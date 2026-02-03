@@ -1,0 +1,475 @@
+creo que me quiero generar una especie de JIRA o algo asi para ir teniendo control de los proyectos que voy haciendo y de las horas que le echo y el tiempo que gasto, me gustaria que fuese igualmente una herramienta online en html, css y js que use .json's como "save file" para que asi todo el mundo la pueda usar, y me gustaria ver si podria sacar informacion del calendario de mac porque es ahi donde ahora mismo me voy apuntando todo y seria increible poder scrappearlo o incluso sincronizarlo de alguna manera
+
+9:55
+Me parece un proyecto genial. Déjame primero revisar el skill de frontend-design para asegurarme de crear algo con buen diseño, y luego te haré algunas preguntas para entender mejor lo que necesitas.
+
+
+Revisar el skill de diseño frontend para crear una herramienta con buen diseño
+Perfecto. Ahora tengo claro cómo hacer algo visualmente memorable. Antes de ponerme a construir, déjame hacerte algunas preguntas para entender mejor lo que necesitas:
+
+Sobre la funcionalidad:
+
+Proyectos - ¿Qué info quieres trackear de cada proyecto? (nombre, cliente, estado, deadline, presupuesto, etc.)
+Tracking de tiempo - ¿Prefieres un timer en vivo tipo "start/stop" o prefieres introducir las horas manualmente después?
+Tareas - ¿Quieres algo tipo Kanban (columnas de "To Do", "In Progress", "Done") o una lista más simple?
+Sobre el calendario de Mac:
+
+Aquí hay varias opciones:
+
+Exportar manualmente: Puedes exportar tu calendario como .ics y la herramienta lo importaría
+Sincronización con iCloud: Más complejo, requeriría autenticación con Apple
+Scraping local: Si tienes los archivos del calendario en tu Mac, podría leerlos directamente
+La opción más práctica para una herramienta que "cualquiera pueda usar" sería la importación de archivos .ics, que es el formato estándar de calendarios.
+
+Sobre el estilo visual:
+
+¿Tienes alguna preferencia estética? Por ejemplo:
+
+Minimalista y limpio (tipo Notion/Linear)
+Más colorido y visual (tipo Asana)
+Dark mode / Light mode
+Algo más único y con personalidad
+Cuéntame y te monto algo potente 🔧
+
+1770109431138_image.png
+1 si, justo, incluso me gustaria que pueda introducir los datos de facturacion de cada proyecto (y si ha pagado o no cliente) para que cuando el proyecto esté concluido me diga a cuanto me ha salido la hora neto
+
+2 prefiero introducir las horas manualmente despues, es lo que hago ahora mismo
+
+3 no se que opciones hay! 
+
+sobre el calendario de mac: ahora mismo te puedo pasar una captura de por ejemplo la semana pasada:  lo morado y lo rojo oscuro son bhoras que trabajo en web. creo que lo mas facil seria que en lugar de que pueda tomar los datos del calendario que yo tome nota de cuantas horas he gastado segun calendario y las introduzca y de cara a futuro cuando lo vaya introduciendo en el calendario lo introduzca tambien en este nuevo programa (que necesitamos un nombre por cierto!!!) 
+
+quiero que la estetica sea minimalista y bastante clean pero que pruebes a que tenga personalidad!!! auntes de empezar a tirar codigo quiero que me explique smuy bien cómo funcionará para que lo tengamos muy claro antes de que gastes recursos en genearr codigo
+
+Mostrar más
+10:05
+¡Perfecto! Me encanta tu calendario, se ve que tienes un sistema de colores muy claro (morado para webs de clientes, rojo oscuro para otras webs, verde para posts, etc.).
+
+Vamos a definir bien la herramienta antes de escribir ni una línea de código:
+
+TRACKR (o algún nombre que te mole más)
+Concepto General
+Una herramienta de gestión de proyectos freelance que te permite:
+
+Controlar proyectos con toda su info (cliente, estado, fechas, facturación)
+Registrar horas manualmente por proyecto
+Calcular rentabilidad real (€/hora neto) al finalizar
+Exportar/Importar todo como JSON para portabilidad total
+Estructura de Datos
+Cada proyecto tendría:
+
+Nombre del proyecto
+Cliente
+Estado (Pendiente → En progreso → Completado → Facturado → Pagado)
+Fecha inicio / Fecha fin estimada / Fecha fin real
+Categoría/Color (como en tu calendario: web, posts, gestión, etc.)
+Facturación: precio acordado, gastos asociados, pagado (sí/no), fecha de pago
+Horas: lista de entradas con fecha, horas, y nota opcional
+Al completar un proyecto: Precio neto ÷ Horas totales = €/hora real
+
+Vistas principales
+1. Dashboard
+
+Resumen rápido: proyectos activos, horas esta semana/mes, ingresos pendientes de cobro
+Gráfico simple de horas por categoría
+Alertas: proyectos sin actividad, facturas pendientes de pago
+2. Lista de Proyectos
+
+Tabla/cards con todos los proyectos
+Filtros por estado, cliente, categoría
+Ordenar por fecha, horas, rentabilidad
+Click para ver detalle
+3. Detalle de Proyecto
+
+Toda la info del proyecto
+Historial de horas (añadir nueva entrada aquí)
+Calculadora de rentabilidad en tiempo real
+Cambiar estado, editar facturación
+4. Registro rápido de horas
+
+Formulario simple: seleccionar proyecto → horas → nota → guardar
+Para el día a día sin entrar al detalle
+5. Informes
+
+Horas totales por período
+Ingresos por mes/cliente/categoría
+Ranking de proyectos por €/hora (para saber qué tipo de trabajo te conviene más)
+Clientes más rentables vs menos rentables
+Flujo típico de uso
+Creas un proyecto: "Conor Web" → Cliente: Conor → Categoría: Web → Precio: 800€
+Cada día (o cuando quieras): añades horas → "2.5h - Diseño homepage"
+Al terminar: marcas como completado, introduces fecha real de fin
+Al facturar: marcas como facturado, introduces gastos si los hay
+Al cobrar: marcas como pagado → Te muestra: "Has ganado 720€ netos en 18h = 40€/hora"
+Sistema de guardado
+Todo se guarda en localStorage del navegador (persistente)
+Botón "Exportar JSON" → descarga un archivo con todos tus datos
+Botón "Importar JSON" → carga datos desde archivo
+Así puedes hacer backup, cambiar de ordenador, o compartir la herramienta
+Estética
+Pensaba en algo así:
+
+Dark mode base (como tu calendario)
+Tipografía con personalidad pero legible (algo geométrico tipo "DM Sans" o "Outfit")
+Colores: fondo oscuro neutro, acentos de color saturados para las categorías (similar a tu calendario)
+Personalidad: quizás algún detalle tipo bordes redondeados asimétricos, o un gradiente sutil, o micro-animaciones en las interacciones
+Clean pero no aburrido: espacios amplios, jerarquía visual clara, pero con pequeños detalles que lo hagan memorable
+Preguntas antes de empezar:
+¿Te cuadra este flujo? ¿Cambiarías algo?
+¿Qué categorías usas? Veo en tu calendario: Webs (morado), algo rojo oscuro, Posts IG (verde), gestiones (naranja/amarillo)... ¿cuáles son todas?
+¿Quieres multi-moneda o todo en €?
+¿El "precio acordado" es siempre fijo o a veces trabajas por horas (ej: 30€/h × horas que salgan)?
+¿Nombre? TRACKR, HORAS, PROYECTA, CURRO... ¿alguna idea?
+
+calculadoraInversa.zip
+zip
+
+habria una vista mas que es antes de cargar el json no? (o el archivo de datos que me recomiendes, ¿cual me recomiendas? me gusta json porque es facil de leer incluso sin programa) y cuando vaya teniendo muchos muchos proyectos como lo podriamos hacer? para que no quede un json enorme? o daria igual en verdad y simplemente se van añadiendo en una array de proyectos terminados 
+
+me gustaria una tipo como la dm mono en verda algo asi mas divertido
+
+que cada proyecto pueda tener un color asignado
+
+dale personalidad si!! yo lo veo bien y el nombre de tracker es chulisimo. quiero que sea solo euros y ahora mismo los proyectos me gusta no soplo incluir las horas de trabajo "solitario" (que es lo que ves ene l calendari como morado/azul) sino las hors de reuniones también (en rojo burdeos) y poder poner ambas hopras por separado 
+
+el precio acordado cada proyecto tendra uno y introduciré el iva y el irpf para que lo calcule bien, pero me gustaria que pudiese funcionar como la calculadora inversa que te mando para que pueda tanto introducir el total como la base imponible y el irpf e iva para que haga el calculo. habran proyectos que sean gratis porque sean por intercambios o asi y esos tambien los quiero registrar
+
+¿tienes alguna duda mas?
+
+Mostrar más
+10:12
+Déjame revisar la calculadora inversa que me has enviado para entender bien cómo funciona.
+
+
+Ejecutó un comando, vio un archivo
+Entendido. Ahora veo cómo funciona tu calculadora bidireccional (puedes introducir base o total y calcula el otro). Muy bien pensada.
+
+TRACKR - Especificación Final
+Sobre el almacenamiento (JSON)
+Sí, JSON es perfecto. Es legible, portable y estándar. Para muchos proyectos no te preocupes por el tamaño:
+
+Un proyecto con 100 entradas de horas ≈ 5-10 KB
+500 proyectos completos ≈ 2-5 MB máximo
+Los navegadores manejan esto sin problema
+Opción futura (si algún día llegas a miles): podrías tener un JSON de "proyectos activos" y otro de "archivo histórico", pero honestamente con cientos de proyectos no notarás nada.
+
+Vistas confirmadas
+Pantalla de inicio / Carga de datos
+Primera vez: crear nuevo archivo de datos o cargar JSON existente
+Si ya hay datos en localStorage: carga automático + opción de importar otro
+Dashboard - Resumen rápido
+Lista de proyectos - Con filtros y ordenación
+Detalle de proyecto - Info completa + registro de horas
+Registro rápido de horas - Para el día a día
+Informes - Estadísticas y rentabilidad
+Estructura de un proyecto
+javascript
+{
+  id: "uuid-único",
+  nombre: "Conor Web",
+  cliente: "Conor",
+  color: "#8B5CF6",  // Color personalizado
+  estado: "en_progreso", // pendiente | en_progreso | completado | facturado | pagado
+  
+  fechas: {
+    inicio: "2025-01-15",
+    finEstimada: "2025-02-28",
+    finReal: null
+  },
+  
+  facturacion: {
+    modo: "desde_base", // "desde_base" | "desde_total" | "gratis"
+    baseImponible: 800,  // O null si introduces total
+    total: null,         // O el total si introduces desde ahí
+    iva: 21,
+    irpf: 15,
+    // Calculados automáticamente:
+    importeIva: 168,
+    importeIrpf: 120,
+    totalFactura: 848,
+    netoRecibido: 680,   // Lo que realmente cobras (total - IRPF)
+    
+    pagado: false,
+    fechaPago: null,
+    gastos: 0  // Gastos asociados (dominios, etc.)
+  },
+  
+  horas: [
+    {
+      id: "uuid",
+      fecha: "2025-01-20",
+      tipo: "trabajo",    // "trabajo" | "reunion"
+      cantidad: 2.5,
+      nota: "Diseño homepage"
+    },
+    {
+      id: "uuid",
+      fecha: "2025-01-22",
+      tipo: "reunion",
+      cantidad: 1,
+      nota: "Call inicial con cliente"
+    }
+  ],
+  
+  notas: "Proyecto de rediseño completo..."
+}
+```
+
+---
+
+### **Calculadora de facturación integrada**
+
+Igual que tu calculadora inversa:
+- **Toggle IVA** (activado por defecto, 21%)
+- **Toggle IRPF** (activado por defecto, 15%)
+- **Modo bidireccional**: introduces base → calcula total, o introduces total → calcula base
+- **Modo "gratis/intercambio"**: marca el proyecto como sin facturación pero sigue trackeando horas
+
+---
+
+### **Horas separadas**
+
+- **Trabajo**: horas de curro en solitario (lo morado de tu calendario)
+- **Reunión**: horas de calls/meetings (lo burdeos)
+- En los informes verás ambas por separado y el total
+- €/hora se calculará sobre el total (trabajo + reuniones) porque tu tiempo es tu tiempo
+
+---
+
+### **Cálculo de rentabilidad final**
+
+Cuando un proyecto está **pagado**:
+```
+Neto recibido - Gastos = Beneficio real
+Beneficio real ÷ Horas totales = €/hora neto
+Ejemplo:
+
+Base: 800€, IVA 21%, IRPF 15%
+Total factura: 848€
+Neto recibido: 680€ (800 - 120 de IRPF)
+Gastos: 50€ (dominio + hosting)
+Beneficio real: 630€
+Horas: 18h trabajo + 2h reuniones = 20h
+€/hora neto: 31.50€
+Estética
+Dark mode base (como tu calendario y calculadora)
+Tipografía: DM Mono para números/datos, algo geométrico para títulos
+Colores de proyectos: paleta vibrante seleccionable
+Personalidad: bordes con un ligero glow en el color del proyecto, transiciones suaves, micro-animaciones en hover
+Una última pregunta
+¿Quieres que los clientes sean una entidad separada (con sus datos: nombre, email, etc.) que luego asignas a proyectos? Esto permitiría:
+
+Ver "todos los proyectos de Conor"
+Estadísticas por cliente (rentabilidad media, horas totales, etc.)
+Autocompletar cliente al crear proyecto
+¿O prefieres que "cliente" sea simplemente un campo de texto libre en cada proyecto (más simple)?
+
+vale o sea que entiendo que podria ir añadiendo horas en dias o incluso que pueda añadir horas totales sin dias!!! 
+
+en principio solo hay un proyecto por cliente asi que no necesitaria eso!
+
+10:15
+Perfecto, lo tengo todo claro. Entonces:
+
+Horas flexibles: podrás añadir horas de dos formas:
+
+Con fecha específica ("2h el 20 de enero - diseño homepage")
+Sin fecha ("15h totales de trabajo") para cuando migres datos históricos o no te importe el detalle
+Cliente como texto libre: simple y directo, sin complicaciones.
+
+Resumen final antes de codear
+TRACKR - Gestor de proyectos freelance
+6 vistas:
+
+Inicio → Cargar JSON existente o crear nuevo
+Dashboard → Resumen: proyectos activos, horas semana/mes, € pendientes de cobro
+Proyectos → Lista filtrable/ordenable con cards de colores
+Detalle proyecto → Todo: info, horas, facturación con calculadora bidireccional
++ Horas rápido → Selector proyecto → tipo (trabajo/reunión) → cantidad → nota opcional → guardar
+Informes → Estadísticas, rankings de rentabilidad, horas por período
+Proyecto incluye:
+
+Nombre, cliente (texto), color personalizado, estado (5 opciones)
+Fechas: inicio, fin estimada, fin real
+Facturación bidireccional (base↔total) con IVA/IRPF toggleables + modo gratis
+Horas: trabajo vs reunión, con o sin fecha, con nota opcional
+Cálculo automático de €/hora neto al completar
+Técnico:
+
+HTML + CSS + JS vanilla (un solo archivo)
+Datos en localStorage + export/import JSON
+Dark mode, DM Mono para datos, colores vibrantes, personalidad
+¿Le doy caña? 🔥
+
+dale caña!!!
+
+10:16
+
+Crear TRACKR - Gestor de proyectos freelance completo con todas las funcionalidades especificadas
+Continuar
+
+10:22
+<function_results>File created at /home/claude/trackr/index.html with 1163 lines
+</function_results>
+
+El archivo se ha truncado. Déjame completarlo:
+
+
+Ejecutó 2 comandos, vio un archivo, archivo creado
+La respuesta de Claude se interrumpió
+pasame el estado actual que tengas con el brief completo y lo tiro desde claude code!
+
+10:22
+¡Perfecto! Aquí tienes el brief completo para que lo tires desde Claude Code:
+
+TRACKR - Brief Completo
+Qué es
+Herramienta web de gestión de proyectos freelance para trackear proyectos, horas y facturación. Todo en un solo archivo HTML + CSS + JS. Datos guardados en localStorage + export/import JSON.
+
+Vistas (6 total)
+Pantalla de inicio → Cargar JSON existente o crear nuevo archivo de datos
+Dashboard → Resumen: proyectos activos, horas semana/mes, € pendientes de cobro, alertas de facturas sin pagar
+Proyectos → Lista filtrable (por estado) y ordenable (recientes, nombre, horas, rentabilidad) con cards de colores
+Detalle proyecto → Info completa, historial de horas, facturación, botón editar/eliminar
++ Horas rápido → Selector proyecto → tipo (trabajo/reunión) → cantidad → nota opcional → guardar
+Informes → Estadísticas generales, ranking de proyectos por €/hora, resumen por cliente
+Estructura de un proyecto
+javascript
+{
+  id: "uuid-único",
+  nombre: "Conor Web",
+  cliente: "Conor",  // texto libre
+  color: "#8B5CF6",  // color personalizado seleccionable
+  estado: "en_progreso", // pendiente | en_progreso | completado | facturado | pagado
+  
+  fechas: {
+    inicio: "2025-01-15",
+    finEstimada: "2025-02-28",
+    finReal: null
+  },
+  
+  facturacion: {
+    modo: "desde_base", // "desde_base" | "desde_total" | "gratis"
+    baseImponible: 800,
+    total: null,
+    iva: 21,            // porcentaje, toggleable
+    irpf: 15,           // porcentaje, toggleable
+    // Calculados automáticamente:
+    importeIva: 168,
+    importeIrpf: 120,
+    totalFactura: 848,
+    netoRecibido: 680,  // base - IRPF (lo que realmente cobras)
+    
+    pagado: false,
+    fechaPago: null,
+    gastos: 0           // gastos asociados (dominios, etc.)
+  },
+  
+  horas: [
+    {
+      id: "uuid",
+      fecha: "2025-01-20",  // opcional - puede ser null para horas sin fecha
+      tipo: "trabajo",       // "trabajo" | "reunion"
+      cantidad: 2.5,
+      nota: "Diseño homepage"
+    }
+  ],
+  
+  notas: "Proyecto de rediseño completo..."
+}
+```
+
+---
+
+### **Calculadora de facturación (bidireccional)**
+
+Igual que la calculadora inversa que ya tienes:
+- **3 modos**: "Desde base" | "Desde total" | "Gratis"
+- **Toggle IVA** (activado por defecto 21%)
+- **Toggle IRPF** (activado por defecto 15%)
+- **Bidireccional**: introduces base → calcula total, O introduces total → calcula base
+- Muestra desglose: Base, +IVA, -IRPF, Total factura, Neto a recibir
+
+Referencia de la lógica: `/mnt/user-data/uploads/calculadoraInversa.zip` (ya lo tienes extraído)
+
+---
+
+### **Horas**
+
+- **Dos tipos**: Trabajo (💻) y Reunión (👥)
+- **Fecha opcional**: puede tener fecha específica o no (para datos históricos)
+- **Nota opcional**: descripción de qué se hizo
+- Se pueden añadir desde el detalle del proyecto O desde la vista rápida "+ Horas"
+
+---
+
+### **Cálculo de rentabilidad**
+
+Cuando un proyecto tiene horas y facturación:
+```
+Neto recibido - Gastos = Beneficio real
+Beneficio real ÷ Horas totales (trabajo + reunión) = €/hora neto
+Estética
+Dark mode base (como el calendario de Mac del usuario)
+Tipografía: DM Mono para números/datos, Outfit para títulos y texto
+Colores de proyectos: paleta vibrante seleccionable (10 colores)
+Personalidad: bordes con glow sutil en el color del proyecto, transiciones suaves
+Minimalista pero con carácter: espacios amplios, jerarquía visual clara
+Referencia de estilo: skill de frontend-design en /mnt/skills/public/frontend-design/SKILL.md
+
+Almacenamiento
+localStorage para persistencia automática
+Exportar JSON: botón que descarga trackr_backup_FECHA.json
+Importar JSON: botón que carga archivo y reemplaza datos
+Estructura del JSON:
+
+javascript
+{
+  projects: [...],
+  settings: {
+    defaultIva: 21,
+    defaultIrpf: 15
+  }
+}
+```
+
+---
+
+### **Paleta de colores para proyectos**
+```
+#8B5CF6 (violeta)
+#EC4899 (rosa)
+#EF4444 (rojo)
+#F59E0B (naranja)
+#10B981 (verde)
+#06B6D4 (cyan)
+#3B82F6 (azul)
+#6366F1 (indigo)
+#A855F7 (púrpura)
+#78716C (gris)
+Estados de proyecto
+Pendiente → Aún no empezado
+En progreso → Trabajando
+Completado → Trabajo terminado, pendiente facturar
+Facturado → Factura enviada, pendiente de pago
+Pagado → Cobrado ✓
+Navegación
+Sidebar fijo a la izquierda con:
+
+Logo "TRACKR"
+Dashboard
+Proyectos
+Horas
+Informes
+(separador)
+Exportar JSON
+Importar JSON
+¡Dale caña desde Claude Code! 🔥
+
+
+
+
+
+
+Claude es IA y puede cometer errores. Por favor, verifica las respuestas.
