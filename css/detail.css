@@ -25,6 +25,7 @@
 .hr:last-child{border-radius:0 0 var(--r) var(--r)}
 .hr:only-child{border-radius:var(--r)}
 .hr:hover{background:var(--bg3)}
+.hr-click{cursor:pointer}
 .hr-t{width:22px;text-align:center;font-size:.9rem}
 .hr-d{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--t3);min-width:80px}
 .hr-a{font-family:'DM Mono',monospace;font-weight:500;min-width:40px}

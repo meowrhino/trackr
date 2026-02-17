@@ -40,42 +40,34 @@ const App={
     const ps=D.ps();
     ps.forEach(p=>B.calc(p));
 
-    /* COMENTADO: filtro solo en_progreso. Ahora muestra todos.
-    const act=ps.filter(p=>p.estado==='en_progreso');
-    FIN COMENTADO */
-    const act=ps;
-
-    /* COMENTADO: cálculo y renderizado de stats (Activos, Semana, Mes, Pendiente cobro)
-    const now=new Date();
-    const wa=new Date(now);wa.setDate(wa.getDate()-7);
-    const ma=new Date(now);ma.setDate(ma.getDate()-30);
-    let hw=0,hm=0,pend=0;
-    ps.forEach(p=>{
-      p.horas.forEach(h=>{if(h.fecha){const d=new Date(h.fecha);if(d>=wa)hw+=h.cantidad;if(d>=ma)hm+=h.cantidad}});
-      if(p.estado==='facturado'&&!p.facturacion.pagado)pend+=p.facturacion.totalFactura||0;
-    });
-    document.getElementById('dSt').innerHTML=`
-      <div class="sc"><div class="sc-l">Activos</div><div class="sc-v m">${act.length}</div><div class="sc-d">${ps.length} total</div></div>
-      <div class="sc"><div class="sc-l">Semana</div><div class="sc-v m">${hw.toFixed(1)}h</div></div>
-      <div class="sc"><div class="sc-l">Mes</div><div class="sc-v m">${hm.toFixed(1)}h</div></div>
-      <div class="sc"><div class="sc-l">Pendiente cobro</div><div class="sc-v m" style="color:${pend>0?'var(--warn)':'var(--ok)'}">${pend.toFixed(2)} €</div></div>`;
-    FIN COMENTADO */
-
     /* Alertas */
     const als=[];
     ps.forEach(p=>{
       if(p.estado==='facturado'&&!p.facturacion.pagado)als.push({t:`${p.nombre} — pendiente de pago`,id:p.id});
+      /* COMENTADO: alerta pendiente de facturar
       if(p.estado==='completado')als.push({t:`${p.nombre} — pendiente de facturar`,id:p.id});
+      FIN COMENTADO */
     });
     document.getElementById('dAl').innerHTML=als.map(a=>
       `<div class="al" onclick="App.go('det','${a.id}')"><span style="color:var(--warn)">!</span><span style="flex:1">${a.t}</span><span style="color:var(--t3)">→</span></div>`
     ).join('');
 
-    /* Grid de proyectos */
+    /* Agrupar proyectos por estado */
+    const order=['en_progreso','pendiente','completado','recurrente','facturado','pagado'];
+    const labels={en_progreso:'En progreso',pendiente:'Pendientes',completado:'Completados',recurrente:'Recurrentes',facturado:'Facturados',pagado:'Pagados'};
+    const groups={};
+    ps.forEach(p=>{if(!groups[p.estado])groups[p.estado]=[];groups[p.estado].push(p)});
+
     const c=document.getElementById('dPr');
-    c.innerHTML=act.length
-      ? act.map(p=>this.card(p)).join('')
-      : '<div class="es"><div class="tx">Sin proyectos</div></div>';
+    if(!ps.length){c.innerHTML='<div class="es"><div class="tx">Sin proyectos</div></div>';return}
+
+    let html='';
+    order.forEach(st=>{
+      const g=groups[st];
+      if(!g||!g.length)return;
+      html+=`<div class="dash-group"><div class="dash-group-title">${labels[st]}</div><div class="pg">${g.map(p=>this.card(p,true)).join('')}</div></div>`;
+    });
+    c.innerHTML=html;
   },
 
   /* ══════════════════════════════════════════════
@@ -104,10 +96,11 @@ const App={
   },
 
   /* Genera HTML de card de proyecto (usado en dashboard y lista) */
-  card(p){
+  card(p,noBadge){
     const th=p.horas.reduce((s,h)=>s+h.cantidad,0),eph=B.eph(p),hex=colorHex(p.color);
-    return `<div class="pc" style="--project-color:${hex}" onclick="App.go('det','${p.id}')">
-      <div class="pc-h"><div><div class="pc-n">${esc(p.nombre)}</div><div class="pc-c">${esc(p.cliente)}</div></div><span class="bd bd-${p.estado}">${EST[p.estado]}</span></div>
+    const isMR=(p.cliente||'').toLowerCase()==='meowrhino';
+    return `<div class="pc${isMR?' pc-mr':''}" style="--project-color:${hex}" onclick="App.go('det','${p.id}')">
+      <div class="pc-h"><div><div class="pc-n">${esc(p.nombre)}</div><div class="pc-c">${esc(p.cliente)}</div></div>${noBadge?'':` <span class="bd bd-${p.estado}">${EST[p.estado]}</span>`}</div>
       <div class="pc-s">
         <span><span class="m">${th.toFixed(1)}h</span></span>
         ${p.facturacion.modo!=='gratis'?`<span><span class="m">${(p.facturacion.totalFactura||0).toFixed(2)} €</span></span>`:'<span style="color:var(--t3)">gratis</span>'}
@@ -131,12 +124,11 @@ const App={
       eph=B.eph(p),hex=colorHex(p.color);
 
     const hHtml=!p.horas.length?'<div class="es"><div class="tx">Sin horas</div></div>'
-      :`<div class="hl">${p.horas.map(h=>`<div class="hr" style="border-left-color:${hex}">
+      :`<div class="hl">${p.horas.map(h=>`<div class="hr hr-click" style="border-left-color:${hex}" onclick="App.eHour('${p.id}','${h.id}')">
         <span class="hr-t">${h.tipo==='trabajo'?'💻':'👥'}</span>
-        <span class="hr-d">${fmtDate(h.fecha)}</span>
+        <span class="hr-d">${fmtDate(h.fecha)}${h.horaInicio?' '+h.horaInicio:''}</span>
         <span class="hr-a m">${h.cantidad}h</span>
         <span class="hr-n">${esc(h.nota||'')}</span>
-        <span class="hr-e" onclick="event.stopPropagation();App.eHour('${p.id}','${h.id}')" title="Editar">✎</span>
         <span class="hr-x" onclick="event.stopPropagation();App.xHour('${p.id}','${h.id}')" title="Eliminar">×</span>
       </div>`).join('')}</div>`;
 
@@ -161,8 +153,8 @@ const App={
         <div><div class="dfl">Fin real</div><div class="dfv">${fmtDate(p.fechas.finReal)}</div></div>
         <div><div class="dfl">Horas</div><div class="dfv">${th.toFixed(1)}h <span style="color:var(--t3);font-size:.72rem">💻${wh.toFixed(1)} 👥${mh.toFixed(1)}</span></div></div>
       </div>${p.notas?`<div style="margin-top:.75rem"><div class="dfl">Notas</div><div style="color:var(--t3);font-size:.85rem">${esc(p.notas)}</div></div>`:''}</div>
-      <div class="ds"><div class="dst">Facturación</div>${bHtml}${p.facturacion.pagado?`<div style="margin-top:.5rem;font-size:.82rem;color:var(--ok)">Pagado${p.facturacion.fechaPago?' el '+fmtDate(p.facturacion.fechaPago):''}</div>`:''}</div>
-      <div class="ds"><div style="display:flex;justify-content:space-between;align-items:center"><div class="dst" style="border:none;margin:0;padding:0">Horas</div><button class="bt bt-s" onclick="App.hModal('${p.id}')">+ Añadir</button></div>${hHtml}</div>`;
+      <div class="ds"><div style="display:flex;justify-content:space-between;align-items:center"><div class="dst" style="border:none;margin:0;padding:0">Horas</div><button class="bt bt-add" onclick="App.hModal('${p.id}')">+ Añadir</button></div>${hHtml}</div>
+      <div class="ds"><div class="dst">Facturación</div>${bHtml}${p.facturacion.pagado?`<div style="margin-top:.5rem;font-size:.82rem;color:var(--ok)">Pagado${p.facturacion.fechaPago?' el '+fmtDate(p.facturacion.fechaPago):''}</div>`:''}</div>`;
   },
 
   /* Editar una entrada de hora */
@@ -170,7 +162,6 @@ const App={
     const p=D.p(pid);if(!p)return;
     const h=p.horas.find(x=>x.id===hid);if(!h)return;
     const noDate=!h.fecha;
-    const noTime=!h.horaInicio;
     this.om(`<div class="mt">Editar hora</div>
       <label>Tipo</label>
       <div class="ts2">
@@ -179,7 +170,7 @@ const App={
       </div>
       <div class="fr"><div class="fg"><label>Horas</label><input type="number" id="ehA" min="0.25" step="0.25" value="${h.cantidad}"></div>
         <div class="fg"><label>Fecha</label><input type="date" id="ehD" value="${h.fecha||''}" ${noDate?'disabled':''}><label style="margin-top:.35rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="ehNd" ${noDate?'checked':''} onchange="document.getElementById('ehD').disabled=this.checked;if(this.checked)document.getElementById('ehD').value=''" style="width:auto;accent-color:var(--t2)"> Sin fecha</label></div></div>
-      <div class="fr"><div class="fg"><label>Hora inicio</label><input type="time" id="ehHI" value="${h.horaInicio||''}" ${noTime?'disabled':''}><label style="margin-top:.35rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="ehNt" ${noTime?'checked':''} onchange="document.getElementById('ehHI').disabled=this.checked;if(this.checked)document.getElementById('ehHI').value=''" style="width:auto;accent-color:var(--t2)"> Sin hora</label></div><div class="fg"></div></div>
+      <div class="fr"><div class="fg"><label>Hora inicio</label><input type="time" id="ehHI" value="${h.horaInicio||''}"></div><div class="fg"></div></div>
       <div class="fg"><label>Nota</label><input type="text" id="ehN" value="${esc(h.nota||'')}"></div>
       <div class="ma"><button class="bt" onclick="App.cm()">Cancelar</button><button class="bt bt-p" onclick="App.saveEH('${pid}','${hid}')">Guardar</button></div>`);
   },
@@ -192,16 +183,15 @@ const App={
     const cant=parseFloat(document.getElementById('ehA').value)||h.cantidad;
     const sinFecha=document.getElementById('ehNd')?.checked;
     const fecha=sinFecha?null:(document.getElementById('ehD').value||null);
-    const sinHora=document.getElementById('ehNt')?.checked;
-    const horaInicio=sinHora?null:(document.getElementById('ehHI').value||null);
+    const horaInicio=document.getElementById('ehHI').value||null;
     const nota=document.getElementById('ehN').value.trim();
     h.tipo=tipo;h.cantidad=cant;h.fecha=fecha;h.horaInicio=horaInicio;h.nota=nota;
-    D.up(pid,{horas:p.horas});this.cm();
+    sortHoras(p.horas);D.up(pid,{horas:p.horas});this.cm();
     if(this.cv==='cal')this.rCal();else this.rDet(pid);
   },
 
   /* Eliminar una hora */
-  xHour(pid,hid){const p=D.p(pid);if(!p)return;p.horas=p.horas.filter(h=>h.id!==hid);D.up(pid,{horas:p.horas});this.rDet(pid)},
+  xHour(pid,hid){const p=D.p(pid);if(!p)return;if(!confirm('¿Eliminar esta entrada de horas?'))return;p.horas=p.horas.filter(h=>h.id!==hid);D.up(pid,{horas:p.horas});this.rDet(pid)},
 
   /* Eliminar un proyecto */
   xProj(id){const p=D.p(id);if(!p)return;if(confirm(`¿Eliminar "${p.nombre}"?`)){D.del(id);this.go('dash')}},
@@ -238,7 +228,7 @@ const App={
     if(!pid||cant<=0)return;
     const p=D.p(pid);if(!p)return;
     p.horas.push({id:uid(),fecha,tipo,cantidad:cant,nota,horaInicio:null});
-    D.up(pid,{horas:p.horas});
+    sortHoras(p.horas);D.up(pid,{horas:p.horas});
     const m=document.getElementById('qOk');m.textContent=`${cant}h → ${p.nombre}`;m.style.display='block';
     setTimeout(()=>m.style.display='none',2500);
     document.getElementById('qA').value='1';document.getElementById('qN').value='';
@@ -328,7 +318,7 @@ const App={
       if(!c.in)cl.push('out');
       if(c.today)cl.push('today');
       const es=(hm[c.date]||[]).map(e=>
-        `<div class="cal-entry" style="border-left-color:${e.pc}"><span class="cal-e-h m">${e.cant}h</span><span class="cal-e-p">${esc(e.pn)}</span></div>`
+        `<div class="cal-entry" style="border-left-color:${e.pc}"><span class="cal-e-ico">${e.tipo==='trabajo'?'💻':'👥'}</span><span class="cal-e-h m">${e.cant}h</span><span class="cal-e-p">${esc(e.pn)}</span></div>`
       ).join('');
       g+=`<div class="${cl.join(' ')}" onclick="App.calDetail('${c.date}')"><div class="cal-num">${c.num}</div>${es}</div>`;
     });
@@ -409,8 +399,8 @@ const App={
     days.forEach((d,di)=>{
       let slots='';
       for(let hr=hStart;hr<hEnd;hr++){
-        const lbl=`${String(hr).padStart(2,'0')}:00`;
-        slots+=`<div class="cal-slot" onclick="App.calAddHour('${d.date}','${lbl}')"></div>`;
+        slots+=`<div class="cal-slot" data-date="${d.date}" data-hr="${hr}" data-min="0" data-col="${di}"></div>`;
+        slots+=`<div class="cal-slot" data-date="${d.date}" data-hr="${hr}" data-min="30" data-col="${di}"></div>`;
       }
       let evts='';
       colEvts[di].forEach(e=>{
@@ -418,9 +408,9 @@ const App={
         const mins=parseInt(parts[0])*60+parseInt(parts[1]);
         const top=((mins-hStart*60)/60)*slotH;
         const height=e.cant*slotH;
-        evts+=`<div class="cal-evt" style="top:${top}px;height:${Math.max(height,20)}px;--ec:${e.pc}" onclick="event.stopPropagation();App.eHour('${e.pid}','${e.hid}')"><span class="cal-evt-t">${e.cant}h</span><span class="cal-evt-n">${esc(e.pn)}</span></div>`;
+        evts+=`<div class="cal-evt" style="top:${top}px;height:${Math.max(height,20)}px;--ec:${e.pc}" onclick="event.stopPropagation();App.eHour('${e.pid}','${e.hid}')"><span class="cal-evt-t">${e.tipo==='trabajo'?'💻':'👥'} ${e.cant}h</span><span class="cal-evt-n">${esc(e.pn)}</span></div>`;
       });
-      cols+=`<div class="cal-wcol">${slots}${evts}</div>`;
+      cols+=`<div class="cal-wcol" data-col="${di}">${slots}${evts}</div>`;
     });
 
     /* Sin hora asignada */
@@ -437,6 +427,72 @@ const App={
       +`<div class="cal-week-hdr">${hdr}</div>`
       +`<div class="cal-week-body"><div class="cal-week-tl">${timeLbl}</div>${cols}</div>`
       +`</div>`+ntHtml;
+
+    /* ── Drag-to-create en slots vacíos ── */
+    const wkBody=document.querySelector('.cal-week-body');
+    if(!wkBody)return;
+    let drag=null; // {startHr,startMin,date,preview,wcol,endMin}
+
+    const minFromY=(y,wcol)=>{
+      const rect=wcol.getBoundingClientRect();
+      const relY=Math.max(0,y-rect.top);
+      return hStart*60+Math.floor(relY/slotH*60);
+    };
+
+    const snap30=m=>Math.floor(m/30)*30;
+
+    const updatePreview=endMin=>{
+      if(!drag)return;
+      const startTotal=drag.startHr*60+drag.startMin;
+      let endTotal=snap30(endMin)+30;
+      if(endTotal<=startTotal)endTotal=startTotal+30;
+      if(endTotal>hEnd*60)endTotal=hEnd*60;
+      const topPx=((startTotal-hStart*60)/60)*slotH;
+      const hPx=((endTotal-startTotal)/60)*slotH;
+      drag.preview.style.top=topPx+'px';
+      drag.preview.style.height=Math.max(hPx,15)+'px';
+      drag.endMin=endTotal;
+    };
+
+    wkBody.addEventListener('mousedown',ev=>{
+      const slot=ev.target.closest('.cal-slot');
+      if(!slot)return;
+      ev.preventDefault();
+      const wcol=slot.closest('.cal-wcol');
+      const date=slot.dataset.date;
+      const startHr=parseInt(slot.dataset.hr);
+      const startMin=parseInt(slot.dataset.min);
+
+      /* Crear preview */
+      const pv=document.createElement('div');
+      pv.className='cal-drag-pv';
+      wcol.appendChild(pv);
+
+      drag={startHr,startMin,date,preview:pv,wcol,endMin:startHr*60+startMin+30};
+      updatePreview(startHr*60+startMin);
+    });
+
+    wkBody.addEventListener('mousemove',ev=>{
+      if(!drag)return;
+      ev.preventDefault();
+      const rawMin=minFromY(ev.clientY,drag.wcol);
+      updatePreview(rawMin);
+    });
+
+    const endDrag=()=>{
+      if(!drag)return;
+      const d=drag;drag=null;
+      if(d.preview.parentNode)d.preview.remove();
+      const startTotal=d.startHr*60+d.startMin;
+      const dur=(d.endMin-startTotal)/60;
+      const hh=String(d.startHr).padStart(2,'0');
+      const mm=String(d.startMin).padStart(2,'0');
+      App.calAddHour(d.date,`${hh}:${mm}`,dur>0?dur:0.5);
+    };
+    wkBody.addEventListener('mouseup',endDrag);
+    wkBody.addEventListener('mouseleave',()=>{
+      if(drag){drag.preview.remove();drag=null}
+    });
   },
 
   /* Header compartido mes/semana */
@@ -527,18 +583,18 @@ const App={
   },
 
   /* Modal añadir hora desde calendario (con selector de proyecto) */
-  calAddHour(fecha,hora){
+  calAddHour(fecha,hora,duracion){
     const ps=D.ps().filter(p=>p.estado!=='pagado');
     if(!ps.length){this.om(`<div class="mt">Añadir hora</div><div class="es"><div class="tx">Crea un proyecto primero</div></div><div class="ma"><button class="bt" onclick="App.cm()">Cerrar</button></div>`);return}
-    const hasHora=!!hora;
+    const dur=duracion||1;
     this.om(`<div class="mt">Añadir hora</div>
       <div class="fg"><label>Proyecto</label><select id="chP">${ps.map(p=>`<option value="${p.id}">${esc(p.nombre)} — ${esc(p.cliente)}</option>`).join('')}</select></div>
       <label>Tipo</label>
       <div class="ts2"><div class="to on" data-type="trabajo" onclick="App.selT(this)"><span class="ic">💻</span><span class="la">Trabajo</span></div>
         <div class="to" data-type="reunion" onclick="App.selT(this)"><span class="ic">👥</span><span class="la">Reunión</span></div></div>
-      <div class="fr"><div class="fg"><label>Horas</label><input type="number" id="chA" min="0.25" step="0.25" value="1"></div>
+      <div class="fr"><div class="fg"><label>Horas</label><input type="number" id="chA" min="0.25" step="0.25" value="${dur}"></div>
         <div class="fg"><label>Fecha</label><input type="date" id="chD" value="${fecha||new Date().toISOString().slice(0,10)}"></div></div>
-      <div class="fr"><div class="fg"><label>Hora inicio</label><input type="time" id="chHI" value="${hora||''}" ${!hasHora?'disabled':''}><label style="margin-top:.35rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="chNt" ${!hasHora?'checked':''} onchange="document.getElementById('chHI').disabled=this.checked;if(this.checked)document.getElementById('chHI').value=''" style="width:auto;accent-color:var(--t2)"> Sin hora</label></div><div class="fg"></div></div>
+      <div class="fr"><div class="fg"><label>Hora inicio</label><input type="time" id="chHI" value="${hora||''}"></div><div class="fg"></div></div>
       <div class="fg"><label>Nota</label><input type="text" id="chN" placeholder="¿Qué hiciste?"></div>
       <div class="ma"><button class="bt" onclick="App.cm()">Cancelar</button><button class="bt bt-p" onclick="App.saveCalH()">Guardar</button></div>`);
   },
@@ -549,13 +605,12 @@ const App={
     const tipo=document.querySelector('#mC .to.on')?.dataset.type||'trabajo';
     const cant=parseFloat(document.getElementById('chA').value)||0;
     const fecha=document.getElementById('chD').value||null;
-    const sinH=document.getElementById('chNt')?.checked;
-    const horaInicio=sinH?null:(document.getElementById('chHI').value||null);
+    const horaInicio=document.getElementById('chHI').value||null;
     const nota=document.getElementById('chN').value.trim();
     if(cant<=0||!pid)return;
     const p=D.p(pid);if(!p)return;
     p.horas.push({id:uid(),fecha,tipo,cantidad:cant,nota,horaInicio});
-    D.up(pid,{horas:p.horas});this.cm();this.rCal();
+    sortHoras(p.horas);D.up(pid,{horas:p.horas});this.cm();this.rCal();
   },
 
   /* ══════════════════════════════════════════════
@@ -564,19 +619,37 @@ const App={
   om(h){document.getElementById('mC').innerHTML=h;document.getElementById('mO').classList.add('on')},
   cm(){document.getElementById('mO').classList.remove('on')},
 
-  /* Selector de color W3C */
+  /* Selector de color W3C — grid de swatches */
   colorSelect(currentName){
     const curHex=colorHex(currentName);
-    let html=`<div style="display:flex;align-items:center;gap:.5rem"><div id="mpColorDot" style="width:20px;height:20px;border-radius:var(--r);background:${curHex};flex-shrink:0;border:1px solid var(--b2)"></div><select id="mpColor" style="width:100%" onchange="document.getElementById('mpColorDot').style.background=colorHex(this.value)">`;
+    let html=`<div class="cs-wrap"><div class="cs-hd"><div id="mpColorDot" class="cs-dot" style="background:${curHex}"></div><span id="mpColorLbl" class="cs-lbl">${currentName}</span></div>`;
+    html+=`<input type="hidden" id="mpColor" value="${currentName}">`;
+    html+=`<div class="cs-grid" onmouseleave="App._csReset()">`;
     for(const[group,colors] of Object.entries(W3C_COLORS)){
-      html+=`<optgroup label="${group}">`;
       colors.forEach(([name,hex])=>{
-        html+=`<option value="${name}" ${name===currentName?'selected':''} style="color:${hex}">${name}</option>`;
+        html+=`<div class="cs-sw${name===currentName?' on':''}" style="background:${hex}" data-name="${name}" data-hex="${hex}" title="${name}" onmouseenter="App._csHover(this)" onclick="App._csPick(this)"></div>`;
       });
-      html+='</optgroup>';
     }
-    html+='</select></div>';
+    html+=`</div></div>`;
     return html;
+  },
+  _csHover(el){
+    document.getElementById('mpColorDot').style.background=el.dataset.hex;
+    document.getElementById('mpColorLbl').textContent=el.dataset.name;
+  },
+  _csReset(){
+    const sel=document.getElementById('mpColor');
+    if(!sel)return;
+    const name=sel.value;
+    document.getElementById('mpColorDot').style.background=colorHex(name);
+    document.getElementById('mpColorLbl').textContent=name;
+  },
+  _csPick(el){
+    document.querySelectorAll('.cs-sw.on').forEach(s=>s.classList.remove('on'));
+    el.classList.add('on');
+    document.getElementById('mpColor').value=el.dataset.name;
+    document.getElementById('mpColorDot').style.background=el.dataset.hex;
+    document.getElementById('mpColorLbl').textContent=el.dataset.name;
   },
 
   /* Modal crear/editar proyecto */
@@ -684,7 +757,7 @@ const App={
         <div class="to" data-type="reunion" onclick="App.selT(this)"><span class="ic">👥</span><span class="la">Reunión</span></div></div>
       <div class="fr"><div class="fg"><label>Horas</label><input type="number" id="mhA" min="0.25" step="0.25" value="1"></div>
         <div class="fg"><label>Fecha</label><input type="date" id="mhD" value="${new Date().toISOString().slice(0,10)}"><label style="margin-top:.35rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="mhNd" onchange="document.getElementById('mhD').disabled=this.checked;if(this.checked)document.getElementById('mhD').value=''" style="width:auto;accent-color:var(--t2)"> Sin fecha</label></div></div>
-      <div class="fr"><div class="fg"><label>Hora inicio</label><input type="time" id="mhHI" value="" disabled><label style="margin-top:.35rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="mhNt" checked onchange="document.getElementById('mhHI').disabled=this.checked;if(this.checked)document.getElementById('mhHI').value=''" style="width:auto;accent-color:var(--t2)"> Sin hora</label></div><div class="fg"></div></div>
+      <div class="fr"><div class="fg"><label>Hora inicio</label><input type="time" id="mhHI" value=""></div><div class="fg"></div></div>
       <div class="fg"><label>Nota</label><input type="text" id="mhN" placeholder="¿Qué hiciste?"></div>
       <div class="ma"><button class="bt" onclick="App.cm()">Cancelar</button><button class="bt bt-p" onclick="App.saveHM('${pid}')">Guardar</button></div>`);
   },
@@ -695,12 +768,11 @@ const App={
       cant=parseFloat(document.getElementById('mhA').value)||0,
       sinF=document.getElementById('mhNd')?.checked,
       fecha=sinF?null:(document.getElementById('mhD').value||null),
-      sinH=document.getElementById('mhNt')?.checked,
-      horaInicio=sinH?null:(document.getElementById('mhHI').value||null),
+      horaInicio=document.getElementById('mhHI').value||null,
       nota=document.getElementById('mhN').value.trim();
     if(cant<=0)return;const p=D.p(pid);if(!p)return;
     p.horas.push({id:uid(),fecha,tipo,cantidad:cant,nota,horaInicio});
-    D.up(pid,{horas:p.horas});this.cm();this.rDet(pid);
+    sortHoras(p.horas);D.up(pid,{horas:p.horas});this.cm();this.rDet(pid);
   },
 
   /* ══════════════════════════════════════════════
@@ -708,7 +780,9 @@ const App={
    * ══════════════════════════════════════════════ */
   exp(){
     const d=JSON.stringify(D.d,null,2),b=new Blob([d],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');
-    a.href=u;a.download=`trackr_backup_${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(u);
+    const now=new Date();
+    const ts=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}-${String(now.getMinutes()).padStart(2,'0')}`;
+    a.href=u;a.download=`trackr_backup_${ts}.json`;a.click();URL.revokeObjectURL(u);
   },
 
   imp(ev,isS){

@@ -124,12 +124,17 @@
   overflow:hidden;
   white-space:nowrap;
 }
+.cal-e-ico{
+  font-size:.6rem;
+  flex-shrink:0;
+}
 .cal-e-h{
   font-weight:500;
   flex-shrink:0;
+  color:var(--t1);
 }
 .cal-e-p{
-  color:var(--t3);
+  color:var(--t2);
   overflow:hidden;
   text-overflow:ellipsis;
 }
@@ -216,10 +221,10 @@
   flex-direction:column;
 }
 
-/* Celda slot vacía */
+/* Celda slot vacía (30 min = mitad del slot horario) */
 .cal-slot{
   background:var(--bg2);
-  height:var(--slot-h,60px);
+  height:calc(var(--slot-h,60px) / 2);
   cursor:pointer;
   transition:background var(--tr);
   flex-shrink:0;
@@ -255,10 +260,23 @@
 }
 .cal-evt-n{
   font-size:.62rem;
-  color:var(--t3);
+  color:var(--t2);
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
+}
+
+/* Drag preview al crear hora */
+.cal-drag-pv{
+  position:absolute;
+  left:2px;
+  right:2px;
+  background:rgba(200,200,200,.18);
+  border-left:3px solid var(--t2);
+  border-radius:0 var(--r) var(--r) 0;
+  pointer-events:none;
+  z-index:2;
+  transition:height .05s ease;
 }
 
 /* Sección "sin hora asignada" debajo del grid semanal */

@@ -44,7 +44,6 @@
   .cal-week-hdr{grid-template-columns:35px repeat(7,1fr)}
   .cal-week-body{grid-template-columns:35px repeat(7,1fr)}
   .cal-tl{font-size:.55rem}
-  .cal-slot{height:40px}
   .cal-week{--slot-h:40px}
   .cal-wh-dow{font-size:.55rem}
   .cal-wh-num{font-size:.7rem}

@@ -10,6 +10,7 @@ const EST = {
   pendiente:'Pendiente',
   en_progreso:'En progreso',
   completado:'Completado',
+  recurrente:'Recurrente',
   facturado:'Facturado',
   pagado:'Pagado'
 };
@@ -36,4 +37,20 @@ function fmtDate(s){
   if(!s) return '—';
   const p=s.split('-');
   return p.length===3 ? `${p[2]}-${p[1]}-${p[0]}` : s;
+}
+
+/* Ordena array de horas por fecha (antiguas→recientes) y luego por horaInicio.
+   Sin fecha van al final. Modifica el array in-place y lo devuelve. */
+function sortHoras(arr){
+  return arr.sort((a,b)=>{
+    if(!a.fecha&&!b.fecha)return 0;
+    if(!a.fecha)return 1;
+    if(!b.fecha)return -1;
+    const cf=a.fecha.localeCompare(b.fecha);
+    if(cf!==0)return cf;
+    if(!a.horaInicio&&!b.horaInicio)return 0;
+    if(!a.horaInicio)return 1;
+    if(!b.horaInicio)return -1;
+    return a.horaInicio.localeCompare(b.horaInicio);
+  });
 }
