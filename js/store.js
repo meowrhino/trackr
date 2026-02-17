@@ -17,7 +17,7 @@ const D={
 
   /* Crea estructura de datos vacía */
   create(){
-    this.d={projects:[],settings:{defaultIva:21,defaultIrpf:15}};
+    this.d={projects:[],settings:{defaultIva:21,defaultIrpf:15,usuario:''}};
     this.save();
   },
 

@@ -28,9 +28,29 @@ const App={
     const map={info:'vInfo',dash:'vDash',cal:'vCal',proj:'vProj',det:'vDet',hrs:'vHrs',rep:'vRep'};
     const el=document.getElementById(map[v]);if(el)el.classList.add('on');
     const nav=document.querySelector(`.ni[data-v="${v}"]`);if(nav)nav.classList.add('on');
-    if(v==='dash')this.rDash();else if(v==='proj')this.rProj();else if(v==='det')this.rDet(d);
+    if(v==='dash')this.rDash();else if(v==='info')this.rInfo();else if(v==='proj')this.rProj();else if(v==='det')this.rDet(d);
     else if(v==='hrs')this.rHrs();else if(v==='rep')this.rRep();
     else if(v==='cal')this.rCal();
+  },
+
+  /* ══════════════════════════════════════════════
+   *  INFO — Usuario
+   * ══════════════════════════════════════════════ */
+  rInfo(){
+    const st=D.d.settings;
+    const name=st.usuario||'';
+    document.getElementById('infoUser').innerHTML=
+      `<div class="info-user-row">`
+      +`<input type="text" id="iuName" value="${esc(name)}" placeholder="Tu nombre o empresa">`
+      +`<button class="bt bt-p" onclick="App.saveUser()">Guardar</button>`
+      +`</div>`
+      +`<p class="info-user-hint">Este nombre se usará para resaltar tus proyectos en el dashboard.</p>`;
+  },
+  saveUser(){
+    const name=document.getElementById('iuName').value.trim();
+    D.d.settings.usuario=name;
+    D.save();
+    this.rInfo();
   },
 
   /* ══════════════════════════════════════════════
@@ -57,6 +77,17 @@ const App={
     const labels={en_progreso:'En progreso',pendiente:'Pendientes',completado:'Completados',recurrente:'Recurrentes',facturado:'Facturados',pagado:'Pagados'};
     const groups={};
     ps.forEach(p=>{if(!groups[p.estado])groups[p.estado]=[];groups[p.estado].push(p)});
+
+    /* Ordenar cada grupo: proyectos del usuario primero, luego por horas desc */
+    const usr=(D.d.settings.usuario||'').toLowerCase();
+    Object.keys(groups).forEach(st=>{
+      groups[st].sort((a,b)=>{
+        const aU=usr&&(a.cliente||'').toLowerCase()===usr?0:1;
+        const bU=usr&&(b.cliente||'').toLowerCase()===usr?0:1;
+        if(aU!==bU)return aU-bU;
+        return b.horas.reduce((s,h)=>s+h.cantidad,0)-a.horas.reduce((s,h)=>s+h.cantidad,0);
+      });
+    });
 
     const c=document.getElementById('dPr');
     if(!ps.length){c.innerHTML='<div class="es"><div class="tx">Sin proyectos</div></div>';return}
@@ -98,7 +129,8 @@ const App={
   /* Genera HTML de card de proyecto (usado en dashboard y lista) */
   card(p,noBadge){
     const th=p.horas.reduce((s,h)=>s+h.cantidad,0),eph=B.eph(p),hex=colorHex(p.color);
-    const isMR=(p.cliente||'').toLowerCase()==='meowrhino';
+    const usr=(D.d.settings.usuario||'').toLowerCase();
+    const isMR=usr&&(p.cliente||'').toLowerCase()===usr;
     return `<div class="pc${isMR?' pc-mr':''}" style="--project-color:${hex}" onclick="App.go('det','${p.id}')">
       <div class="pc-h"><div><div class="pc-n">${esc(p.nombre)}</div><div class="pc-c">${esc(p.cliente)}</div></div>${noBadge?'':` <span class="bd bd-${p.estado}">${EST[p.estado]}</span>`}</div>
       <div class="pc-s">
@@ -293,13 +325,18 @@ const App={
     /* Recopilar horas de todos los proyectos en un mapa por fecha */
     const ps=D.ps();
     const hm={};let mt=0;
+    const pStats={}; /* pid → {pn,pc,h} para stats del periodo */
     ps.forEach(p=>{
       const hex=colorHex(p.color);
       p.horas.forEach(h=>{
         if(!h.fecha)return;
         if(!hm[h.fecha])hm[h.fecha]=[];
         hm[h.fecha].push({pid:p.id,pn:p.nombre,pc:hex,tipo:h.tipo,cant:h.cantidad,nota:h.nota});
-        if(h.fecha.startsWith(mKey))mt+=h.cantidad;
+        if(h.fecha.startsWith(mKey)){
+          mt+=h.cantidad;
+          if(!pStats[p.id])pStats[p.id]={pn:p.nombre,pc:hex,h:0};
+          pStats[p.id].h+=h.cantidad;
+        }
       });
     });
 
@@ -325,7 +362,8 @@ const App={
 
     document.getElementById('calC').innerHTML=
       this._calHeader(`${MESES[month]} ${year}`,`Total mes: <span class="m">${mt.toFixed(1)}h</span>`)
-      +`<div class="cal-grid">${g}</div>`;
+      +`<div class="cal-grid">${g}</div>`
+      +this._calProjStats(pStats);
   },
 
   /* ── Vista semanal ── */
@@ -356,6 +394,7 @@ const App={
     /* Recopilar horas */
     const ps=D.ps();
     const hm={};let wt=0;
+    const pStats={}; /* pid → {pn,pc,h} */
     const dateSet=new Set(days.map(d=>d.date));
     ps.forEach(p=>{
       const hex=colorHex(p.color);
@@ -364,6 +403,8 @@ const App={
         if(!hm[h.fecha])hm[h.fecha]=[];
         hm[h.fecha].push({pid:p.id,hid:h.id,pn:p.nombre,pc:hex,tipo:h.tipo,cant:h.cantidad,nota:h.nota,hi:h.horaInicio});
         wt+=h.cantidad;
+        if(!pStats[p.id])pStats[p.id]={pn:p.nombre,pc:hex,h:0};
+        pStats[p.id].h+=h.cantidad;
       });
     });
 
@@ -426,7 +467,7 @@ const App={
       +`<div class="cal-week" style="--slot-h:${slotH}px">`
       +`<div class="cal-week-hdr">${hdr}</div>`
       +`<div class="cal-week-body"><div class="cal-week-tl">${timeLbl}</div>${cols}</div>`
-      +`</div>`+ntHtml;
+      +`</div>`+ntHtml+this._calProjStats(pStats);
 
     /* ── Drag-to-create en slots vacíos ── */
     const wkBody=document.querySelector('.cal-week-body');
@@ -504,6 +545,15 @@ const App={
       +`<button class="bt bt-s" onclick="App.calToday()">Hoy</button>`
       +`<div class="cal-vt"><button class="cal-vb${isM?' on':''}" onclick="App.calSetView('month')">Mes</button><button class="cal-vb${!isM?' on':''}" onclick="App.calSetView('week')">Semana</button></div></div>`
       +`<div class="cal-stat"><span class="cal-stat-l">${stat}</span></div>`;
+  },
+
+  /* Stats de proyectos trabajados en el periodo */
+  _calProjStats(pStats){
+    const list=Object.values(pStats).sort((a,b)=>b.h-a.h);
+    if(!list.length)return '';
+    return `<div class="cal-ps"><div class="cal-ps-title">Proyectos en este periodo</div><div class="cal-ps-list">${
+      list.map(p=>`<div class="cal-ps-item"><span class="cal-ps-dot" style="background:${p.pc}"></span><span class="cal-ps-name">${esc(p.pn)}</span><span class="cal-ps-h m">${p.h.toFixed(1)}h</span></div>`).join('')
+    }</div></div>`;
   },
 
   calSetView(v){this.calView=v;this.rCal()},

@@ -52,7 +52,9 @@
       <div class="ni" data-v="hrs" onclick="App.go('hrs')"><span class="ic">+</span><span class="nt">Horas</span></div>
       FIN COMENTADO -->
       <div class="ni" data-v="cal" onclick="App.go('cal')"><span class="ic">▣</span><span class="nt">Calendario</span></div>
+      <!-- COMENTADO: Informes (datos visibles desde dashboard y calendario)
       <div class="ni" data-v="rep" onclick="App.go('rep')"><span class="ic">◬</span><span class="nt">Informes</span></div>
+      FIN COMENTADO -->
       <div class="sep"></div>
       <div class="ni" onclick="App.exp()"><span class="ic">↓</span><span class="nt">Exportar</span></div>
       <div class="ni" onclick="document.getElementById('impA').click()"><span class="ic">↑</span><span class="nt">Importar</span></div>
@@ -72,20 +74,20 @@
         </div>
         <p class="info-desc">Herramienta minimalista para gestionar tus proyectos freelance. Controla horas, facturación y rentabilidad desde un solo lugar. Tus datos se guardan en el navegador — exporta un JSON cuando quieras hacer backup.</p>
       </div>
+      <div class="ds"><div class="dst">Usuario</div></div>
+      <div class="info-user" id="infoUser"></div>
       <div class="ds"><div class="dst">Cómo funciona</div></div>
       <div class="info-grid">
         <div class="info-card"><div class="info-card-icon">▦</div><div class="info-card-title">Crea proyectos</div><div class="info-card-desc">Define cliente, color, presupuesto y tipo de facturación (por horas, fijo o gratis). Asigna fechas estimadas de inicio y fin.</div></div>
         <div class="info-card"><div class="info-card-icon">+</div><div class="info-card-title">Registra horas</div><div class="info-card-desc">Loguea trabajo y reuniones desde el acceso rápido. Cada entrada lleva fecha, cantidad, tipo y una nota opcional.</div></div>
         <div class="info-card"><div class="info-card-icon">◩</div><div class="info-card-title">Consulta el dashboard</div><div class="info-card-desc">Visualiza proyectos activos, horas semanales y mensuales, alertas de cobro pendiente y estado general de tu actividad.</div></div>
-        <div class="info-card"><div class="info-card-icon">◬</div><div class="info-card-title">Analiza informes</div><div class="info-card-desc">Revisa ranking de rentabilidad (€/hora), facturación total, desglose por cliente y métricas clave de tu negocio.</div></div>
+        <div class="info-card"><div class="info-card-icon">▣</div><div class="info-card-title">Calendario</div><div class="info-card-desc">Visualiza tu trabajo en vistas mensual y semanal, crea horas directamente desde el grid.</div></div>
       </div>
       <div class="ds"><div class="dst">Navegación</div></div>
       <div class="info-nav-grid">
-        <div class="info-card"><div class="info-card-icon">?</div><div class="info-card-title">Info</div><div class="info-card-desc">Guía de uso</div></div>
+        <div class="info-card"><div class="info-card-icon">?</div><div class="info-card-title">Info</div><div class="info-card-desc">Guía de uso y usuario</div></div>
         <div class="info-card"><div class="info-card-icon">◩</div><div class="info-card-title">Dashboard</div><div class="info-card-desc">Resumen general y alertas</div></div>
-        <div class="info-card"><div class="info-card-icon">▦</div><div class="info-card-title">Proyectos</div><div class="info-card-desc">Lista con filtros y orden</div></div>
-        <div class="info-card"><div class="info-card-icon">+</div><div class="info-card-title">Horas</div><div class="info-card-desc">Registro rápido de tiempo</div></div>
-        <div class="info-card"><div class="info-card-icon">◬</div><div class="info-card-title">Informes</div><div class="info-card-desc">Métricas y rentabilidad</div></div>
+        <div class="info-card"><div class="info-card-icon">▣</div><div class="info-card-title">Calendario</div><div class="info-card-desc">Vista mensual y semanal</div></div>
         <div class="info-card"><div class="info-card-icon">↓ ↑</div><div class="info-card-title">Datos</div><div class="info-card-desc">Exportar / Importar JSON</div></div>
       </div>
     </div>
@@ -130,13 +132,14 @@
       <div id="calC"></div>
     </div>
 
-    <!-- ── Vista: Informes ── -->
+    <!-- COMENTADO: Vista Informes (datos visibles desde dashboard y calendario)
     <div id="vRep" class="vw">
       <h1 class="pt">Informes</h1>
       <div class="sg" id="rSt"></div>
       <div class="ds"><div class="dst">Ranking €/hora</div><div class="rl" id="rRk"></div></div>
       <div class="ds" style="margin-top:1.5rem"><div class="dst">Por cliente</div><div class="csg" id="rCl"></div></div>
     </div>
+    FIN COMENTADO -->
 
   </main>
 </div>
