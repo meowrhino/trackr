@@ -1,0 +1,39 @@
+/* ================================================
+ * TRACKR — Layout
+ * Start screen, sidebar, main content, tipografía
+ * Dependencias: variables.css
+ * ================================================ */
+
+/* ── Start screen ── */
+#S{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem}
+.s-box{text-align:center;max-width:380px;width:100%}
+.s-logo{font-family:'DM Mono',monospace;font-size:1.8rem;font-weight:500;letter-spacing:.35em;color:var(--t1);margin-bottom:.3rem}
+.s-sub{color:var(--t3);font-size:.85rem;margin-bottom:3rem;font-weight:300}
+.s-actions{display:flex;flex-direction:column;gap:.75rem}
+.s-btn{padding:.85rem 1.5rem;border:1px solid var(--b1);background:var(--bg2);color:var(--t1);font-family:'Outfit',sans-serif;font-size:.88rem;cursor:pointer;transition:all var(--tr);display:flex;align-items:center;justify-content:center;gap:.6rem;border-radius:var(--r)}
+.s-btn:hover{border-color:var(--b2);background:var(--bg3)}
+.s-btn.p{background:var(--t1);color:var(--bg);border-color:var(--t1);font-weight:500}
+.s-btn.p:hover{background:#fff}
+
+/* ── App container ── */
+#A{display:none;min-height:100vh}
+#A.on{display:flex}
+
+/* ── Sidebar ── */
+.sb{width:200px;min-height:100vh;background:var(--bg);border-right:1px solid var(--b1);padding:1.25rem 0;display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100}
+.sb-logo{font-family:'DM Mono',monospace;font-size:1rem;font-weight:500;letter-spacing:.3em;color:var(--t2);padding:0 1.25rem;margin-bottom:2rem}
+.sb-nav{flex:1;display:flex;flex-direction:column}
+.ni{display:flex;align-items:center;gap:.65rem;padding:.55rem 1.25rem;color:var(--t3);cursor:pointer;transition:all var(--tr);font-size:.85rem;font-weight:400}
+.ni:hover{color:var(--t1)}
+.ni.on{color:var(--t1)}
+.ni .ic{font-size:.95rem;width:18px;text-align:center}
+.sep{height:1px;background:var(--b1);margin:.75rem 1.25rem}
+
+/* ── Main content ── */
+.mc{flex:1;margin-left:200px;padding:2rem 2.5rem;min-height:100vh}
+.vw{display:none}
+.vw.on{display:block}
+
+/* ── Tipografía de página ── */
+.pt{font-size:1.3rem;font-weight:500;margin-bottom:1.25rem;letter-spacing:-.01em}
+.ps{font-size:.82rem;color:var(--t3);margin-top:-.8rem;margin-bottom:1.25rem}

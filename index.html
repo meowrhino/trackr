@@ -8,208 +8,22 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --bg:#111;--bg2:#191919;--bg3:#222;--bg4:#2a2a2a;
-  --b1:#262626;--b2:#333;--b3:#444;
-  --t1:#ccc;--t2:#888;--t3:#555;
-  --ok:#5a9;--warn:#c93;--bad:#c55;
-  --r:3px;--tr:0.15s ease;
-}
-body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh}
-.m{font-family:'DM Mono',monospace}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--b2)}
-
-/* ── Start ── */
-#S{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem}
-.s-box{text-align:center;max-width:380px;width:100%}
-.s-logo{font-family:'DM Mono',monospace;font-size:1.8rem;font-weight:500;letter-spacing:.35em;color:var(--t1);margin-bottom:.3rem}
-.s-sub{color:var(--t3);font-size:.85rem;margin-bottom:3rem;font-weight:300}
-.s-actions{display:flex;flex-direction:column;gap:.75rem}
-.s-btn{padding:.85rem 1.5rem;border:1px solid var(--b1);background:var(--bg2);color:var(--t1);font-family:'Outfit',sans-serif;font-size:.88rem;cursor:pointer;transition:all var(--tr);display:flex;align-items:center;justify-content:center;gap:.6rem;border-radius:var(--r)}
-.s-btn:hover{border-color:var(--b2);background:var(--bg3)}
-.s-btn.p{background:var(--t1);color:var(--bg);border-color:var(--t1);font-weight:500}
-.s-btn.p:hover{background:#fff}
-
-/* ── Layout ── */
-#A{display:none;min-height:100vh}
-#A.on{display:flex}
-
-/* ── Sidebar ── */
-.sb{width:200px;min-height:100vh;background:var(--bg);border-right:1px solid var(--b1);padding:1.25rem 0;display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100}
-.sb-logo{font-family:'DM Mono',monospace;font-size:1rem;font-weight:500;letter-spacing:.3em;color:var(--t2);padding:0 1.25rem;margin-bottom:2rem}
-.sb-nav{flex:1;display:flex;flex-direction:column}
-.ni{display:flex;align-items:center;gap:.65rem;padding:.55rem 1.25rem;color:var(--t3);cursor:pointer;transition:all var(--tr);font-size:.85rem;font-weight:400}
-.ni:hover{color:var(--t1)}
-.ni.on{color:var(--t1)}
-.ni .ic{font-size:.95rem;width:18px;text-align:center}
-.sep{height:1px;background:var(--b1);margin:.75rem 1.25rem}
-
-/* ── Main ── */
-.mc{flex:1;margin-left:200px;padding:2rem 2.5rem;min-height:100vh}
-.vw{display:none}.vw.on{display:block}
-
-/* ── Typography ── */
-.pt{font-size:1.3rem;font-weight:500;margin-bottom:1.25rem;letter-spacing:-.01em}
-.ps{font-size:.82rem;color:var(--t3);margin-top:-.8rem;margin-bottom:1.25rem}
-
-/* ── Stats ── */
-.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.75rem;margin-bottom:1.5rem}
-.sc{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:1rem}
-.sc-l{font-size:.72rem;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.3rem}
-.sc-v{font-family:'DM Mono',monospace;font-size:1.4rem;font-weight:400}
-.sc-d{font-size:.72rem;color:var(--t3);margin-top:.15rem}
-
-/* ── Buttons ── */
-.bt{padding:.45rem 1rem;border-radius:var(--r);border:1px solid var(--b1);background:var(--bg2);color:var(--t1);font-family:'Outfit',sans-serif;font-size:.82rem;cursor:pointer;transition:all var(--tr);display:inline-flex;align-items:center;gap:.4rem}
-.bt:hover{border-color:var(--b2);background:var(--bg3)}
-.bt-p{background:var(--t1);border-color:var(--t1);color:var(--bg)}
-.bt-p:hover{background:#fff}
-.bt-d{border-color:var(--bad);color:var(--bad)}.bt-d:hover{background:rgba(204,85,85,.08)}
-.bt-s{padding:.35rem .7rem;font-size:.78rem}
-.bg{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
-
-/* ── Inputs ── */
-input,select,textarea{font-family:'Outfit',sans-serif;font-size:.85rem;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);color:var(--t1);padding:.5rem .7rem;transition:border-color var(--tr);width:100%}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--t3)}
-input:disabled{opacity:.35;cursor:not-allowed}
-input[type="number"]{font-family:'DM Mono',monospace}
-textarea{resize:vertical;min-height:70px}
-select{cursor:pointer}
-label{font-size:.75rem;color:var(--t3);display:block;margin-bottom:.25rem;text-transform:uppercase;letter-spacing:.04em}
-.fg{margin-bottom:.85rem}
-.fr{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
-
-/* ── Toggle ── */
-.tr{display:flex;align-items:center;justify-content:space-between;padding:.4rem 0}
-.tl{font-size:.82rem;color:var(--t1)}
-.tg{position:relative;width:36px;height:20px;cursor:pointer}
-.tg input{display:none}
-.ts{position:absolute;inset:0;background:var(--b2);border-radius:10px;transition:var(--tr)}
-.ts::before{content:'';position:absolute;width:14px;height:14px;left:3px;top:3px;background:var(--t2);border-radius:50%;transition:var(--tr)}
-.tg input:checked+.ts{background:var(--t1)}.tg input:checked+.ts::before{transform:translateX(16px);background:var(--bg)}
-
-/* ── Cards ── */
-.pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:.75rem}
-.pc{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:1rem;cursor:pointer;transition:all var(--tr);position:relative;border-left:3px solid var(--project-color,var(--b2))}
-.pc:hover{background:var(--bg3)}
-.pc-h{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.5rem}
-.pc-n{font-weight:500;font-size:.95rem}
-.pc-c{font-size:.78rem;color:var(--t3);margin-top:.1rem}
-.bd{font-family:'DM Mono',monospace;font-size:.68rem;padding:.15rem .5rem;border:1px solid var(--b1);border-radius:var(--r);text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;color:var(--t3)}
-.bd-en_progreso{border-color:rgba(100,160,220,.3);color:#78b4e8}
-.bd-completado{border-color:rgba(200,160,60,.3);color:#c9a43c}
-.bd-facturado{border-color:rgba(160,120,200,.3);color:#b08cd8}
-.bd-pagado{border-color:rgba(90,170,140,.3);color:#5aac8c}
-.pc-s{display:flex;gap:1.25rem;margin-top:.5rem;font-size:.78rem;color:var(--t3)}
-.pc-s span{display:flex;align-items:center;gap:.25rem}
-
-/* ── Toolbar ── */
-.tb{display:flex;gap:.5rem;margin-bottom:1.25rem;flex-wrap:wrap;align-items:center}
-.tbs{flex:1}
-.fb{padding:.3rem .7rem;border:1px solid var(--b1);background:transparent;color:var(--t3);font-family:'Outfit',sans-serif;font-size:.78rem;cursor:pointer;transition:all var(--tr);border-radius:var(--r)}
-.fb:hover{border-color:var(--b2);color:var(--t1)}
-.fb.on{border-color:var(--t2);color:var(--t1)}
-
-/* ── Detail ── */
-.dh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem}
-.db{display:inline-flex;align-items:center;gap:.3rem;color:var(--t3);font-size:.82rem;cursor:pointer;margin-bottom:.75rem;transition:color var(--tr)}
-.db:hover{color:var(--t1)}
-.dt{font-size:1.5rem;font-weight:500;letter-spacing:-.01em}
-.dc{color:var(--t3);margin-top:.15rem;font-size:.88rem}
-.ds{margin-bottom:1.5rem}
-.dst{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:.75rem;padding-bottom:.4rem;border-bottom:1px solid var(--b1)}
-.dg{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.75rem}
-.dfl{font-size:.72rem;color:var(--t3);margin-bottom:.15rem;text-transform:uppercase;letter-spacing:.04em}
-.dfv{font-family:'DM Mono',monospace;font-size:.9rem}
-
-/* ── Hours ── */
-.hl{display:flex;flex-direction:column;gap:1px}
-.hr{display:flex;align-items:center;gap:.75rem;padding:.55rem .75rem;background:var(--bg2);font-size:.82rem;transition:background var(--tr);border-left:2px solid transparent}
-.hr:first-child{border-radius:var(--r) var(--r) 0 0}
-.hr:last-child{border-radius:0 0 var(--r) var(--r)}
-.hr:only-child{border-radius:var(--r)}
-.hr:hover{background:var(--bg3)}
-.hr-t{width:22px;text-align:center;font-size:.9rem}
-.hr-d{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--t3);min-width:80px}
-.hr-a{font-family:'DM Mono',monospace;font-weight:500;min-width:40px}
-.hr-n{color:var(--t3);flex:1;font-size:.78rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.hr-e,.hr-x{color:var(--t3);cursor:pointer;font-size:.85rem;padding:.15rem;transition:color var(--tr);opacity:.4}
-.hr-e:hover{color:var(--t1);opacity:1}
-.hr-x:hover{color:var(--bad);opacity:1}
-
-/* ── Billing ── */
-.bb{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:1rem;margin-top:.75rem}
-.br{display:flex;justify-content:space-between;padding:.3rem 0;font-size:.85rem}
-.br.tot{border-top:1px solid var(--b1);margin-top:.4rem;padding-top:.6rem;font-weight:500}
-.br .la{color:var(--t3)}.br .va{font-family:'DM Mono',monospace}
-
-/* ── Color select ── */
-.color-sel{position:relative}
-.color-preview{display:flex;align-items:center;gap:.5rem;padding:.5rem .7rem;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);cursor:pointer;font-size:.82rem;transition:border-color var(--tr)}
-.color-preview:hover{border-color:var(--b2)}
-.color-dot{width:12px;height:12px;border-radius:2px;flex-shrink:0}
-.color-name{color:var(--t1)}
-
-/* ── Alerts ── */
-.als{margin-bottom:1.5rem}
-.al{display:flex;align-items:center;gap:.6rem;padding:.6rem .75rem;background:var(--bg2);border:1px solid var(--b1);border-left:3px solid var(--warn);border-radius:var(--r);margin-bottom:.4rem;font-size:.82rem;cursor:pointer;transition:all var(--tr)}
-.al:hover{background:var(--bg3)}
-
-/* ── Ranking ── */
-.rl{display:flex;flex-direction:column;gap:1px}
-.ri{display:flex;align-items:center;gap:.75rem;padding:.65rem .75rem;background:var(--bg2);transition:all var(--tr);cursor:pointer}
-.ri:first-child{border-radius:var(--r) var(--r) 0 0}
-.ri:last-child{border-radius:0 0 var(--r) var(--r)}
-.ri:only-child{border-radius:var(--r)}
-.ri:hover{background:var(--bg3)}
-.ri-p{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--t3);width:20px;text-align:center}
-.ri-c{width:4px;height:24px;border-radius:1px;flex-shrink:0}
-.ri-i{flex:1}
-.ri-n{font-weight:500;font-size:.88rem}.ri-cl{font-size:.72rem;color:var(--t3)}
-.ri-r{font-family:'DM Mono',monospace;font-size:.92rem;font-weight:500}
-
-/* ── Modal ── */
-.mo{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:1000;padding:2rem;opacity:0;pointer-events:none;transition:opacity var(--tr)}
-.mo.on{opacity:1;pointer-events:all}
-.md{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:1.75rem;width:100%;max-width:520px;max-height:85vh;overflow-y:auto}
-.mt{font-size:1.1rem;font-weight:500;margin-bottom:1.25rem}
-.ma{display:flex;justify-content:flex-end;gap:.5rem;margin-top:1.25rem}
-
-/* ── Quick hours ── */
-.qf{max-width:440px}
-.ts2{display:flex;gap:.5rem;margin-bottom:.85rem}
-.to{flex:1;padding:.75rem;border:1px solid var(--b1);border-radius:var(--r);background:var(--bg2);text-align:center;cursor:pointer;transition:all var(--tr)}
-.to:hover{border-color:var(--b2)}
-.to.on{border-color:var(--t2);background:var(--bg3)}
-.to .ic{font-size:1.2rem;display:block;margin-bottom:.2rem}
-.to .la{font-size:.78rem;color:var(--t2)}
-.to.on .la{color:var(--t1)}
-
-/* ── Billing mode ── */
-.bms{display:flex;gap:.4rem;margin-bottom:.85rem}
-.bm{flex:1;padding:.4rem;border:1px solid var(--b1);border-radius:var(--r);background:transparent;color:var(--t3);font-family:'Outfit',sans-serif;font-size:.78rem;cursor:pointer;transition:all var(--tr);text-align:center}
-.bm:hover{border-color:var(--b2)}.bm.on{border-color:var(--t2);color:var(--t1)}
-
-/* ── Empty ── */
-.es{text-align:center;padding:2.5rem 1rem;color:var(--t3)}.es .ic{font-size:1.8rem;margin-bottom:.5rem;opacity:.3}.es .tx{font-size:.88rem}
-
-/* ── Client cards ── */
-.csg{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:.75rem}
-.cc{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:1rem}
-.cn{font-weight:500;margin-bottom:.5rem;font-size:.92rem}
-.cs{display:flex;justify-content:space-between;padding:.2rem 0;font-size:.82rem}
-.cs .la{color:var(--t3)}.cs .va{font-family:'DM Mono',monospace}
-
-/* ── Responsive ── */
-@media(max-width:768px){.sb{width:52px}.sb .nt,.sb-logo span{display:none}.sb-logo{padding:0;text-align:center}.ni{justify-content:center;padding:.55rem}.mc{margin-left:52px;padding:1.25rem}.fr{grid-template-columns:1fr}.pg{grid-template-columns:1fr}}
-.fh{position:absolute;width:0;height:0;opacity:0;pointer-events:none}
-</style>
+<!-- CSS (orden importa: variables primero, responsive último) -->
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/detail.css">
+<link rel="stylesheet" href="css/info.css">
+<link rel="stylesheet" href="css/forms.css">
+<link rel="stylesheet" href="css/reports.css">
+<link rel="stylesheet" href="css/calendar.css">
+<link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
 
-<!-- Start -->
+<!-- ════════════════════════════════════════════
+     START SCREEN
+     ════════════════════════════════════════════ -->
 <div id="S">
   <div class="s-box">
     <div class="s-logo">TRACKR</div>
@@ -222,14 +36,22 @@ label{font-size:.75rem;color:var(--t3);display:block;margin-bottom:.25rem;text-t
   </div>
 </div>
 
-<!-- App -->
+<!-- ════════════════════════════════════════════
+     APP
+     ════════════════════════════════════════════ -->
 <div id="A">
+
+  <!-- Sidebar -->
   <nav class="sb">
     <div class="sb-logo"><span>TRACKR</span></div>
     <div class="sb-nav">
+      <div class="ni" data-v="info" onclick="App.go('info')"><span class="ic">?</span><span class="nt">Info</span></div>
       <div class="ni on" data-v="dash" onclick="App.go('dash')"><span class="ic">◩</span><span class="nt">Dashboard</span></div>
+      <!-- COMENTADO: Proyectos y Horas (redundantes, accesibles desde dashboard y detalle)
       <div class="ni" data-v="proj" onclick="App.go('proj')"><span class="ic">▦</span><span class="nt">Proyectos</span></div>
       <div class="ni" data-v="hrs" onclick="App.go('hrs')"><span class="ic">+</span><span class="nt">Horas</span></div>
+      FIN COMENTADO -->
+      <div class="ni" data-v="cal" onclick="App.go('cal')"><span class="ic">▣</span><span class="nt">Calendario</span></div>
       <div class="ni" data-v="rep" onclick="App.go('rep')"><span class="ic">◬</span><span class="nt">Informes</span></div>
       <div class="sep"></div>
       <div class="ni" onclick="App.exp()"><span class="ic">↓</span><span class="nt">Exportar</span></div>
@@ -237,440 +59,99 @@ label{font-size:.75rem;color:var(--t3);display:block;margin-bottom:.25rem;text-t
       <input type="file" id="impA" class="fh" accept=".json" onchange="App.imp(event,0)">
     </div>
   </nav>
+
+  <!-- Main content -->
   <main class="mc">
-    <div id="vDash" class="vw on"><h1 class="pt">Dashboard</h1><div class="sg" id="dSt"></div><div class="als" id="dAl"></div><div class="ds"><div class="dst">Proyectos activos</div><div class="pg" id="dPr"></div></div></div>
-    <div id="vProj" class="vw"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem"><h1 class="pt" style="margin:0">Proyectos</h1><button class="bt bt-p" onclick="App.pModal()">+ Nuevo</button></div><div class="tb" id="pTb"></div><div class="pg" id="pLs"></div><div id="pEm" class="es" style="display:none"><div class="tx">Sin proyectos</div></div></div>
+
+    <!-- ── Vista: Info ── -->
+    <div id="vInfo" class="vw">
+      <div class="info-hero">
+        <div>
+          <div class="s-logo">TRACKR</div>
+          <p class="s-sub">gestión freelance</p>
+        </div>
+        <p class="info-desc">Herramienta minimalista para gestionar tus proyectos freelance. Controla horas, facturación y rentabilidad desde un solo lugar. Tus datos se guardan en el navegador — exporta un JSON cuando quieras hacer backup.</p>
+      </div>
+      <div class="ds"><div class="dst">Cómo funciona</div></div>
+      <div class="info-grid">
+        <div class="info-card"><div class="info-card-icon">▦</div><div class="info-card-title">Crea proyectos</div><div class="info-card-desc">Define cliente, color, presupuesto y tipo de facturación (por horas, fijo o gratis). Asigna fechas estimadas de inicio y fin.</div></div>
+        <div class="info-card"><div class="info-card-icon">+</div><div class="info-card-title">Registra horas</div><div class="info-card-desc">Loguea trabajo y reuniones desde el acceso rápido. Cada entrada lleva fecha, cantidad, tipo y una nota opcional.</div></div>
+        <div class="info-card"><div class="info-card-icon">◩</div><div class="info-card-title">Consulta el dashboard</div><div class="info-card-desc">Visualiza proyectos activos, horas semanales y mensuales, alertas de cobro pendiente y estado general de tu actividad.</div></div>
+        <div class="info-card"><div class="info-card-icon">◬</div><div class="info-card-title">Analiza informes</div><div class="info-card-desc">Revisa ranking de rentabilidad (€/hora), facturación total, desglose por cliente y métricas clave de tu negocio.</div></div>
+      </div>
+      <div class="ds"><div class="dst">Navegación</div></div>
+      <div class="info-nav-grid">
+        <div class="info-card"><div class="info-card-icon">?</div><div class="info-card-title">Info</div><div class="info-card-desc">Guía de uso</div></div>
+        <div class="info-card"><div class="info-card-icon">◩</div><div class="info-card-title">Dashboard</div><div class="info-card-desc">Resumen general y alertas</div></div>
+        <div class="info-card"><div class="info-card-icon">▦</div><div class="info-card-title">Proyectos</div><div class="info-card-desc">Lista con filtros y orden</div></div>
+        <div class="info-card"><div class="info-card-icon">+</div><div class="info-card-title">Horas</div><div class="info-card-desc">Registro rápido de tiempo</div></div>
+        <div class="info-card"><div class="info-card-icon">◬</div><div class="info-card-title">Informes</div><div class="info-card-desc">Métricas y rentabilidad</div></div>
+        <div class="info-card"><div class="info-card-icon">↓ ↑</div><div class="info-card-title">Datos</div><div class="info-card-desc">Exportar / Importar JSON</div></div>
+      </div>
+    </div>
+
+    <!-- ── Vista: Dashboard ── -->
+    <div id="vDash" class="vw on">
+      <h1 class="pt">Dashboard</h1>
+      <!-- COMENTADO: Stats (Activos, Semana, Mes, Pendiente cobro)
+      <div class="sg" id="dSt"></div>
+      FIN COMENTADO -->
+      <div class="als" id="dAl"></div>
+      <div class="ds">
+        <div class="dst">Proyectos</div>
+        <div class="pg" id="dPr"></div>
+        <div style="margin-top:1rem"><button class="bt bt-p" onclick="App.pModal()">+ Nuevo</button></div>
+      </div>
+    </div>
+
+    <!-- COMENTADO: Vista Proyectos (accesible desde dashboard)
+    <div id="vProj" class="vw">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
+        <h1 class="pt" style="margin:0">Proyectos</h1>
+        <button class="bt bt-p" onclick="App.pModal()">+ Nuevo</button>
+      </div>
+      <div class="tb" id="pTb"></div>
+      <div class="pg" id="pLs"></div>
+      <div id="pEm" class="es" style="display:none"><div class="tx">Sin proyectos</div></div>
+    </div>
+    FIN COMENTADO -->
+
+    <!-- ── Vista: Detalle de proyecto ── -->
     <div id="vDet" class="vw"><div id="detC"></div></div>
-    <div id="vHrs" class="vw"><h1 class="pt">+ Horas</h1><p class="ps">Registro rápido</p><div class="qf" id="qhF"></div></div>
-    <div id="vRep" class="vw"><h1 class="pt">Informes</h1><div class="sg" id="rSt"></div><div class="ds"><div class="dst">Ranking €/hora</div><div class="rl" id="rRk"></div></div><div class="ds" style="margin-top:1.5rem"><div class="dst">Por cliente</div><div class="csg" id="rCl"></div></div></div>
+
+    <!-- COMENTADO: Vista Horas (accesible desde detalle de proyecto)
+    <div id="vHrs" class="vw">
+      <h1 class="pt">+ Horas</h1>
+      <p class="ps">Registro rápido</p>
+      <div class="qf" id="qhF"></div>
+    </div>
+    FIN COMENTADO -->
+
+    <!-- ── Vista: Calendario ── -->
+    <div id="vCal" class="vw">
+      <h1 class="pt">Calendario</h1>
+      <div id="calC"></div>
+    </div>
+
+    <!-- ── Vista: Informes ── -->
+    <div id="vRep" class="vw">
+      <h1 class="pt">Informes</h1>
+      <div class="sg" id="rSt"></div>
+      <div class="ds"><div class="dst">Ranking €/hora</div><div class="rl" id="rRk"></div></div>
+      <div class="ds" style="margin-top:1.5rem"><div class="dst">Por cliente</div><div class="csg" id="rCl"></div></div>
+    </div>
+
   </main>
 </div>
 
-<!-- Modal -->
+<!-- Modal global -->
 <div class="mo" id="mO"><div class="md" id="mC"></div></div>
 
-<script>
-/* ═══ W3C Named Colors ═══ */
-const W3C_COLORS = {
-  'Rojos': [
-    ['LightCoral','#F08080'],['Salmon','#FA8072'],['IndianRed','#CD5C5C'],['Red','#FF0000'],
-    ['Crimson','#DC143C'],['FireBrick','#B22222'],['Brown','#A52A2A'],['DarkRed','#8B0000'],['Maroon','#800000']
-  ],
-  'Naranjas': [
-    ['LightSalmon','#FFA07A'],['DarkSalmon','#E9967A'],['Orange','#FFA500'],['DarkOrange','#FF8C00'],
-    ['Coral','#FF7F50'],['Tomato','#FF6347'],['OrangeRed','#FF4500']
-  ],
-  'Marrones': [
-    ['SandyBrown','#F4A460'],['Goldenrod','#DAA520'],['Peru','#CD853F'],['DarkGoldenrod','#B8860B'],
-    ['Chocolate','#D2691E'],['Sienna','#A0522D'],['SaddleBrown','#8B4513']
-  ],
-  'Amarillos': [
-    ['Khaki','#F0E68C'],['Yellow','#FFFF00'],['Gold','#FFD700'],['DarkKhaki','#BDB76B'],['Olive','#808000']
-  ],
-  'Verdes': [
-    ['PaleGreen','#98FB98'],['LightGreen','#90EE90'],['SpringGreen','#00FF7F'],['Lime','#00FF00'],
-    ['LimeGreen','#32CD32'],['MediumSeaGreen','#3CB371'],['SeaGreen','#2E8B57'],
-    ['ForestGreen','#228B22'],['Green','#008000'],['DarkGreen','#006400'],
-    ['YellowGreen','#9ACD32'],['OliveDrab','#6B8E23']
-  ],
-  'Cianes': [
-    ['Aquamarine','#7FFFD4'],['Cyan','#00FFFF'],['Turquoise','#40E0D0'],
-    ['MediumTurquoise','#48D1CC'],['DarkTurquoise','#00CED1'],['LightSeaGreen','#20B2AA'],
-    ['CadetBlue','#5F9EA0'],['DarkCyan','#008B8B'],['Teal','#008080']
-  ],
-  'Azules': [
-    ['LightSkyBlue','#87CEFA'],['SkyBlue','#87CEEB'],['DeepSkyBlue','#00BFFF'],
-    ['CornflowerBlue','#6495ED'],['DodgerBlue','#1E90FF'],['SteelBlue','#4682B4'],
-    ['RoyalBlue','#4169E1'],['Blue','#0000FF'],['MediumBlue','#0000CD'],
-    ['DarkBlue','#00008B'],['Navy','#000080'],['MidnightBlue','#191970']
-  ],
-  'Violetas': [
-    ['Plum','#DDA0DD'],['Violet','#EE82EE'],['Orchid','#DA70D6'],['Magenta','#FF00FF'],
-    ['MediumPurple','#9370DB'],['MediumOrchid','#BA55D3'],['SlateBlue','#6A5ACD'],
-    ['BlueViolet','#8A2BE2'],['DarkViolet','#9400D3'],['DarkOrchid','#9932CC'],
-    ['DarkMagenta','#8B008B'],['Purple','#800080'],['Indigo','#4B0082']
-  ],
-  'Rosas': [
-    ['Pink','#FFC0CB'],['LightPink','#FFB6C1'],['HotPink','#FF69B4'],
-    ['PaleVioletRed','#DB7093'],['DeepPink','#FF1493'],['MediumVioletRed','#C71585']
-  ],
-  'Grises': [
-    ['Silver','#C0C0C0'],['DarkGray','#A9A9A9'],['Gray','#808080'],
-    ['DimGray','#696969'],['SlateGray','#708090'],['DarkSlateGray','#2F4F4F']
-  ]
-};
-
-// Flat lookup: name → hex
-const COLOR_MAP = {};
-Object.values(W3C_COLORS).forEach(arr => arr.forEach(([n,h]) => COLOR_MAP[n] = h));
-
-function colorHex(name) { return COLOR_MAP[name] || name; }
-
-const EST = {pendiente:'Pendiente',en_progreso:'En progreso',completado:'Completado',facturado:'Facturado',pagado:'Pagado'};
-
-function uid(){return 'xxxx-xxxx-xxxx'.replace(/x/g,()=>((Math.random()*16)|0).toString(16))}
-function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
-function fmtDate(s){if(!s)return '—';const p=s.split('-');return p.length===3?`${p[2]}-${p[1]}-${p[0]}`:s}
-
-/* ═══ Store ═══ */
-const D={
-  d:null,
-  init(){const s=localStorage.getItem('trackr_data');if(s){try{this.d=JSON.parse(s);return true}catch{}}return false},
-  create(){this.d={projects:[],settings:{defaultIva:21,defaultIrpf:15}};this.save()},
-  save(){localStorage.setItem('trackr_data',JSON.stringify(this.d))},
-  ps(){return this.d.projects},
-  p(id){return this.d.projects.find(p=>p.id===id)},
-  add(p){this.d.projects.push(p);this.save()},
-  up(id,u){const i=this.d.projects.findIndex(p=>p.id===id);if(i!==-1){Object.assign(this.d.projects[i],u);this.save()}},
-  del(id){this.d.projects=this.d.projects.filter(p=>p.id!==id);this.save()},
-  load(j){this.d=j;this.save()}
-};
-
-/* ═══ Billing ═══ */
-const B={
-  calc(p){
-    const f=p.facturacion;
-    if(f.modo==='gratis'){f.importeIva=0;f.importeIrpf=0;f.totalFactura=0;f.netoRecibido=0;f.baseImponible=0;f.total=0;return f}
-    const iv=f.iva||0,ir=f.irpf||0;
-    if(f.modo==='desde_base'){
-      const b=f.baseImponible||0;
-      f.importeIva=Math.round(b*iv/100*100)/100;f.importeIrpf=Math.round(b*ir/100*100)/100;
-      f.totalFactura=Math.round((b+f.importeIva-f.importeIrpf)*100)/100;f.netoRecibido=Math.round((b-f.importeIrpf)*100)/100;f.total=f.totalFactura;
-    } else {
-      const t=f.total||0,fac=1+iv/100-ir/100,b=fac?Math.round(t/fac*100)/100:0;
-      f.baseImponible=b;f.importeIva=Math.round(b*iv/100*100)/100;f.importeIrpf=Math.round(b*ir/100*100)/100;
-      f.totalFactura=t;f.netoRecibido=Math.round((b-f.importeIrpf)*100)/100;
-    }
-    return f;
-  },
-  eph(p){const h=p.horas.reduce((s,x)=>s+x.cantidad,0);if(!h)return null;return Math.round(((p.facturacion.netoRecibido||0)-(p.facturacion.gastos||0))/h*100)/100}
-};
-
-/* ═══ App ═══ */
-const App={
-  cv:'dash',cp:null,pf:'todos',ps:'recientes',
-
-  init(){if(D.init())this.enter()},
-  createNew(){D.create();this.enter()},
-  enter(){document.getElementById('S').style.display='none';document.getElementById('A').classList.add('on');this.go('dash')},
-
-  go(v,d){
-    this.cv=v;
-    document.querySelectorAll('.vw').forEach(e=>e.classList.remove('on'));
-    document.querySelectorAll('.ni').forEach(e=>e.classList.remove('on'));
-    const map={dash:'vDash',proj:'vProj',det:'vDet',hrs:'vHrs',rep:'vRep'};
-    const el=document.getElementById(map[v]);if(el)el.classList.add('on');
-    const nav=document.querySelector(`.ni[data-v="${v}"]`);if(nav)nav.classList.add('on');
-    if(v==='dash')this.rDash();else if(v==='proj')this.rProj();else if(v==='det')this.rDet(d);
-    else if(v==='hrs')this.rHrs();else if(v==='rep')this.rRep();
-  },
-
-  /* ── Dashboard ── */
-  rDash(){
-    const ps=D.ps(),act=ps.filter(p=>p.estado==='en_progreso'),now=new Date();
-    const wa=new Date(now);wa.setDate(wa.getDate()-7);const ma=new Date(now);ma.setDate(ma.getDate()-30);
-    let hw=0,hm=0,pend=0;
-    ps.forEach(p=>{B.calc(p);p.horas.forEach(h=>{if(h.fecha){const d=new Date(h.fecha);if(d>=wa)hw+=h.cantidad;if(d>=ma)hm+=h.cantidad}});
-      if(p.estado==='facturado'&&!p.facturacion.pagado)pend+=p.facturacion.totalFactura||0});
-    document.getElementById('dSt').innerHTML=`
-      <div class="sc"><div class="sc-l">Activos</div><div class="sc-v m">${act.length}</div><div class="sc-d">${ps.length} total</div></div>
-      <div class="sc"><div class="sc-l">Semana</div><div class="sc-v m">${hw.toFixed(1)}h</div></div>
-      <div class="sc"><div class="sc-l">Mes</div><div class="sc-v m">${hm.toFixed(1)}h</div></div>
-      <div class="sc"><div class="sc-l">Pendiente cobro</div><div class="sc-v m" style="color:${pend>0?'var(--warn)':'var(--ok)'}">${pend.toFixed(2)} €</div></div>`;
-    const als=[];
-    ps.forEach(p=>{if(p.estado==='facturado'&&!p.facturacion.pagado)als.push({t:`${p.nombre} — pendiente de pago`,id:p.id});
-      if(p.estado==='completado')als.push({t:`${p.nombre} — pendiente de facturar`,id:p.id})});
-    document.getElementById('dAl').innerHTML=als.map(a=>`<div class="al" onclick="App.go('det','${a.id}')"><span style="color:var(--warn)">!</span><span style="flex:1">${a.t}</span><span style="color:var(--t3)">→</span></div>`).join('');
-    const c=document.getElementById('dPr');
-    c.innerHTML=act.length?act.map(p=>this.card(p)).join(''):'<div class="es"><div class="tx">Sin proyectos en progreso</div></div>';
-  },
-
-  /* ── Projects ── */
-  rProj(){
-    let ps=D.ps();ps.forEach(p=>B.calc(p));
-    document.getElementById('pTb').innerHTML=`
-      ${['todos','pendiente','en_progreso','completado','facturado','pagado'].map(f=>`<button class="fb ${this.pf===f?'on':''}" onclick="App.sf('${f}')">${f==='todos'?'Todos':EST[f]}</button>`).join('')}
-      <span class="tbs"></span>
-      <select onchange="App.ss(this.value)" style="width:auto">
-        <option value="recientes" ${this.ps==='recientes'?'selected':''}>Recientes</option>
-        <option value="nombre" ${this.ps==='nombre'?'selected':''}>Nombre</option>
-        <option value="horas" ${this.ps==='horas'?'selected':''}>Horas</option>
-        <option value="rentabilidad" ${this.ps==='rentabilidad'?'selected':''}>€/h</option>
-      </select>`;
-    if(this.pf!=='todos')ps=ps.filter(p=>p.estado===this.pf);
-    if(this.ps==='recientes')ps.sort((a,b)=>(b.fechas.inicio||'').localeCompare(a.fechas.inicio||''));
-    else if(this.ps==='nombre')ps.sort((a,b)=>a.nombre.localeCompare(b.nombre));
-    else if(this.ps==='horas')ps.sort((a,b)=>b.horas.reduce((s,h)=>s+h.cantidad,0)-a.horas.reduce((s,h)=>s+h.cantidad,0));
-    else if(this.ps==='rentabilidad')ps.sort((a,b)=>(B.eph(b)||0)-(B.eph(a)||0));
-    const c=document.getElementById('pLs'),em=document.getElementById('pEm');
-    if(!ps.length){c.innerHTML='';em.style.display='block'}else{em.style.display='none';c.innerHTML=ps.map(p=>this.card(p)).join('')}
-  },
-
-  card(p){
-    const th=p.horas.reduce((s,h)=>s+h.cantidad,0),eph=B.eph(p),hex=colorHex(p.color);
-    return `<div class="pc" style="--project-color:${hex}" onclick="App.go('det','${p.id}')">
-      <div class="pc-h"><div><div class="pc-n">${esc(p.nombre)}</div><div class="pc-c">${esc(p.cliente)}</div></div><span class="bd bd-${p.estado}">${EST[p.estado]}</span></div>
-      <div class="pc-s">
-        <span><span class="m">${th.toFixed(1)}h</span></span>
-        ${p.facturacion.modo!=='gratis'?`<span><span class="m">${(p.facturacion.totalFactura||0).toFixed(2)} €</span></span>`:'<span style="color:var(--t3)">gratis</span>'}
-        ${eph!==null&&p.facturacion.modo!=='gratis'?`<span style="color:${eph>=30?'var(--ok)':eph>=15?'var(--warn)':'var(--bad)'}">${eph.toFixed(2)} €/h</span>`:''}
-      </div></div>`;
-  },
-
-  sf(f){this.pf=f;this.rProj()},ss(s){this.ps=s;this.rProj()},
-
-  /* ── Detail ── */
-  rDet(idOr){
-    const id=typeof idOr==='string'?idOr:this.cp;this.cp=id;const p=D.p(id);
-    if(!p){this.go('proj');return}
-    B.calc(p);
-    const th=p.horas.reduce((s,h)=>s+h.cantidad,0),wh=p.horas.filter(h=>h.tipo==='trabajo').reduce((s,h)=>s+h.cantidad,0),
-      mh=p.horas.filter(h=>h.tipo==='reunion').reduce((s,h)=>s+h.cantidad,0),eph=B.eph(p),hex=colorHex(p.color);
-    const hHtml=!p.horas.length?'<div class="es"><div class="tx">Sin horas</div></div>'
-      :`<div class="hl">${p.horas.map(h=>`<div class="hr" style="border-left-color:${hex}">
-        <span class="hr-t">${h.tipo==='trabajo'?'💻':'👥'}</span>
-        <span class="hr-d">${fmtDate(h.fecha)}</span>
-        <span class="hr-a m">${h.cantidad}h</span>
-        <span class="hr-n">${esc(h.nota||'')}</span>
-        <span class="hr-e" onclick="event.stopPropagation();App.eHour('${p.id}','${h.id}')" title="Editar">✎</span>
-        <span class="hr-x" onclick="event.stopPropagation();App.xHour('${p.id}','${h.id}')" title="Eliminar">×</span>
-      </div>`).join('')}</div>`;
-    const bHtml=p.facturacion.modo==='gratis'?'<div style="color:var(--t3);font-size:.85rem">Proyecto gratuito</div>'
-      :`<div class="bb">
-        <div class="br"><span class="la">Base imponible</span><span class="va">${(p.facturacion.baseImponible||0).toFixed(2)} €</span></div>
-        ${p.facturacion.iva?`<div class="br"><span class="la">+ IVA (${p.facturacion.iva}%)</span><span class="va">${(p.facturacion.importeIva||0).toFixed(2)} €</span></div>`:''}
-        ${p.facturacion.irpf?`<div class="br"><span class="la">- IRPF (${p.facturacion.irpf}%)</span><span class="va">${(p.facturacion.importeIrpf||0).toFixed(2)} €</span></div>`:''}
-        <div class="br tot"><span class="la">Total factura</span><span class="va">${(p.facturacion.totalFactura||0).toFixed(2)} €</span></div>
-        <div class="br"><span class="la">Neto a recibir</span><span class="va" style="color:var(--ok)">${(p.facturacion.netoRecibido||0).toFixed(2)} €</span></div>
-        ${p.facturacion.gastos?`<div class="br"><span class="la">Gastos</span><span class="va" style="color:var(--bad)">-${p.facturacion.gastos.toFixed(2)} €</span></div>`:''}
-        ${eph!==null?`<div class="br"><span class="la">Rentabilidad</span><span class="va" style="color:${eph>=30?'var(--ok)':eph>=15?'var(--warn)':'var(--bad)'}">${eph.toFixed(2)} €/h</span></div>`:''}
-      </div>`;
-    document.getElementById('detC').innerHTML=`
-      <div class="db" onclick="App.go('proj')">← proyectos</div>
-      <div class="dh"><div><div class="dt" style="color:${hex}">${esc(p.nombre)}</div><div class="dc">${esc(p.cliente)}</div></div>
-        <div class="bg"><span class="bd bd-${p.estado}">${EST[p.estado]}</span><button class="bt bt-s" onclick="App.pModal('${p.id}')">Editar</button><button class="bt bt-s bt-d" onclick="App.xProj('${p.id}')">Eliminar</button></div></div>
-      <div class="ds"><div class="dst">Info</div><div class="dg">
-        <div><div class="dfl">Inicio</div><div class="dfv">${fmtDate(p.fechas.inicio)}</div></div>
-        <div><div class="dfl">Fin estimada</div><div class="dfv">${fmtDate(p.fechas.finEstimada)}</div></div>
-        <div><div class="dfl">Fin real</div><div class="dfv">${fmtDate(p.fechas.finReal)}</div></div>
-        <div><div class="dfl">Horas</div><div class="dfv">${th.toFixed(1)}h <span style="color:var(--t3);font-size:.72rem">💻${wh.toFixed(1)} 👥${mh.toFixed(1)}</span></div></div>
-      </div>${p.notas?`<div style="margin-top:.75rem"><div class="dfl">Notas</div><div style="color:var(--t3);font-size:.85rem">${esc(p.notas)}</div></div>`:''}</div>
-      <div class="ds"><div class="dst">Facturación</div>${bHtml}${p.facturacion.pagado?`<div style="margin-top:.5rem;font-size:.82rem;color:var(--ok)">Pagado${p.facturacion.fechaPago?' el '+fmtDate(p.facturacion.fechaPago):''}</div>`:''}</div>
-      <div class="ds"><div style="display:flex;justify-content:space-between;align-items:center"><div class="dst" style="border:none;margin:0;padding:0">Horas</div><button class="bt bt-s" onclick="App.hModal('${p.id}')">+ Añadir</button></div>${hHtml}</div>`;
-  },
-
-  eHour(pid,hid){
-    const p=D.p(pid);if(!p)return;
-    const h=p.horas.find(x=>x.id===hid);if(!h)return;
-    const noDate=!h.fecha;
-    this.om(`<div class="mt">Editar hora</div>
-      <label>Tipo</label>
-      <div class="ts2">
-        <div class="to ${h.tipo==='trabajo'?'on':''}" data-type="trabajo" onclick="App.selT(this)"><span class="ic">💻</span><span class="la">Trabajo</span></div>
-        <div class="to ${h.tipo==='reunion'?'on':''}" data-type="reunion" onclick="App.selT(this)"><span class="ic">👥</span><span class="la">Reunión</span></div>
-      </div>
-      <div class="fr"><div class="fg"><label>Horas</label><input type="number" id="ehA" min="0.25" step="0.25" value="${h.cantidad}"></div>
-        <div class="fg"><label>Fecha</label><input type="date" id="ehD" value="${h.fecha||''}" ${noDate?'disabled':''}><label style="margin-top:.35rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="ehNd" ${noDate?'checked':''} onchange="document.getElementById('ehD').disabled=this.checked;if(this.checked)document.getElementById('ehD').value=''" style="width:auto;accent-color:var(--t2)"> Sin fecha</label></div></div>
-      <div class="fg"><label>Nota</label><input type="text" id="ehN" value="${esc(h.nota||'')}"></div>
-      <div class="ma"><button class="bt" onclick="App.cm()">Cancelar</button><button class="bt bt-p" onclick="App.saveEH('${pid}','${hid}')">Guardar</button></div>`);
-  },
-
-  saveEH(pid,hid){
-    const p=D.p(pid);if(!p)return;
-    const h=p.horas.find(x=>x.id===hid);if(!h)return;
-    const tipo=document.querySelector('#mC .to.on')?.dataset.type||h.tipo;
-    const cant=parseFloat(document.getElementById('ehA').value)||h.cantidad;
-    const sinFecha=document.getElementById('ehNd')?.checked;
-    const fecha=sinFecha?null:(document.getElementById('ehD').value||null);
-    const nota=document.getElementById('ehN').value.trim();
-    h.tipo=tipo;h.cantidad=cant;h.fecha=fecha;h.nota=nota;
-    D.up(pid,{horas:p.horas});this.cm();this.rDet(pid);
-  },
-
-  xHour(pid,hid){const p=D.p(pid);if(!p)return;p.horas=p.horas.filter(h=>h.id!==hid);D.up(pid,{horas:p.horas});this.rDet(pid)},
-  xProj(id){const p=D.p(id);if(!p)return;if(confirm(`¿Eliminar "${p.nombre}"?`)){D.del(id);this.go('proj')}},
-
-  /* ── Quick Hours ── */
-  rHrs(){
-    const ps=D.ps().filter(p=>p.estado!=='pagado');
-    if(!ps.length){document.getElementById('qhF').innerHTML='<div class="es"><div class="tx">Crea un proyecto primero</div></div>';return}
-    document.getElementById('qhF').innerHTML=`
-      <div class="fg"><label>Proyecto</label><select id="qP">${ps.map(p=>`<option value="${p.id}">${esc(p.nombre)} — ${esc(p.cliente)}</option>`).join('')}</select></div>
-      <label>Tipo</label>
-      <div class="ts2"><div class="to on" data-type="trabajo" onclick="App.selT(this)"><span class="ic">💻</span><span class="la">Trabajo</span></div>
-        <div class="to" data-type="reunion" onclick="App.selT(this)"><span class="ic">👥</span><span class="la">Reunión</span></div></div>
-      <div class="fr"><div class="fg"><label>Horas</label><input type="number" id="qA" min="0.25" step="0.25" value="1"></div>
-        <div class="fg"><label>Fecha</label><input type="date" id="qD" value="${new Date().toISOString().slice(0,10)}"><label style="margin-top:.35rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="qNd" onchange="document.getElementById('qD').disabled=this.checked;if(this.checked)document.getElementById('qD').value=''" style="width:auto;accent-color:var(--t2)"> Sin fecha</label></div></div>
-      <div class="fg"><label>Nota</label><input type="text" id="qN" placeholder="¿Qué hiciste?"></div>
-      <button class="bt bt-p" onclick="App.saveQH()">Guardar</button>
-      <div id="qOk" style="display:none;margin-top:.75rem;color:var(--ok);font-size:.82rem"></div>`;
-  },
-
-  selT(el){el.parentElement.querySelectorAll('.to').forEach(o=>o.classList.remove('on'));el.classList.add('on')},
-
-  saveQH(){
-    const pid=document.getElementById('qP').value,tipo=document.querySelector('#qhF .to.on')?.dataset.type||'trabajo',
-      cant=parseFloat(document.getElementById('qA').value)||0,sinF=document.getElementById('qNd')?.checked,fecha=sinF?null:(document.getElementById('qD').value||null),nota=document.getElementById('qN').value.trim();
-    if(!pid||cant<=0)return;const p=D.p(pid);if(!p)return;
-    p.horas.push({id:uid(),fecha,tipo,cantidad:cant,nota});D.up(pid,{horas:p.horas});
-    const m=document.getElementById('qOk');m.textContent=`${cant}h → ${p.nombre}`;m.style.display='block';setTimeout(()=>m.style.display='none',2500);
-    document.getElementById('qA').value='1';document.getElementById('qN').value='';
-  },
-
-  /* ── Reports ── */
-  rRep(){
-    const ps=D.ps();ps.forEach(p=>B.calc(p));
-    let th=0,tb=0,tn=0,tg=0,tp=0;
-    ps.forEach(p=>{th+=p.horas.reduce((s,h)=>s+h.cantidad,0);if(p.facturacion.modo!=='gratis'){tb+=p.facturacion.totalFactura||0;tn+=p.facturacion.netoRecibido||0;tg+=p.facturacion.gastos||0}if(p.facturacion.pagado)tp+=p.facturacion.totalFactura||0});
-    const avg=th>0?((tn-tg)/th):0;
-    document.getElementById('rSt').innerHTML=`
-      <div class="sc"><div class="sc-l">Facturado</div><div class="sc-v m">${tb.toFixed(2)} €</div></div>
-      <div class="sc"><div class="sc-l">Cobrado</div><div class="sc-v m" style="color:var(--ok)">${tp.toFixed(2)} €</div></div>
-      <div class="sc"><div class="sc-l">Horas</div><div class="sc-v m">${th.toFixed(1)}h</div></div>
-      <div class="sc"><div class="sc-l">Media €/h</div><div class="sc-v m">${avg.toFixed(2)} €/h</div></div>`;
-    const rk=ps.map(p=>({...p,eph:B.eph(p)})).filter(p=>p.eph!==null&&p.facturacion.modo!=='gratis').sort((a,b)=>b.eph-a.eph);
-    document.getElementById('rRk').innerHTML=!rk.length?'<div class="es"><div class="tx">Añade horas y facturación</div></div>'
-      :rk.map((p,i)=>`<div class="ri" onclick="App.go('det','${p.id}')"><span class="ri-p">${i+1}</span><div class="ri-c" style="background:${colorHex(p.color)}"></div><div class="ri-i"><div class="ri-n">${esc(p.nombre)}</div><div class="ri-cl">${esc(p.cliente)}</div></div><div class="ri-r" style="color:${p.eph>=30?'var(--ok)':p.eph>=15?'var(--warn)':'var(--bad)'}">${p.eph.toFixed(2)} €/h</div></div>`).join('');
-    const cls={};
-    ps.forEach(p=>{const c=p.cliente||'Sin cliente';if(!cls[c])cls[c]={pr:0,h:0,b:0,n:0};cls[c].pr++;cls[c].h+=p.horas.reduce((s,h)=>s+h.cantidad,0);if(p.facturacion.modo!=='gratis'){cls[c].b+=p.facturacion.totalFactura||0;cls[c].n+=p.facturacion.netoRecibido||0}});
-    document.getElementById('rCl').innerHTML=!Object.keys(cls).length?'<div class="es"><div class="tx">Sin datos</div></div>'
-      :Object.entries(cls).map(([n,d])=>`<div class="cc"><div class="cn">${esc(n)}</div><div class="cs"><span class="la">Proyectos</span><span class="va">${d.pr}</span></div><div class="cs"><span class="la">Horas</span><span class="va">${d.h.toFixed(1)}h</span></div><div class="cs"><span class="la">Facturado</span><span class="va">${d.b.toFixed(2)} €</span></div><div class="cs"><span class="la">Neto</span><span class="va">${d.n.toFixed(2)} €</span></div></div>`).join('');
-  },
-
-  /* ── Modals ── */
-  om(h){document.getElementById('mC').innerHTML=h;document.getElementById('mO').classList.add('on')},
-  cm(){document.getElementById('mO').classList.remove('on')},
-
-  /* Color select HTML */
-  colorSelect(currentName){
-    const curHex=colorHex(currentName);
-    let html=`<div style="display:flex;align-items:center;gap:.5rem"><div id="mpColorDot" style="width:20px;height:20px;border-radius:var(--r);background:${curHex};flex-shrink:0;border:1px solid var(--b2)"></div><select id="mpColor" style="width:100%" onchange="document.getElementById('mpColorDot').style.background=colorHex(this.value)">`;
-    for(const[group,colors] of Object.entries(W3C_COLORS)){
-      html+=`<optgroup label="${group}">`;
-      colors.forEach(([name,hex])=>{
-        html+=`<option value="${name}" ${name===currentName?'selected':''} style="color:${hex}">${name}</option>`;
-      });
-      html+='</optgroup>';
-    }
-    html+='</select></div>';
-    return html;
-  },
-
-  pModal(eid){
-    const isE=!!eid,p=isE?D.p(eid):null,st=D.d.settings;
-    const df={
-      nombre:p?.nombre||'',cliente:p?.cliente||'',color:p?.color||'CornflowerBlue',estado:p?.estado||'pendiente',
-      inicio:p?.fechas?.inicio||'',finEst:p?.fechas?.finEstimada||'',finR:p?.fechas?.finReal||'',
-      modo:p?.facturacion?.modo||'desde_base',base:p?.facturacion?.baseImponible||'',total:p?.facturacion?.total||'',
-      iva:p?.facturacion?.iva??st.defaultIva,irpf:p?.facturacion?.irpf??st.defaultIrpf,
-      ivaOn:p?(p.facturacion.iva>0):true,irpfOn:p?(p.facturacion.irpf>0):true,
-      pagado:p?.facturacion?.pagado||false,fechaPago:p?.facturacion?.fechaPago||'',gastos:p?.facturacion?.gastos||'',notas:p?.notas||''
-    };
-    this.om(`<div class="mt">${isE?'Editar':'Nuevo proyecto'}</div>
-      <div class="fr"><div class="fg"><label>Nombre</label><input type="text" id="mpN" value="${esc(df.nombre)}" placeholder="Web Conor"></div>
-        <div class="fg"><label>Cliente</label><input type="text" id="mpCl" value="${esc(df.cliente)}" placeholder="Conor"></div></div>
-      <div class="fg"><label>Color</label>${this.colorSelect(df.color)}</div>
-      <div class="fg"><label>Estado</label><select id="mpSt">${Object.entries(EST).map(([k,v])=>`<option value="${k}" ${k===df.estado?'selected':''}>${v}</option>`).join('')}</select></div>
-      <div class="fr"><div class="fg"><label>Inicio</label><input type="date" id="mpI" value="${df.inicio}"></div><div class="fg"><label>Fin estimada</label><input type="date" id="mpFE" value="${df.finEst}"></div></div>
-      <div class="fg"><label>Fin real</label><input type="date" id="mpFR" value="${df.finR}" style="max-width:50%"></div>
-      <div class="dst" style="margin-top:1.25rem">Facturación</div>
-      <div class="bms">
-        <button class="bm ${df.modo==='desde_base'?'on':''}" onclick="App.sBM('desde_base')">Desde base</button>
-        <button class="bm ${df.modo==='desde_total'?'on':''}" onclick="App.sBM('desde_total')">Desde total</button>
-        <button class="bm ${df.modo==='gratis'?'on':''}" onclick="App.sBM('gratis')">Gratis</button>
-      </div><input type="hidden" id="mpBM" value="${df.modo}">
-      <div id="bF" style="${df.modo==='gratis'?'display:none':''}">
-        <div class="fr">
-          <div class="fg" id="bfBase" style="${df.modo==='desde_total'?'display:none':''}"><label>Base (€)</label><input type="number" id="mpBa" value="${df.base}" step="0.01" placeholder="0.00" oninput="App.cPrev()"></div>
-          <div class="fg" id="bfTot" style="${df.modo==='desde_base'?'display:none':''}"><label>Total (€)</label><input type="number" id="mpTo" value="${df.total}" step="0.01" placeholder="0.00" oninput="App.cPrev()"></div>
-          <div class="fg"><label>Gastos (€)</label><input type="number" id="mpGa" value="${df.gastos}" step="0.01" placeholder="0.00"></div>
-        </div>
-        <div class="tr"><span class="tl">IVA (${df.iva}%)</span><label class="tg"><input type="checkbox" id="mpIva" ${df.ivaOn?'checked':''} onchange="App.cPrev()"><span class="ts"></span></label></div>
-        <div class="tr"><span class="tl">IRPF (${df.irpf}%)</span><label class="tg"><input type="checkbox" id="mpIrpf" ${df.irpfOn?'checked':''} onchange="App.cPrev()"><span class="ts"></span></label></div>
-        <div id="bPrev" class="bb" style="margin-top:.4rem"></div>
-        <div class="tr" style="margin-top:.75rem"><span class="tl">Pagado</span><label class="tg"><input type="checkbox" id="mpPg" ${df.pagado?'checked':''} onchange="document.getElementById('mpFPw').style.display=this.checked?'block':'none'"><span class="ts"></span></label></div>
-        <div id="mpFPw" style="${df.pagado?'':'display:none'}"><div class="fg"><label>Fecha pago</label><input type="date" id="mpFP" value="${df.fechaPago}"></div></div>
-      </div>
-      <div class="fg" style="margin-top:.75rem"><label>Notas</label><textarea id="mpNo" placeholder="...">${esc(df.notas)}</textarea></div>
-      <div class="ma"><button class="bt" onclick="App.cm()">Cancelar</button><button class="bt bt-p" onclick="App.saveP('${eid||''}')">${isE?'Guardar':'Crear'}</button></div>`);
-    this.cPrev();
-  },
-
-  sBM(m){
-    document.getElementById('mpBM').value=m;
-    document.querySelectorAll('.bm').forEach(b=>b.classList.remove('on'));
-    document.querySelector(`.bm:nth-child(${m==='desde_base'?1:m==='desde_total'?2:3})`).classList.add('on');
-    const f=document.getElementById('bF'),bf=document.getElementById('bfBase'),tf=document.getElementById('bfTot');
-    if(m==='gratis')f.style.display='none';else{f.style.display='';bf.style.display=m==='desde_total'?'none':'';tf.style.display=m==='desde_base'?'none':''}
-    this.cPrev();
-  },
-
-  cPrev(){
-    const m=document.getElementById('mpBM')?.value;if(!m||m==='gratis')return;
-    const ivaOn=document.getElementById('mpIva')?.checked,irpfOn=document.getElementById('mpIrpf')?.checked;
-    const ivR=ivaOn?(D.d.settings.defaultIva||21):0,irR=irpfOn?(D.d.settings.defaultIrpf||15):0;
-    let base,importeIva,importeIrpf,totalF,neto;
-    if(m==='desde_base'){base=parseFloat(document.getElementById('mpBa')?.value)||0;importeIva=Math.round(base*ivR/100*100)/100;importeIrpf=Math.round(base*irR/100*100)/100;totalF=Math.round((base+importeIva-importeIrpf)*100)/100;neto=Math.round((base-importeIrpf)*100)/100}
-    else{const t=parseFloat(document.getElementById('mpTo')?.value)||0;const fac=1+ivR/100-irR/100;base=fac?Math.round(t/fac*100)/100:0;importeIva=Math.round(base*ivR/100*100)/100;importeIrpf=Math.round(base*irR/100*100)/100;totalF=t;neto=Math.round((base-importeIrpf)*100)/100}
-    const el=document.getElementById('bPrev');
-    if(el)el.innerHTML=`<div class="br"><span class="la">Base</span><span class="va">${base.toFixed(2)} €</span></div>
-      ${ivR?`<div class="br"><span class="la">+ IVA ${ivR}%</span><span class="va">${importeIva.toFixed(2)} €</span></div>`:''}
-      ${irR?`<div class="br"><span class="la">- IRPF ${irR}%</span><span class="va">${importeIrpf.toFixed(2)} €</span></div>`:''}
-      <div class="br tot"><span class="la">Total</span><span class="va">${totalF.toFixed(2)} €</span></div>
-      <div class="br"><span class="la">Neto</span><span class="va" style="color:var(--ok)">${neto.toFixed(2)} €</span></div>`;
-  },
-
-  saveP(eid){
-    const nombre=document.getElementById('mpN').value.trim(),cliente=document.getElementById('mpCl').value.trim();
-    if(!nombre){alert('Nombre obligatorio');return}
-    const color=document.getElementById('mpColor').value;
-    const estado=document.getElementById('mpSt').value,modo=document.getElementById('mpBM').value;
-    const ivaOn=document.getElementById('mpIva')?.checked,irpfOn=document.getElementById('mpIrpf')?.checked;
-    const proj={id:eid||uid(),nombre,cliente,color,estado,
-      fechas:{inicio:document.getElementById('mpI').value||null,finEstimada:document.getElementById('mpFE').value||null,finReal:document.getElementById('mpFR').value||null},
-      facturacion:{modo,baseImponible:parseFloat(document.getElementById('mpBa')?.value)||0,total:parseFloat(document.getElementById('mpTo')?.value)||0,
-        iva:ivaOn?(D.d.settings.defaultIva||21):0,irpf:irpfOn?(D.d.settings.defaultIrpf||15):0,
-        importeIva:0,importeIrpf:0,totalFactura:0,netoRecibido:0,
-        pagado:document.getElementById('mpPg')?.checked||false,fechaPago:document.getElementById('mpFP')?.value||null,
-        gastos:parseFloat(document.getElementById('mpGa')?.value)||0},
-      horas:eid?(D.p(eid)?.horas||[]):[],notas:document.getElementById('mpNo').value.trim()};
-    B.calc(proj);
-    if(eid)D.up(eid,proj);else D.add(proj);
-    this.cm();if(this.cv==='det')this.rDet(proj.id);else this.go('proj');
-  },
-
-  hModal(pid){
-    this.om(`<div class="mt">Añadir horas</div>
-      <label>Tipo</label>
-      <div class="ts2"><div class="to on" data-type="trabajo" onclick="App.selT(this)"><span class="ic">💻</span><span class="la">Trabajo</span></div>
-        <div class="to" data-type="reunion" onclick="App.selT(this)"><span class="ic">👥</span><span class="la">Reunión</span></div></div>
-      <div class="fr"><div class="fg"><label>Horas</label><input type="number" id="mhA" min="0.25" step="0.25" value="1"></div>
-        <div class="fg"><label>Fecha</label><input type="date" id="mhD" value="${new Date().toISOString().slice(0,10)}"><label style="margin-top:.35rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="mhNd" onchange="document.getElementById('mhD').disabled=this.checked;if(this.checked)document.getElementById('mhD').value=''" style="width:auto;accent-color:var(--t2)"> Sin fecha</label></div></div>
-      <div class="fg"><label>Nota</label><input type="text" id="mhN" placeholder="¿Qué hiciste?"></div>
-      <div class="ma"><button class="bt" onclick="App.cm()">Cancelar</button><button class="bt bt-p" onclick="App.saveHM('${pid}')">Guardar</button></div>`);
-  },
-
-  saveHM(pid){
-    const tipo=document.querySelector('#mC .to.on')?.dataset.type||'trabajo',cant=parseFloat(document.getElementById('mhA').value)||0,
-      sinF=document.getElementById('mhNd')?.checked,fecha=sinF?null:(document.getElementById('mhD').value||null),nota=document.getElementById('mhN').value.trim();
-    if(cant<=0)return;const p=D.p(pid);if(!p)return;
-    p.horas.push({id:uid(),fecha,tipo,cantidad:cant,nota});D.up(pid,{horas:p.horas});this.cm();this.rDet(pid);
-  },
-
-  /* ── Export/Import ── */
-  exp(){
-    const d=JSON.stringify(D.d,null,2),b=new Blob([d],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');
-    a.href=u;a.download=`trackr_backup_${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(u);
-  },
-  imp(ev,isS){
-    const f=ev.target.files[0];if(!f)return;const r=new FileReader();
-    r.onload=e=>{try{const d=JSON.parse(e.target.result);if(!d.projects||!Array.isArray(d.projects)){alert('JSON no válido');return}
-      if(!d.settings)d.settings={defaultIva:21,defaultIrpf:15};D.load(d);if(isS)this.enter();else this.go(this.cv)}catch(err){alert('Error: '+err.message)}};
-    r.readAsText(f);ev.target.value='';
-  }
-};
-
-document.addEventListener('DOMContentLoaded',()=>App.init());
-</script>
+<!-- JS (orden importa: dependencias primero, app último) -->
+<script src="js/colors.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/store.js"></script>
+<script src="js/billing.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>

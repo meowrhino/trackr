@@ -1,0 +1,27 @@
+/* ================================================
+ * TRACKR — Variables y estilos globales
+ * Reset, variables CSS, tipografía base, scrollbar
+ * Dependencias: ninguna (cargar primero)
+ * ================================================ */
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --bg:#111;--bg2:#191919;--bg3:#222;--bg4:#2a2a2a;
+  --b1:#262626;--b2:#333;--b3:#444;
+  --t1:#ccc;--t2:#888;--t3:#555;
+  --ok:#5a9;--warn:#c93;--bad:#c55;
+  --r:3px;--tr:0.15s ease;
+}
+
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh}
+
+/* Clase helper para monospace */
+.m{font-family:'DM Mono',monospace}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--b2)}
+
+/* Input file oculto */
+.fh{position:absolute;width:0;height:0;opacity:0;pointer-events:none}

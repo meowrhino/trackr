@@ -1,0 +1,274 @@
+/* ================================================
+ * TRACKR — Calendario (mensual + semanal)
+ * Grid de días, entradas de horas, navegación, timeline
+ * Dependencias: variables.css
+ * ================================================ */
+
+/* ── Header: navegación de mes/semana ── */
+.cal-hd{
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+  margin-bottom:1rem;
+}
+.cal-title{
+  font-size:1.1rem;
+  font-weight:500;
+  margin:0 .5rem;
+  min-width:160px;
+  text-align:center;
+}
+
+/* ── Toggle vista Mes/Semana ── */
+.cal-vt{
+  display:flex;
+  gap:2px;
+  margin-left:auto;
+}
+.cal-vb{
+  padding:.35rem .7rem;
+  border:1px solid var(--b1);
+  border-radius:var(--r);
+  background:transparent;
+  color:var(--t3);
+  font-family:'Outfit',sans-serif;
+  font-size:.78rem;
+  cursor:pointer;
+  transition:all var(--tr);
+}
+.cal-vb:hover{border-color:var(--b2);color:var(--t1)}
+.cal-vb.on{border-color:var(--t2);color:var(--t1)}
+
+/* ── Stat: total del periodo ── */
+.cal-stat{
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+  margin-bottom:1rem;
+  font-size:.82rem;
+  color:var(--t3);
+}
+
+/* ══════════════════════════════════════
+ *  VISTA MENSUAL
+ * ══════════════════════════════════════ */
+
+/* ── Grid 7 columnas ── */
+.cal-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:1px;
+  background:var(--b1);
+  border:1px solid var(--b1);
+  border-radius:var(--r);
+  overflow:hidden;
+}
+
+/* ── Headers día de la semana ── */
+.cal-dow{
+  background:var(--bg2);
+  padding:.4rem;
+  text-align:center;
+  font-size:.68rem;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  color:var(--t3);
+}
+
+/* ── Celda de día ── */
+.cal-day{
+  background:var(--bg2);
+  min-height:90px;
+  padding:.4rem;
+  cursor:pointer;
+  transition:background var(--tr);
+  display:flex;
+  flex-direction:column;
+}
+.cal-day:hover{background:var(--bg3)}
+
+/* Fuera del mes actual */
+.cal-day.out{opacity:.3}
+
+/* Número del día */
+.cal-num{
+  font-family:'DM Mono',monospace;
+  font-size:.75rem;
+  color:var(--t2);
+  margin-bottom:.3rem;
+}
+
+/* Hoy: círculo invertido en el número */
+.cal-day.today .cal-num{
+  background:var(--t1);
+  color:var(--bg);
+  border-radius:50%;
+  width:22px;
+  height:22px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* ── Entrada de hora dentro de celda mensual ── */
+.cal-entry{
+  font-size:.68rem;
+  padding:.15rem .3rem;
+  border-left:2px solid var(--b2);
+  margin-bottom:2px;
+  border-radius:0 var(--r) var(--r) 0;
+  background:var(--bg3);
+  display:flex;
+  gap:.3rem;
+  align-items:center;
+  overflow:hidden;
+  white-space:nowrap;
+}
+.cal-e-h{
+  font-weight:500;
+  flex-shrink:0;
+}
+.cal-e-p{
+  color:var(--t3);
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* ══════════════════════════════════════
+ *  VISTA SEMANAL
+ * ══════════════════════════════════════ */
+
+.cal-week{
+  border:1px solid var(--b1);
+  border-radius:var(--r);
+  overflow:hidden;
+}
+
+/* Header: esquina + 7 días */
+.cal-week-hdr{
+  display:grid;
+  grid-template-columns:50px repeat(7,1fr);
+  gap:1px;
+  background:var(--b1);
+}
+.cal-wc{background:var(--bg2)} /* esquina vacía */
+.cal-wh{
+  background:var(--bg2);
+  padding:.5rem .25rem;
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:.15rem;
+}
+.cal-wh-dow{
+  font-size:.65rem;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  color:var(--t3);
+}
+.cal-wh-num{
+  font-family:'DM Mono',monospace;
+  font-size:.85rem;
+  color:var(--t2);
+}
+.cal-wh.today .cal-wh-num{
+  background:var(--t1);
+  color:var(--bg);
+  border-radius:50%;
+  width:24px;
+  height:24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* Body: columna etiquetas + 7 columnas día */
+.cal-week-body{
+  display:grid;
+  grid-template-columns:50px repeat(7,1fr);
+  gap:1px;
+  background:var(--b1);
+}
+
+/* Columna de etiquetas de hora (izquierda) */
+.cal-week-tl{
+  display:flex;
+  flex-direction:column;
+}
+.cal-tl{
+  background:var(--bg2);
+  height:var(--slot-h,60px);
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  padding-top:.25rem;
+  font-family:'DM Mono',monospace;
+  font-size:.65rem;
+  color:var(--t3);
+  flex-shrink:0;
+}
+
+/* Columna de día (slots + eventos) */
+.cal-wcol{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+}
+
+/* Celda slot vacía */
+.cal-slot{
+  background:var(--bg2);
+  height:var(--slot-h,60px);
+  cursor:pointer;
+  transition:background var(--tr);
+  flex-shrink:0;
+}
+.cal-slot:hover{background:var(--bg3)}
+
+/* Evento posicionado */
+.cal-evt{
+  position:absolute;
+  left:2px;
+  right:2px;
+  border-left:3px solid var(--ec,var(--b2));
+  background:color-mix(in srgb, var(--ec,var(--b2)) 15%, var(--bg2));
+  border-radius:0 var(--r) var(--r) 0;
+  padding:.2rem .35rem;
+  overflow:hidden;
+  cursor:pointer;
+  pointer-events:auto;
+  transition:background var(--tr);
+  display:flex;
+  flex-direction:column;
+  gap:.1rem;
+  z-index:1;
+}
+.cal-evt:hover{
+  background:color-mix(in srgb, var(--ec,var(--b2)) 25%, var(--bg2));
+}
+.cal-evt-t{
+  font-family:'DM Mono',monospace;
+  font-size:.68rem;
+  font-weight:500;
+  color:var(--t1);
+}
+.cal-evt-n{
+  font-size:.62rem;
+  color:var(--t3);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/* Sección "sin hora asignada" debajo del grid semanal */
+.cal-nt{
+  margin-top:1rem;
+}
+.cal-nt-title{
+  font-size:.72rem;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  color:var(--t3);
+  margin-bottom:.5rem;
+}

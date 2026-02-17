@@ -1,0 +1,41 @@
+/* ================================================
+ * TRACKR — Vista detalle de proyecto
+ * Header, info grid, lista de horas, facturación
+ * Dependencias: variables.css
+ * ================================================ */
+
+/* ── Header ── */
+.dh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem}
+.db{display:inline-flex;align-items:center;gap:.3rem;color:var(--t3);font-size:.82rem;cursor:pointer;margin-bottom:.75rem;transition:color var(--tr)}
+.db:hover{color:var(--t1)}
+.dt{font-size:1.5rem;font-weight:500;letter-spacing:-.01em}
+.dc{color:var(--t3);margin-top:.15rem;font-size:.88rem}
+
+/* ── Secciones y grid de datos ── */
+.ds{margin-bottom:1.5rem}
+.dst{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:.75rem;padding-bottom:.4rem;border-bottom:1px solid var(--b1)}
+.dg{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.75rem}
+.dfl{font-size:.72rem;color:var(--t3);margin-bottom:.15rem;text-transform:uppercase;letter-spacing:.04em}
+.dfv{font-family:'DM Mono',monospace;font-size:.9rem}
+
+/* ── Lista de horas ── */
+.hl{display:flex;flex-direction:column;gap:1px}
+.hr{display:flex;align-items:center;gap:.75rem;padding:.55rem .75rem;background:var(--bg2);font-size:.82rem;transition:background var(--tr);border-left:2px solid transparent}
+.hr:first-child{border-radius:var(--r) var(--r) 0 0}
+.hr:last-child{border-radius:0 0 var(--r) var(--r)}
+.hr:only-child{border-radius:var(--r)}
+.hr:hover{background:var(--bg3)}
+.hr-t{width:22px;text-align:center;font-size:.9rem}
+.hr-d{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--t3);min-width:80px}
+.hr-a{font-family:'DM Mono',monospace;font-weight:500;min-width:40px}
+.hr-n{color:var(--t3);flex:1;font-size:.78rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hr-e,.hr-x{color:var(--t3);cursor:pointer;font-size:.85rem;padding:.15rem;transition:color var(--tr);opacity:.4}
+.hr-e:hover{color:var(--t1);opacity:1}
+.hr-x:hover{color:var(--bad);opacity:1}
+
+/* ── Facturación ── */
+.bb{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:1rem;margin-top:.75rem}
+.br{display:flex;justify-content:space-between;padding:.3rem 0;font-size:.85rem}
+.br.tot{border-top:1px solid var(--b1);margin-top:.4rem;padding-top:.6rem;font-weight:500}
+.br .la{color:var(--t3)}
+.br .va{font-family:'DM Mono',monospace}

@@ -1,0 +1,67 @@
+/* ================================================
+ * TRACKR — Componentes reutilizables
+ * Stats, botones, toggles, cards, toolbar, modal, empty state
+ * Dependencias: variables.css
+ * ================================================ */
+
+/* ── Stats grid ── */
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.75rem;margin-bottom:1.5rem}
+.sc{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:1rem}
+.sc-l{font-size:.72rem;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.3rem}
+.sc-v{font-family:'DM Mono',monospace;font-size:1.4rem;font-weight:400}
+.sc-d{font-size:.72rem;color:var(--t3);margin-top:.15rem}
+
+/* ── Botones ── */
+.bt{padding:.45rem 1rem;border-radius:var(--r);border:1px solid var(--b1);background:var(--bg2);color:var(--t1);font-family:'Outfit',sans-serif;font-size:.82rem;cursor:pointer;transition:all var(--tr);display:inline-flex;align-items:center;gap:.4rem}
+.bt:hover{border-color:var(--b2);background:var(--bg3)}
+.bt-p{background:var(--t1);border-color:var(--t1);color:var(--bg)}
+.bt-p:hover{background:#fff}
+.bt-d{border-color:var(--bad);color:var(--bad)}.bt-d:hover{background:rgba(204,85,85,.08)}
+.bt-s{padding:.35rem .7rem;font-size:.78rem}
+.bg{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+
+/* ── Toggle switch ── */
+.tr{display:flex;align-items:center;justify-content:space-between;padding:.4rem 0}
+.tl{font-size:.82rem;color:var(--t1)}
+.tg{position:relative;width:36px;height:20px;cursor:pointer}
+.tg input{display:none}
+.ts{position:absolute;inset:0;background:var(--b2);border-radius:10px;transition:var(--tr)}
+.ts::before{content:'';position:absolute;width:14px;height:14px;left:3px;top:3px;background:var(--t2);border-radius:50%;transition:var(--tr)}
+.tg input:checked+.ts{background:var(--t1)}
+.tg input:checked+.ts::before{transform:translateX(16px);background:var(--bg)}
+
+/* ── Project cards ── */
+.pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:.75rem}
+.pc{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:1rem;cursor:pointer;transition:all var(--tr);position:relative;border-left:3px solid var(--project-color,var(--b2))}
+.pc:hover{background:var(--bg3)}
+.pc-h{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.5rem}
+.pc-n{font-weight:500;font-size:.95rem}
+.pc-c{font-size:.78rem;color:var(--t3);margin-top:.1rem}
+.pc-s{display:flex;gap:1.25rem;margin-top:.5rem;font-size:.78rem;color:var(--t3)}
+.pc-s span{display:flex;align-items:center;gap:.25rem}
+
+/* ── Badges de estado ── */
+.bd{font-family:'DM Mono',monospace;font-size:.68rem;padding:.15rem .5rem;border:1px solid var(--b1);border-radius:var(--r);text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;color:var(--t3)}
+.bd-en_progreso{border-color:rgba(100,160,220,.3);color:#78b4e8}
+.bd-completado{border-color:rgba(200,160,60,.3);color:#c9a43c}
+.bd-facturado{border-color:rgba(160,120,200,.3);color:#b08cd8}
+.bd-pagado{border-color:rgba(90,170,140,.3);color:#5aac8c}
+
+/* ── Toolbar (filtros/orden) ── */
+.tb{display:flex;gap:.5rem;margin-bottom:1.25rem;flex-wrap:wrap;align-items:center}
+.tbs{flex:1}
+.fb{padding:.3rem .7rem;border:1px solid var(--b1);background:transparent;color:var(--t3);font-family:'Outfit',sans-serif;font-size:.78rem;cursor:pointer;transition:all var(--tr);border-radius:var(--r)}
+.fb:hover{border-color:var(--b2);color:var(--t1)}
+.fb.on{border-color:var(--t2);color:var(--t1)}
+
+/* ── Modal ── */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:1000;padding:2rem;opacity:0;pointer-events:none;transition:opacity var(--tr)}
+.mo.on{opacity:1;pointer-events:all}
+.md{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:1.75rem;width:100%;max-width:520px;max-height:85vh;overflow-y:auto}
+.mt{font-size:1.1rem;font-weight:500;margin-bottom:1.25rem}
+.ma{display:flex;justify-content:flex-end;gap:.5rem;margin-top:1.25rem}
+
+/* ── Empty state ── */
+.es{text-align:center;padding:2.5rem 1rem;color:var(--t3)}
+.es .ic{font-size:1.8rem;margin-bottom:.5rem;opacity:.3}
+.es .tx{font-size:.88rem}

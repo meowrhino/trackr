@@ -1,0 +1,32 @@
+/* ================================================
+ * TRACKR — Vista Info / Ayuda
+ * Hero 2 columnas, cards de funcionalidad, grid de navegación
+ * Dependencias: variables.css
+ * ================================================ */
+
+/* ── Hero: 2 columnas (logo + descripción) ── */
+.info-hero{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:2rem;
+  align-items:center;
+  margin-bottom:2.5rem;
+}
+.info-hero .s-logo{font-size:1.4rem;margin-bottom:.2rem}
+.info-hero .s-sub{margin-bottom:0}
+.info-desc{color:var(--t2);font-size:.88rem;line-height:1.6}
+
+/* ── Cards de funcionalidad (Cómo funciona) ── */
+.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-bottom:2rem}
+.info-card{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:1.1rem}
+.info-card-icon{font-size:1.1rem;margin-bottom:.5rem}
+.info-card-title{font-size:.85rem;font-weight:500;margin-bottom:.3rem}
+.info-card-desc{font-size:.78rem;color:var(--t3);line-height:1.5}
+
+/* ── Grid de navegación (6 columnas) ── */
+.info-nav-grid{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:1rem;
+  margin-bottom:2rem;
+}

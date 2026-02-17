@@ -1,0 +1,53 @@
+/* ================================================
+ * TRACKR — Responsive
+ * Media queries para mobile/tablet (cargar último)
+ * Dependencias: todas las demás hojas CSS
+ * ================================================ */
+
+/* ── Tablet: nav grid a 3 columnas ── */
+@media(max-width:1200px){
+  .info-nav-grid{grid-template-columns:repeat(3,1fr)}
+}
+
+/* ── Mobile ── */
+@media(max-width:768px){
+  /* Sidebar colapsado */
+  .sb{width:52px}
+  .sb .nt,.sb-logo span{display:none}
+  .sb-logo{padding:0;text-align:center}
+  .ni{justify-content:center;padding:.55rem}
+
+  /* Main content ajustado */
+  .mc{margin-left:52px;padding:1.25rem}
+
+  /* Grids a 1 columna */
+  .fr{grid-template-columns:1fr}
+  .pg{grid-template-columns:1fr}
+  .info-grid{grid-template-columns:1fr}
+
+  /* Info: hero a 1 columna, nav a 2 columnas */
+  .info-hero{grid-template-columns:1fr}
+  .info-nav-grid{grid-template-columns:repeat(2,1fr)}
+
+  /* Calendario mensual: celdas compactas, ocultar nombre proyecto */
+  .cal-day{min-height:60px;padding:.25rem}
+  .cal-entry{font-size:.6rem}
+  .cal-e-p{display:none}
+  .cal-dow{font-size:.6rem;padding:.25rem .15rem}
+  .cal-title{font-size:.95rem;min-width:130px}
+
+  /* Calendario: header wrap */
+  .cal-hd{flex-wrap:wrap}
+  .cal-vt{margin-left:0}
+
+  /* Calendario semanal: compactar */
+  .cal-week-hdr{grid-template-columns:35px repeat(7,1fr)}
+  .cal-week-body{grid-template-columns:35px repeat(7,1fr)}
+  .cal-tl{font-size:.55rem}
+  .cal-slot{height:40px}
+  .cal-week{--slot-h:40px}
+  .cal-wh-dow{font-size:.55rem}
+  .cal-wh-num{font-size:.7rem}
+  .cal-evt-t{font-size:.6rem}
+  .cal-evt-n{display:none}
+}

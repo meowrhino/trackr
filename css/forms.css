@@ -1,0 +1,39 @@
+/* ================================================
+ * TRACKR — Formularios
+ * Inputs, selects, color picker, quick hours, billing mode
+ * Dependencias: variables.css
+ * ================================================ */
+
+/* ── Inputs base ── */
+input,select,textarea{font-family:'Outfit',sans-serif;font-size:.85rem;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);color:var(--t1);padding:.5rem .7rem;transition:border-color var(--tr);width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--t3)}
+input:disabled{opacity:.35;cursor:not-allowed}
+input[type="number"]{font-family:'DM Mono',monospace}
+textarea{resize:vertical;min-height:70px}
+select{cursor:pointer}
+label{font-size:.75rem;color:var(--t3);display:block;margin-bottom:.25rem;text-transform:uppercase;letter-spacing:.04em}
+.fg{margin-bottom:.85rem}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+
+/* ── Color select ── */
+.color-sel{position:relative}
+.color-preview{display:flex;align-items:center;gap:.5rem;padding:.5rem .7rem;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);cursor:pointer;font-size:.82rem;transition:border-color var(--tr)}
+.color-preview:hover{border-color:var(--b2)}
+.color-dot{width:12px;height:12px;border-radius:2px;flex-shrink:0}
+.color-name{color:var(--t1)}
+
+/* ── Quick hours: selector tipo trabajo/reunión ── */
+.qf{max-width:440px}
+.ts2{display:flex;gap:.5rem;margin-bottom:.85rem}
+.to{flex:1;padding:.75rem;border:1px solid var(--b1);border-radius:var(--r);background:var(--bg2);text-align:center;cursor:pointer;transition:all var(--tr)}
+.to:hover{border-color:var(--b2)}
+.to.on{border-color:var(--t2);background:var(--bg3)}
+.to .ic{font-size:1.2rem;display:block;margin-bottom:.2rem}
+.to .la{font-size:.78rem;color:var(--t2)}
+.to.on .la{color:var(--t1)}
+
+/* ── Billing mode selector ── */
+.bms{display:flex;gap:.4rem;margin-bottom:.85rem}
+.bm{flex:1;padding:.4rem;border:1px solid var(--b1);border-radius:var(--r);background:transparent;color:var(--t3);font-family:'Outfit',sans-serif;font-size:.78rem;cursor:pointer;transition:all var(--tr);text-align:center}
+.bm:hover{border-color:var(--b2)}
+.bm.on{border-color:var(--t2);color:var(--t1)}
