@@ -4,20 +4,11 @@
  * Dependencias: variables.css
  * ================================================ */
 
-/* ── Start screen ── */
-#S{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem}
-.s-box{text-align:center;max-width:380px;width:100%}
+/* ── Logo reutilizable ── */
 .s-logo{font-family:'DM Mono',monospace;font-size:1.8rem;font-weight:500;letter-spacing:.35em;color:var(--t1);margin-bottom:.3rem}
-.s-sub{color:var(--t3);font-size:.85rem;margin-bottom:3rem;font-weight:300}
-.s-actions{display:flex;flex-direction:column;gap:.75rem}
-.s-btn{padding:.85rem 1.5rem;border:1px solid var(--b1);background:var(--bg2);color:var(--t1);font-family:'Outfit',sans-serif;font-size:.88rem;cursor:pointer;transition:all var(--tr);display:flex;align-items:center;justify-content:center;gap:.6rem;border-radius:var(--r)}
-.s-btn:hover{border-color:var(--b2);background:var(--bg3)}
-.s-btn.p{background:var(--t1);color:var(--bg);border-color:var(--t1);font-weight:500}
-.s-btn.p:hover{background:#fff}
 
 /* ── App container ── */
-#A{display:none;min-height:100vh}
-#A.on{display:flex}
+#A{display:flex;min-height:100vh}
 
 /* ── Sidebar ── */
 .sb{width:200px;min-height:100vh;background:var(--bg);border-right:1px solid var(--b1);padding:1.25rem 0;display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100}

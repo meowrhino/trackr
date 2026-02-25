@@ -6,7 +6,7 @@
  * ================================================ */
 
 const App={
-  cv:'dash',  // vista actual
+  cv:'info',  // vista actual
   cp:null,    // proyecto actual (en detalle)
   pf:'todos', // filtro de proyectos
   ps:'recientes', // orden de proyectos
@@ -16,9 +16,9 @@ const App={
   calWeekStart:null, // Date del lunes de la semana (null = inicializar)
 
   /* ── Inicialización ── */
-  init(){if(D.init())this.enter()},
-  createNew(){D.create();this.enter()},
-  enter(){document.getElementById('S').style.display='none';document.getElementById('A').classList.add('on');this.go('dash')},
+  init(){if(!D.init())D.create();this.enter()},
+  createNew(){D.create();this.go('info')},
+  enter(){this.go('info')},
 
   /* ── Navegación ── */
   go(v,d){
@@ -39,6 +39,31 @@ const App={
   rInfo(){
     const st=D.d.settings;
     const name=st.usuario||'';
+    const ps=D.ps();
+    const hasProjects=ps.length>0;
+    const statusEl=document.getElementById('infoStatus');
+    if(hasProjects){
+      const activos=ps.filter(p=>p.status==='activo').length;
+      statusEl.innerHTML=
+        `<div class="info-status">`
+        +`<div class="info-status-text"><span class="info-status-num">${ps.length}</span> proyecto${ps.length!==1?'s':''}`
+        +`${activos?` · <strong>${activos} activo${activos!==1?'s':''}</strong>`:''}`
+        +`</div>`
+        +`<div class="info-status-actions">`
+        +`<button class="bt bt-p" onclick="App.go('dash')">Ir al Dashboard</button>`
+        +`<button class="bt" onclick="App.pModal()">+ Nuevo proyecto</button>`
+        +`</div>`
+        +`</div>`;
+    }else{
+      statusEl.innerHTML=
+        `<div class="info-cta">`
+        +`<p class="info-cta-text">No tienes proyectos todavía. Crea uno nuevo o importa tus datos desde un JSON.</p>`
+        +`<div class="info-cta-actions">`
+        +`<button class="bt bt-p" onclick="App.pModal()">+ Nuevo proyecto</button>`
+        +`<button class="bt" onclick="document.getElementById('impA').click()">Cargar JSON</button>`
+        +`</div>`
+        +`</div>`;
+    }
     document.getElementById('infoUser').innerHTML=
       `<div class="info-user-row">`
       +`<input type="text" id="iuName" value="${esc(name)}" placeholder="Tu nombre o empresa">`
@@ -835,13 +860,13 @@ const App={
     a.href=u;a.download=`trackr_backup_${ts}.json`;a.click();URL.revokeObjectURL(u);
   },
 
-  imp(ev,isS){
+  imp(ev){
     const f=ev.target.files[0];if(!f)return;const r=new FileReader();
     r.onload=e=>{try{
       const d=JSON.parse(e.target.result);
       if(!d.projects||!Array.isArray(d.projects)){alert('JSON no válido');return}
       if(!d.settings)d.settings={defaultIva:21,defaultIrpf:15};
-      D.load(d);if(isS)this.enter();else this.go(this.cv);
+      D.load(d);this.go(this.cv);
     }catch(err){alert('Error: '+err.message)}};
     r.readAsText(f);ev.target.value='';
   }

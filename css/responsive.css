@@ -4,10 +4,6 @@
  * Dependencias: todas las demás hojas CSS
  * ================================================ */
 
-/* ── Tablet: nav grid a 3 columnas ── */
-@media(max-width:1200px){
-  .info-nav-grid{grid-template-columns:repeat(3,1fr)}
-}
 
 /* ── Mobile ── */
 @media(max-width:768px){
@@ -25,9 +21,10 @@
   .pg{grid-template-columns:1fr}
   .info-grid{grid-template-columns:1fr}
 
-  /* Info: hero a 1 columna, nav a 2 columnas */
-  .info-hero{grid-template-columns:1fr}
-  .info-nav-grid{grid-template-columns:repeat(2,1fr)}
+  /* Info: CTA y status a columna */
+  .info-cta-actions,.info-status{flex-direction:column}
+  .info-status-actions{width:100%}
+  .info-status-actions .bt{flex:1}
 
   /* Calendario mensual: celdas compactas, ocultar nombre proyecto */
   .cal-day{min-height:60px;padding:.25rem}

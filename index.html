@@ -22,21 +22,6 @@
 <body>
 
 <!-- ════════════════════════════════════════════
-     START SCREEN
-     ════════════════════════════════════════════ -->
-<div id="S">
-  <div class="s-box">
-    <div class="s-logo">TRACKR</div>
-    <p class="s-sub">gestión freelance</p>
-    <div class="s-actions">
-      <button class="s-btn p" onclick="App.createNew()">Empezar nuevo</button>
-      <button class="s-btn" onclick="document.getElementById('impS').click()">Cargar JSON</button>
-      <input type="file" id="impS" class="fh" accept=".json" onchange="App.imp(event,1)">
-    </div>
-  </div>
-</div>
-
-<!-- ════════════════════════════════════════════
      APP
      ════════════════════════════════════════════ -->
 <div id="A">
@@ -45,8 +30,8 @@
   <nav class="sb">
     <div class="sb-logo"><span>TRACKR</span></div>
     <div class="sb-nav">
-      <div class="ni" data-v="info" onclick="App.go('info')"><span class="ic">?</span><span class="nt">Info</span></div>
-      <div class="ni on" data-v="dash" onclick="App.go('dash')"><span class="ic">◩</span><span class="nt">Dashboard</span></div>
+      <div class="ni on" data-v="info" onclick="App.go('info')"><span class="ic">?</span><span class="nt">Info</span></div>
+      <div class="ni" data-v="dash" onclick="App.go('dash')"><span class="ic">◩</span><span class="nt">Dashboard</span></div>
       <!-- COMENTADO: Proyectos y Horas (redundantes, accesibles desde dashboard y detalle)
       <div class="ni" data-v="proj" onclick="App.go('proj')"><span class="ic">▦</span><span class="nt">Proyectos</span></div>
       <div class="ni" data-v="hrs" onclick="App.go('hrs')"><span class="ic">+</span><span class="nt">Horas</span></div>
@@ -58,7 +43,7 @@
       <div class="sep"></div>
       <div class="ni" onclick="App.exp()"><span class="ic">↓</span><span class="nt">Exportar</span></div>
       <div class="ni" onclick="document.getElementById('impA').click()"><span class="ic">↑</span><span class="nt">Importar</span></div>
-      <input type="file" id="impA" class="fh" accept=".json" onchange="App.imp(event,0)">
+      <input type="file" id="impA" class="fh" accept=".json" onchange="App.imp(event)">
     </div>
   </nav>
 
@@ -66,14 +51,12 @@
   <main class="mc">
 
     <!-- ── Vista: Info ── -->
-    <div id="vInfo" class="vw">
+    <div id="vInfo" class="vw on">
       <div class="info-hero">
-        <div>
-          <div class="s-logo">TRACKR</div>
-          <p class="s-sub">gestión freelance</p>
-        </div>
+        <div class="s-logo">TRACKR</div>
         <p class="info-desc">Herramienta minimalista para gestionar tus proyectos freelance. Controla horas, facturación y rentabilidad desde un solo lugar. Tus datos se guardan en el navegador — exporta un JSON cuando quieras hacer backup.</p>
       </div>
+      <div id="infoStatus"></div>
       <div class="ds"><div class="dst">Usuario</div></div>
       <div class="info-user" id="infoUser"></div>
       <div class="ds"><div class="dst">Cómo funciona</div></div>
@@ -83,17 +66,10 @@
         <div class="info-card"><div class="info-card-icon">◩</div><div class="info-card-title">Consulta el dashboard</div><div class="info-card-desc">Visualiza proyectos activos, horas semanales y mensuales, alertas de cobro pendiente y estado general de tu actividad.</div></div>
         <div class="info-card"><div class="info-card-icon">▣</div><div class="info-card-title">Calendario</div><div class="info-card-desc">Visualiza tu trabajo en vistas mensual y semanal, crea horas directamente desde el grid.</div></div>
       </div>
-      <div class="ds"><div class="dst">Navegación</div></div>
-      <div class="info-nav-grid">
-        <div class="info-card"><div class="info-card-icon">?</div><div class="info-card-title">Info</div><div class="info-card-desc">Guía de uso y usuario</div></div>
-        <div class="info-card"><div class="info-card-icon">◩</div><div class="info-card-title">Dashboard</div><div class="info-card-desc">Resumen general y alertas</div></div>
-        <div class="info-card"><div class="info-card-icon">▣</div><div class="info-card-title">Calendario</div><div class="info-card-desc">Vista mensual y semanal</div></div>
-        <div class="info-card"><div class="info-card-icon">↓ ↑</div><div class="info-card-title">Datos</div><div class="info-card-desc">Exportar / Importar JSON</div></div>
-      </div>
     </div>
 
     <!-- ── Vista: Dashboard ── -->
-    <div id="vDash" class="vw on">
+    <div id="vDash" class="vw">
       <h1 class="pt">Dashboard</h1>
       <!-- COMENTADO: Stats (Activos, Semana, Mes, Pendiente cobro)
       <div class="sg" id="dSt"></div>
