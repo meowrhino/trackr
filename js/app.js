@@ -574,10 +574,10 @@ const App={
 
   /* Stats de proyectos trabajados en el periodo */
   _calProjStats(pStats){
-    const list=Object.values(pStats).sort((a,b)=>b.h-a.h);
+    const list=Object.entries(pStats).map(([id,v])=>({id,...v})).sort((a,b)=>b.h-a.h);
     if(!list.length)return '';
     return `<div class="cal-ps"><div class="cal-ps-title">Proyectos en este periodo</div><div class="cal-ps-list">${
-      list.map(p=>`<div class="cal-ps-item"><span class="cal-ps-dot" style="background:${p.pc}"></span><span class="cal-ps-name">${esc(p.pn)}</span><span class="cal-ps-h m">${p.h.toFixed(1)}h</span></div>`).join('')
+      list.map(p=>`<div class="cal-ps-item cal-ps-click" onclick="App.pModal('${p.id}')"><span class="cal-ps-dot" style="background:${p.pc}"></span><span class="cal-ps-name">${esc(p.pn)}</span><span class="cal-ps-h m">${p.h.toFixed(1)}h</span></div>`).join('')
     }</div></div>`;
   },
 
@@ -821,7 +821,7 @@ const App={
     B.calc(proj);
     if(eid)D.up(eid,proj);else D.add(proj);
     this.cm();
-    if(this.cv==='det')this.rDet(proj.id);else this.go('dash');
+    if(this.cv==='det')this.rDet(proj.id);else this.go(this.cv);
   },
 
   /* Modal añadir horas (desde detalle) */

@@ -312,5 +312,7 @@
   font-size:.78rem;
 }
 .cal-ps-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.cal-ps-click{cursor:pointer;transition:all var(--tr)}
+.cal-ps-click:hover{border-color:var(--b2);background:var(--bg3)}
 .cal-ps-name{color:var(--t2)}
 .cal-ps-h{color:var(--t1);font-size:.72rem}
