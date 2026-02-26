@@ -139,6 +139,14 @@
   text-overflow:ellipsis;
 }
 
+/* Gasto dentro de celda mensual */
+.cal-entry-gasto .cal-e-ico{
+  color:var(--warn);
+}
+.cal-entry-gasto .cal-e-h{
+  font-size:.62rem;
+}
+
 /* ══════════════════════════════════════
  *  VISTA SEMANAL
  * ══════════════════════════════════════ */

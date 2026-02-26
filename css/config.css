@@ -48,6 +48,12 @@
 .cl-item:only-child { border-radius: var(--r); }
 .cl-item:hover { background: var(--bg3); }
 
+.cl-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--r);
+  flex-shrink: 0;
+}
 .cl-name {
   flex: 1;
   font-size: .88rem;

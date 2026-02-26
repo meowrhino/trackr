@@ -115,6 +115,10 @@ const D = {
       }
     });
 
+    /* Garantizar campo color en clientes y gastos */
+    d.clientes.forEach(c => { if (!c.color) c.color = 'CornflowerBlue'; });
+    d.gastos.forEach(g => { if (!g.color) g.color = 'Salmon'; });
+
     /* Extraer clientes únicos de proyectos legacy (campo string) */
     const hasLegacy = d.projects.some(p => p.cliente && !p.clienteId);
     if (hasLegacy && d.clientes.length === 0) {
