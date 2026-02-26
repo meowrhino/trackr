@@ -15,7 +15,7 @@
 .bt{padding:.45rem 1rem;border-radius:var(--r);border:1px solid var(--b1);background:var(--bg2);color:var(--t1);font-family:'Outfit',sans-serif;font-size:.82rem;cursor:pointer;transition:all var(--tr);display:inline-flex;align-items:center;gap:.4rem}
 .bt:hover{border-color:var(--b2);background:var(--bg3)}
 .bt-p{background:var(--t1);border-color:var(--t1);color:var(--bg)}
-.bt-p:hover{background:#fff}
+.bt-p:hover{opacity:.85}
 .bt-d{border-color:var(--bad);color:var(--bad)}.bt-d:hover{background:rgba(204,85,85,.08)}
 .bt-s{padding:.35rem .7rem;font-size:.78rem}
 .bt-add{padding:.4rem .9rem;font-size:.78rem;border:1px dashed var(--b2);color:var(--t2);background:transparent;border-radius:var(--r);margin-bottom:.75rem}
@@ -45,11 +45,32 @@
 
 /* ── Badges de estado ── */
 .bd{font-family:'DM Mono',monospace;font-size:.68rem;padding:.15rem .5rem;border:1px solid var(--b1);border-radius:var(--r);text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;color:var(--t3)}
-.bd-en_progreso{border-color:rgba(100,160,220,.3);color:#78b4e8}
-.bd-completado{border-color:rgba(200,160,60,.3);color:#c9a43c}
-.bd-facturado{border-color:rgba(160,120,200,.3);color:#b08cd8}
-.bd-pagado{border-color:rgba(90,170,140,.3);color:#5aac8c}
-.bd-recurrente{border-color:rgba(180,140,100,.3);color:#c4a06a}
+.bd-activo{border-color:rgba(100,160,220,.3);color:#78b4e8}
+.bd-pausado{border-color:rgba(200,160,60,.3);color:#c9a43c}
+.bd-completado{border-color:rgba(90,170,140,.3);color:#5aac8c}
+
+/* ── Flags de proyecto (iconos en card) ── */
+.pc-flags{display:flex;gap:.3rem;align-items:center;font-size:.65rem}
+.pc-flag{padding:.1rem .35rem;border-radius:var(--r);background:var(--bg4);color:var(--t2);white-space:nowrap}
+.pc-flag-int{background:rgba(100,160,220,.1);color:#78b4e8}
+.pc-flag-rec{background:rgba(180,140,100,.1);color:#c4a06a}
+.pc-flag-paid{background:rgba(90,170,140,.15);color:#5aac8c}
+.pc-flag-inv{background:rgba(160,120,200,.15);color:#b08cd8}
+
+/* ── Barra de progreso (objetivos, financiero) ── */
+.pbar{height:8px;background:var(--bg3);border-radius:4px;overflow:hidden}
+.pbar-fill{height:100%;border-radius:4px;transition:width .3s ease}
+.pbar-ok{background:var(--ok)}
+.pbar-warn{background:var(--warn)}
+.pbar-neutral{background:var(--t2)}
+
+/* ── Resumen financiero (barras con label) ── */
+.fin-row{display:flex;align-items:center;gap:.75rem;margin-bottom:.6rem}
+.fin-label{font-size:.78rem;color:var(--t3);min-width:80px}
+.fin-bar{flex:1}
+.fin-value{font-family:'DM Mono',monospace;font-size:.82rem;min-width:90px;text-align:right}
+.fin-sep{border-top:1px solid var(--b1);margin:.6rem 0}
+.fin-total{font-weight:500}
 
 /* ── Toolbar (filtros/orden) ── */
 .tb{display:flex;gap:.5rem;margin-bottom:1.25rem;flex-wrap:wrap;align-items:center}

@@ -4,7 +4,6 @@
  * Dependencias: todas las demás hojas CSS
  * ================================================ */
 
-
 /* ── Mobile ── */
 @media(max-width:768px){
   /* Sidebar colapsado */
@@ -20,6 +19,8 @@
   .fr{grid-template-columns:1fr}
   .pg{grid-template-columns:1fr}
   .info-grid{grid-template-columns:1fr}
+  .cfg-grid{grid-template-columns:1fr}
+  .gas-summary{grid-template-columns:1fr 1fr}
 
   /* Info: CTA y status a columna */
   .info-cta-actions,.info-status{flex-direction:column}
@@ -46,4 +47,7 @@
   .cal-wh-num{font-size:.7rem}
   .cal-evt-t{font-size:.6rem}
   .cal-evt-n{display:none}
+
+  /* Gastos */
+  .gas-count{display:none}
 }

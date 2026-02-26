@@ -1,0 +1,135 @@
+/* ================================================
+ * TRACKR — Vista Configuración
+ * Emisor, defaults, targets, gestión de clientes
+ * Dependencias: variables.css
+ * ================================================ */
+
+/* ── Secciones de configuración ── */
+.cfg-section {
+  margin-bottom: 2rem;
+}
+.cfg-section-title {
+  font-size: .72rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--t3);
+  margin-bottom: .75rem;
+  padding-bottom: .4rem;
+  border-bottom: 1px solid var(--b1);
+}
+
+/* ── Grid de campos (2 columnas) ── */
+.cfg-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .75rem;
+  max-width: 600px;
+}
+.cfg-full {
+  grid-column: 1 / -1;
+}
+
+/* ── Lista de clientes ── */
+.cl-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.cl-item {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .6rem .75rem;
+  background: var(--bg2);
+  transition: background var(--tr);
+}
+.cl-item:first-child { border-radius: var(--r) var(--r) 0 0; }
+.cl-item:last-child { border-radius: 0 0 var(--r) var(--r); }
+.cl-item:only-child { border-radius: var(--r); }
+.cl-item:hover { background: var(--bg3); }
+
+.cl-name {
+  flex: 1;
+  font-size: .88rem;
+  font-weight: 500;
+}
+.cl-nif {
+  font-size: .75rem;
+  color: var(--t3);
+  font-family: 'DM Mono', monospace;
+}
+.cl-actions {
+  display: flex;
+  gap: .35rem;
+}
+.cl-btn {
+  color: var(--t3);
+  cursor: pointer;
+  font-size: .82rem;
+  padding: .15rem .3rem;
+  transition: color var(--tr);
+  opacity: .5;
+  background: none;
+  border: none;
+}
+.cl-btn:hover { color: var(--t1); opacity: 1; }
+.cl-btn-del:hover { color: var(--bad); opacity: 1; }
+
+/* ── Selector de temas ── */
+.theme-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+}
+.theme-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .35rem;
+  padding: .5rem;
+  border: 2px solid var(--b1);
+  border-radius: var(--r);
+  background: transparent;
+  cursor: pointer;
+  transition: all var(--tr);
+}
+.theme-btn:hover {
+  border-color: var(--b2);
+}
+.theme-btn.on {
+  border-color: var(--t1);
+}
+.theme-preview {
+  width: 64px;
+  height: 40px;
+  border-radius: 2px;
+  border: 1px solid;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 4px;
+}
+.theme-name {
+  font-size: .68rem;
+  color: var(--t2);
+  font-family: 'Outfit', sans-serif;
+}
+.theme-btn.on .theme-name {
+  color: var(--t1);
+}
+
+/* ── Botón guardar configuración ── */
+.cfg-save {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: .5rem;
+}
+.cfg-saved {
+  color: var(--ok);
+  font-size: .82rem;
+  display: none;
+  align-items: center;
+  gap: .3rem;
+}

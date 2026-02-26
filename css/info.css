@@ -64,8 +64,52 @@
 .info-card-title{font-size:.85rem;font-weight:500;margin-bottom:.3rem}
 .info-card-desc{font-size:.78rem;color:var(--t3);line-height:1.5}
 
-/* ── Sección usuario ── */
-.info-user{margin-bottom:2rem}
-.info-user-row{display:flex;gap:.5rem;align-items:center}
-.info-user-row input{flex:1}
-.info-user-hint{font-size:.72rem;color:var(--t3);margin-top:.4rem}
+/* ── Resumen financiero en Info ── */
+.info-fin{
+  background:var(--bg2);
+  border:1px solid var(--b1);
+  border-radius:var(--r);
+  padding:1.25rem;
+  margin-bottom:2rem;
+}
+.info-fin-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:1rem;
+}
+.info-fin-title{
+  font-size:.82rem;
+  font-weight:500;
+}
+.info-fin-nav{
+  display:flex;
+  align-items:center;
+  gap:.35rem;
+}
+.info-fin-toggle{
+  display:flex;
+  gap:2px;
+  margin-left:.75rem;
+}
+.info-fin-tb{
+  padding:.25rem .5rem;
+  border:1px solid var(--b1);
+  border-radius:var(--r);
+  background:transparent;
+  color:var(--t3);
+  font-family:'Outfit',sans-serif;
+  font-size:.72rem;
+  cursor:pointer;
+  transition:all var(--tr);
+}
+.info-fin-tb:hover{border-color:var(--b2);color:var(--t1)}
+.info-fin-tb.on{border-color:var(--t2);color:var(--t1)}
+.info-fin-stats{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  gap:.75rem;
+  margin-top:1rem;
+  padding-top:.75rem;
+  border-top:1px solid var(--b1);
+}
