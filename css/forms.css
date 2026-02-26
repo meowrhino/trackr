@@ -14,6 +14,7 @@ select{cursor:pointer}
 label{font-size:.75rem;color:var(--t3);display:block;margin-bottom:.25rem;text-transform:uppercase;letter-spacing:.04em}
 .fg{margin-bottom:.85rem}
 .fr{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.fr-3{grid-template-columns:1fr 1fr 1fr}
 
 /* ── Color select ── */
 .color-sel{position:relative}

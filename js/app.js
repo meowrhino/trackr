@@ -107,6 +107,27 @@ const App = {
     this._rInfoFinancial();
   },
 
+  /**
+   * Comprueba si un periodo tiene datos (horas, cobros o gastos).
+   * Usado para ocultar flechas de navegación si no hay datos.
+   */
+  _hasPeriodData(type, year, month) {
+    const ps = D.ps();
+    for (const p of ps) {
+      for (const h of p.horas) {
+        if (h.fecha && inPeriod(h.fecha, type, year, month)) return true;
+      }
+      const f = p.facturacion;
+      if (f.pagado && f.fechaPago && inPeriod(f.fechaPago, type, year, month)) return true;
+    }
+    for (const g of D.gs()) {
+      for (const e of (g.entradas || [])) {
+        if (e.fecha && inPeriod(e.fecha, type, year, month)) return true;
+      }
+    }
+    return false;
+  },
+
   /** Renderiza el resumen financiero en la vista Info */
   _rInfoFinancial() {
     const el = document.getElementById('infoFinancial');
@@ -154,8 +175,9 @@ const App = {
     const neto = cobrado - gastosTotal;
     const eurH = horas > 0 ? neto / horas : 0;
 
-    /* Sin actividad en el periodo → no mostrar */
-    if (cobrado === 0 && gastosTotal === 0 && horas === 0) {
+    /* Sin actividad en el periodo → mostrar solo nav si hay datos en otros periodos */
+    const isEmpty = cobrado === 0 && gastosTotal === 0 && horas === 0;
+    if (isEmpty && !this._hasPeriodData(type, year, month)) {
       el.innerHTML = ''; return;
     }
 
@@ -170,15 +192,27 @@ const App = {
     /* Max para barras proporcionales */
     const maxBar = Math.max(cobrado, gastosTotal, 1);
 
+    /* Comprobar si periodos adyacentes tienen datos (para flechas) */
+    let prevY = year, prevM = month, nextY = year, nextM = month;
+    if (type === 'mes') {
+      prevM--; if (prevM < 0) { prevM = 11; prevY--; }
+      nextM++; if (nextM > 11) { nextM = 0; nextY++; }
+    } else if (type === 'trim') {
+      prevM -= 3; if (prevM < 0) { prevM += 12; prevY--; }
+      nextM += 3; if (nextM > 11) { nextM -= 12; nextY++; }
+    } else { prevY--; nextY++; }
+    const hasPrev = this._hasPeriodData(type, prevY, prevM);
+    const hasNext = this._hasPeriodData(type, nextY, nextM);
+
     /* HTML */
     el.innerHTML =
       `<div class="info-fin">`
       + `<div class="info-fin-header">`
       +   `<span class="info-fin-title">Resumen financiero</span>`
       +   `<div class="info-fin-nav">`
-      +     `<button class="bt bt-s" onclick="App._infoFinPrev()">&larr;</button>`
+      +     (hasPrev ? `<button class="bt bt-s" onclick="App._infoFinPrev()">&larr;</button>` : `<span style="width:2rem"></span>`)
       +     `<span style="min-width:120px;text-align:center;font-size:.85rem">${periodLabel}</span>`
-      +     `<button class="bt bt-s" onclick="App._infoFinNext()">&rarr;</button>`
+      +     (hasNext ? `<button class="bt bt-s" onclick="App._infoFinNext()">&rarr;</button>` : `<span style="width:2rem"></span>`)
       +     `<div class="info-fin-toggle">`
       +       `<button class="info-fin-tb${type === 'mes' ? ' on' : ''}" onclick="App._infoFinType('mes')">Mes</button>`
       +       `<button class="info-fin-tb${type === 'trim' ? ' on' : ''}" onclick="App._infoFinType('trim')">Trim</button>`
@@ -186,32 +220,33 @@ const App = {
       +     `</div>`
       +   `</div>`
       + `</div>`
-      /* Barras */
-      + `<div class="fin-row">`
-      +   `<span class="fin-label">Cobrado</span>`
-      +   `<div class="fin-bar"><div class="pbar"><div class="pbar-fill pbar-ok" style="width:${(cobrado / maxBar * 100).toFixed(1)}%"></div></div></div>`
-      +   `<span class="fin-value" style="color:var(--ok)">${fmtMoney(cobrado)}</span>`
-      + `</div>`
-      + `<div class="fin-row">`
-      +   `<span class="fin-label">Gastos</span>`
-      +   `<div class="fin-bar"><div class="pbar"><div class="pbar-fill pbar-warn" style="width:${(gastosTotal / maxBar * 100).toFixed(1)}%"></div></div></div>`
-      +   `<span class="fin-value" style="color:var(--warn)">${fmtMoney(gastosTotal)}</span>`
-      + `</div>`
-      + `<div class="fin-sep"></div>`
-      + `<div class="fin-row fin-total">`
-      +   `<span class="fin-label">Neto</span>`
-      +   `<span class="fin-value" style="color:${neto >= 0 ? 'var(--ok)' : 'var(--bad)'}">${fmtMoney(neto)}</span>`
-      + `</div>`
-      /* Stats adicionales */
-      + `<div class="info-fin-stats">`
-      +   `<div class="sc"><div class="sc-l">Horas</div><div class="sc-v m">${horas.toFixed(1)}h</div></div>`
-      +   `<div class="sc"><div class="sc-l">&euro;/hora real</div><div class="sc-v m">${fmtNum(eurH)} &euro;/h</div></div>`
-      + (type === 'trim'
-        ? `<div class="sc"><div class="sc-l">Base imponible</div><div class="sc-v m">${fmtMoney(baseTotal)}</div></div>`
-        + `<div class="sc"><div class="sc-l">IVA repercutido</div><div class="sc-v m">${fmtMoney(ivaTotal)}</div></div>`
-        + `<div class="sc"><div class="sc-l">IRPF retenido</div><div class="sc-v m">${fmtMoney(irpfTotal)}</div></div>`
-        : '')
-      + `</div>`
+      + (isEmpty
+        ? `<div class="es"><div class="tx">Sin actividad en este periodo</div></div>`
+        : `<div class="fin-row">`
+        +   `<span class="fin-label">Cobrado</span>`
+        +   `<div class="fin-bar"><div class="pbar"><div class="pbar-fill pbar-ok" style="width:${(cobrado / maxBar * 100).toFixed(1)}%"></div></div></div>`
+        +   `<span class="fin-value" style="color:var(--ok)">${fmtMoney(cobrado)}</span>`
+        + `</div>`
+        + `<div class="fin-row">`
+        +   `<span class="fin-label">Gastos</span>`
+        +   `<div class="fin-bar"><div class="pbar"><div class="pbar-fill pbar-warn" style="width:${(gastosTotal / maxBar * 100).toFixed(1)}%"></div></div></div>`
+        +   `<span class="fin-value" style="color:var(--warn)">${fmtMoney(gastosTotal)}</span>`
+        + `</div>`
+        + `<div class="fin-sep"></div>`
+        + `<div class="fin-row fin-total">`
+        +   `<span class="fin-label">Neto</span>`
+        +   `<span class="fin-value" style="color:${neto >= 0 ? 'var(--ok)' : 'var(--bad)'}">${fmtMoney(neto)}</span>`
+        + `</div>`
+        + `<div class="info-fin-stats">`
+        +   `<div class="sc"><div class="sc-l">Horas</div><div class="sc-v m">${horas.toFixed(1)}h</div></div>`
+        +   `<div class="sc"><div class="sc-l">&euro;/hora real</div><div class="sc-v m">${fmtNum(eurH)} &euro;/h</div></div>`
+        + (type === 'trim'
+          ? `<div class="sc"><div class="sc-l">Base imponible</div><div class="sc-v m">${fmtMoney(baseTotal)}</div></div>`
+          + `<div class="sc"><div class="sc-l">IVA repercutido</div><div class="sc-v m">${fmtMoney(ivaTotal)}</div></div>`
+          + `<div class="sc"><div class="sc-l">IRPF retenido</div><div class="sc-v m">${fmtMoney(irpfTotal)}</div></div>`
+          : '')
+        + `</div>`
+      )
       + `</div>`;
   },
 
@@ -516,6 +551,17 @@ const App = {
       });
     });
 
+    /* Gastos por fecha para el calendario */
+    const gm = {};
+    D.gs().forEach(g => {
+      const gc = colorHex(g.color || 'Salmon');
+      (g.entradas || []).forEach(e => {
+        if (!e.fecha) return;
+        if (!gm[e.fecha]) gm[e.fecha] = [];
+        gm[e.fecha].push({ gn: g.nombre, gc, cant: e.cantidad || 0 });
+      });
+    });
+
     const cells = [];
     for (let i = 0; i < totalCells; i++) {
       const d = new Date(year, month, 1 + (i - startDow));
@@ -531,7 +577,10 @@ const App = {
       const es = (hm[c.date] || []).map(e =>
         `<div class="cal-entry" style="border-left-color:${e.pc}"><span class="cal-e-ico">${e.tipo === 'trabajo' ? '💻' : '👥'}</span><span class="cal-e-h m">${e.cant}h</span><span class="cal-e-p">${esc(e.pn)}</span></div>`
       ).join('');
-      g += `<div class="${cl.join(' ')}" onclick="App.calDetail('${c.date}')"><div class="cal-num">${c.num}</div>${es}</div>`;
+      const ge = (gm[c.date] || []).map(e =>
+        `<div class="cal-entry cal-entry-gasto" style="border-left-color:${e.gc}"><span class="cal-e-ico">€</span><span class="cal-e-h m">${fmtMoney(e.cant)}</span><span class="cal-e-p">${esc(e.gn)}</span></div>`
+      ).join('');
+      g += `<div class="${cl.join(' ')}" onclick="App.calDetail('${c.date}')"><div class="cal-num">${c.num}</div>${es}${ge}</div>`;
     });
 
     document.getElementById('calC').innerHTML =
@@ -578,6 +627,17 @@ const App = {
       });
     });
 
+    /* Gastos de la semana */
+    const weekGastos = [];
+    D.gs().forEach(gasto => {
+      const gc = colorHex(gasto.color || 'Salmon');
+      (gasto.entradas || []).forEach(e => {
+        if (e.fecha && dateSet.has(e.fecha)) {
+          weekGastos.push({ gn: gasto.nombre, gc, cant: e.cantidad || 0, fecha: e.fecha });
+        }
+      });
+    });
+
     const hStart = 7, hEnd = 22, slotH = 60;
     let hdr = '<div class="cal-wc"></div>';
     days.forEach(d => { hdr += `<div class="cal-wh${d.today ? ' today' : ''}"><span class="cal-wh-dow">${d.dow}</span><span class="cal-wh-num">${d.num}</span></div>`; });
@@ -618,10 +678,18 @@ const App = {
       ).join('')}</div></div>`;
     }
 
+    /* Gastos de la semana */
+    let wgHtml = '';
+    if (weekGastos.length) {
+      wgHtml = `<div class="cal-nt"><div class="cal-nt-title">Gastos de la semana</div><div class="hl">${weekGastos.map(e =>
+        `<div class="hr" style="border-left-color:${e.gc}"><span class="hr-t">€</span><span class="hr-d">${fmtDate(e.fecha)}</span><span class="hr-a m">${fmtMoney(e.cant)}</span><span style="color:var(--t1);font-size:.82rem;flex:1">${esc(e.gn)}</span></div>`
+      ).join('')}</div></div>`;
+    }
+
     document.getElementById('calC').innerHTML =
       this._calHeader(title, `Total semana: <span class="m">${wt.toFixed(1)}h</span>`)
       + `<div class="cal-week" style="--slot-h:${slotH}px"><div class="cal-week-hdr">${hdr}</div><div class="cal-week-body"><div class="cal-week-tl">${timeLbl}</div>${cols}</div></div>`
-      + ntHtml
+      + ntHtml + wgHtml
       + this._calGoals('week', wt, ws.getFullYear(), ws.getMonth())
       + this._calProjStats(pStats)
       + this._calFinancial(ws.getFullYear(), ws.getMonth());
@@ -769,15 +837,59 @@ const App = {
         ).join('')}</div>`;
     }
     if (!es.length) body += '<div class="es"><div class="tx">Sin horas este día</div></div>';
+
+    /* Gastos del día */
+    const dayGastos = [];
+    D.gs().forEach(gasto => {
+      const gc = colorHex(gasto.color || 'Salmon');
+      (gasto.entradas || []).forEach(e => {
+        if (e.fecha === ds) dayGastos.push({ gn: gasto.nombre, gc, cant: e.cantidad || 0, nota: e.nota || '' });
+      });
+    });
+    if (dayGastos.length) {
+      body += `<div style="margin-top:.75rem;font-size:.72rem;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.4rem">Gastos</div>`
+        + `<div class="hl">${dayGastos.map(e =>
+          `<div class="hr" style="border-left-color:${e.gc}"><span class="hr-t">€</span><span class="hr-a m">${fmtMoney(e.cant)}</span><span style="color:var(--t1);font-size:.82rem;flex:1">${esc(e.gn)}</span><span class="hr-n">${esc(e.nota)}</span></div>`
+        ).join('')}</div>`;
+    }
+
     this.om(`<div class="mt">${fmtDate(ds)}</div><div style="margin-bottom:.75rem;font-size:.82rem;color:var(--t3)">Total: <span class="m">${tot.toFixed(1)}h</span></div>${body}<div class="ma"><button class="bt bt-p" onclick="App.cm();App.calAddHour('${ds}','')">+ Añadir hora</button><button class="bt" onclick="App.cm()">Cerrar</button></div>`);
   },
 
+  /**
+   * Genera opciones de proyecto agrupadas por estado para un <select>.
+   * Incluye todos los proyectos (también completados).
+   */
+  _projOptions(selectedId) {
+    const ps = D.ps();
+    const groups = {};
+    ps.forEach(p => { if (!groups[p.estado]) groups[p.estado] = []; groups[p.estado].push(p); });
+    const labels = { activo: 'Activos', pausado: 'Pausados', completado: 'Completados' };
+    let html = '';
+    EST_ORDER.forEach(st => {
+      const g = groups[st];
+      if (!g || !g.length) return;
+      html += `<optgroup label="${labels[st]}">`;
+      g.forEach(p => {
+        const cn = clienteName(p);
+        html += `<option value="${p.id}" ${p.id === selectedId ? 'selected' : ''}>${esc(p.nombre)}${cn ? ' — ' + esc(cn) : ''}</option>`;
+      });
+      html += `</optgroup>`;
+    });
+    return html;
+  },
+
   calAddHour(fecha, hora, duracion) {
-    const ps = D.ps().filter(p => p.estado !== 'completado' || p.recurrente);
-    if (!ps.length) { this.om(`<div class="mt">Añadir hora</div><div class="es"><div class="tx">Crea un proyecto primero</div></div><div class="ma"><button class="bt" onclick="App.cm()">Cerrar</button></div>`); return; }
+    const ps = D.ps();
     const dur = duracion || 1;
+    const projOpts = this._projOptions();
     this.om(`<div class="mt">Añadir hora</div>`
-      + `<div class="fg"><label>Proyecto</label><select id="chP">${ps.map(p => `<option value="${p.id}">${esc(p.nombre)} — ${esc(clienteName(p))}</option>`).join('')}</select></div>`
+      + `<div class="fg"><label>Proyecto</label><select id="chP" onchange="App._onCalProjChange(this.value)">${projOpts}<option value="_new">+ Crear nuevo proyecto...</option></select></div>`
+      + `<div id="chPNew" style="display:none;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);padding:.75rem;margin-bottom:.85rem">`
+      +   `<div class="fg"><label>Nombre proyecto</label><input type="text" id="chPN" placeholder="Nombre del proyecto"></div>`
+      +   `<div class="fg"><label>Cliente</label><select id="chPCl" onchange="document.getElementById('chPClNew').style.display=this.value==='_new'?'block':'none'"><option value="">— Sin cliente —</option>${D.cls().map(c => `<option value="${c.id}">${esc(c.nombre)}</option>`).join('')}<option value="_new">+ Nuevo cliente...</option></select></div>`
+      +   `<div id="chPClNew" style="display:none"><div class="fg"><label>Nombre cliente</label><input type="text" id="chPClN" placeholder="Nombre del cliente"></div></div>`
+      + `</div>`
       + `<label>Tipo</label><div class="ts2"><div class="to on" data-type="trabajo" onclick="App.selT(this)"><span class="ic">💻</span><span class="la">Trabajo</span></div><div class="to" data-type="reunion" onclick="App.selT(this)"><span class="ic">👥</span><span class="la">Reunión</span></div></div>`
       + `<div class="fr"><div class="fg"><label>Horas</label><input type="number" id="chA" min="0.25" step="0.25" value="${dur}"></div><div class="fg"><label>Fecha</label><input type="date" id="chD" value="${fecha || todayStr()}"></div></div>`
       + `<div class="fr"><div class="fg"><label>Hora inicio</label><input type="time" id="chHI" value="${hora || ''}"></div><div class="fg"></div></div>`
@@ -785,14 +897,42 @@ const App = {
       + `<div class="ma"><button class="bt" onclick="App.cm()">Cancelar</button><button class="bt bt-p" onclick="App.saveCalH()">Guardar</button></div>`);
   },
 
+  /** Muestra/oculta panel de creación inline de proyecto en modal de horas */
+  _onCalProjChange(val) {
+    document.getElementById('chPNew').style.display = val === '_new' ? 'block' : 'none';
+  },
+
   saveCalH() {
-    const pid = document.getElementById('chP').value;
+    let pid = document.getElementById('chP').value;
     const tipo = document.querySelector('#mC .to.on')?.dataset.type || 'trabajo';
     const cant = parseFloat(document.getElementById('chA').value) || 0;
     const fecha = document.getElementById('chD').value || null;
     const horaInicio = document.getElementById('chHI').value || null;
     const nota = document.getElementById('chN').value.trim();
-    if (cant <= 0 || !pid) return;
+    if (cant <= 0) return;
+
+    /* Crear proyecto inline si se eligió "_new" */
+    if (pid === '_new') {
+      const pName = document.getElementById('chPN')?.value?.trim();
+      if (!pName) { alert('Nombre de proyecto obligatorio'); return; }
+      let clienteId = document.getElementById('chPCl')?.value || null;
+      if (clienteId === '_new') {
+        const clName = document.getElementById('chPClN')?.value?.trim();
+        if (!clName) { alert('Nombre de cliente obligatorio'); return; }
+        const newCl = D.addCl({ id: uid(), nombre: clName, direccion1: '', direccion2: '', nif: '', color: 'CornflowerBlue' });
+        clienteId = newCl.id;
+      } else if (!clienteId) clienteId = null;
+      const newP = {
+        id: uid(), nombre: pName, clienteId, color: 'CornflowerBlue',
+        estado: 'activo', interno: false, recurrente: false,
+        fechas: { inicio: fecha, finEstimada: null, finReal: null },
+        facturacion: { modo: 'gratis', baseImponible: 0, total: 0, iva: 0, irpf: 0, importeIva: 0, importeIrpf: 0, totalFactura: 0, netoRecibido: 0, ivaExcepcion: '', pagado: false, fechaPago: null, gastos: 0, facturaNum: null, facturaFecha: null },
+        horas: [], notas: ''
+      };
+      D.add(newP);
+      pid = newP.id;
+    }
+    if (!pid) return;
     const p = D.p(pid); if (!p) return;
     p.horas.push({ id: uid(), fecha, tipo, cantidad: cant, nota, horaInicio });
     T.ev('action', 'hours_add', 'calendar');
@@ -835,7 +975,7 @@ const App = {
       + `<div class="cfg-save"><button class="bt bt-p" onclick="App.saveCfg()">Guardar configuración</button><span class="cfg-saved" id="cfgOk">Guardado</span></div>`
       + `<div class="cfg-section" style="margin-top:2.5rem"><div class="cfg-section-title">Clientes</div>`
       + (cls.length
-        ? `<div class="cl-list">${cls.map(c => `<div class="cl-item"><span class="cl-name">${esc(c.nombre)}</span>${c.nif ? `<span class="cl-nif">${esc(c.nif)}</span>` : ''}<div class="cl-actions"><button class="cl-btn" onclick="App.clModal('${c.id}')" title="Editar">&#9998;</button><button class="cl-btn cl-btn-del" onclick="App.delCl('${c.id}')" title="Eliminar">&times;</button></div></div>`).join('')}</div>`
+        ? `<div class="cl-list">${cls.map(c => `<div class="cl-item"><span class="cl-dot" style="background:${colorHex(c.color || 'CornflowerBlue')}"></span><span class="cl-name">${esc(c.nombre)}</span>${c.nif ? `<span class="cl-nif">${esc(c.nif)}</span>` : ''}<div class="cl-actions"><button class="cl-btn" onclick="App.clModal('${c.id}')" title="Editar">&#9998;</button><button class="cl-btn cl-btn-del" onclick="App.delCl('${c.id}')" title="Eliminar">&times;</button></div></div>`).join('')}</div>`
         : '<div style="color:var(--t3);font-size:.82rem">Sin clientes. Se crearán al añadir proyectos.</div>')
       + `<button class="bt bt-add" style="margin-top:.75rem" onclick="App.clModal()">+ Nuevo cliente</button></div>`;
   },
@@ -867,17 +1007,19 @@ const App = {
 
   clModal(cid) {
     const isE = !!cid, c = isE ? D.cl(cid) : null;
+    const clColor = c?.color || 'CornflowerBlue';
     this.om(`<div class="mt">${isE ? 'Editar' : 'Nuevo'} cliente</div>`
       + `<div class="fg"><label>Nombre</label><input type="text" id="clN" value="${esc(c?.nombre || '')}" placeholder="Nombre o empresa"></div>`
       + `<div class="fr"><div class="fg"><label>Dirección línea 1</label><input type="text" id="clD1" value="${esc(c?.direccion1 || '')}" placeholder="Calle, número"></div><div class="fg"><label>Dirección línea 2</label><input type="text" id="clD2" value="${esc(c?.direccion2 || '')}" placeholder="CP, Ciudad"></div></div>`
-      + `<div class="fg"><label>NIF / CIF</label><input type="text" id="clNif" value="${esc(c?.nif || '')}" placeholder="12345678A" style="max-width:50%"></div>`
+      + `<div class="fr"><div class="fg"><label>NIF / CIF</label><input type="text" id="clNif" value="${esc(c?.nif || '')}" placeholder="12345678A"></div><div class="fg"><label>Color</label>${this.colorSelect(clColor)}</div></div>`
       + `<div class="ma"><button class="bt" onclick="App.cm()">Cancelar</button><button class="bt bt-p" onclick="App.saveCl('${cid || ''}')">${isE ? 'Guardar' : 'Crear'}</button></div>`);
   },
 
   saveCl(cid) {
     const nombre = document.getElementById('clN').value.trim();
     if (!nombre) { alert('Nombre obligatorio'); return; }
-    const data = { nombre, direccion1: document.getElementById('clD1').value.trim(), direccion2: document.getElementById('clD2').value.trim(), nif: document.getElementById('clNif').value.trim() };
+    const color = document.getElementById('mpColor')?.value || 'CornflowerBlue';
+    const data = { nombre, direccion1: document.getElementById('clD1').value.trim(), direccion2: document.getElementById('clD2').value.trim(), nif: document.getElementById('clNif').value.trim(), color };
     if (cid) D.upCl(cid, data); else { data.id = uid(); D.addCl(data); }
     this.cm(); this.rCfg();
   },
@@ -910,7 +1052,8 @@ const App = {
       const total = (g.entradas || []).reduce((s, e) => s + (e.cantidad || 0), 0);
       const count = (g.entradas || []).length;
       const catLabel = GASTO_CAT[g.categoria] || g.categoria || 'Otro';
-      html += `<div class="gas-card"><div class="gas-header" onclick="this.nextElementSibling.classList.toggle('open')">`
+      const gHex = colorHex(g.color || 'Salmon');
+      html += `<div class="gas-card" style="border-left:3px solid ${gHex}"><div class="gas-header" onclick="this.nextElementSibling.classList.toggle('open')">`
         + `<span class="gas-name">${esc(g.nombre)}</span><span class="gas-cat">${catLabel}</span>`
         + `${g.recurrente !== 'no' ? `<span class="gas-rec">${RECURRENCIA[g.recurrente] || ''}</span>` : ''}`
         + `<span class="gas-total m">${fmtMoney(total)}</span><span class="gas-count">${count} entr.</span>`
@@ -929,10 +1072,12 @@ const App = {
 
   gModal(gid) {
     const isE = !!gid, g = isE ? D.g(gid) : null;
+    const gColor = g?.color || 'Salmon';
     this.om(`<div class="mt">${isE ? 'Editar' : 'Nuevo'} gasto</div>`
       + `<div class="fg"><label>Nombre</label><input type="text" id="gN" value="${esc(g?.nombre || '')}" placeholder="Ej: Mentoring, Dominio..."></div>`
       + `<div class="fr"><div class="fg"><label>Categoría</label><select id="gCat">${Object.entries(GASTO_CAT).map(([k, v]) => `<option value="${k}" ${g?.categoria === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
       + `<div class="fg"><label>Recurrencia</label><select id="gRec">${Object.entries(RECURRENCIA).map(([k, v]) => `<option value="${k}" ${g?.recurrente === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div></div>`
+      + `<div class="fg"><label>Color</label>${this.colorSelect(gColor)}</div>`
       + `<div class="fg"><label>Notas</label><textarea id="gNo" placeholder="...">${esc(g?.notas || '')}</textarea></div>`
       + `<div class="ma"><button class="bt" onclick="App.cm()">Cancelar</button><button class="bt bt-p" onclick="App.saveG('${gid || ''}')">${isE ? 'Guardar' : 'Crear'}</button></div>`);
   },
@@ -940,7 +1085,8 @@ const App = {
   saveG(gid) {
     const nombre = document.getElementById('gN').value.trim();
     if (!nombre) { alert('Nombre obligatorio'); return; }
-    const data = { nombre, categoria: document.getElementById('gCat').value, recurrente: document.getElementById('gRec').value, notas: document.getElementById('gNo').value.trim() };
+    const color = document.getElementById('mpColor')?.value || 'Salmon';
+    const data = { nombre, categoria: document.getElementById('gCat').value, recurrente: document.getElementById('gRec').value, color, notas: document.getElementById('gNo').value.trim() };
     if (gid) D.upG(gid, data); else { data.id = uid(); data.entradas = []; D.addG(data); }
     this.cm(); this.rGas();
   },
@@ -1023,6 +1169,19 @@ const App = {
   _csReset() { const sel = document.getElementById('mpColor'); if (!sel) return; document.getElementById('mpColorDot').style.background = colorHex(sel.value); document.getElementById('mpColorLbl').textContent = sel.value; },
   _csPick(el) { document.querySelectorAll('.cs-sw.on').forEach(s => s.classList.remove('on')); el.classList.add('on'); document.getElementById('mpColor').value = el.dataset.name; document.getElementById('mpColorDot').style.background = el.dataset.hex; document.getElementById('mpColorLbl').textContent = el.dataset.name; },
 
+  /** Cuando cambia el cliente en el modal de proyecto, aplica su color por defecto */
+  _onClientChange(val) {
+    document.getElementById('mpClNew').style.display = val === '_new' ? 'block' : 'none';
+    if (val && val !== '_new') {
+      const cl = D.cl(val);
+      if (cl?.color) {
+        const hex = colorHex(cl.color);
+        const sw = document.querySelector(`.cs-sw[data-name="${cl.color}"]`);
+        if (sw) this._csPick(sw);
+      }
+    }
+  },
+
 
   /* ══════════════════════════════════════════════
    *  MODAL PROYECTO (crear/editar)
@@ -1034,7 +1193,7 @@ const App = {
       nombre: p?.nombre || '', clienteId: p?.clienteId || '', color: p?.color || 'CornflowerBlue',
       estado: p?.estado || 'activo', interno: p?.interno || false, recurrente: p?.recurrente || false,
       inicio: p?.fechas?.inicio || '', finEst: p?.fechas?.finEstimada || '', finR: p?.fechas?.finReal || '',
-      modo: p?.facturacion?.modo || 'desde_base', base: p?.facturacion?.baseImponible || '', total: p?.facturacion?.total || '',
+      modo: p?.facturacion?.modo || 'desde_base', base: p?.facturacion?.baseImponible || '', total: p?.facturacion?.total || '', precioHora: p?.facturacion?.precioHora || '',
       iva: p?.facturacion?.iva ?? st.defaultIva, irpf: p?.facturacion?.irpf ?? st.defaultIrpf,
       ivaOn: p ? (p.facturacion.iva > 0) : true, irpfOn: p ? (p.facturacion.irpf > 0) : true,
       ivaExc: p?.facturacion?.ivaExcepcion || '',
@@ -1044,20 +1203,20 @@ const App = {
 
     this.om(`<div class="mt">${isE ? 'Editar' : 'Nuevo proyecto'}</div>`
       + `<div class="fg"><label>Nombre</label><input type="text" id="mpN" value="${esc(df.nombre)}" placeholder="Web Conor"></div>`
-      + `<div class="fg"><label>Cliente</label><select id="mpCl" onchange="document.getElementById('mpClNew').style.display=this.value==='_new'?'block':'none'"><option value="">— Sin cliente —</option>${clOpts}<option value="_new">+ Crear nuevo...</option></select></div>`
+      + `<div class="fg"><label>Cliente</label><select id="mpCl" onchange="App._onClientChange(this.value)"><option value="">— Sin cliente —</option>${clOpts}<option value="_new">+ Crear nuevo...</option></select></div>`
       + `<div id="mpClNew" style="display:none;margin-bottom:.85rem"><input type="text" id="mpClNewN" placeholder="Nombre del nuevo cliente"></div>`
       + `<div class="fg"><label>Color</label>${this.colorSelect(df.color)}</div>`
       + `<div class="fr"><div class="fg"><label>Estado</label><select id="mpSt">${Object.entries(EST).map(([k, v]) => `<option value="${k}" ${k === df.estado ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
-      + `<div class="fg" style="display:flex;flex-direction:column;gap:.5rem;padding-top:1.5rem">`
+      + `<div class="fg" style="display:flex;gap:1.25rem;padding-top:1.5rem">`
       + `<label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="mpInt" ${df.interno ? 'checked' : ''} style="width:auto;accent-color:var(--t2)"> Interno</label>`
       + `<label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="mpRec" ${df.recurrente ? 'checked' : ''} style="width:auto;accent-color:var(--t2)"> Recurrente</label>`
       + `</div></div>`
-      + `<div class="fr"><div class="fg"><label>Inicio</label><input type="date" id="mpI" value="${df.inicio}"></div><div class="fg"><label>Fin estimada</label><input type="date" id="mpFE" value="${df.finEst}"></div></div>`
-      + `<div class="fg"><label>Fin real</label><input type="date" id="mpFR" value="${df.finR}" style="max-width:50%"></div>`
+      + `<div class="fr fr-3"><div class="fg"><label>Inicio</label><input type="date" id="mpI" value="${df.inicio}"></div><div class="fg"><label>Fin estimada</label><input type="date" id="mpFE" value="${df.finEst}"></div><div class="fg"><label>Fin real</label><input type="date" id="mpFR" value="${df.finR}"></div></div>`
       + `<div class="dst" style="margin-top:1.25rem">Facturación</div>`
-      + `<div class="bms"><button class="bm ${df.modo === 'desde_base' ? 'on' : ''}" onclick="App.sBM('desde_base')">Desde base</button><button class="bm ${df.modo === 'desde_total' ? 'on' : ''}" onclick="App.sBM('desde_total')">Desde total</button><button class="bm ${df.modo === 'gratis' ? 'on' : ''}" onclick="App.sBM('gratis')">Gratis</button></div><input type="hidden" id="mpBM" value="${df.modo}">`
+      + `<div class="bms"><button class="bm ${df.modo === 'desde_base' ? 'on' : ''}" onclick="App.sBM('desde_base')">Desde base</button><button class="bm ${df.modo === 'desde_total' ? 'on' : ''}" onclick="App.sBM('desde_total')">Desde total</button><button class="bm ${df.modo === 'por_hora' ? 'on' : ''}" onclick="App.sBM('por_hora')">Por hora</button><button class="bm ${df.modo === 'gratis' ? 'on' : ''}" onclick="App.sBM('gratis')">Gratis</button></div><input type="hidden" id="mpBM" value="${df.modo}">`
       + `<div id="bF" style="${df.modo === 'gratis' ? 'display:none' : ''}">`
-      + `<div class="fr"><div class="fg" id="bfBase" style="${df.modo === 'desde_total' ? 'display:none' : ''}"><label>Base (&euro;)</label><input type="number" id="mpBa" value="${df.base}" step="0.01" placeholder="0.00" oninput="App.cPrev()"></div><div class="fg" id="bfTot" style="${df.modo === 'desde_base' ? 'display:none' : ''}"><label>Total (&euro;)</label><input type="number" id="mpTo" value="${df.total}" step="0.01" placeholder="0.00" oninput="App.cPrev()"></div><div class="fg"><label>Gastos (&euro;)</label><input type="number" id="mpGa" value="${df.gastos}" step="0.01" placeholder="0.00"></div></div>`
+      + `<div id="bfPH" style="${df.modo === 'por_hora' ? '' : 'display:none'}"><div class="fg"><label>&euro; / hora</label><input type="number" id="mpPH" value="${df.precioHora}" step="0.01" min="0" placeholder="30.00" oninput="App.cPrev()"></div></div>`
+      + `<div class="fr"><div class="fg" id="bfBase" style="${df.modo === 'desde_total' || df.modo === 'por_hora' ? 'display:none' : ''}"><label>Base (&euro;)</label><input type="number" id="mpBa" value="${df.base}" step="0.01" placeholder="0.00" oninput="App.cPrev()"></div><div class="fg" id="bfTot" style="${df.modo === 'desde_base' || df.modo === 'por_hora' ? 'display:none' : ''}"><label>Total (&euro;)</label><input type="number" id="mpTo" value="${df.total}" step="0.01" placeholder="0.00" oninput="App.cPrev()"></div><div class="fg"><label>Gastos (&euro;)</label><input type="number" id="mpGa" value="${df.gastos}" step="0.01" placeholder="0.00"></div></div>`
       + `<div class="tr"><span class="tl">IVA (${df.iva}%)</span><label class="tg"><input type="checkbox" id="mpIva" ${df.ivaOn ? 'checked' : ''} onchange="App.cPrev()"><span class="ts"></span></label></div>`
       + `<div class="tr"><span class="tl">IRPF (${df.irpf}%)</span><label class="tg"><input type="checkbox" id="mpIrpf" ${df.irpfOn ? 'checked' : ''} onchange="App.cPrev()"><span class="ts"></span></label></div>`
       + `<div class="fg" style="margin-top:.4rem"><label>Excepción IVA</label><input type="text" id="mpIvaExc" value="${esc(df.ivaExc)}" placeholder="Ej: Art. 20 LIVA"></div>`
@@ -1072,10 +1231,16 @@ const App = {
   sBM(m) {
     document.getElementById('mpBM').value = m;
     document.querySelectorAll('.bm').forEach(b => b.classList.remove('on'));
-    document.querySelector(`.bm:nth-child(${m === 'desde_base' ? 1 : m === 'desde_total' ? 2 : 3})`).classList.add('on');
-    const f = document.getElementById('bF'), bf = document.getElementById('bfBase'), tf = document.getElementById('bfTot');
-    if (m === 'gratis') f.style.display = 'none';
-    else { f.style.display = ''; bf.style.display = m === 'desde_total' ? 'none' : ''; tf.style.display = m === 'desde_base' ? 'none' : ''; }
+    const idx = { desde_base: 1, desde_total: 2, por_hora: 3, gratis: 4 }[m] || 4;
+    document.querySelector(`.bm:nth-child(${idx})`)?.classList.add('on');
+    const f = document.getElementById('bF'), bf = document.getElementById('bfBase'), tf = document.getElementById('bfTot'), ph = document.getElementById('bfPH');
+    if (m === 'gratis') { f.style.display = 'none'; }
+    else {
+      f.style.display = '';
+      bf.style.display = (m === 'desde_total' || m === 'por_hora') ? 'none' : '';
+      tf.style.display = (m === 'desde_base' || m === 'por_hora') ? 'none' : '';
+      ph.style.display = m === 'por_hora' ? '' : 'none';
+    }
     this.cPrev();
   },
 
@@ -1084,7 +1249,16 @@ const App = {
     const ivaOn = document.getElementById('mpIva')?.checked, irpfOn = document.getElementById('mpIrpf')?.checked;
     const ivR = ivaOn ? (D.d.settings.defaultIva || 21) : 0, irR = irpfOn ? (D.d.settings.defaultIrpf || 15) : 0;
     let base, importeIva, importeIrpf, totalF, neto;
-    if (m === 'desde_base') {
+    if (m === 'por_hora') {
+      const ph = parseFloat(document.getElementById('mpPH')?.value) || 0;
+      /* Si estamos editando, usar horas reales; si no, mostrar tarifa */
+      const eid = document.querySelector('.ma .bt-p')?.onclick?.toString()?.match(/'([^']+)'/)?.[1];
+      const p = eid ? D.p(eid) : null;
+      const th = p ? p.horas.reduce((s, h) => s + h.cantidad, 0) : 0;
+      base = Math.round(th * ph * 100) / 100;
+      importeIva = Math.round(base * ivR / 100 * 100) / 100; importeIrpf = Math.round(base * irR / 100 * 100) / 100;
+      totalF = Math.round((base + importeIva - importeIrpf) * 100) / 100; neto = Math.round((base - importeIrpf) * 100) / 100;
+    } else if (m === 'desde_base') {
       base = parseFloat(document.getElementById('mpBa')?.value) || 0;
       importeIva = Math.round(base * ivR / 100 * 100) / 100; importeIrpf = Math.round(base * irR / 100 * 100) / 100;
       totalF = Math.round((base + importeIva - importeIrpf) * 100) / 100; neto = Math.round((base - importeIrpf) * 100) / 100;
@@ -1095,7 +1269,10 @@ const App = {
       totalF = t; neto = Math.round((base - importeIrpf) * 100) / 100;
     }
     const el = document.getElementById('bPrev');
-    if (el) el.innerHTML = `<div class="br"><span class="la">Base</span><span class="va">${fmtMoney(base)}</span></div>`
+    if (el) el.innerHTML = (m === 'por_hora'
+      ? `<div class="br"><span class="la" style="font-size:.75rem;color:var(--t3)">${(function(){ const eid2 = document.querySelector('.ma .bt-p')?.onclick?.toString()?.match(/'([^']+)'/)?.[1]; const p2 = eid2 ? D.p(eid2) : null; return p2 ? p2.horas.reduce((s,h)=>s+h.cantidad,0).toFixed(1)+'h × ' + fmtNum(parseFloat(document.getElementById('mpPH')?.value)||0) + ' €/h' : 'Sin horas aún'; })()}</span></div>`
+      : '')
+      + `<div class="br"><span class="la">Base</span><span class="va">${fmtMoney(base)}</span></div>`
       + `${ivR ? `<div class="br"><span class="la">+ IVA ${ivR}%</span><span class="va">${fmtMoney(importeIva)}</span></div>` : ''}`
       + `${irR ? `<div class="br"><span class="la">- IRPF ${irR}%</span><span class="va">${fmtMoney(importeIrpf)}</span></div>` : ''}`
       + `<div class="br tot"><span class="la">Total</span><span class="va">${fmtMoney(totalF)}</span></div>`
@@ -1108,14 +1285,14 @@ const App = {
 
     /* Resolver cliente */
     let clienteId = document.getElementById('mpCl').value;
+    const color = document.getElementById('mpColor').value;
     if (clienteId === '_new') {
       const newName = document.getElementById('mpClNewN').value.trim();
       if (!newName) { alert('Nombre de cliente obligatorio'); return; }
-      const newCl = D.addCl({ id: uid(), nombre: newName, direccion1: '', direccion2: '', nif: '' });
+      const newCl = D.addCl({ id: uid(), nombre: newName, direccion1: '', direccion2: '', nif: '', color: color || 'CornflowerBlue' });
       clienteId = newCl.id;
     } else if (!clienteId) clienteId = null;
 
-    const color = document.getElementById('mpColor').value;
     const estado = document.getElementById('mpSt').value;
     const modo = document.getElementById('mpBM').value;
     const ivaOn = document.getElementById('mpIva')?.checked;
@@ -1128,6 +1305,7 @@ const App = {
       fechas: { inicio: document.getElementById('mpI').value || null, finEstimada: document.getElementById('mpFE').value || null, finReal: document.getElementById('mpFR').value || null },
       facturacion: {
         modo, baseImponible: parseFloat(document.getElementById('mpBa')?.value) || 0, total: parseFloat(document.getElementById('mpTo')?.value) || 0,
+        precioHora: parseFloat(document.getElementById('mpPH')?.value) || 0,
         iva: ivaOn ? (D.d.settings.defaultIva || 21) : 0, irpf: irpfOn ? (D.d.settings.defaultIrpf || 15) : 0,
         ivaExcepcion: document.getElementById('mpIvaExc')?.value?.trim() || '',
         importeIva: 0, importeIrpf: 0, totalFactura: 0, netoRecibido: 0,
