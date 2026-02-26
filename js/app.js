@@ -16,12 +16,16 @@ const App={
   calWeekStart:null, // Date del lunes de la semana (null = inicializar)
 
   /* ── Inicialización ── */
-  init(){if(!D.init())D.create();this.enter()},
+  init(){
+    T.init('https://trackr-analytics.YOUR_SUBDOMAIN.workers.dev/event');
+    if(!D.init())D.create();this.enter();
+  },
   createNew(){D.create();this.go('info')},
   enter(){this.go('info')},
 
   /* ── Navegación ── */
   go(v,d){
+    T.ev('nav','view',v);
     this.cv=v;
     document.querySelectorAll('.vw').forEach(e=>e.classList.remove('on'));
     document.querySelectorAll('.ni').forEach(e=>e.classList.remove('on'));
@@ -285,6 +289,7 @@ const App={
     if(!pid||cant<=0)return;
     const p=D.p(pid);if(!p)return;
     p.horas.push({id:uid(),fecha,tipo,cantidad:cant,nota,horaInicio:null});
+    T.ev('action','hours_add','quick');
     sortHoras(p.horas);D.up(pid,{horas:p.horas});
     const m=document.getElementById('qOk');m.textContent=`${cant}h → ${p.nombre}`;m.style.display='block';
     setTimeout(()=>m.style.display='none',2500);
@@ -581,7 +586,7 @@ const App={
     }</div></div>`;
   },
 
-  calSetView(v){this.calView=v;this.rCal()},
+  calSetView(v){T.ev('nav','cal_view',v);this.calView=v;this.rCal()},
 
   calPrev(){
     if(this.calView==='week'){
@@ -685,6 +690,7 @@ const App={
     if(cant<=0||!pid)return;
     const p=D.p(pid);if(!p)return;
     p.horas.push({id:uid(),fecha,tipo,cantidad:cant,nota,horaInicio});
+    T.ev('action','hours_add','calendar');
     sortHoras(p.horas);D.up(pid,{horas:p.horas});this.cm();this.rCal();
   },
 
@@ -819,7 +825,7 @@ const App={
         gastos:parseFloat(document.getElementById('mpGa')?.value)||0},
       horas:eid?(D.p(eid)?.horas||[]):[],notas:document.getElementById('mpNo').value.trim()};
     B.calc(proj);
-    if(eid)D.up(eid,proj);else D.add(proj);
+    if(eid){D.up(eid,proj);T.ev('action','project_edit')}else{D.add(proj);T.ev('action','project_create')}
     this.cm();
     if(this.cv==='det')this.rDet(proj.id);else this.go(this.cv);
   },
@@ -847,6 +853,7 @@ const App={
       nota=document.getElementById('mhN').value.trim();
     if(cant<=0)return;const p=D.p(pid);if(!p)return;
     p.horas.push({id:uid(),fecha,tipo,cantidad:cant,nota,horaInicio});
+    T.ev('action','hours_add','modal');
     sortHoras(p.horas);D.up(pid,{horas:p.horas});this.cm();this.rDet(pid);
   },
 
@@ -854,6 +861,7 @@ const App={
    *  EXPORT / IMPORT
    * ══════════════════════════════════════════════ */
   exp(){
+    T.ev('action','export');
     const d=JSON.stringify(D.d,null,2),b=new Blob([d],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');
     const now=new Date();
     const ts=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}-${String(now.getMinutes()).padStart(2,'0')}`;
@@ -866,7 +874,7 @@ const App={
       const d=JSON.parse(e.target.result);
       if(!d.projects||!Array.isArray(d.projects)){alert('JSON no válido');return}
       if(!d.settings)d.settings={defaultIva:21,defaultIrpf:15};
-      D.load(d);this.go(this.cv);
+      D.load(d);T.ev('action','import');this.go(this.cv);
     }catch(err){alert('Error: '+err.message)}};
     r.readAsText(f);ev.target.value='';
   }
