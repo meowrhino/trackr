@@ -17,6 +17,8 @@
 <link rel="stylesheet" href="css/forms.css">
 <link rel="stylesheet" href="css/reports.css">
 <link rel="stylesheet" href="css/calendar.css">
+<link rel="stylesheet" href="css/config.css">
+<link rel="stylesheet" href="css/gastos.css">
 <link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
@@ -31,16 +33,11 @@
     <div class="sb-logo"><span>TRACKR</span></div>
     <div class="sb-nav">
       <div class="ni on" data-v="info" onclick="App.go('info')"><span class="ic">?</span><span class="nt">Info</span></div>
-      <div class="ni" data-v="dash" onclick="App.go('dash')"><span class="ic">◩</span><span class="nt">Dashboard</span></div>
-      <!-- COMENTADO: Proyectos y Horas (redundantes, accesibles desde dashboard y detalle)
-      <div class="ni" data-v="proj" onclick="App.go('proj')"><span class="ic">▦</span><span class="nt">Proyectos</span></div>
-      <div class="ni" data-v="hrs" onclick="App.go('hrs')"><span class="ic">+</span><span class="nt">Horas</span></div>
-      FIN COMENTADO -->
+      <div class="ni" data-v="dash" onclick="App.go('dash')"><span class="ic">◩</span><span class="nt">Proyectos</span></div>
       <div class="ni" data-v="cal" onclick="App.go('cal')"><span class="ic">▣</span><span class="nt">Calendario</span></div>
-      <!-- COMENTADO: Informes (datos visibles desde dashboard y calendario)
-      <div class="ni" data-v="rep" onclick="App.go('rep')"><span class="ic">◬</span><span class="nt">Informes</span></div>
-      FIN COMENTADO -->
+      <div class="ni" data-v="gas" onclick="App.go('gas')"><span class="ic">€</span><span class="nt">Gastos</span></div>
       <div class="sep"></div>
+      <div class="ni" data-v="cfg" onclick="App.go('cfg')"><span class="ic">⚙</span><span class="nt">Configuración</span></div>
       <div class="ni" onclick="App.exp()"><span class="ic">↓</span><span class="nt">Exportar</span></div>
       <div class="ni" onclick="document.getElementById('impA').click()"><span class="ic">↑</span><span class="nt">Importar</span></div>
       <input type="file" id="impA" class="fh" accept=".json" onchange="App.imp(event)">
@@ -50,57 +47,36 @@
   <!-- Main content -->
   <main class="mc">
 
-    <!-- ── Vista: Info ── -->
+    <!-- ── Vista: Info (Home) ── -->
     <div id="vInfo" class="vw on">
       <div class="info-hero">
         <div class="s-logo">TRACKR</div>
         <p class="info-desc">Herramienta minimalista para gestionar tus proyectos freelance. Controla horas, facturación y rentabilidad desde un solo lugar. Tus datos se guardan en el navegador — exporta un JSON cuando quieras hacer backup.</p>
       </div>
       <div id="infoStatus"></div>
-      <div class="ds"><div class="dst">Usuario</div></div>
-      <div class="info-user" id="infoUser"></div>
+      <div id="infoFinancial"></div>
       <div class="ds"><div class="dst">Cómo funciona</div></div>
       <div class="info-grid">
-        <div class="info-card"><div class="info-card-icon">▦</div><div class="info-card-title">Crea proyectos</div><div class="info-card-desc">Define cliente, color, presupuesto y tipo de facturación (por horas, fijo o gratis). Asigna fechas estimadas de inicio y fin.</div></div>
-        <div class="info-card"><div class="info-card-icon">+</div><div class="info-card-title">Registra horas</div><div class="info-card-desc">Loguea trabajo y reuniones desde el acceso rápido. Cada entrada lleva fecha, cantidad, tipo y una nota opcional.</div></div>
-        <div class="info-card"><div class="info-card-icon">◩</div><div class="info-card-title">Consulta el dashboard</div><div class="info-card-desc">Visualiza proyectos activos, horas semanales y mensuales, alertas de cobro pendiente y estado general de tu actividad.</div></div>
-        <div class="info-card"><div class="info-card-icon">▣</div><div class="info-card-title">Calendario</div><div class="info-card-desc">Visualiza tu trabajo en vistas mensual y semanal, crea horas directamente desde el grid.</div></div>
+        <div class="info-card"><div class="info-card-icon">◩</div><div class="info-card-title">Crea proyectos</div><div class="info-card-desc">Define cliente, presupuesto y tipo de facturación (por horas, fijo o gratis). Asigna fechas y controla el estado.</div></div>
+        <div class="info-card"><div class="info-card-icon">+</div><div class="info-card-title">Registra horas</div><div class="info-card-desc">Loguea trabajo y reuniones desde el calendario o el detalle del proyecto. Cada entrada lleva fecha, cantidad y nota.</div></div>
+        <div class="info-card"><div class="info-card-icon">▣</div><div class="info-card-title">Calendario</div><div class="info-card-desc">Visualiza tu trabajo en vistas mensual y semanal, con objetivos y resumen financiero del periodo.</div></div>
+        <div class="info-card"><div class="info-card-icon">€</div><div class="info-card-title">Gastos y facturas</div><div class="info-card-desc">Registra gastos del negocio, genera facturas PDF y consulta el resumen financiero por periodo.</div></div>
       </div>
     </div>
 
-    <!-- ── Vista: Dashboard ── -->
+    <!-- ── Vista: Proyectos (ex-Dashboard) ── -->
     <div id="vDash" class="vw">
-      <h1 class="pt">Dashboard</h1>
-      <!-- COMENTADO: Stats (Activos, Semana, Mes, Pendiente cobro)
-      <div class="sg" id="dSt"></div>
-      FIN COMENTADO -->
-      <div class="als" id="dAl"></div>
-      <div id="dPr"></div>
-      <div style="margin-top:1rem"><button class="bt bt-add" onclick="App.pModal()">+ Nuevo proyecto</button></div>
-    </div>
-
-    <!-- COMENTADO: Vista Proyectos (accesible desde dashboard)
-    <div id="vProj" class="vw">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
         <h1 class="pt" style="margin:0">Proyectos</h1>
-        <button class="bt bt-p" onclick="App.pModal()">+ Nuevo</button>
+        <button class="bt bt-p" onclick="App.pModal()">+ Nuevo proyecto</button>
       </div>
-      <div class="tb" id="pTb"></div>
-      <div class="pg" id="pLs"></div>
-      <div id="pEm" class="es" style="display:none"><div class="tx">Sin proyectos</div></div>
+      <div class="tb" id="dFilt"></div>
+      <div class="als" id="dAl"></div>
+      <div id="dPr"></div>
     </div>
-    FIN COMENTADO -->
 
     <!-- ── Vista: Detalle de proyecto ── -->
     <div id="vDet" class="vw"><div id="detC"></div></div>
-
-    <!-- COMENTADO: Vista Horas (accesible desde detalle de proyecto)
-    <div id="vHrs" class="vw">
-      <h1 class="pt">+ Horas</h1>
-      <p class="ps">Registro rápido</p>
-      <div class="qf" id="qhF"></div>
-    </div>
-    FIN COMENTADO -->
 
     <!-- ── Vista: Calendario ── -->
     <div id="vCal" class="vw">
@@ -108,14 +84,20 @@
       <div id="calC"></div>
     </div>
 
-    <!-- COMENTADO: Vista Informes (datos visibles desde dashboard y calendario)
-    <div id="vRep" class="vw">
-      <h1 class="pt">Informes</h1>
-      <div class="sg" id="rSt"></div>
-      <div class="ds"><div class="dst">Ranking €/hora</div><div class="rl" id="rRk"></div></div>
-      <div class="ds" style="margin-top:1.5rem"><div class="dst">Por cliente</div><div class="csg" id="rCl"></div></div>
+    <!-- ── Vista: Gastos ── -->
+    <div id="vGas" class="vw">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
+        <h1 class="pt" style="margin:0">Gastos</h1>
+        <button class="bt bt-p" onclick="App.gModal()">+ Nuevo gasto</button>
+      </div>
+      <div id="gasC"></div>
     </div>
-    FIN COMENTADO -->
+
+    <!-- ── Vista: Configuración ── -->
+    <div id="vCfg" class="vw">
+      <h1 class="pt">Configuración</h1>
+      <div id="cfgC"></div>
+    </div>
 
   </main>
 </div>
@@ -124,11 +106,14 @@
 <div class="mo" id="mO"><div class="md" id="mC"></div></div>
 
 <!-- JS (orden importa: dependencias primero, app último) -->
+<script src="js/themes.js"></script>
 <script src="js/colors.js"></script>
 <script src="js/utils.js"></script>
 <script src="js/store.js"></script>
 <script src="js/billing.js"></script>
 <script src="js/tracking.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="js/facturas.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
