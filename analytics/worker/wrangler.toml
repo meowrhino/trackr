@@ -1,0 +1,16 @@
+name = "trackr-analytics"
+main = "index.js"
+compatibility_date = "2024-01-01"
+
+# KV namespace para almacenar contadores agregados
+[[kv_namespaces]]
+binding = "ANALYTICS"
+id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+
+# Cron: ejecuta syncToGitHub() diariamente a las 3:00 UTC
+[triggers]
+crons = ["0 3 * * *"]
+
+# Variables de entorno (configurar como secrets con wrangler secret put)
+# GITHUB_TOKEN  = Personal Access Token con permisos contents:write
+# GITHUB_REPO   = usuario/repo (ej: manu/trackr)
