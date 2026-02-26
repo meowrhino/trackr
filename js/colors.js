@@ -58,4 +58,12 @@ const W3C_COLORS = {
 const COLOR_MAP = {};
 Object.values(W3C_COLORS).forEach(arr => arr.forEach(([n,h]) => COLOR_MAP[n] = h));
 
-function colorHex(name) { return COLOR_MAP[name] || name; }
+/**
+ * Convierte nombre de color a hex.
+ * Devuelve gris por defecto si el nombre no es reconocido ni hex válido.
+ */
+function colorHex(name) {
+  if (COLOR_MAP[name]) return COLOR_MAP[name];
+  if (typeof name === 'string' && /^#[0-9a-fA-F]{3,8}$/.test(name)) return name;
+  return '#808080';
+}

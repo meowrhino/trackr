@@ -16,13 +16,6 @@ label{font-size:.75rem;color:var(--t3);display:block;margin-bottom:.25rem;text-t
 .fr{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
 .fr-3{grid-template-columns:1fr 1fr 1fr}
 
-/* ── Color select ── */
-.color-sel{position:relative}
-.color-preview{display:flex;align-items:center;gap:.5rem;padding:.5rem .7rem;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);cursor:pointer;font-size:.82rem;transition:border-color var(--tr)}
-.color-preview:hover{border-color:var(--b2)}
-.color-dot{width:12px;height:12px;border-radius:2px;flex-shrink:0}
-.color-name{color:var(--t1)}
-
 /* ── Quick hours: selector tipo trabajo/reunión ── */
 .qf{max-width:440px}
 .ts2{display:flex;gap:.5rem;margin-bottom:.85rem}

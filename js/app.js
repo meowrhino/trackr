@@ -19,13 +19,17 @@ const App = {
   infoPeriod: 'mes',  /* periodo del resumen: 'mes' | 'trim' | 'año' */
   infoY: null,        /* año del resumen financiero */
   infoM: null,        /* mes del resumen financiero 0-11 */
+  _editPid: null,     /* ID del proyecto siendo editado (para preview facturación) */
 
   /* ══════════════════════════════════════════════
    *  INICIALIZACIÓN Y NAVEGACIÓN
    * ══════════════════════════════════════════════ */
 
   init() {
-    T.init('https://trackr-analytics.YOUR_SUBDOMAIN.workers.dev/event');
+    /* Analytics desactivado — configurar URL real para activar:
+       T.init('https://trackr-analytics.tu-dominio.workers.dev/event'); */
+    T.init(null);
+
     if (!D.init()) D.create();
 
     /* Aplicar tema guardado */
@@ -35,6 +39,11 @@ const App = {
     const now = new Date();
     this.infoY = now.getFullYear();
     this.infoM = now.getMonth();
+
+    /* Cerrar modal con Escape */
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') this.cm();
+    });
 
     this.enter();
   },
@@ -766,9 +775,16 @@ const App = {
   _calWeekDrag(hStart, hEnd, slotH) {
     const wkBody = document.querySelector('.cal-week-body');
     if (!wkBody) return;
+
     let drag = null;
-    const minFromY = (y, wcol) => { const rect = wcol.getBoundingClientRect(); return hStart * 60 + Math.floor(Math.max(0, y - rect.top) / slotH * 60); };
+
+    const minFromY = (y, wcol) => {
+      const rect = wcol.getBoundingClientRect();
+      return hStart * 60 + Math.floor(Math.max(0, y - rect.top) / slotH * 60);
+    };
+
     const snap30 = m => Math.floor(m / 30) * 30;
+
     const updatePreview = endMin => {
       if (!drag) return;
       const st = drag.startHr * 60 + drag.startMin;
@@ -779,24 +795,47 @@ const App = {
       drag.preview.style.height = Math.max(((et - st) / 60) * slotH, 15) + 'px';
       drag.endMin = et;
     };
-    wkBody.addEventListener('mousedown', ev => {
-      const slot = ev.target.closest('.cal-slot'); if (!slot) return;
-      ev.preventDefault();
-      const wcol = slot.closest('.cal-wcol');
-      const pv = document.createElement('div'); pv.className = 'cal-drag-pv'; wcol.appendChild(pv);
-      drag = { startHr: parseInt(slot.dataset.hr), startMin: parseInt(slot.dataset.min), date: slot.dataset.date, preview: pv, wcol, endMin: parseInt(slot.dataset.hr) * 60 + parseInt(slot.dataset.min) + 30 };
-      updatePreview(drag.startHr * 60 + drag.startMin);
-    });
-    wkBody.addEventListener('mousemove', ev => { if (!drag) return; ev.preventDefault(); updatePreview(minFromY(ev.clientY, drag.wcol)); });
-    const endDrag = () => {
+
+    const finishDrag = () => {
       if (!drag) return;
       const d = drag; drag = null;
+      /* Limpiar listeners globales */
+      document.removeEventListener('mousemove', onDocMove);
+      document.removeEventListener('mouseup', onDocUp);
       if (d.preview.parentNode) d.preview.remove();
-      const st = d.startHr * 60 + d.startMin, dur = (d.endMin - st) / 60;
+      const st = d.startHr * 60 + d.startMin;
+      const dur = (d.endMin - st) / 60;
       App.calAddHour(d.date, `${String(d.startHr).padStart(2, '0')}:${String(d.startMin).padStart(2, '0')}`, dur > 0 ? dur : 0.5);
     };
-    wkBody.addEventListener('mouseup', endDrag);
-    wkBody.addEventListener('mouseleave', () => { if (drag) { drag.preview.remove(); drag = null; } });
+
+    const onDocMove = ev => {
+      if (!drag) return;
+      ev.preventDefault();
+      updatePreview(minFromY(ev.clientY, drag.wcol));
+    };
+    const onDocUp = () => finishDrag();
+
+    wkBody.addEventListener('mousedown', ev => {
+      const slot = ev.target.closest('.cal-slot');
+      if (!slot) return;
+      ev.preventDefault();
+      const wcol = slot.closest('.cal-wcol');
+      const pv = document.createElement('div');
+      pv.className = 'cal-drag-pv';
+      wcol.appendChild(pv);
+      drag = {
+        startHr: parseInt(slot.dataset.hr),
+        startMin: parseInt(slot.dataset.min),
+        date: slot.dataset.date,
+        preview: pv,
+        wcol,
+        endMin: parseInt(slot.dataset.hr) * 60 + parseInt(slot.dataset.min) + 30
+      };
+      updatePreview(drag.startHr * 60 + drag.startMin);
+      /* Capturar movimiento y fin del drag en todo el documento */
+      document.addEventListener('mousemove', onDocMove);
+      document.addEventListener('mouseup', onDocUp);
+    });
   },
 
   calSetView(v) { T.ev('nav', 'cal_view', v); this.calView = v; this.rCal(); },
@@ -916,14 +955,19 @@ const App = {
       const pName = document.getElementById('chPN')?.value?.trim();
       if (!pName) { alert('Nombre de proyecto obligatorio'); return; }
       let clienteId = document.getElementById('chPCl')?.value || null;
+      let projColor = 'CornflowerBlue';
       if (clienteId === '_new') {
         const clName = document.getElementById('chPClN')?.value?.trim();
         if (!clName) { alert('Nombre de cliente obligatorio'); return; }
-        const newCl = D.addCl({ id: uid(), nombre: clName, direccion1: '', direccion2: '', nif: '', color: 'CornflowerBlue' });
+        const newCl = D.addCl({ id: uid(), nombre: clName, direccion1: '', direccion2: '', nif: '', color: projColor });
         clienteId = newCl.id;
-      } else if (!clienteId) clienteId = null;
+      } else if (clienteId) {
+        /* Heredar color del cliente seleccionado */
+        const cl = D.cl(clienteId);
+        if (cl?.color) projColor = cl.color;
+      } else { clienteId = null; }
       const newP = {
-        id: uid(), nombre: pName, clienteId, color: 'CornflowerBlue',
+        id: uid(), nombre: pName, clienteId, color: projColor,
         estado: 'activo', interno: false, recurrente: false,
         fechas: { inicio: fecha, finEstimada: null, finReal: null },
         facturacion: { modo: 'gratis', baseImponible: 0, total: 0, iva: 0, irpf: 0, importeIva: 0, importeIrpf: 0, totalFactura: 0, netoRecibido: 0, ivaExcepcion: '', pagado: false, fechaPago: null, gastos: 0, facturaNum: null, facturaFecha: null },
@@ -1055,7 +1099,7 @@ const App = {
       const gHex = colorHex(g.color || 'Salmon');
       html += `<div class="gas-card" style="border-left:3px solid ${gHex}"><div class="gas-header" onclick="this.nextElementSibling.classList.toggle('open')">`
         + `<span class="gas-name">${esc(g.nombre)}</span><span class="gas-cat">${catLabel}</span>`
-        + `${g.recurrente !== 'no' ? `<span class="gas-rec">${RECURRENCIA[g.recurrente] || ''}</span>` : ''}`
+        + `${g.recurrente && g.recurrente !== 'no' ? `<span class="gas-rec">${RECURRENCIA[g.recurrente]}</span>` : ''}`
         + `<span class="gas-total m">${fmtMoney(total)}</span><span class="gas-count">${count} entr.</span>`
         + `<div class="gas-actions"><button class="cl-btn" onclick="event.stopPropagation();App.gModal('${g.id}')" title="Editar">&#9998;</button><button class="cl-btn cl-btn-del" onclick="event.stopPropagation();App.delG('${g.id}')" title="Eliminar">&times;</button></div>`
         + `</div><div class="gas-body">`;
@@ -1155,7 +1199,7 @@ const App = {
    * ══════════════════════════════════════════════ */
 
   om(h) { document.getElementById('mC').innerHTML = h; document.getElementById('mO').classList.add('on'); },
-  cm() { document.getElementById('mO').classList.remove('on'); },
+  cm() { document.getElementById('mO').classList.remove('on'); this._editPid = null; },
   selT(el) { el.parentElement.querySelectorAll('.to').forEach(o => o.classList.remove('on')); el.classList.add('on'); },
 
   colorSelect(currentName) {
@@ -1188,6 +1232,7 @@ const App = {
    * ══════════════════════════════════════════════ */
 
   pModal(eid) {
+    this._editPid = eid || null;
     const isE = !!eid, p = isE ? D.p(eid) : null, st = D.d.settings, cls = D.cls();
     const df = {
       nombre: p?.nombre || '', clienteId: p?.clienteId || '', color: p?.color || 'CornflowerBlue',
@@ -1244,37 +1289,55 @@ const App = {
     this.cPrev();
   },
 
+  /** Actualiza la preview de facturación en el modal de proyecto */
   cPrev() {
-    const m = document.getElementById('mpBM')?.value; if (!m || m === 'gratis') return;
-    const ivaOn = document.getElementById('mpIva')?.checked, irpfOn = document.getElementById('mpIrpf')?.checked;
-    const ivR = ivaOn ? (D.d.settings.defaultIva || 21) : 0, irR = irpfOn ? (D.d.settings.defaultIrpf || 15) : 0;
+    const m = document.getElementById('mpBM')?.value;
+    if (!m || m === 'gratis') return;
+
+    const ivaOn = document.getElementById('mpIva')?.checked;
+    const irpfOn = document.getElementById('mpIrpf')?.checked;
+    const ivR = ivaOn ? (D.d.settings.defaultIva || 21) : 0;
+    const irR = irpfOn ? (D.d.settings.defaultIrpf || 15) : 0;
+
     let base, importeIva, importeIrpf, totalF, neto;
+
+    /* Proyecto siendo editado (si existe) */
+    const p = this._editPid ? D.p(this._editPid) : null;
+
     if (m === 'por_hora') {
       const ph = parseFloat(document.getElementById('mpPH')?.value) || 0;
-      /* Si estamos editando, usar horas reales; si no, mostrar tarifa */
-      const eid = document.querySelector('.ma .bt-p')?.onclick?.toString()?.match(/'([^']+)'/)?.[1];
-      const p = eid ? D.p(eid) : null;
       const th = p ? p.horas.reduce((s, h) => s + h.cantidad, 0) : 0;
       base = Math.round(th * ph * 100) / 100;
-      importeIva = Math.round(base * ivR / 100 * 100) / 100; importeIrpf = Math.round(base * irR / 100 * 100) / 100;
-      totalF = Math.round((base + importeIva - importeIrpf) * 100) / 100; neto = Math.round((base - importeIrpf) * 100) / 100;
     } else if (m === 'desde_base') {
       base = parseFloat(document.getElementById('mpBa')?.value) || 0;
-      importeIva = Math.round(base * ivR / 100 * 100) / 100; importeIrpf = Math.round(base * irR / 100 * 100) / 100;
-      totalF = Math.round((base + importeIva - importeIrpf) * 100) / 100; neto = Math.round((base - importeIrpf) * 100) / 100;
     } else {
       const t = parseFloat(document.getElementById('mpTo')?.value) || 0;
-      const fac = 1 + ivR / 100 - irR / 100; base = fac ? Math.round(t / fac * 100) / 100 : 0;
-      importeIva = Math.round(base * ivR / 100 * 100) / 100; importeIrpf = Math.round(base * irR / 100 * 100) / 100;
-      totalF = t; neto = Math.round((base - importeIrpf) * 100) / 100;
+      const fac = 1 + ivR / 100 - irR / 100;
+      base = fac ? Math.round(t / fac * 100) / 100 : 0;
+      totalF = t; /* en desde_total, el total es el input */
     }
+
+    /* Cálculos comunes */
+    importeIva = Math.round(base * ivR / 100 * 100) / 100;
+    importeIrpf = Math.round(base * irR / 100 * 100) / 100;
+    if (m !== 'desde_total') totalF = Math.round((base + importeIva - importeIrpf) * 100) / 100;
+    neto = Math.round((base - importeIrpf) * 100) / 100;
+
+    /* Línea informativa para modo por_hora */
+    let phInfo = '';
+    if (m === 'por_hora') {
+      const ph = parseFloat(document.getElementById('mpPH')?.value) || 0;
+      const th = p ? p.horas.reduce((s, h) => s + h.cantidad, 0) : 0;
+      phInfo = `<div class="br"><span class="la" style="font-size:.75rem;color:var(--t3)">`
+        + (p ? `${th.toFixed(1)}h × ${fmtNum(ph)} €/h` : 'Sin horas aún')
+        + `</span></div>`;
+    }
+
     const el = document.getElementById('bPrev');
-    if (el) el.innerHTML = (m === 'por_hora'
-      ? `<div class="br"><span class="la" style="font-size:.75rem;color:var(--t3)">${(function(){ const eid2 = document.querySelector('.ma .bt-p')?.onclick?.toString()?.match(/'([^']+)'/)?.[1]; const p2 = eid2 ? D.p(eid2) : null; return p2 ? p2.horas.reduce((s,h)=>s+h.cantidad,0).toFixed(1)+'h × ' + fmtNum(parseFloat(document.getElementById('mpPH')?.value)||0) + ' €/h' : 'Sin horas aún'; })()}</span></div>`
-      : '')
+    if (el) el.innerHTML = phInfo
       + `<div class="br"><span class="la">Base</span><span class="va">${fmtMoney(base)}</span></div>`
-      + `${ivR ? `<div class="br"><span class="la">+ IVA ${ivR}%</span><span class="va">${fmtMoney(importeIva)}</span></div>` : ''}`
-      + `${irR ? `<div class="br"><span class="la">- IRPF ${irR}%</span><span class="va">${fmtMoney(importeIrpf)}</span></div>` : ''}`
+      + (ivR ? `<div class="br"><span class="la">+ IVA ${ivR}%</span><span class="va">${fmtMoney(importeIva)}</span></div>` : '')
+      + (irR ? `<div class="br"><span class="la">- IRPF ${irR}%</span><span class="va">${fmtMoney(importeIrpf)}</span></div>` : '')
       + `<div class="br tot"><span class="la">Total</span><span class="va">${fmtMoney(totalF)}</span></div>`
       + `<div class="br"><span class="la">Neto</span><span class="va" style="color:var(--ok)">${fmtMoney(neto)}</span></div>`;
   },
@@ -1370,10 +1433,17 @@ const App = {
     r.onload = e => {
       try {
         const d = JSON.parse(e.target.result);
-        if (!d.projects || !Array.isArray(d.projects)) { alert('JSON no válido'); return; }
+        if (!d.projects || !Array.isArray(d.projects)) { alert('JSON no válido: falta "projects"'); return; }
+        /* Validar estructura mínima de cada proyecto */
+        for (const p of d.projects) {
+          if (!p.id || !p.nombre) { alert('JSON no válido: proyecto sin id o nombre'); return; }
+          if (p.horas && !Array.isArray(p.horas)) { alert('JSON no válido: "horas" no es un array'); return; }
+        }
+        if (d.clientes && !Array.isArray(d.clientes)) { alert('JSON no válido: "clientes" no es un array'); return; }
+        if (d.gastos && !Array.isArray(d.gastos)) { alert('JSON no válido: "gastos" no es un array'); return; }
         if (!d.settings) d.settings = { defaultIva: 21, defaultIrpf: 15 };
         D.load(d); T.ev('action', 'import'); this.go(this.cv);
-      } catch (err) { alert('Error: ' + err.message); }
+      } catch (err) { alert('Error al importar: ' + err.message); }
     };
     r.readAsText(f); ev.target.value = '';
   }

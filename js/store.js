@@ -112,6 +112,7 @@ const D = {
         if (p.facturacion.ivaExcepcion == null) p.facturacion.ivaExcepcion = '';
         if (p.facturacion.facturaNum == null) p.facturacion.facturaNum = null;
         if (p.facturacion.facturaFecha == null) p.facturacion.facturaFecha = null;
+        if (p.facturacion.precioHora == null) p.facturacion.precioHora = 0;
       }
     });
 
