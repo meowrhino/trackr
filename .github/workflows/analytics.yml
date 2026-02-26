@@ -1,0 +1,32 @@
+# Backup: si el cron del Worker falla, este workflow hace lo mismo.
+# También sirve como alternativa si no se usa Cloudflare Workers.
+# Requiere secret ANALYTICS_WORKER_URL con la URL del Worker + /dump endpoint.
+
+name: Pull analytics data
+
+on:
+  schedule:
+    - cron: '0 4 * * *' # diario a las 4:00 UTC (1h después del cron del Worker)
+  workflow_dispatch: # permite ejecución manual
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch analytics from Worker KV
+        run: |
+          mkdir -p analytics
+          # Descargar datos agregados del Worker
+          curl -sf "${{ secrets.ANALYTICS_WORKER_URL }}/dump" \
+            -H "Authorization: Bearer ${{ secrets.ANALYTICS_DUMP_TOKEN }}" \
+            -o analytics/data.json || echo "[]" > analytics/data.json
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add analytics/data.json
+          git diff --cached --quiet || git commit -m "analytics: update $(date +%Y-%m-%d)"
+          git push
