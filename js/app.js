@@ -17,7 +17,7 @@ const App = {
   /* ── Estado de la app ── */
   cv: 'info',         /* vista actual */
   cp: null,           /* proyecto en detalle */
-  pf: 'todos',        /* filtro de proyectos */
+  pf: 'externos',     /* filtro de proyectos */
   calY: null,         /* año del calendario */
   calM: null,         /* mes del calendario 0-11 */
   calView: 'month',   /* 'month' | 'week' */

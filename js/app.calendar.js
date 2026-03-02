@@ -71,9 +71,47 @@ Object.assign(App, {
       g += `<div class="${cl.join(' ')}" onclick="App.calDetail('${c.date}')"><div class="cal-num">${c.num}</div>${es}${ge}</div>`;
     });
 
+    /* ── Lista de gastos del mes ── */
+    const monthGastos = [];
+    D.gs().forEach(gasto => {
+      const gc = colorHex(gasto.color || 'Salmon');
+      (gasto.entradas || []).forEach(e => {
+        if (e.fecha && e.fecha.startsWith(mKey)) {
+          monthGastos.push({ gn: gasto.nombre, gc, cant: e.cantidad || 0, fecha: e.fecha, nota: e.nota || '' });
+        }
+      });
+    });
+    monthGastos.sort((a, b) => a.fecha.localeCompare(b.fecha));
+    let mgHtml = '';
+    if (monthGastos.length) {
+      const mgTotal = monthGastos.reduce((s, e) => s + e.cant, 0);
+      mgHtml = `<div class="cal-nt"><div class="cal-nt-title">Gastos del mes <span class="m" style="font-weight:400;font-size:.78rem;color:var(--warn)">${fmtMoney(mgTotal)}</span></div><div class="hl">${monthGastos.map(e =>
+        `<div class="hr" style="border-left-color:${e.gc}"><span class="hr-t">€</span><span class="hr-d">${fmtDate(e.fecha)}</span><span class="hr-a m">${fmtMoney(e.cant)}</span><span style="color:var(--t1);font-size:.82rem;flex:1">${esc(e.gn)}</span>${e.nota ? `<span class="hr-n">${esc(e.nota)}</span>` : ''}</div>`
+      ).join('')}</div></div>`;
+    }
+
+    /* ── Lista de cobros del mes ── */
+    const monthCobros = [];
+    ps.forEach(p => {
+      B.calc(p);
+      const f = p.facturacion;
+      if (f.pagado && f.fechaPago && f.fechaPago.startsWith(mKey)) {
+        monthCobros.push({ pn: p.nombre, pc: colorHex(p.color), total: f.totalFactura || 0, fecha: f.fechaPago });
+      }
+    });
+    monthCobros.sort((a, b) => a.fecha.localeCompare(b.fecha));
+    let mcHtml = '';
+    if (monthCobros.length) {
+      const mcTotal = monthCobros.reduce((s, e) => s + e.total, 0);
+      mcHtml = `<div class="cal-nt"><div class="cal-nt-title">Cobros del mes <span class="m" style="font-weight:400;font-size:.78rem;color:var(--ok)">${fmtMoney(mcTotal)}</span></div><div class="hl">${monthCobros.map(e =>
+        `<div class="hr" style="border-left-color:${e.pc}"><span class="hr-t">✓</span><span class="hr-d">${fmtDate(e.fecha)}</span><span class="hr-a m" style="color:var(--ok)">${fmtMoney(e.total)}</span><span style="color:var(--t1);font-size:.82rem;flex:1">${esc(e.pn)}</span></div>`
+      ).join('')}</div></div>`;
+    }
+
     document.getElementById('calC').innerHTML =
       this._calHeader(`${MESES[month]} ${year}`, `Total mes: <span class="m">${mt.toFixed(1)}h</span>`)
       + `<div class="cal-grid">${g}</div>`
+      + mgHtml + mcHtml
       + this._calGoals('month', mt, year, month)
       + this._calProjStats(pStats)
       + this._calFinancial(year, month);
@@ -125,7 +163,7 @@ Object.assign(App, {
       });
     });
 
-    const hStart = 7, hEnd = 22, slotH = 60;
+    const hStart = 0, hEnd = 24, slotH = 60;
     let hdr = '<div class="cal-wc"></div>';
     days.forEach(d => { hdr += `<div class="cal-wh${d.today ? ' today' : ''}"><span class="cal-wh-dow">${d.dow}</span><span class="cal-wh-num">${d.num}</span></div>`; });
 
@@ -167,15 +205,33 @@ Object.assign(App, {
 
     let wgHtml = '';
     if (weekGastos.length) {
-      wgHtml = `<div class="cal-nt"><div class="cal-nt-title">Gastos de la semana</div><div class="hl">${weekGastos.map(e =>
+      const wgTotal = weekGastos.reduce((s, e) => s + e.cant, 0);
+      wgHtml = `<div class="cal-nt"><div class="cal-nt-title">Gastos de la semana <span class="m" style="font-weight:400;font-size:.78rem;color:var(--warn)">${fmtMoney(wgTotal)}</span></div><div class="hl">${weekGastos.map(e =>
         `<div class="hr" style="border-left-color:${e.gc}"><span class="hr-t">€</span><span class="hr-d">${fmtDate(e.fecha)}</span><span class="hr-a m">${fmtMoney(e.cant)}</span><span style="color:var(--t1);font-size:.82rem;flex:1">${esc(e.gn)}</span></div>`
+      ).join('')}</div></div>`;
+    }
+
+    /* ── Cobros de la semana ── */
+    const weekCobros = [];
+    ps.forEach(p => {
+      B.calc(p);
+      const f = p.facturacion;
+      if (f.pagado && f.fechaPago && dateSet.has(f.fechaPago)) {
+        weekCobros.push({ pn: p.nombre, pc: colorHex(p.color), total: f.totalFactura || 0, fecha: f.fechaPago });
+      }
+    });
+    let wcHtml = '';
+    if (weekCobros.length) {
+      const wcTotal = weekCobros.reduce((s, e) => s + e.total, 0);
+      wcHtml = `<div class="cal-nt"><div class="cal-nt-title">Cobros de la semana <span class="m" style="font-weight:400;font-size:.78rem;color:var(--ok)">${fmtMoney(wcTotal)}</span></div><div class="hl">${weekCobros.map(e =>
+        `<div class="hr" style="border-left-color:${e.pc}"><span class="hr-t">✓</span><span class="hr-d">${fmtDate(e.fecha)}</span><span class="hr-a m" style="color:var(--ok)">${fmtMoney(e.total)}</span><span style="color:var(--t1);font-size:.82rem;flex:1">${esc(e.pn)}</span></div>`
       ).join('')}</div></div>`;
     }
 
     document.getElementById('calC').innerHTML =
       this._calHeader(title, `Total semana: <span class="m">${wt.toFixed(1)}h</span>`)
       + `<div class="cal-week" style="--slot-h:${slotH}px"><div class="cal-week-hdr">${hdr}</div><div class="cal-week-body"><div class="cal-week-tl">${timeLbl}</div>${cols}</div></div>`
-      + ntHtml + wgHtml
+      + ntHtml + wgHtml + wcHtml
       + this._calGoals('week', wt, ws.getFullYear(), ws.getMonth())
       + this._calProjStats(pStats)
       + this._calFinancial(ws.getFullYear(), ws.getMonth());
@@ -198,7 +254,9 @@ Object.assign(App, {
     if (!t) return '';
     const goals = [];
     if (view === 'month') {
-      if (t.horasMes) goals.push({ label: 'Horas', actual, target: t.horasMes, unit: 'h' });
+      if (t.horasMes) goals.push({ label: 'Horas/mes', actual, target: t.horasMes, unit: 'h' });
+      else if (t.horasSemana) goals.push({ label: 'Horas/mes', actual, target: Math.round(t.horasSemana * 4.33), unit: 'h', derived: `${t.horasSemana}h/sem × 4.33` });
+      if (t.horasSemana) goals.push({ label: 'Horas/semana', actual: actual / 4.33, target: t.horasSemana, unit: 'h' });
       if (t.ingresosMes) {
         let income = 0;
         D.ps().forEach(p => { const f = p.facturacion; if (f.pagado && f.fechaPago && inPeriod(f.fechaPago, 'mes', year, month)) income += f.totalFactura || 0; });
@@ -215,7 +273,7 @@ Object.assign(App, {
       const barColor = pct >= 100 ? 'pbar-ok' : pct >= 50 ? 'pbar-neutral' : 'pbar-warn';
       const valStr = g.unit === '€' ? fmtMoney(g.actual) : `${g.actual.toFixed(1)}${g.unit}`;
       const tgtStr = g.unit === '€' ? fmtMoney(g.target) : `${g.target}${g.unit}`;
-      html += `<div style="margin-bottom:.6rem"><div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:.25rem"><span style="color:var(--t2)">${g.label}</span><span class="m" style="color:var(--t1)">${valStr} / ${tgtStr}</span></div><div class="pbar"><div class="pbar-fill ${barColor}" style="width:${Math.min(pct, 100).toFixed(1)}%"></div></div></div>`;
+      html += `<div style="margin-bottom:.6rem"><div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:.25rem"><span style="color:var(--t2)">${g.label}${g.derived ? ` <span style="color:var(--t3);font-size:.7rem">(${g.derived})</span>` : ''}</span><span class="m" style="color:var(--t1)">${valStr} / ${tgtStr}</span></div><div class="pbar"><div class="pbar-fill ${barColor}" style="width:${Math.min(pct, 100).toFixed(1)}%"></div></div></div>`;
     });
     return html + '</div>';
   },

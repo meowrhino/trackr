@@ -13,9 +13,9 @@ Object.assign(App, {
 
     /* ── Filtros ── */
     const filters = [
+      { k: 'externos', l: 'Externos' },
       { k: 'todos', l: 'Todos' },
       { k: 'internos', l: 'Internos' },
-      { k: 'externos', l: 'Externos' },
       { k: 'recurrentes', l: 'Recurrentes' }
     ];
     document.getElementById('dFilt').innerHTML = filters.map(f =>
