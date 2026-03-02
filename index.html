@@ -105,7 +105,10 @@
 <!-- Modal global -->
 <div class="mo" id="mO" onclick="if(event.target===this)App.cm()"><div class="md" id="mC"></div></div>
 
-<!-- JS (orden importa: dependencias primero, app último) -->
+<!-- Toast notifications -->
+<div id="toasts"></div>
+
+<!-- JS (orden importa: dependencias primero, app core, luego módulos de vista) -->
 <script src="js/themes.js"></script>
 <script src="js/colors.js"></script>
 <script src="js/utils.js"></script>
@@ -114,6 +117,13 @@
 <script src="js/tracking.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="js/facturas.js"></script>
+<script src="js/toast.js"></script>
 <script src="js/app.js"></script>
+<script src="js/app.info.js"></script>
+<script src="js/app.dash.js"></script>
+<script src="js/app.detail.js"></script>
+<script src="js/app.calendar.js"></script>
+<script src="js/app.config.js"></script>
+<script src="js/app.gastos.js"></script>
 </body>
 </html>

@@ -68,11 +68,15 @@ function esc(s) {
  *  FORMATOS
  * ══════════════════════════════════════════════ */
 
-/** Formatea fecha YYYY-MM-DD → DD-MM-YYYY */
+/** Formatea fecha YYYY-MM-DD → DD-MM-YYYY (con cache) */
+const _fmtDateCache = {};
 function fmtDate(s) {
   if (!s) return '—';
+  if (_fmtDateCache[s]) return _fmtDateCache[s];
   const p = s.split('-');
-  return p.length === 3 ? `${p[2]}-${p[1]}-${p[0]}` : s;
+  const r = p.length === 3 ? `${p[2]}-${p[1]}-${p[0]}` : s;
+  _fmtDateCache[s] = r;
+  return r;
 }
 
 /** Formatea cantidad monetaria: 1234.5 → "1.234,50 €" */

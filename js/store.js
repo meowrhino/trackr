@@ -154,7 +154,12 @@ const D = {
 
   /** Persiste en localStorage */
   save() {
-    localStorage.setItem('trackr_data', JSON.stringify(this.d));
+    try {
+      localStorage.setItem('trackr_data', JSON.stringify(this.d));
+    } catch (e) {
+      if (typeof Toast !== 'undefined') Toast.error('Error al guardar: ' + (e.name === 'QuotaExceededError' ? 'almacenamiento lleno' : e.message));
+      console.error('D.save() failed:', e);
+    }
   },
 
   /* ══════════════════════════════════════════════
