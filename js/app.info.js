@@ -1,31 +1,50 @@
 /* ================================================
- * TRACKR — App: Vista Info (Home)
+ * TRACKR — App: Vista Info (Dashboard)
  * Globales: extiende App
  * Dependencias: app.js (App base), utils.js, store.js,
- *               billing.js
+ *               billing.js, colors.js
  * ================================================ */
 
 Object.assign(App, {
 
   rInfo() {
     const ps = D.ps();
-    const hasProjects = ps.length > 0;
-    const statusEl = document.getElementById('infoStatus');
+    const gs = D.gs();
+    const hasData = ps.length > 0;
 
-    if (hasProjects) {
-      const activos = ps.filter(p => p.estado === 'activo').length;
-      statusEl.innerHTML =
-        `<div class="info-status">`
-        + `<div class="info-status-text">`
-        +   `<span class="info-status-num">${ps.length}</span> proyecto${ps.length !== 1 ? 's' : ''}`
-        +   `${activos ? ` · <strong>${activos} activo${activos !== 1 ? 's' : ''}</strong>` : ''}`
-        + `</div>`
-        + `<div class="info-status-actions">`
-        +   `<button class="bt bt-p" onclick="App.go('dash')">Ir a Proyectos</button>`
-        +   `<button class="bt" onclick="App.pModal()">+ Nuevo</button>`
-        + `</div>`
-        + `</div>`;
-    } else {
+    const now = new Date();
+    const today = todayStr();
+    const dow = (now.getDay() + 6) % 7;
+    const weekStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dow);
+    const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+    /* ── Stats rápidas ── */
+    const activos = ps.filter(p => p.estado === 'activo');
+    let horasSemana = 0, horasMes = 0, pendienteCobro = 0, nPendiente = 0;
+    const weekDates = new Set();
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + i);
+      weekDates.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`);
+    }
+
+    ps.forEach(p => {
+      B.calc(p);
+      p.horas.forEach(h => {
+        if (!h.fecha) return;
+        if (weekDates.has(h.fecha)) horasSemana += h.cantidad;
+        if (h.fecha.startsWith(thisMonth)) horasMes += h.cantidad;
+      });
+      const f = p.facturacion;
+      if ((p.estado === 'completado' || p.estado === 'abandonado') && f.facturaFecha && !f.pagado) {
+        pendienteCobro += f.netoRecibido || 0;
+        nPendiente++;
+      }
+    });
+
+    const statusEl = document.getElementById('infoStatus');
+    const mainEl = document.getElementById('infoMain');
+
+    if (!hasData) {
       statusEl.innerHTML =
         `<div class="info-cta">`
         + `<p class="info-cta-text">No tienes proyectos todavía. Crea uno nuevo o importa tus datos desde un JSON.</p>`
@@ -34,8 +53,133 @@ Object.assign(App, {
         +   `<button class="bt" onclick="document.getElementById('impA').click()">Cargar JSON</button>`
         + `</div>`
         + `</div>`;
+      mainEl.innerHTML = '';
+      document.getElementById('infoFinancial').innerHTML = '';
+      return;
     }
 
+    /* ── Stats cards ── */
+    statusEl.innerHTML =
+      `<div class="info-stats">`
+      + `<div class="info-stat-card" onclick="App.go('dash')">`
+      +   `<div class="info-stat-val">${activos.length}</div>`
+      +   `<div class="info-stat-lbl">proyecto${activos.length !== 1 ? 's' : ''} activo${activos.length !== 1 ? 's' : ''}</div>`
+      + `</div>`
+      + `<div class="info-stat-card" onclick="App.go('cal')">`
+      +   `<div class="info-stat-val">${horasSemana.toFixed(1)}<small>h</small></div>`
+      +   `<div class="info-stat-lbl">esta semana</div>`
+      + `</div>`
+      + `<div class="info-stat-card" onclick="App.go('cal')">`
+      +   `<div class="info-stat-val">${horasMes.toFixed(1)}<small>h</small></div>`
+      +   `<div class="info-stat-lbl">este mes</div>`
+      + `</div>`
+      + `<div class="info-stat-card${nPendiente ? ' info-stat-alert' : ''}">`
+      +   `<div class="info-stat-val">${nPendiente > 0 ? fmtMoney(pendienteCobro) : '—'}</div>`
+      +   `<div class="info-stat-lbl">${nPendiente ? `${nPendiente} pendiente${nPendiente > 1 ? 's' : ''} de cobro` : 'todo cobrado'}</div>`
+      + `</div>`
+      + `</div>`;
+
+    /* ── Actividad reciente ── */
+    const activity = [];
+
+    ps.forEach(p => {
+      const hex = colorHex(p.color);
+      p.horas.forEach(h => {
+        if (!h.fecha) return;
+        activity.push({
+          type: 'hora', fecha: h.fecha, sort: h.fecha + (h.horaInicio || '99:99'),
+          icon: h.tipo === 'trabajo' ? '💻' : '👥',
+          text: `${h.cantidad}h — ${p.nombre}`,
+          note: h.nota || '', color: hex
+        });
+      });
+    });
+
+    gs.forEach(g => {
+      const gc = colorHex(g.color || 'Salmon');
+      (g.entradas || []).forEach(e => {
+        if (!e.fecha) return;
+        activity.push({
+          type: 'gasto', fecha: e.fecha, sort: e.fecha + '99:99',
+          icon: '€',
+          text: `${fmtMoney(e.cantidad || 0)} — ${g.nombre}`,
+          note: e.nota || '', color: gc
+        });
+      });
+    });
+
+    activity.sort((a, b) => b.sort.localeCompare(a.sort));
+    const recent = activity.slice(0, 12);
+
+    let actHtml = '';
+    if (recent.length) {
+      let lastDate = '';
+      actHtml = `<div class="info-section"><div class="info-section-title">Actividad reciente</div><div class="hl">`;
+      recent.forEach(a => {
+        const dateLabel = a.fecha === today ? 'Hoy'
+          : a.fecha === (() => { const y = new Date(now - 86400000); return `${y.getFullYear()}-${String(y.getMonth()+1).padStart(2,'0')}-${String(y.getDate()).padStart(2,'0')}`; })() ? 'Ayer'
+          : fmtDate(a.fecha);
+        if (a.fecha !== lastDate) {
+          if (lastDate) actHtml += `<div class="info-act-sep"></div>`;
+          lastDate = a.fecha;
+        }
+        actHtml += `<div class="hr" style="border-left-color:${a.color}">`
+          + `<span class="hr-t">${a.icon}</span>`
+          + `<span class="hr-d">${dateLabel}</span>`
+          + `<span style="color:var(--t1);font-size:.82rem;flex:1">${esc(a.text)}</span>`
+          + (a.note ? `<span class="hr-n">${esc(a.note)}</span>` : '')
+          + `</div>`;
+      });
+      actHtml += `</div></div>`;
+    }
+
+    /* ── Deadlines próximos ── */
+    const deadlines = [];
+    const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    activos.forEach(p => {
+      const fe = p.fechas?.finEstimada;
+      if (!fe) return;
+      const parts = fe.split('-');
+      const dDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+      const diffDays = Math.ceil((dDate - todayDate) / 86400000);
+      if (diffDays < -30) return; /* ignore very old deadlines */
+      deadlines.push({
+        pn: p.nombre, pid: p.id, fecha: fe, diffDays,
+        pc: colorHex(p.color), cn: clienteName(p)
+      });
+    });
+    deadlines.sort((a, b) => a.diffDays - b.diffDays);
+
+    let dlHtml = '';
+    if (deadlines.length) {
+      dlHtml = `<div class="info-section"><div class="info-section-title">Deadlines</div><div class="hl">`;
+      deadlines.forEach(d => {
+        const urgency = d.diffDays < 0 ? 'overdue' : d.diffDays <= 7 ? 'soon' : 'ok';
+        const label = d.diffDays < 0 ? `${Math.abs(d.diffDays)}d atrasado`
+          : d.diffDays === 0 ? 'Hoy'
+          : d.diffDays === 1 ? 'Mañana'
+          : `${d.diffDays}d`;
+        dlHtml += `<div class="hr info-dl-${urgency}" style="border-left-color:${d.pc};cursor:pointer" onclick="App.go('det','${d.pid}')">`
+          + `<span class="hr-d info-dl-badge">${label}</span>`
+          + `<span style="color:var(--t1);font-size:.82rem;flex:1">${esc(d.pn)}</span>`
+          + (d.cn ? `<span class="hr-n">${esc(d.cn)}</span>` : '')
+          + `<span class="hr-d">${fmtDate(d.fecha)}</span>`
+          + `</div>`;
+      });
+      dlHtml += `</div></div>`;
+    }
+
+    /* ── Acciones rápidas ── */
+    const quickHtml = `<div class="info-quick">`
+      + `<button class="bt bt-p" onclick="App.pModal()">+ Nuevo proyecto</button>`
+      + `<button class="bt" onclick="document.getElementById('impA').click()">Cargar otro JSON</button>`
+      + `<button class="bt" onclick="App.resetData()">Nuevo usuario</button>`
+      + `</div>`
+      + `<div style="text-align:center;margin-top:1.5rem;font-size:.72rem"><a href="https://meowrhino.studio" target="_blank" style="color:var(--t3);text-decoration:none">meowrhino.studio</a></div>`;
+
+    mainEl.innerHTML = actHtml + dlHtml + quickHtml;
+
+    /* ── Resumen financiero (reutilizamos el existente) ── */
     this._rInfoFinancial();
   },
 
@@ -74,10 +218,11 @@ Object.assign(App, {
       p.horas.forEach(h => {
         if (h.fecha && inPeriod(h.fecha, type, year, month)) {
           horas += h.cantidad;
+          if (h.monto) cobrado += h.monto;
         }
       });
       if (f.pagado && f.fechaPago && inPeriod(f.fechaPago, type, year, month)) {
-        cobrado += f.totalFactura || 0;
+        cobrado += f.netoRecibido || 0;
         baseTotal += f.baseImponible || 0;
         ivaTotal += f.importeIva || 0;
         irpfTotal += f.importeIrpf || 0;

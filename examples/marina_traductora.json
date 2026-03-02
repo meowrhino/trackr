@@ -1,0 +1,269 @@
+{
+  "version": 2,
+  "clientes": [
+    { "id": "c201-xa11-yb22", "nombre": "Editorial Mediterráneo", "direccion1": "Carrer de Colón 32, 3r", "direccion2": "46004 València", "nif": "B98765432", "color": "Teal" },
+    { "id": "c202-xc33-yd44", "nombre": "Solera Cosmetics", "direccion1": "Av. del Puerto 88", "direccion2": "46023 València", "nif": "B11998877", "color": "RosyBrown" },
+    { "id": "c203-xe55-yf66", "nombre": "TechBridge GmbH", "direccion1": "Friedrichstraße 112", "direccion2": "10117 Berlin, Alemania", "nif": "DE312456789", "color": "DodgerBlue" },
+    { "id": "c204-xg77-yh88", "nombre": "Agencia Naranjo Comms", "direccion1": "Plaça de l'Ajuntament 5", "direccion2": "46002 València", "nif": "B66554433", "color": "DarkOrange" }
+  ],
+  "projects": [
+    {
+      "id": "p201-m1m1-n2n2", "nombre": "Traducción catálogo ES→EN", "clienteId": "c202-xc33-yd44", "color": "RosyBrown",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2025-07-01", "finEstimada": "2025-08-15", "finReal": "2025-08-10" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 1400, "total": 0, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 294, "importeIrpf": 210,
+        "totalFactura": 1484, "netoRecibido": 1190, "ivaExcepcion": "",
+        "pagado": true, "fechaPago": "2025-09-01", "gastos": 0,
+        "facturaNum": 1, "facturaFecha": "2025-08-10"
+      },
+      "horas": [
+        { "id": "h201-0001", "fecha": "2025-07-02", "tipo": "reunion", "cantidad": 1, "nota": "Briefing + glosario de marca", "horaInicio": "10:00" },
+        { "id": "h201-0002", "fecha": "2025-07-03", "tipo": "trabajo", "cantidad": 5, "nota": "Traducción fichas productos (lote 1)", "horaInicio": "09:00" },
+        { "id": "h201-0003", "fecha": "2025-07-07", "tipo": "trabajo", "cantidad": 6, "nota": "Fichas productos (lote 2)", "horaInicio": "08:30" },
+        { "id": "h201-0004", "fecha": "2025-07-10", "tipo": "trabajo", "cantidad": 4, "nota": "Textos packaging + etiquetas", "horaInicio": "09:00" },
+        { "id": "h201-0005", "fecha": "2025-07-15", "tipo": "trabajo", "cantidad": 5, "nota": "Web copy: home + about us", "horaInicio": "09:00" },
+        { "id": "h201-0006", "fecha": "2025-07-21", "tipo": "trabajo", "cantidad": 3, "nota": "Sección ingredientes + claims", "horaInicio": "10:00" },
+        { "id": "h201-0007", "fecha": "2025-07-28", "tipo": "trabajo", "cantidad": 4, "nota": "Revisión nativa (proofreading)", "horaInicio": "09:00" },
+        { "id": "h201-0008", "fecha": "2025-08-04", "tipo": "trabajo", "cantidad": 3, "nota": "Maquetación InDesign bilingüe", "horaInicio": "14:00" },
+        { "id": "h201-0009", "fecha": "2025-08-08", "tipo": "trabajo", "cantidad": 2, "nota": "Correcciones finales cliente", "horaInicio": "09:00" },
+        { "id": "h201-0010", "fecha": "2025-08-10", "tipo": "reunion", "cantidad": 0.5, "nota": "Entrega + cierre", "horaInicio": "11:00" }
+      ],
+      "notas": "Catálogo completo de cosméticos naturales. 48 fichas + textos institucionales."
+    },
+    {
+      "id": "p202-o3o3-p4p4", "nombre": "Localización app TechBridge", "clienteId": "c203-xe55-yf66", "color": "DodgerBlue",
+      "estado": "activo", "interno": false, "recurrente": true,
+      "fechas": { "inicio": "2025-09-01", "finEstimada": "2026-08-31", "finReal": null },
+      "facturacion": {
+        "modo": "por_hora", "baseImponible": 0, "total": 0, "precioHora": 40,
+        "iva": 0, "irpf": 0, "importeIva": 0, "importeIrpf": 0,
+        "totalFactura": 0, "netoRecibido": 0, "ivaExcepcion": "Operación intracomunitaria exenta (art. 25 Ley 37/1992)",
+        "pagado": false, "fechaPago": null, "gastos": 0,
+        "facturaNum": null, "facturaFecha": null
+      },
+      "horas": [
+        { "id": "h202-0001", "fecha": "2025-09-03", "tipo": "reunion", "cantidad": 1.5, "nota": "Onboarding + acceso Crowdin", "horaInicio": "15:00" },
+        { "id": "h202-0002", "fecha": "2025-09-05", "tipo": "trabajo", "cantidad": 4, "nota": "Strings UI principales (DE→ES)", "horaInicio": "09:00" },
+        { "id": "h202-0003", "fecha": "2025-09-10", "tipo": "trabajo", "cantidad": 5, "nota": "Onboarding flow + tooltips", "horaInicio": "09:00" },
+        { "id": "h202-0004", "fecha": "2025-09-18", "tipo": "trabajo", "cantidad": 3, "nota": "Emails transaccionales", "horaInicio": "10:00" },
+        { "id": "h202-0005", "fecha": "2025-09-24", "tipo": "trabajo", "cantidad": 4, "nota": "Help center artículos (batch 1)", "horaInicio": "09:00" },
+        { "id": "h202-0006", "fecha": "2025-10-03", "tipo": "trabajo", "cantidad": 3, "nota": "Release notes v3.2", "horaInicio": "14:00" },
+        { "id": "h202-0007", "fecha": "2025-10-15", "tipo": "trabajo", "cantidad": 5, "nota": "Help center artículos (batch 2)", "horaInicio": "09:00" },
+        { "id": "h202-0008", "fecha": "2025-10-28", "tipo": "trabajo", "cantidad": 2, "nota": "QA strings en staging", "horaInicio": "16:00" },
+        { "id": "h202-0009", "fecha": "2025-11-06", "tipo": "trabajo", "cantidad": 4, "nota": "Nuevos módulos dashboard", "horaInicio": "09:00" },
+        { "id": "h202-0010", "fecha": "2025-11-19", "tipo": "trabajo", "cantidad": 3, "nota": "Landing pages campaña Black Friday", "horaInicio": "10:00" },
+        { "id": "h202-0011", "fecha": "2025-12-04", "tipo": "trabajo", "cantidad": 4, "nota": "Release notes v3.3 + changelog", "horaInicio": "09:00" },
+        { "id": "h202-0012", "fecha": "2025-12-17", "tipo": "trabajo", "cantidad": 2, "nota": "Correcciones feedback usuarios", "horaInicio": "14:00" },
+        { "id": "h202-0013", "fecha": "2026-01-09", "tipo": "trabajo", "cantidad": 5, "nota": "Módulo facturación (nuevo)", "horaInicio": "09:00", "monto": 200 },
+        { "id": "h202-0014", "fecha": "2026-01-22", "tipo": "trabajo", "cantidad": 3, "nota": "Legal: términos y privacidad ES", "horaInicio": "10:00", "monto": 120 },
+        { "id": "h202-0015", "fecha": "2026-02-05", "tipo": "trabajo", "cantidad": 4, "nota": "Release notes v3.4", "horaInicio": "09:00", "monto": 160 },
+        { "id": "h202-0016", "fecha": "2026-02-18", "tipo": "reunion", "cantidad": 1, "nota": "Revisión semestral + roadmap", "horaInicio": "15:00", "monto": 40 }
+      ],
+      "notas": "SaaS de gestión para pymes. Localización continua DE→ES via Crowdin. Facturación mensual por horas."
+    },
+    {
+      "id": "p203-q5q5-r6r6", "nombre": "Blog Naranjo (copywriting)", "clienteId": "c204-xg77-yh88", "color": "DarkOrange",
+      "estado": "activo", "interno": false, "recurrente": true,
+      "fechas": { "inicio": "2025-10-01", "finEstimada": "2026-09-30", "finReal": null },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 600, "total": 0, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 126, "importeIrpf": 90,
+        "totalFactura": 636, "netoRecibido": 510, "ivaExcepcion": "",
+        "pagado": false, "fechaPago": null, "gastos": 0,
+        "facturaNum": null, "facturaFecha": null
+      },
+      "horas": [
+        { "id": "h203-0001", "fecha": "2025-10-02", "tipo": "reunion", "cantidad": 1, "nota": "Briefing editorial + keywords", "horaInicio": "10:00" },
+        { "id": "h203-0002", "fecha": "2025-10-08", "tipo": "trabajo", "cantidad": 3, "nota": "Post: Tendencias branding 2026", "horaInicio": "09:00" },
+        { "id": "h203-0003", "fecha": "2025-10-22", "tipo": "trabajo", "cantidad": 3.5, "nota": "Post: Naming para startups", "horaInicio": "09:00" },
+        { "id": "h203-0004", "fecha": "2025-11-05", "tipo": "trabajo", "cantidad": 3, "nota": "Post: Guía identidad visual", "horaInicio": "09:30" },
+        { "id": "h203-0005", "fecha": "2025-11-20", "tipo": "trabajo", "cantidad": 3.5, "nota": "Post: Rebranding cuándo y cómo", "horaInicio": "09:00" },
+        { "id": "h203-0006", "fecha": "2025-12-03", "tipo": "trabajo", "cantidad": 3, "nota": "Post: Color psychology en marketing", "horaInicio": "09:00" },
+        { "id": "h203-0007", "fecha": "2025-12-18", "tipo": "trabajo", "cantidad": 3, "nota": "Post: Packaging sostenible", "horaInicio": "10:00" },
+        { "id": "h203-0008", "fecha": "2026-01-08", "tipo": "trabajo", "cantidad": 3.5, "nota": "Post: Tipografía y legibilidad web", "horaInicio": "09:00" },
+        { "id": "h203-0009", "fecha": "2026-01-23", "tipo": "trabajo", "cantidad": 3, "nota": "Post: Caso de éxito cliente", "horaInicio": "09:00" },
+        { "id": "h203-0010", "fecha": "2026-02-06", "tipo": "trabajo", "cantidad": 3.5, "nota": "Post: IA en diseño gráfico", "horaInicio": "09:00" },
+        { "id": "h203-0011", "fecha": "2026-02-20", "tipo": "trabajo", "cantidad": 3, "nota": "Post: Branding personal freelance", "horaInicio": "09:00" }
+      ],
+      "notas": "2 artículos SEO/mes (~1000 palabras cada uno). 600€/mes fijo. Temática branding y diseño."
+    },
+    {
+      "id": "p204-s7s7-t8t8", "nombre": "Novela Mediterráneo (trad. literaria)", "clienteId": "c201-xa11-yb22", "color": "Teal",
+      "estado": "activo", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2025-12-01", "finEstimada": "2026-04-30", "finReal": null },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 4500, "total": 0, "precioHora": 0,
+        "iva": 4, "irpf": 15, "importeIva": 180, "importeIrpf": 675,
+        "totalFactura": 4005, "netoRecibido": 3825, "ivaExcepcion": "",
+        "pagado": false, "fechaPago": null, "gastos": 35,
+        "facturaNum": null, "facturaFecha": null
+      },
+      "horas": [
+        { "id": "h204-0001", "fecha": "2025-12-02", "tipo": "reunion", "cantidad": 2, "nota": "Briefing con la editora + muestra de estilo", "horaInicio": "10:00" },
+        { "id": "h204-0002", "fecha": "2025-12-04", "tipo": "trabajo", "cantidad": 4, "nota": "Capítulos 1-2 (primer borrador)", "horaInicio": "08:00" },
+        { "id": "h204-0003", "fecha": "2025-12-09", "tipo": "trabajo", "cantidad": 5, "nota": "Capítulos 3-5", "horaInicio": "08:00" },
+        { "id": "h204-0004", "fecha": "2025-12-11", "tipo": "trabajo", "cantidad": 4, "nota": "Capítulos 6-7", "horaInicio": "08:30" },
+        { "id": "h204-0005", "fecha": "2025-12-16", "tipo": "trabajo", "cantidad": 5, "nota": "Capítulos 8-10", "horaInicio": "08:00" },
+        { "id": "h204-0006", "fecha": "2025-12-19", "tipo": "trabajo", "cantidad": 4, "nota": "Capítulos 11-12 + revisión acumulada", "horaInicio": "09:00" },
+        { "id": "h204-0007", "fecha": "2026-01-07", "tipo": "trabajo", "cantidad": 5, "nota": "Capítulos 13-15", "horaInicio": "08:00" },
+        { "id": "h204-0008", "fecha": "2026-01-13", "tipo": "trabajo", "cantidad": 4, "nota": "Capítulos 16-18", "horaInicio": "08:30" },
+        { "id": "h204-0009", "fecha": "2026-01-20", "tipo": "trabajo", "cantidad": 5, "nota": "Capítulos 19-21", "horaInicio": "08:00" },
+        { "id": "h204-0010", "fecha": "2026-01-27", "tipo": "reunion", "cantidad": 1, "nota": "Revisión parcial con editora", "horaInicio": "11:00" },
+        { "id": "h204-0011", "fecha": "2026-02-03", "tipo": "trabajo", "cantidad": 5, "nota": "Capítulos 22-24", "horaInicio": "08:00" },
+        { "id": "h204-0012", "fecha": "2026-02-10", "tipo": "trabajo", "cantidad": 4, "nota": "Capítulos 25-27", "horaInicio": "08:30" },
+        { "id": "h204-0013", "fecha": "2026-02-17", "tipo": "trabajo", "cantidad": 5, "nota": "Capítulos 28-30 (fin borrador)", "horaInicio": "08:00" },
+        { "id": "h204-0014", "fecha": "2026-02-24", "tipo": "trabajo", "cantidad": 3, "nota": "Revisión estilística global", "horaInicio": "09:00" }
+      ],
+      "notas": "Novela italiana contemporánea, IT→ES. ~280 páginas. IVA reducido 4% por ser traducción literaria."
+    },
+    {
+      "id": "p205-u9u9-v0v0", "nombre": "RRSS Solera (textos)", "clienteId": "c202-xc33-yd44", "color": "RosyBrown",
+      "estado": "activo", "interno": false, "recurrente": true,
+      "fechas": { "inicio": "2025-10-01", "finEstimada": "2026-09-30", "finReal": null },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 450, "total": 0, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 94.5, "importeIrpf": 67.5,
+        "totalFactura": 477, "netoRecibido": 382.5, "ivaExcepcion": "",
+        "pagado": false, "fechaPago": null, "gastos": 0,
+        "facturaNum": null, "facturaFecha": null
+      },
+      "horas": [
+        { "id": "h205-0001", "fecha": "2025-10-06", "tipo": "trabajo", "cantidad": 3, "nota": "Copy posts octubre (12 posts)", "horaInicio": "14:00" },
+        { "id": "h205-0002", "fecha": "2025-10-20", "tipo": "trabajo", "cantidad": 1.5, "nota": "Stories highlights textos", "horaInicio": "10:00" },
+        { "id": "h205-0003", "fecha": "2025-11-04", "tipo": "trabajo", "cantidad": 3, "nota": "Copy posts noviembre", "horaInicio": "14:00" },
+        { "id": "h205-0004", "fecha": "2025-11-18", "tipo": "trabajo", "cantidad": 2, "nota": "Copy campaña Black Friday", "horaInicio": "09:00" },
+        { "id": "h205-0005", "fecha": "2025-12-02", "tipo": "trabajo", "cantidad": 3, "nota": "Copy posts diciembre + Navidad", "horaInicio": "14:00" },
+        { "id": "h205-0006", "fecha": "2026-01-06", "tipo": "trabajo", "cantidad": 3, "nota": "Copy posts enero + propósitos", "horaInicio": "14:00" },
+        { "id": "h205-0007", "fecha": "2026-02-03", "tipo": "trabajo", "cantidad": 3, "nota": "Copy posts febrero + San Valentín", "horaInicio": "14:00" },
+        { "id": "h205-0008", "fecha": "2026-02-17", "tipo": "trabajo", "cantidad": 1.5, "nota": "Revisión tono de voz trimestral", "horaInicio": "10:00" }
+      ],
+      "notas": "Redacción de copy para Instagram y TikTok. 12 posts/mes + stories puntuales. 450€/mes."
+    },
+    {
+      "id": "p206-w1w1-x2x2", "nombre": "Web Solera (trad. FR)", "clienteId": "c202-xc33-yd44", "color": "RosyBrown",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2025-08-15", "finEstimada": "2025-09-30", "finReal": "2025-09-25" },
+      "facturacion": {
+        "modo": "desde_total", "baseImponible": 0, "total": 950, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 0, "importeIrpf": 0,
+        "totalFactura": 950, "netoRecibido": 950, "ivaExcepcion": "",
+        "pagado": true, "fechaPago": "2025-10-15", "gastos": 0,
+        "facturaNum": 2, "facturaFecha": "2025-09-25"
+      },
+      "horas": [
+        { "id": "h206-0001", "fecha": "2025-08-18", "tipo": "trabajo", "cantidad": 4, "nota": "Home + About (ES→FR)", "horaInicio": "09:00" },
+        { "id": "h206-0002", "fecha": "2025-08-21", "tipo": "trabajo", "cantidad": 5, "nota": "Fichas producto (lote 1)", "horaInicio": "09:00" },
+        { "id": "h206-0003", "fecha": "2025-08-26", "tipo": "trabajo", "cantidad": 5, "nota": "Fichas producto (lote 2)", "horaInicio": "09:00" },
+        { "id": "h206-0004", "fecha": "2025-09-01", "tipo": "trabajo", "cantidad": 3, "nota": "Blog posts destacados", "horaInicio": "14:00" },
+        { "id": "h206-0005", "fecha": "2025-09-08", "tipo": "trabajo", "cantidad": 2, "nota": "Checkout + emails transaccionales", "horaInicio": "10:00" },
+        { "id": "h206-0006", "fecha": "2025-09-15", "tipo": "trabajo", "cantidad": 3, "nota": "Revisión nativa (correctora francesa)", "horaInicio": "09:00" },
+        { "id": "h206-0007", "fecha": "2025-09-22", "tipo": "trabajo", "cantidad": 2, "nota": "QA final en staging", "horaInicio": "14:00" }
+      ],
+      "notas": "Traducción web completa ES→FR para expansión a Francia. Precio cerrado 950€."
+    },
+    {
+      "id": "p207-y3y3-z4z4", "nombre": "Glosarios y TMs (interno)", "clienteId": null, "color": "MediumPurple",
+      "estado": "activo", "interno": true, "recurrente": false,
+      "fechas": { "inicio": "2025-06-01", "finEstimada": null, "finReal": null },
+      "facturacion": {
+        "modo": "gratis", "baseImponible": 0, "total": 0, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 0, "importeIrpf": 0,
+        "totalFactura": 0, "netoRecibido": 0, "ivaExcepcion": "",
+        "pagado": false, "fechaPago": null, "gastos": 0,
+        "facturaNum": null, "facturaFecha": null
+      },
+      "horas": [
+        { "id": "h207-0001", "fecha": "2025-06-15", "tipo": "trabajo", "cantidad": 3, "nota": "Setup memorias de traducción en memoQ", "horaInicio": "16:00" },
+        { "id": "h207-0002", "fecha": "2025-08-01", "tipo": "trabajo", "cantidad": 2, "nota": "Glosario sector cosmética (ES/EN/FR)", "horaInicio": "17:00" },
+        { "id": "h207-0003", "fecha": "2025-10-10", "tipo": "trabajo", "cantidad": 2, "nota": "Glosario sector tech (DE/ES)", "horaInicio": "17:00" },
+        { "id": "h207-0004", "fecha": "2025-12-20", "tipo": "trabajo", "cantidad": 1.5, "nota": "Limpieza y consolidación TMs", "horaInicio": "18:00" },
+        { "id": "h207-0005", "fecha": "2026-02-22", "tipo": "trabajo", "cantidad": 2, "nota": "Actualización glosarios Q1 2026", "horaInicio": "17:00" }
+      ],
+      "notas": "Mantenimiento de memorias de traducción y glosarios terminológicos. Inversión en productividad."
+    },
+    {
+      "id": "p208-a5a5-b6b6", "nombre": "Manual técnico Valensi", "clienteId": null, "color": "Gray",
+      "estado": "abandonado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2025-09-15", "finEstimada": "2025-11-30", "finReal": null },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 2200, "total": 0, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 462, "importeIrpf": 330,
+        "totalFactura": 2332, "netoRecibido": 1870, "ivaExcepcion": "",
+        "pagado": false, "fechaPago": null, "gastos": 0,
+        "facturaNum": null, "facturaFecha": null
+      },
+      "horas": [
+        { "id": "h208-0001", "fecha": "2025-09-16", "tipo": "reunion", "cantidad": 1, "nota": "Briefing con ing. jefe", "horaInicio": "10:00" },
+        { "id": "h208-0002", "fecha": "2025-09-22", "tipo": "trabajo", "cantidad": 4, "nota": "Traducción cap. 1-3 (ES→EN)", "horaInicio": "09:00" },
+        { "id": "h208-0003", "fecha": "2025-10-01", "tipo": "trabajo", "cantidad": 3, "nota": "Terminología técnica + glosario", "horaInicio": "09:00" }
+      ],
+      "notas": "Empresa cerró operaciones inesperadamente. 8h trabajadas sin cobrar."
+    }
+  ],
+  "gastos": [
+    {
+      "id": "g201-0001", "nombre": "memoQ Translator Pro", "categoria": "software", "recurrente": "anual", "color": "MediumSlateBlue", "notas": "Licencia anual CAT tool",
+      "entradas": [
+        { "id": "ge201-01", "fecha": "2025-06-10", "cantidad": 620, "nota": "Renovación anual" }
+      ]
+    },
+    {
+      "id": "g201-0002", "nombre": "DeepL Pro", "categoria": "software", "recurrente": "mensual", "color": "DodgerBlue", "notas": "Asistente traducción",
+      "entradas": [
+        { "id": "ge202-01", "fecha": "2025-10-01", "cantidad": 24.99, "nota": "" },
+        { "id": "ge202-02", "fecha": "2025-11-01", "cantidad": 24.99, "nota": "" },
+        { "id": "ge202-03", "fecha": "2025-12-01", "cantidad": 24.99, "nota": "" },
+        { "id": "ge202-04", "fecha": "2026-01-01", "cantidad": 24.99, "nota": "" },
+        { "id": "ge202-05", "fecha": "2026-02-01", "cantidad": 24.99, "nota": "" }
+      ]
+    },
+    {
+      "id": "g201-0003", "nombre": "Correctora nativa francesa", "categoria": "otro", "recurrente": "no", "color": "RosyBrown", "notas": "Subcontratación web Solera",
+      "entradas": [
+        { "id": "ge203-01", "fecha": "2025-09-15", "cantidad": 180, "nota": "Revisión web Solera FR" }
+      ]
+    },
+    {
+      "id": "g201-0004", "nombre": "Cuota autónomos", "categoria": "otro", "recurrente": "mensual", "color": "Gray", "notas": "Seguridad social",
+      "entradas": [
+        { "id": "ge204-01", "fecha": "2025-10-01", "cantidad": 293, "nota": "" },
+        { "id": "ge204-02", "fecha": "2025-11-01", "cantidad": 293, "nota": "" },
+        { "id": "ge204-03", "fecha": "2025-12-01", "cantidad": 293, "nota": "" },
+        { "id": "ge204-04", "fecha": "2026-01-01", "cantidad": 293, "nota": "" },
+        { "id": "ge204-05", "fecha": "2026-02-01", "cantidad": 293, "nota": "" }
+      ]
+    },
+    {
+      "id": "g201-0005", "nombre": "Coworking La Nau", "categoria": "oficina", "recurrente": "mensual", "color": "Peru", "notas": "",
+      "entradas": [
+        { "id": "ge205-01", "fecha": "2025-10-01", "cantidad": 160, "nota": "" },
+        { "id": "ge205-02", "fecha": "2025-11-01", "cantidad": 160, "nota": "" },
+        { "id": "ge205-03", "fecha": "2025-12-01", "cantidad": 160, "nota": "" },
+        { "id": "ge205-04", "fecha": "2026-01-01", "cantidad": 160, "nota": "" },
+        { "id": "ge205-05", "fecha": "2026-02-01", "cantidad": 160, "nota": "" }
+      ]
+    },
+    {
+      "id": "g201-0006", "nombre": "Diccionario técnico italiano", "categoria": "herramientas", "recurrente": "no", "color": "Teal", "notas": "",
+      "entradas": [
+        { "id": "ge206-01", "fecha": "2025-12-01", "cantidad": 35, "nota": "Libro físico" }
+      ]
+    },
+    {
+      "id": "g201-0007", "nombre": "Dominio marinacrespo.com", "categoria": "herramientas", "recurrente": "anual", "color": "DarkOrange", "notas": "",
+      "entradas": [
+        { "id": "ge207-01", "fecha": "2025-07-20", "cantidad": 14, "nota": "Renovación anual" }
+      ]
+    }
+  ],
+  "settings": {
+    "emisor": { "nombre": "Marina Crespo — Traducción & Copy", "direccion1": "Carrer de Russafa 17, 2a", "direccion2": "46004 València", "nif": "26789012F" },
+    "defaultIva": 21,
+    "defaultIrpf": 15,
+    "targets": { "horasMes": 100, "ingresosMes": 3000, "horasSemana": 25 },
+    "nextFacturaNum": 4,
+    "tema": "sepia"
+  }
+}

@@ -95,9 +95,15 @@ Object.assign(App, {
     ps.forEach(p => {
       B.calc(p);
       const f = p.facturacion;
+      const hex = colorHex(p.color);
       if (f.pagado && f.fechaPago && f.fechaPago.startsWith(mKey)) {
-        monthCobros.push({ pn: p.nombre, pc: colorHex(p.color), total: f.totalFactura || 0, fecha: f.fechaPago });
+        monthCobros.push({ pn: p.nombre, pc: hex, total: f.netoRecibido || 0, fecha: f.fechaPago });
       }
+      p.horas.forEach(h => {
+        if (h.monto && h.fecha && h.fecha.startsWith(mKey)) {
+          monthCobros.push({ pn: p.nombre, pc: hex, total: h.monto, fecha: h.fecha });
+        }
+      });
     });
     monthCobros.sort((a, b) => a.fecha.localeCompare(b.fecha));
     let mcHtml = '';
@@ -216,9 +222,15 @@ Object.assign(App, {
     ps.forEach(p => {
       B.calc(p);
       const f = p.facturacion;
+      const hex = colorHex(p.color);
       if (f.pagado && f.fechaPago && dateSet.has(f.fechaPago)) {
-        weekCobros.push({ pn: p.nombre, pc: colorHex(p.color), total: f.totalFactura || 0, fecha: f.fechaPago });
+        weekCobros.push({ pn: p.nombre, pc: hex, total: f.netoRecibido || 0, fecha: f.fechaPago });
       }
+      p.horas.forEach(h => {
+        if (h.monto && h.fecha && dateSet.has(h.fecha)) {
+          weekCobros.push({ pn: p.nombre, pc: hex, total: h.monto, fecha: h.fecha });
+        }
+      });
     });
     let wcHtml = '';
     if (weekCobros.length) {
@@ -253,19 +265,60 @@ Object.assign(App, {
     const t = D.d.settings.targets;
     if (!t) return '';
     const goals = [];
+    let weeklyHtml = '';
+
     if (view === 'month') {
       if (t.horasMes) goals.push({ label: 'Horas/mes', actual, target: t.horasMes, unit: 'h' });
       else if (t.horasSemana) goals.push({ label: 'Horas/mes', actual, target: Math.round(t.horasSemana * 4.33), unit: 'h', derived: `${t.horasSemana}h/sem × 4.33` });
-      if (t.horasSemana) goals.push({ label: 'Horas/semana', actual: actual / 4.33, target: t.horasSemana, unit: 'h' });
+
+      /* ── Mini-barras semanales ── */
+      if (t.horasSemana) {
+        const daysIn = new Date(year, month + 1, 0).getDate();
+        const weeks = [];
+        let ws = 1;
+        while (ws <= daysIn) {
+          const d = new Date(year, month, ws);
+          const dow = (d.getDay() + 6) % 7; /* 0=lun */
+          const we = Math.min(ws + (6 - dow), daysIn);
+          const nDays = we - ws + 1;
+          weeks.push({ from: ws, to: we, nDays, h: 0 });
+          ws = we + 1;
+        }
+        /* Sum hours per week */
+        const mKey = `${year}-${String(month + 1).padStart(2, '0')}`;
+        D.ps().forEach(p => {
+          p.horas.forEach(h => {
+            if (!h.fecha || !h.fecha.startsWith(mKey)) return;
+            const day = parseInt(h.fecha.split('-')[2]);
+            const w = weeks.find(w => day >= w.from && day <= w.to);
+            if (w) w.h += h.cantidad;
+          });
+        });
+
+        const target = t.horasSemana;
+        weeklyHtml = `<div style="margin-bottom:.6rem"><div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:.25rem"><span style="color:var(--t2)">Horas/semana</span><span style="color:var(--t3);font-size:.7rem">obj: ${target}h</span></div><div class="cal-wseg">`;
+        weeks.forEach(w => {
+          const adjTarget = target * w.nDays / 7;
+          const pct = Math.min(adjTarget > 0 ? (w.h / adjTarget * 100) : 0, 100).toFixed(1);
+          const widthPct = (w.nDays / daysIn * 100).toFixed(1);
+          weeklyHtml += `<div class="cal-wseg-item" style="width:${widthPct}%"><div class="cal-wseg-bar" title="${w.h.toFixed(1)}h (${w.from}–${w.to})"><div class="cal-wseg-fill" style="width:${pct}%"></div></div><span class="cal-wseg-lbl">${w.from}–${w.to}</span></div>`;
+        });
+        weeklyHtml += `</div></div>`;
+      }
+
       if (t.ingresosMes) {
         let income = 0;
-        D.ps().forEach(p => { const f = p.facturacion; if (f.pagado && f.fechaPago && inPeriod(f.fechaPago, 'mes', year, month)) income += f.totalFactura || 0; });
+        D.ps().forEach(p => {
+          B.calc(p); const f = p.facturacion;
+          if (f.pagado && f.fechaPago && inPeriod(f.fechaPago, 'mes', year, month)) income += f.netoRecibido || 0;
+          p.horas.forEach(h => { if (h.monto && h.fecha && inPeriod(h.fecha, 'mes', year, month)) income += h.monto; });
+        });
         goals.push({ label: 'Ingresos', actual: income, target: t.ingresosMes, unit: '€' });
       }
     } else {
       if (t.horasSemana) goals.push({ label: 'Horas', actual, target: t.horasSemana, unit: 'h' });
     }
-    if (!goals.length) return `<div class="cal-ps" style="margin-top:1rem"><span style="font-size:.78rem;color:var(--t3)">Sin objetivos. <a href="#" onclick="event.preventDefault();App.go('cfg')" style="color:var(--t2)">Configurar &rarr;</a></span></div>`;
+    if (!goals.length && !weeklyHtml) return `<div class="cal-ps" style="margin-top:1rem"><span style="font-size:.78rem;color:var(--t3)">Sin objetivos. <a href="#" onclick="event.preventDefault();App.go('cfg')" style="color:var(--t2)">Configurar &rarr;</a></span></div>`;
 
     let html = `<div class="cal-ps" style="margin-top:1.25rem"><div class="cal-ps-title">Objetivos</div>`;
     goals.forEach(g => {
@@ -275,6 +328,7 @@ Object.assign(App, {
       const tgtStr = g.unit === '€' ? fmtMoney(g.target) : `${g.target}${g.unit}`;
       html += `<div style="margin-bottom:.6rem"><div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:.25rem"><span style="color:var(--t2)">${g.label}${g.derived ? ` <span style="color:var(--t3);font-size:.7rem">(${g.derived})</span>` : ''}</span><span class="m" style="color:var(--t1)">${valStr} / ${tgtStr}</span></div><div class="pbar"><div class="pbar-fill ${barColor}" style="width:${Math.min(pct, 100).toFixed(1)}%"></div></div></div>`;
     });
+    html += weeklyHtml;
     return html + '</div>';
   },
 
@@ -290,8 +344,10 @@ Object.assign(App, {
     let cobrado = 0, horas = 0, gastosTotal = 0;
     D.ps().forEach(p => {
       B.calc(p);
-      if (p.facturacion.pagado && p.facturacion.fechaPago && inPeriod(p.facturacion.fechaPago, 'mes', year, month)) cobrado += p.facturacion.totalFactura || 0;
-      p.horas.forEach(h => { if (h.fecha && inPeriod(h.fecha, 'mes', year, month)) horas += h.cantidad; });
+      if (p.facturacion.pagado && p.facturacion.fechaPago && inPeriod(p.facturacion.fechaPago, 'mes', year, month)) cobrado += p.facturacion.netoRecibido || 0;
+      p.horas.forEach(h => {
+        if (h.fecha && inPeriod(h.fecha, 'mes', year, month)) { horas += h.cantidad; if (h.monto) cobrado += h.monto; }
+      });
     });
     D.gs().forEach(g => { (g.entradas || []).forEach(e => { if (e.fecha && inPeriod(e.fecha, 'mes', year, month)) gastosTotal += e.cantidad || 0; }); });
     if (cobrado === 0 && gastosTotal === 0) return '';
@@ -430,7 +486,7 @@ Object.assign(App, {
     const ps = D.ps();
     const groups = {};
     ps.forEach(p => { if (!groups[p.estado]) groups[p.estado] = []; groups[p.estado].push(p); });
-    const labels = { activo: 'Activos', pausado: 'Pausados', completado: 'Completados' };
+    const labels = { activo: 'Activos', pausado: 'Pausados', completado: 'Completados', abandonado: 'Abandonados' };
     let html = '';
     EST_ORDER.forEach(st => {
       const g = groups[st];
@@ -458,7 +514,7 @@ Object.assign(App, {
       + `</div>`
       + `<label>Tipo</label><div class="ts2"><div class="to on" data-type="trabajo" onclick="App.selT(this)"><span class="ic">💻</span><span class="la">Trabajo</span></div><div class="to" data-type="reunion" onclick="App.selT(this)"><span class="ic">👥</span><span class="la">Reunión</span></div></div>`
       + `<div class="fr"><div class="fg"><label>Horas</label><input type="number" id="chA" min="0.25" step="0.25" value="${dur}"></div><div class="fg"><label>Fecha</label><input type="date" id="chD" value="${fecha || todayStr()}"></div></div>`
-      + `<div class="fr"><div class="fg"><label>Hora inicio</label><input type="time" id="chHI" value="${hora || ''}"></div><div class="fg"></div></div>`
+      + `<div class="fr"><div class="fg"><label>Hora inicio</label><input type="time" id="chHI" value="${hora || ''}"></div><div class="fg"><label>Cobro (€)</label><input type="number" id="chMo" min="0" step="0.01" placeholder="0"></div></div>`
       + `<div class="fg"><label>Nota</label><input type="text" id="chN" placeholder="¿Qué hiciste?"></div>`
       + `<div class="ma"><button class="bt" onclick="App.cm()">Cancelar</button><button class="bt bt-p" onclick="App.saveCalH()">Guardar</button></div>`);
   },
@@ -474,6 +530,7 @@ Object.assign(App, {
     const fecha = document.getElementById('chD').value || null;
     const horaInicio = document.getElementById('chHI').value || null;
     const nota = document.getElementById('chN').value.trim();
+    const monto = parseFloat(document.getElementById('chMo').value) || 0;
     if (cant <= 0) return;
 
     if (pid === '_new') {
@@ -502,7 +559,7 @@ Object.assign(App, {
     }
     if (!pid) return;
     const p = D.p(pid); if (!p) return;
-    p.horas.push({ id: uid(), fecha, tipo, cantidad: cant, nota, horaInicio });
+    p.horas.push({ id: uid(), fecha, tipo, cantidad: cant, nota, horaInicio, monto });
     T.ev('action', 'hours_add', 'calendar');
     sortHoras(p.horas); D.up(pid, { horas: p.horas }); this.cm(); this.rCal();
   }

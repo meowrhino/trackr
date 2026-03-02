@@ -324,3 +324,10 @@
 .cal-ps-click:hover{border-color:var(--b2);background:var(--bg3)}
 .cal-ps-name{color:var(--t2)}
 .cal-ps-h{color:var(--t1);font-size:.72rem}
+
+/* ── Weekly segmented bar (objetivos mes) ── */
+.cal-wseg{display:flex;gap:2px}
+.cal-wseg-item{display:flex;flex-direction:column;align-items:center;min-width:0}
+.cal-wseg-bar{width:100%;height:8px;border-radius:4px;background:var(--bg3);position:relative;overflow:hidden}
+.cal-wseg-fill{position:absolute;left:0;top:0;height:100%;background:var(--t2);border-radius:4px;transition:width .3s ease}
+.cal-wseg-lbl{font-size:.58rem;color:var(--t3);margin-top:2px;white-space:nowrap}

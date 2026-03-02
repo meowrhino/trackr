@@ -342,6 +342,12 @@ const App = {
       } catch (err) { Toast.error('Error al importar: ' + err.message); }
     };
     r.readAsText(f); ev.target.value = '';
+  },
+
+  resetData() {
+    if (!confirm('¿Borrar todos los datos y empezar de cero? Esta acción no se puede deshacer.')) return;
+    localStorage.removeItem('trackr_data');
+    location.reload();
   }
 };
 

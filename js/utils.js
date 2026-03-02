@@ -16,11 +16,12 @@
 const EST = {
   activo:     'Activo',
   pausado:    'Pausado',
-  completado: 'Completado'
+  completado: 'Completado',
+  abandonado: 'Abandonado'
 };
 
 /** Orden de agrupación en la vista de proyectos */
-const EST_ORDER = ['activo', 'pausado', 'completado'];
+const EST_ORDER = ['activo', 'pausado', 'completado', 'abandonado'];
 
 /** Categorías de gastos */
 const GASTO_CAT = {

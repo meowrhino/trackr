@@ -28,7 +28,7 @@ Object.assign(App, {
           `<div class="hr hr-click" style="border-left-color:${hex}" onclick="App.eHour('${p.id}','${h.id}')">
             <span class="hr-t">${h.tipo === 'trabajo' ? '💻' : '👥'}</span>
             <span class="hr-d">${fmtDate(h.fecha)}${h.horaInicio ? ' ' + h.horaInicio : ''}</span>
-            <span class="hr-a m">${h.cantidad}h</span>
+            <span class="hr-a m">${h.cantidad}h</span>${h.monto ? `<span class="hr-a m" style="color:var(--ok)">${fmtMoney(h.monto)}</span>` : ''}
             <span class="hr-n">${esc(h.nota || '')}</span>
             <span class="hr-x" onclick="event.stopPropagation();App.xHour('${p.id}','${h.id}')" title="Eliminar">&times;</span>
           </div>`).join('')}</div>`;
@@ -84,7 +84,7 @@ Object.assign(App, {
       + `<div class="fr"><div class="fg"><label>Horas</label><input type="number" id="ehA" min="0.25" step="0.25" value="${h.cantidad}"></div>`
       +   `<div class="fg"><label>Fecha</label><input type="date" id="ehD" value="${h.fecha || ''}" ${noDate ? 'disabled' : ''}>`
       +   `<label style="margin-top:.35rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="ehNd" ${noDate ? 'checked' : ''} onchange="document.getElementById('ehD').disabled=this.checked;if(this.checked)document.getElementById('ehD').value=''" style="width:auto;accent-color:var(--t2)"> Sin fecha</label></div></div>`
-      + `<div class="fr"><div class="fg"><label>Hora inicio</label><input type="time" id="ehHI" value="${h.horaInicio || ''}"></div><div class="fg"></div></div>`
+      + `<div class="fr"><div class="fg"><label>Hora inicio</label><input type="time" id="ehHI" value="${h.horaInicio || ''}"></div><div class="fg"><label>Cobro (€)</label><input type="number" id="ehMo" min="0" step="0.01" value="${h.monto || ''}"></div></div>`
       + `<div class="fg"><label>Nota</label><input type="text" id="ehN" value="${esc(h.nota || '')}"></div>`
       + `<div class="ma"><button class="bt" onclick="App.cm()">Cancelar</button><button class="bt bt-p" onclick="App.saveEH('${pid}','${hid}')">Guardar</button></div>`
     );
@@ -99,6 +99,7 @@ Object.assign(App, {
     h.fecha = sinFecha ? null : (document.getElementById('ehD').value || null);
     h.horaInicio = document.getElementById('ehHI').value || null;
     h.nota = document.getElementById('ehN').value.trim();
+    h.monto = parseFloat(document.getElementById('ehMo').value) || 0;
     sortHoras(p.horas);
     D.up(pid, { horas: p.horas });
     this.cm();
@@ -123,7 +124,7 @@ Object.assign(App, {
       + `<div class="ts2"><div class="to on" data-type="trabajo" onclick="App.selT(this)"><span class="ic">💻</span><span class="la">Trabajo</span></div><div class="to" data-type="reunion" onclick="App.selT(this)"><span class="ic">👥</span><span class="la">Reunión</span></div></div>`
       + `<div class="fr"><div class="fg"><label>Horas</label><input type="number" id="mhA" min="0.25" step="0.25" value="1"></div>`
       + `<div class="fg"><label>Fecha</label><input type="date" id="mhD" value="${todayStr()}"><label style="margin-top:.35rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="mhNd" onchange="document.getElementById('mhD').disabled=this.checked;if(this.checked)document.getElementById('mhD').value=''" style="width:auto;accent-color:var(--t2)"> Sin fecha</label></div></div>`
-      + `<div class="fr"><div class="fg"><label>Hora inicio</label><input type="time" id="mhHI" value=""></div><div class="fg"></div></div>`
+      + `<div class="fr"><div class="fg"><label>Hora inicio</label><input type="time" id="mhHI" value=""></div><div class="fg"><label>Cobro (€)</label><input type="number" id="mhMo" min="0" step="0.01" placeholder="0"></div></div>`
       + `<div class="fg"><label>Nota</label><input type="text" id="mhN" placeholder="¿Qué hiciste?"></div>`
       + `<div class="ma"><button class="bt" onclick="App.cm()">Cancelar</button><button class="bt bt-p" onclick="App.saveHM('${pid}')">Guardar</button></div>`);
   },
@@ -135,9 +136,10 @@ Object.assign(App, {
     const fecha = sinF ? null : (document.getElementById('mhD').value || null);
     const horaInicio = document.getElementById('mhHI').value || null;
     const nota = document.getElementById('mhN').value.trim();
+    const monto = parseFloat(document.getElementById('mhMo').value) || 0;
     if (cant <= 0) return;
     const p = D.p(pid); if (!p) return;
-    p.horas.push({ id: uid(), fecha, tipo, cantidad: cant, nota, horaInicio });
+    p.horas.push({ id: uid(), fecha, tipo, cantidad: cant, nota, horaInicio, monto });
     T.ev('action', 'hours_add', 'modal');
     sortHoras(p.horas); D.up(pid, { horas: p.horas }); this.cm(); this.rDet(pid);
   }

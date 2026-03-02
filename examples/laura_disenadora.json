@@ -1,0 +1,247 @@
+{
+  "version": 2,
+  "clientes": [
+    { "id": "c001-aa11-bb22", "nombre": "Café Malasaña", "direccion1": "Calle del Pez 14", "direccion2": "28004 Madrid", "nif": "B12345678", "color": "Coral" },
+    { "id": "c002-cc33-dd44", "nombre": "Nutribalance", "direccion1": "Av. de la Constitución 8", "direccion2": "28036 Madrid", "nif": "B87654321", "color": "MediumSeaGreen" },
+    { "id": "c003-ee55-ff66", "nombre": "Estudio Legal Rivas", "direccion1": "Gran Vía 22, 4ºB", "direccion2": "28013 Madrid", "nif": "B55667788", "color": "SteelBlue" },
+    { "id": "c004-1122-3344", "nombre": "Mar Romero (fotógrafa)", "direccion1": "Calle Embajadores 41", "direccion2": "28012 Madrid", "nif": "44556677A", "color": "Orchid" },
+    { "id": "c005-5566-7788", "nombre": "Taller Origen", "direccion1": "Calle San Bernardo 99", "direccion2": "28015 Madrid", "nif": "B33445566", "color": "DarkOrange" }
+  ],
+  "projects": [
+    {
+      "id": "p001-a1b2-c3d4", "nombre": "Branding Café Malasaña", "clienteId": "c001-aa11-bb22", "color": "Coral",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2025-06-01", "finEstimada": "2025-07-15", "finReal": "2025-07-20" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 1800, "total": 0, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 378, "importeIrpf": 270,
+        "totalFactura": 1908, "netoRecibido": 1530, "ivaExcepcion": "",
+        "pagado": true, "fechaPago": "2025-08-05", "gastos": 45,
+        "facturaNum": 1, "facturaFecha": "2025-07-20"
+      },
+      "horas": [
+        { "id": "h001-0001-0001", "fecha": "2025-06-03", "tipo": "reunion", "cantidad": 1.5, "nota": "Briefing con el dueño", "horaInicio": "10:00" },
+        { "id": "h001-0001-0002", "fecha": "2025-06-05", "tipo": "trabajo", "cantidad": 4, "nota": "Moodboard + referencias", "horaInicio": "09:00" },
+        { "id": "h001-0001-0003", "fecha": "2025-06-10", "tipo": "trabajo", "cantidad": 6, "nota": "Propuestas logo (3 opciones)", "horaInicio": "09:30" },
+        { "id": "h001-0001-0004", "fecha": "2025-06-17", "tipo": "reunion", "cantidad": 1, "nota": "Presentación propuestas", "horaInicio": "11:00" },
+        { "id": "h001-0001-0005", "fecha": "2025-06-20", "tipo": "trabajo", "cantidad": 5, "nota": "Refinamiento logo elegido + tipografía", "horaInicio": "10:00" },
+        { "id": "h001-0001-0006", "fecha": "2025-06-25", "tipo": "trabajo", "cantidad": 3, "nota": "Paleta de color + patterns", "horaInicio": "14:00" },
+        { "id": "h001-0001-0007", "fecha": "2025-07-01", "tipo": "trabajo", "cantidad": 4, "nota": "Diseño tarjetas + papelería", "horaInicio": "09:00" },
+        { "id": "h001-0001-0008", "fecha": "2025-07-08", "tipo": "trabajo", "cantidad": 3, "nota": "Manual de marca", "horaInicio": "10:00" },
+        { "id": "h001-0001-0009", "fecha": "2025-07-14", "tipo": "trabajo", "cantidad": 2.5, "nota": "Ajustes finales + entrega", "horaInicio": "09:00" },
+        { "id": "h001-0001-0010", "fecha": "2025-07-20", "tipo": "reunion", "cantidad": 0.5, "nota": "Entrega final y cierre", "horaInicio": "12:00" }
+      ],
+      "notas": "Café de especialidad en Malasaña. Querían un look artesanal pero moderno."
+    },
+    {
+      "id": "p002-e5f6-g7h8", "nombre": "Web Nutribalance", "clienteId": "c002-cc33-dd44", "color": "MediumSeaGreen",
+      "estado": "activo", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2025-11-01", "finEstimada": "2026-02-28", "finReal": null },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 3200, "total": 0, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 672, "importeIrpf": 480,
+        "totalFactura": 3392, "netoRecibido": 2720, "ivaExcepcion": "",
+        "pagado": false, "fechaPago": null, "gastos": 120,
+        "facturaNum": null, "facturaFecha": null
+      },
+      "horas": [
+        { "id": "h002-0001-0001", "fecha": "2025-11-04", "tipo": "reunion", "cantidad": 2, "nota": "Kickoff + requisitos", "horaInicio": "10:00" },
+        { "id": "h002-0001-0002", "fecha": "2025-11-07", "tipo": "trabajo", "cantidad": 3, "nota": "Wireframes home + servicios", "horaInicio": "09:00" },
+        { "id": "h002-0001-0003", "fecha": "2025-11-12", "tipo": "trabajo", "cantidad": 5, "nota": "Diseño home en Figma", "horaInicio": "09:30" },
+        { "id": "h002-0001-0004", "fecha": "2025-11-18", "tipo": "reunion", "cantidad": 1, "nota": "Review con cliente", "horaInicio": "16:00" },
+        { "id": "h002-0001-0005", "fecha": "2025-11-20", "tipo": "trabajo", "cantidad": 4, "nota": "Diseño páginas interiores", "horaInicio": "10:00" },
+        { "id": "h002-0001-0006", "fecha": "2025-11-26", "tipo": "trabajo", "cantidad": 3.5, "nota": "Diseño responsive mobile", "horaInicio": "09:00" },
+        { "id": "h002-0001-0007", "fecha": "2025-12-02", "tipo": "trabajo", "cantidad": 6, "nota": "Maquetación HTML/CSS", "horaInicio": "09:00" },
+        { "id": "h002-0001-0008", "fecha": "2025-12-09", "tipo": "trabajo", "cantidad": 5, "nota": "Maquetación resto de páginas", "horaInicio": "10:00" },
+        { "id": "h002-0001-0009", "fecha": "2025-12-15", "tipo": "reunion", "cantidad": 1.5, "nota": "Review intermedia", "horaInicio": "11:00" },
+        { "id": "h002-0001-0010", "fecha": "2026-01-08", "tipo": "trabajo", "cantidad": 4, "nota": "Integración WordPress", "horaInicio": "09:00" },
+        { "id": "h002-0001-0011", "fecha": "2026-01-14", "tipo": "trabajo", "cantidad": 3, "nota": "Ajustes CMS + contenido", "horaInicio": "10:00" },
+        { "id": "h002-0001-0012", "fecha": "2026-01-22", "tipo": "trabajo", "cantidad": 2, "nota": "Testing cross-browser", "horaInicio": "14:00" },
+        { "id": "h002-0001-0013", "fecha": "2026-02-03", "tipo": "trabajo", "cantidad": 3.5, "nota": "Animaciones y microinteracciones", "horaInicio": "09:00" },
+        { "id": "h002-0001-0014", "fecha": "2026-02-10", "tipo": "trabajo", "cantidad": 2, "nota": "SEO básico + meta tags", "horaInicio": "15:00" }
+      ],
+      "notas": "Clínica de nutrición deportiva. Web con booking online y blog."
+    },
+    {
+      "id": "p003-i9j0-k1l2", "nombre": "RRSS Café Malasaña", "clienteId": "c001-aa11-bb22", "color": "Coral",
+      "estado": "activo", "interno": false, "recurrente": true,
+      "fechas": { "inicio": "2025-09-01", "finEstimada": null, "finReal": null },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 400, "total": 0, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 84, "importeIrpf": 60,
+        "totalFactura": 424, "netoRecibido": 340, "ivaExcepcion": "",
+        "pagado": true, "fechaPago": "2026-02-05", "gastos": 0,
+        "facturaNum": 5, "facturaFecha": "2026-02-01"
+      },
+      "horas": [
+        { "id": "h003-0001-0001", "fecha": "2025-12-02", "tipo": "trabajo", "cantidad": 3, "nota": "Pack diciembre (posts navideños)", "horaInicio": "10:00" },
+        { "id": "h003-0001-0002", "fecha": "2025-12-10", "tipo": "trabajo", "cantidad": 2, "nota": "Stories + reels", "horaInicio": "14:00" },
+        { "id": "h003-0001-0003", "fecha": "2026-01-06", "tipo": "trabajo", "cantidad": 3, "nota": "Pack enero", "horaInicio": "09:00" },
+        { "id": "h003-0001-0004", "fecha": "2026-01-15", "tipo": "trabajo", "cantidad": 2, "nota": "Diseño highlight covers", "horaInicio": "11:00" },
+        { "id": "h003-0001-0005", "fecha": "2026-02-03", "tipo": "trabajo", "cantidad": 3.5, "nota": "Pack febrero (San Valentín)", "horaInicio": "09:30" },
+        { "id": "h003-0001-0006", "fecha": "2026-02-17", "tipo": "trabajo", "cantidad": 2, "nota": "Carruseles + stories", "horaInicio": "14:00" }
+      ],
+      "notas": "Gestión de Instagram. 12 posts/mes + stories. 400€/mes."
+    },
+    {
+      "id": "p004-m3n4-o5p6", "nombre": "Identidad Estudio Legal Rivas", "clienteId": "c003-ee55-ff66", "color": "SteelBlue",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2025-09-15", "finEstimada": "2025-10-31", "finReal": "2025-11-10" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 2500, "total": 0, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 525, "importeIrpf": 375,
+        "totalFactura": 2650, "netoRecibido": 2125, "ivaExcepcion": "",
+        "pagado": true, "fechaPago": "2025-12-02", "gastos": 85,
+        "facturaNum": 3, "facturaFecha": "2025-11-10"
+      },
+      "horas": [
+        { "id": "h004-0001-0001", "fecha": "2025-09-16", "tipo": "reunion", "cantidad": 1.5, "nota": "Briefing", "horaInicio": "17:00" },
+        { "id": "h004-0001-0002", "fecha": "2025-09-22", "tipo": "trabajo", "cantidad": 5, "nota": "Investigación + moodboard sector legal", "horaInicio": "09:00" },
+        { "id": "h004-0001-0003", "fecha": "2025-09-29", "tipo": "trabajo", "cantidad": 6, "nota": "3 propuestas de logo", "horaInicio": "09:00" },
+        { "id": "h004-0001-0004", "fecha": "2025-10-03", "tipo": "reunion", "cantidad": 1, "nota": "Presentación propuestas", "horaInicio": "18:00" },
+        { "id": "h004-0001-0005", "fecha": "2025-10-07", "tipo": "trabajo", "cantidad": 4, "nota": "Refinamiento opción B", "horaInicio": "10:00" },
+        { "id": "h004-0001-0006", "fecha": "2025-10-14", "tipo": "trabajo", "cantidad": 5, "nota": "Papelería completa", "horaInicio": "09:00" },
+        { "id": "h004-0001-0007", "fecha": "2025-10-21", "tipo": "trabajo", "cantidad": 3, "nota": "Plantillas PowerPoint", "horaInicio": "10:00" },
+        { "id": "h004-0001-0008", "fecha": "2025-10-28", "tipo": "trabajo", "cantidad": 3, "nota": "Manual de identidad", "horaInicio": "09:00" },
+        { "id": "h004-0001-0009", "fecha": "2025-11-05", "tipo": "trabajo", "cantidad": 2, "nota": "Ajustes + entrega final", "horaInicio": "10:00" }
+      ],
+      "notas": "Bufete de abogados. Estilo serio pero cercano."
+    },
+    {
+      "id": "p005-q7r8-s9t0", "nombre": "Lookbook Mar Romero", "clienteId": "c004-1122-3344", "color": "Orchid",
+      "estado": "activo", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2026-01-20", "finEstimada": "2026-03-15", "finReal": null },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 900, "total": 0, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 189, "importeIrpf": 135,
+        "totalFactura": 954, "netoRecibido": 765, "ivaExcepcion": "",
+        "pagado": false, "fechaPago": null, "gastos": 0,
+        "facturaNum": null, "facturaFecha": null
+      },
+      "horas": [
+        { "id": "h005-0001-0001", "fecha": "2026-01-22", "tipo": "reunion", "cantidad": 1, "nota": "Sesión de fotos + selección", "horaInicio": "10:00" },
+        { "id": "h005-0001-0002", "fecha": "2026-01-27", "tipo": "trabajo", "cantidad": 4, "nota": "Retoque fotográfico (30 fotos)", "horaInicio": "09:00" },
+        { "id": "h005-0001-0003", "fecha": "2026-02-04", "tipo": "trabajo", "cantidad": 5, "nota": "Maquetación lookbook InDesign", "horaInicio": "09:30" },
+        { "id": "h005-0001-0004", "fecha": "2026-02-12", "tipo": "trabajo", "cantidad": 3, "nota": "Versión digital interactiva", "horaInicio": "10:00" }
+      ],
+      "notas": "Portfolio impreso y digital para fotógrafa de bodas."
+    },
+    {
+      "id": "p006-u1v2-w3x4", "nombre": "Web Taller Origen", "clienteId": "c005-5566-7788", "color": "DarkOrange",
+      "estado": "pausado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2025-10-01", "finEstimada": "2025-12-15", "finReal": null },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 2200, "total": 0, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 462, "importeIrpf": 330,
+        "totalFactura": 2332, "netoRecibido": 1870, "ivaExcepcion": "",
+        "pagado": false, "fechaPago": null, "gastos": 35,
+        "facturaNum": null, "facturaFecha": null
+      },
+      "horas": [
+        { "id": "h006-0001-0001", "fecha": "2025-10-02", "tipo": "reunion", "cantidad": 1.5, "nota": "Kickoff", "horaInicio": "16:00" },
+        { "id": "h006-0001-0002", "fecha": "2025-10-08", "tipo": "trabajo", "cantidad": 4, "nota": "Wireframes", "horaInicio": "09:00" },
+        { "id": "h006-0001-0003", "fecha": "2025-10-15", "tipo": "trabajo", "cantidad": 5, "nota": "Diseño home + catálogo", "horaInicio": "10:00" },
+        { "id": "h006-0001-0004", "fecha": "2025-10-22", "tipo": "trabajo", "cantidad": 3, "nota": "Páginas interiores", "horaInicio": "09:00" }
+      ],
+      "notas": "Taller de cerámica artesanal. Pausado porque el cliente está de viaje."
+    },
+    {
+      "id": "p007-y5z6-a7b8", "nombre": "Portfolio personal", "clienteId": null, "color": "DarkGray",
+      "estado": "activo", "interno": true, "recurrente": false,
+      "fechas": { "inicio": "2025-08-01", "finEstimada": null, "finReal": null },
+      "facturacion": {
+        "modo": "gratis", "baseImponible": 0, "total": 0, "precioHora": 0,
+        "iva": 0, "irpf": 0, "importeIva": 0, "importeIrpf": 0,
+        "totalFactura": 0, "netoRecibido": 0, "ivaExcepcion": "",
+        "pagado": false, "fechaPago": null, "gastos": 0,
+        "facturaNum": null, "facturaFecha": null
+      },
+      "horas": [
+        { "id": "h007-0001-0001", "fecha": "2025-08-10", "tipo": "trabajo", "cantidad": 3, "nota": "Diseño nueva home", "horaInicio": null },
+        { "id": "h007-0001-0002", "fecha": "2025-09-15", "tipo": "trabajo", "cantidad": 2, "nota": "Añadir caso Café Malasaña", "horaInicio": null },
+        { "id": "h007-0001-0003", "fecha": "2025-11-20", "tipo": "trabajo", "cantidad": 2.5, "nota": "Añadir caso Estudio Legal Rivas", "horaInicio": null },
+        { "id": "h007-0001-0004", "fecha": "2026-02-08", "tipo": "trabajo", "cantidad": 1.5, "nota": "Actualizar tarifas 2026", "horaInicio": null }
+      ],
+      "notas": "Mi portfolio en lauraestudio.com"
+    },
+    {
+      "id": "p008-c9d0-e1f2", "nombre": "Formación Figma", "clienteId": null, "color": "DarkGray",
+      "estado": "activo", "interno": true, "recurrente": true,
+      "fechas": { "inicio": "2025-09-01", "finEstimada": null, "finReal": null },
+      "facturacion": {
+        "modo": "gratis", "baseImponible": 0, "total": 0, "precioHora": 0,
+        "iva": 0, "irpf": 0, "importeIva": 0, "importeIrpf": 0,
+        "totalFactura": 0, "netoRecibido": 0, "ivaExcepcion": "",
+        "pagado": false, "fechaPago": null, "gastos": 0,
+        "facturaNum": null, "facturaFecha": null
+      },
+      "horas": [
+        { "id": "h008-0001-0001", "fecha": "2025-11-10", "tipo": "trabajo", "cantidad": 2, "nota": "Auto Layout avanzado", "horaInicio": "20:00" },
+        { "id": "h008-0001-0002", "fecha": "2025-12-05", "tipo": "trabajo", "cantidad": 1.5, "nota": "Variables y design tokens", "horaInicio": "20:00" },
+        { "id": "h008-0001-0003", "fecha": "2026-01-12", "tipo": "trabajo", "cantidad": 2, "nota": "Componentes avanzados", "horaInicio": "20:30" },
+        { "id": "h008-0001-0004", "fecha": "2026-02-09", "tipo": "trabajo", "cantidad": 1.5, "nota": "Prototyping + dev mode", "horaInicio": "21:00" }
+      ],
+      "notas": "Curso online de Figma avanzado. 1-2h semanales."
+    }
+  ],
+  "gastos": [
+    {
+      "id": "g001-aa11-bb22", "nombre": "Figma Pro", "categoria": "software", "recurrente": "mensual", "color": "Violet", "notas": "Plan profesional",
+      "entradas": [
+        { "id": "ge01-0001", "fecha": "2025-10-01", "cantidad": 12, "nota": "" },
+        { "id": "ge01-0002", "fecha": "2025-11-01", "cantidad": 12, "nota": "" },
+        { "id": "ge01-0003", "fecha": "2025-12-01", "cantidad": 12, "nota": "" },
+        { "id": "ge01-0004", "fecha": "2026-01-01", "cantidad": 12, "nota": "" },
+        { "id": "ge01-0005", "fecha": "2026-02-01", "cantidad": 12, "nota": "" }
+      ]
+    },
+    {
+      "id": "g002-cc33-dd44", "nombre": "Adobe CC", "categoria": "software", "recurrente": "mensual", "color": "Crimson", "notas": "Suite completa",
+      "entradas": [
+        { "id": "ge02-0001", "fecha": "2025-10-05", "cantidad": 59.99, "nota": "" },
+        { "id": "ge02-0002", "fecha": "2025-11-05", "cantidad": 59.99, "nota": "" },
+        { "id": "ge02-0003", "fecha": "2025-12-05", "cantidad": 59.99, "nota": "" },
+        { "id": "ge02-0004", "fecha": "2026-01-05", "cantidad": 59.99, "nota": "" },
+        { "id": "ge02-0005", "fecha": "2026-02-05", "cantidad": 59.99, "nota": "" }
+      ]
+    },
+    {
+      "id": "g003-ee55-ff66", "nombre": "Dominio lauraestudio.com", "categoria": "herramientas", "recurrente": "anual", "color": "DodgerBlue", "notas": "",
+      "entradas": [
+        { "id": "ge03-0001", "fecha": "2025-08-15", "cantidad": 14.99, "nota": "Renovación anual" }
+      ]
+    },
+    {
+      "id": "g004-1122-3344", "nombre": "Coworking", "categoria": "oficina", "recurrente": "mensual", "color": "Peru", "notas": "WeWork Malasaña",
+      "entradas": [
+        { "id": "ge04-0001", "fecha": "2025-10-01", "cantidad": 250, "nota": "" },
+        { "id": "ge04-0002", "fecha": "2025-11-01", "cantidad": 250, "nota": "" },
+        { "id": "ge04-0003", "fecha": "2025-12-01", "cantidad": 250, "nota": "" },
+        { "id": "ge04-0004", "fecha": "2026-01-01", "cantidad": 250, "nota": "" },
+        { "id": "ge04-0005", "fecha": "2026-02-01", "cantidad": 250, "nota": "" }
+      ]
+    },
+    {
+      "id": "g005-5566-7788", "nombre": "Imprenta muestras", "categoria": "otro", "recurrente": "no", "color": "DarkKhaki", "notas": "Pruebas de impresión para clientes",
+      "entradas": [
+        { "id": "ge05-0001", "fecha": "2025-07-18", "cantidad": 45, "nota": "Muestras Café Malasaña" },
+        { "id": "ge05-0002", "fecha": "2025-10-30", "cantidad": 85, "nota": "Papelería Estudio Legal Rivas" },
+        { "id": "ge05-0003", "fecha": "2025-11-20", "cantidad": 35, "nota": "Muestras web Taller Origen (flyers)" }
+      ]
+    },
+    {
+      "id": "g006-7788-9900", "nombre": "Curso Domestika", "categoria": "formacion", "recurrente": "no", "color": "MediumPurple", "notas": "",
+      "entradas": [
+        { "id": "ge06-0001", "fecha": "2025-09-01", "cantidad": 39.99, "nota": "Figma avanzado para UX" }
+      ]
+    }
+  ],
+  "settings": {
+    "emisor": { "nombre": "Laura Martín Estudio", "direccion1": "Calle de la Palma 28, 3ºA", "direccion2": "28004 Madrid", "nif": "55443322B" },
+    "defaultIva": 21,
+    "defaultIrpf": 15,
+    "targets": { "horasMes": 120, "ingresosMes": 2500, "horasSemana": 30 },
+    "nextFacturaNum": 6,
+    "tema": "claro"
+  }
+}

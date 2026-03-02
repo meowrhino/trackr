@@ -26,7 +26,7 @@ Object.assign(App, {
     const als = [];
     ps.forEach(p => {
       const f = p.facturacion;
-      if (p.estado === 'completado' && f.facturaFecha && !f.pagado) {
+      if ((p.estado === 'completado' || p.estado === 'abandonado') && f.facturaFecha && !f.pagado) {
         als.push({ t: `${p.nombre} — pendiente de pago`, id: p.id });
       }
     });
@@ -66,15 +66,26 @@ Object.assign(App, {
       return;
     }
 
-    const labels = { activo: 'Activos', pausado: 'Pausados', completado: 'Completados' };
+    const labels = { activo: 'Activos', pausado: 'Pausados', completado: 'Completados', abandonado: 'Abandonados' };
+    const collapsible = { completado: true, abandonado: true };
     let html = '';
     EST_ORDER.forEach(st => {
       const g = groups[st];
       if (!g || !g.length) return;
-      html += `<div class="dash-group">`
-        + `<div class="dash-group-title">${labels[st] || st}</div>`
-        + `<div class="pg">${g.map(p => this.card(p)).join('')}</div>`
-        + `</div>`;
+      if (collapsible[st]) {
+        const open = this._groupOpen?.[st] ?? false;
+        html += `<div class="dash-group">`
+          + `<div class="dash-group-title dash-group-toggle" onclick="App.toggleGroup('${st}')">`
+          +   `<span class="dash-group-chev${open ? ' open' : ''}">\u25B8</span> ${labels[st] || st} <span class="dash-group-count">${g.length}</span>`
+          + `</div>`
+          + `<div class="pg${open ? '' : ' hidden'}">${g.map(p => this.card(p)).join('')}</div>`
+          + `</div>`;
+      } else {
+        html += `<div class="dash-group">`
+          + `<div class="dash-group-title">${labels[st] || st}</div>`
+          + `<div class="pg">${g.map(p => this.card(p)).join('')}</div>`
+          + `</div>`;
+      }
     });
     c.innerHTML = html;
   },
@@ -112,6 +123,12 @@ Object.assign(App, {
     </div>`;
   },
 
-  sf(f) { this.pf = f; this.rDash(); }
+  sf(f) { this.pf = f; this.rDash(); },
+
+  toggleGroup(st) {
+    if (!this._groupOpen) this._groupOpen = {};
+    this._groupOpen[st] = !this._groupOpen[st];
+    this.rDash();
+  }
 
 });

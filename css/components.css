@@ -48,6 +48,7 @@
 .bd-activo{border-color:rgba(100,160,220,.3);color:#78b4e8}
 .bd-pausado{border-color:rgba(200,160,60,.3);color:#c9a43c}
 .bd-completado{border-color:rgba(90,170,140,.3);color:#5aac8c}
+.bd-abandonado{border-color:rgba(160,100,100,.3);color:#a07070}
 
 /* ── Flags de proyecto (iconos en card) ── */
 .pc-flags{display:flex;gap:.3rem;align-items:center;font-size:.65rem}
@@ -89,6 +90,12 @@
 /* ── Dashboard groups ── */
 .dash-group{margin-bottom:1.5rem}
 .dash-group-title{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:.6rem;padding-bottom:.35rem;border-bottom:1px solid var(--b1)}
+.dash-group-toggle{cursor:pointer;user-select:none}
+.dash-group-toggle:hover{color:var(--t2)}
+.dash-group-chev{display:inline-block;transition:transform .15s ease;font-size:.6rem}
+.dash-group-chev.open{transform:rotate(90deg)}
+.dash-group-count{font-size:.6rem;color:var(--t3);margin-left:.3rem}
+.pg.hidden{display:none}
 
 /* ── Color selector grid ── */
 .cs-wrap{display:flex;flex-direction:column;gap:.5rem}

@@ -1,0 +1,218 @@
+{
+  "version": 2,
+  "clientes": [
+    { "id": "c101-ab12-cd34", "nombre": "Vinissimo (startup)", "direccion1": "Carrer d'Aragó 215, 6è", "direccion2": "08007 Barcelona", "nif": "B67891234", "color": "Crimson" },
+    { "id": "c102-ef56-gh78", "nombre": "Clínica Dental Sarrià", "direccion1": "Passeig de la Bonanova 44", "direccion2": "08017 Barcelona", "nif": "B11223344", "color": "CadetBlue" },
+    { "id": "c103-ij90-kl12", "nombre": "Agència Branding Nómada", "direccion1": "Carrer de Provença 101", "direccion2": "08029 Barcelona", "nif": "B44332211", "color": "DarkOrange" },
+    { "id": "c104-mn34-op56", "nombre": "Gerard Pla (abogado)", "direccion1": "Via Laietana 38, 2n", "direccion2": "08003 Barcelona", "nif": "38765432C", "color": "SlateBlue" }
+  ],
+  "projects": [
+    {
+      "id": "p101-a1a1-b2b2", "nombre": "App Vinissimo v2", "clienteId": "c101-ab12-cd34", "color": "Crimson",
+      "estado": "activo", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2025-09-01", "finEstimada": "2026-03-31", "finReal": null },
+      "facturacion": {
+        "modo": "por_hora", "baseImponible": 0, "total": 0, "precioHora": 55,
+        "iva": 21, "irpf": 15, "importeIva": 0, "importeIrpf": 0,
+        "totalFactura": 0, "netoRecibido": 0, "ivaExcepcion": "",
+        "pagado": false, "fechaPago": null, "gastos": 0,
+        "facturaNum": null, "facturaFecha": null
+      },
+      "horas": [
+        { "id": "h101-0001", "fecha": "2025-09-02", "tipo": "reunion", "cantidad": 2, "nota": "Sprint planning v2", "horaInicio": "10:00" },
+        { "id": "h101-0002", "fecha": "2025-09-03", "tipo": "trabajo", "cantidad": 6, "nota": "Setup monorepo + Turborepo", "horaInicio": "09:00" },
+        { "id": "h101-0003", "fecha": "2025-09-04", "tipo": "trabajo", "cantidad": 7, "nota": "Auth con Supabase", "horaInicio": "09:00" },
+        { "id": "h101-0004", "fecha": "2025-09-05", "tipo": "trabajo", "cantidad": 5, "nota": "RBAC + middleware", "horaInicio": "10:00" },
+        { "id": "h101-0005", "fecha": "2025-09-09", "tipo": "trabajo", "cantidad": 6, "nota": "API catálogo vinos", "horaInicio": "09:00" },
+        { "id": "h101-0006", "fecha": "2025-09-10", "tipo": "trabajo", "cantidad": 7, "nota": "Filtros + búsqueda full-text", "horaInicio": "09:00" },
+        { "id": "h101-0007", "fecha": "2025-09-11", "tipo": "trabajo", "cantidad": 5, "nota": "Carrito + checkout Stripe", "horaInicio": "10:00" },
+        { "id": "h101-0008", "fecha": "2025-09-12", "tipo": "reunion", "cantidad": 1, "nota": "Demo sprint 1", "horaInicio": "16:00" },
+        { "id": "h101-0009", "fecha": "2025-09-16", "tipo": "trabajo", "cantidad": 8, "nota": "Panel admin + dashboard", "horaInicio": "08:30" },
+        { "id": "h101-0010", "fecha": "2025-09-17", "tipo": "trabajo", "cantidad": 6, "nota": "Gestión inventario", "horaInicio": "09:00" },
+        { "id": "h101-0011", "fecha": "2025-09-18", "tipo": "trabajo", "cantidad": 4, "nota": "Email transaccionales (Resend)", "horaInicio": "14:00" },
+        { "id": "h101-0012", "fecha": "2025-09-22", "tipo": "trabajo", "cantidad": 7, "nota": "Landing page + SEO", "horaInicio": "09:00" },
+        { "id": "h101-0013", "fecha": "2025-09-23", "tipo": "trabajo", "cantidad": 5, "nota": "Tests E2E Playwright", "horaInicio": "09:00" },
+        { "id": "h101-0014", "fecha": "2025-10-01", "tipo": "trabajo", "cantidad": 6, "nota": "Sistema de recomendaciones", "horaInicio": "09:00" },
+        { "id": "h101-0015", "fecha": "2025-10-07", "tipo": "trabajo", "cantidad": 7, "nota": "Club de suscripción mensual", "horaInicio": "09:00" },
+        { "id": "h101-0016", "fecha": "2025-10-14", "tipo": "trabajo", "cantidad": 5, "nota": "Pasarela de pago recurrente", "horaInicio": "10:00" },
+        { "id": "h101-0017", "fecha": "2025-10-21", "tipo": "reunion", "cantidad": 1.5, "nota": "Review con inversores", "horaInicio": "11:00" },
+        { "id": "h101-0018", "fecha": "2025-10-28", "tipo": "trabajo", "cantidad": 6, "nota": "PWA + notificaciones push", "horaInicio": "09:00" },
+        { "id": "h101-0019", "fecha": "2025-11-04", "tipo": "trabajo", "cantidad": 8, "nota": "Integración logística (envíos)", "horaInicio": "08:30" },
+        { "id": "h101-0020", "fecha": "2025-11-11", "tipo": "trabajo", "cantidad": 6, "nota": "Optimización performance", "horaInicio": "09:00" },
+        { "id": "h101-0021", "fecha": "2025-11-18", "tipo": "trabajo", "cantidad": 4, "nota": "Accesibilidad WCAG 2.1", "horaInicio": "10:00" },
+        { "id": "h101-0022", "fecha": "2025-12-02", "tipo": "trabajo", "cantidad": 7, "nota": "Analytics + tracking eventos", "horaInicio": "09:00" },
+        { "id": "h101-0023", "fecha": "2025-12-09", "tipo": "trabajo", "cantidad": 5, "nota": "Migración datos v1 → v2", "horaInicio": "09:00" },
+        { "id": "h101-0024", "fecha": "2026-01-07", "tipo": "trabajo", "cantidad": 6, "nota": "Beta testing + bugfixes", "horaInicio": "09:00" },
+        { "id": "h101-0025", "fecha": "2026-01-14", "tipo": "trabajo", "cantidad": 4, "nota": "CI/CD + deploy Vercel", "horaInicio": "10:00" },
+        { "id": "h101-0026", "fecha": "2026-01-21", "tipo": "reunion", "cantidad": 2, "nota": "Formación equipo interno", "horaInicio": "10:00" },
+        { "id": "h101-0027", "fecha": "2026-02-03", "tipo": "trabajo", "cantidad": 5, "nota": "Hotfixes post-lanzamiento", "horaInicio": "09:00" },
+        { "id": "h101-0028", "fecha": "2026-02-10", "tipo": "trabajo", "cantidad": 6, "nota": "Feature: valoraciones y reseñas", "horaInicio": "09:00" },
+        { "id": "h101-0029", "fecha": "2026-02-18", "tipo": "trabajo", "cantidad": 4, "nota": "Optimización queries DB", "horaInicio": "14:00" }
+      ],
+      "notas": "E-commerce de vinos con suscripción. Next.js + Supabase + Stripe."
+    },
+    {
+      "id": "p102-c3c3-d4d4", "nombre": "Web Clínica Dental Sarrià", "clienteId": "c102-ef56-gh78", "color": "CadetBlue",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2025-07-01", "finEstimada": "2025-08-31", "finReal": "2025-09-05" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 4500, "total": 0, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 945, "importeIrpf": 675,
+        "totalFactura": 4770, "netoRecibido": 3825, "ivaExcepcion": "",
+        "pagado": true, "fechaPago": "2025-10-01", "gastos": 200,
+        "facturaNum": 2, "facturaFecha": "2025-09-05"
+      },
+      "horas": [
+        { "id": "h102-0001", "fecha": "2025-07-02", "tipo": "reunion", "cantidad": 1.5, "nota": "Requisitos + sitemap", "horaInicio": "10:00" },
+        { "id": "h102-0002", "fecha": "2025-07-07", "tipo": "trabajo", "cantidad": 8, "nota": "Setup Next.js + Sanity CMS", "horaInicio": "09:00" },
+        { "id": "h102-0003", "fecha": "2025-07-10", "tipo": "trabajo", "cantidad": 7, "nota": "Páginas principales", "horaInicio": "09:00" },
+        { "id": "h102-0004", "fecha": "2025-07-15", "tipo": "trabajo", "cantidad": 6, "nota": "Sistema citas online (Calendly API)", "horaInicio": "09:00" },
+        { "id": "h102-0005", "fecha": "2025-07-22", "tipo": "trabajo", "cantidad": 5, "nota": "Blog + SEO médico", "horaInicio": "10:00" },
+        { "id": "h102-0006", "fecha": "2025-07-29", "tipo": "trabajo", "cantidad": 6, "nota": "Responsive + animaciones", "horaInicio": "09:00" },
+        { "id": "h102-0007", "fecha": "2025-08-05", "tipo": "trabajo", "cantidad": 4, "nota": "Formularios + RGPD", "horaInicio": "10:00" },
+        { "id": "h102-0008", "fecha": "2025-08-12", "tipo": "trabajo", "cantidad": 3, "nota": "Testing + optimización", "horaInicio": "14:00" },
+        { "id": "h102-0009", "fecha": "2025-08-20", "tipo": "reunion", "cantidad": 1, "nota": "Review final", "horaInicio": "17:00" },
+        { "id": "h102-0010", "fecha": "2025-09-02", "tipo": "trabajo", "cantidad": 3, "nota": "Deploy + DNS + SSL", "horaInicio": "09:00" }
+      ],
+      "notas": "Web institucional con booking online."
+    },
+    {
+      "id": "p103-e5e5-f6f6", "nombre": "Mantenimiento Nómada", "clienteId": "c103-ij90-kl12", "color": "DarkOrange",
+      "estado": "activo", "interno": false, "recurrente": true,
+      "fechas": { "inicio": "2025-06-01", "finEstimada": null, "finReal": null },
+      "facturacion": {
+        "modo": "por_hora", "baseImponible": 0, "total": 0, "precioHora": 45,
+        "iva": 21, "irpf": 15, "importeIva": 0, "importeIrpf": 0,
+        "totalFactura": 0, "netoRecibido": 0, "ivaExcepcion": "",
+        "pagado": true, "fechaPago": "2026-02-10", "gastos": 0,
+        "facturaNum": 7, "facturaFecha": "2026-02-01"
+      },
+      "horas": [
+        { "id": "h103-0001", "fecha": "2025-10-08", "tipo": "trabajo", "cantidad": 2, "nota": "Update plugins + seguridad", "horaInicio": "16:00", "monto": 90 },
+        { "id": "h103-0002", "fecha": "2025-10-22", "tipo": "trabajo", "cantidad": 1.5, "nota": "Bug formulario contacto", "horaInicio": "17:00", "monto": 67.5 },
+        { "id": "h103-0003", "fecha": "2025-11-12", "tipo": "trabajo", "cantidad": 3, "nota": "Nueva landing Black Friday", "horaInicio": "10:00", "monto": 135 },
+        { "id": "h103-0004", "fecha": "2025-12-10", "tipo": "trabajo", "cantidad": 1, "nota": "Fix SSL + redirect www", "horaInicio": "09:00", "monto": 45 },
+        { "id": "h103-0005", "fecha": "2026-01-15", "tipo": "trabajo", "cantidad": 2, "nota": "Migración hosting", "horaInicio": "14:00", "monto": 90 },
+        { "id": "h103-0006", "fecha": "2026-02-05", "tipo": "trabajo", "cantidad": 1.5, "nota": "Optimización WPO", "horaInicio": "10:00", "monto": 67.5 }
+      ],
+      "notas": "Mantenimiento web mensual. WordPress."
+    },
+    {
+      "id": "p104-g7g7-h8h8", "nombre": "Web personal Gerard Pla", "clienteId": "c104-mn34-op56", "color": "SlateBlue",
+      "estado": "activo", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2026-01-15", "finEstimada": "2026-03-15", "finReal": null },
+      "facturacion": {
+        "modo": "desde_total", "baseImponible": 0, "total": 2000, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 0, "importeIrpf": 0,
+        "totalFactura": 2000, "netoRecibido": 0, "ivaExcepcion": "",
+        "pagado": false, "fechaPago": null, "gastos": 25,
+        "facturaNum": null, "facturaFecha": null
+      },
+      "horas": [
+        { "id": "h104-0001", "fecha": "2026-01-16", "tipo": "reunion", "cantidad": 1, "nota": "Briefing + referencias", "horaInicio": "18:00" },
+        { "id": "h104-0002", "fecha": "2026-01-22", "tipo": "trabajo", "cantidad": 5, "nota": "Setup Astro + diseño", "horaInicio": "09:00" },
+        { "id": "h104-0003", "fecha": "2026-01-29", "tipo": "trabajo", "cantidad": 4, "nota": "Páginas servicios + contacto", "horaInicio": "10:00" },
+        { "id": "h104-0004", "fecha": "2026-02-05", "tipo": "trabajo", "cantidad": 6, "nota": "Blog con MDX + SEO", "horaInicio": "09:00" },
+        { "id": "h104-0005", "fecha": "2026-02-12", "tipo": "trabajo", "cantidad": 3, "nota": "Responsive + dark mode", "horaInicio": "14:00" },
+        { "id": "h104-0006", "fecha": "2026-02-20", "tipo": "trabajo", "cantidad": 2, "nota": "Formulario contacto + captcha", "horaInicio": "10:00" }
+      ],
+      "notas": "Web personal para abogado. Astro + Tailwind."
+    },
+    {
+      "id": "p105-i9i9-j0j0", "nombre": "SaaS propio: Devboard", "clienteId": null, "color": "ForestGreen",
+      "estado": "activo", "interno": true, "recurrente": false,
+      "fechas": { "inicio": "2025-03-01", "finEstimada": null, "finReal": null },
+      "facturacion": {
+        "modo": "gratis", "baseImponible": 0, "total": 0, "precioHora": 0,
+        "iva": 0, "irpf": 0, "importeIva": 0, "importeIrpf": 0,
+        "totalFactura": 0, "netoRecibido": 0, "ivaExcepcion": "",
+        "pagado": false, "fechaPago": null, "gastos": 0,
+        "facturaNum": null, "facturaFecha": null
+      },
+      "horas": [
+        { "id": "h105-0001", "fecha": "2025-10-05", "tipo": "trabajo", "cantidad": 4, "nota": "Dashboard widgets API", "horaInicio": "20:00" },
+        { "id": "h105-0002", "fecha": "2025-10-19", "tipo": "trabajo", "cantidad": 3, "nota": "Integración GitHub API", "horaInicio": "21:00" },
+        { "id": "h105-0003", "fecha": "2025-11-02", "tipo": "trabajo", "cantidad": 5, "nota": "Sistema de temas", "horaInicio": "19:00" },
+        { "id": "h105-0004", "fecha": "2025-11-23", "tipo": "trabajo", "cantidad": 4, "nota": "Auth + multi-tenant", "horaInicio": "20:00" },
+        { "id": "h105-0005", "fecha": "2025-12-14", "tipo": "trabajo", "cantidad": 3, "nota": "Billing con Stripe", "horaInicio": "20:00" },
+        { "id": "h105-0006", "fecha": "2026-01-11", "tipo": "trabajo", "cantidad": 6, "nota": "Landing page + waitlist", "horaInicio": "19:00" },
+        { "id": "h105-0007", "fecha": "2026-02-01", "tipo": "trabajo", "cantidad": 4, "nota": "Beta launch prep", "horaInicio": "20:00" },
+        { "id": "h105-0008", "fecha": "2026-02-15", "tipo": "trabajo", "cantidad": 3, "nota": "Onboarding flow", "horaInicio": "20:30" }
+      ],
+      "notas": "Mi side project: dashboard para devs. Noches y fines de semana."
+    },
+    {
+      "id": "p106-k1k1-l2l2", "nombre": "App reservas restaurante", "clienteId": null, "color": "Gray",
+      "estado": "abandonado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2025-05-10", "finEstimada": "2025-07-31", "finReal": null },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 1800, "total": 0, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 378, "importeIrpf": 270,
+        "totalFactura": 1908, "netoRecibido": 1530, "ivaExcepcion": "",
+        "pagado": false, "fechaPago": null, "gastos": 0,
+        "facturaNum": null, "facturaFecha": null
+      },
+      "horas": [
+        { "id": "h106-0001", "fecha": "2025-05-12", "tipo": "reunion", "cantidad": 1.5, "nota": "Briefing con dueño restaurante", "horaInicio": "18:00" },
+        { "id": "h106-0002", "fecha": "2025-05-19", "tipo": "trabajo", "cantidad": 4, "nota": "Wireframes + prototipo Figma", "horaInicio": "10:00" },
+        { "id": "h106-0003", "fecha": "2025-05-26", "tipo": "trabajo", "cantidad": 6, "nota": "Setup proyecto + auth", "horaInicio": "09:00" },
+        { "id": "h106-0004", "fecha": "2025-06-03", "tipo": "trabajo", "cantidad": 3, "nota": "Calendario reservas", "horaInicio": "14:00" }
+      ],
+      "notas": "Cliente dejó de responder después de la tercera reunión. Quedaron 14.5h sin cobrar."
+    }
+  ],
+  "gastos": [
+    {
+      "id": "g101-aa11-bb22", "nombre": "Vercel Pro", "categoria": "herramientas", "recurrente": "mensual", "color": "DimGray", "notas": "Hosting proyectos",
+      "entradas": [
+        { "id": "ge101-01", "fecha": "2025-10-01", "cantidad": 20, "nota": "" },
+        { "id": "ge101-02", "fecha": "2025-11-01", "cantidad": 20, "nota": "" },
+        { "id": "ge101-03", "fecha": "2025-12-01", "cantidad": 20, "nota": "" },
+        { "id": "ge101-04", "fecha": "2026-01-01", "cantidad": 20, "nota": "" },
+        { "id": "ge101-05", "fecha": "2026-02-01", "cantidad": 20, "nota": "" }
+      ]
+    },
+    {
+      "id": "g102-cc33-dd44", "nombre": "Supabase Pro", "categoria": "herramientas", "recurrente": "mensual", "color": "LimeGreen", "notas": "Para Vinissimo",
+      "entradas": [
+        { "id": "ge102-01", "fecha": "2025-09-01", "cantidad": 25, "nota": "" },
+        { "id": "ge102-02", "fecha": "2025-10-01", "cantidad": 25, "nota": "" },
+        { "id": "ge102-03", "fecha": "2025-11-01", "cantidad": 25, "nota": "" },
+        { "id": "ge102-04", "fecha": "2025-12-01", "cantidad": 25, "nota": "" },
+        { "id": "ge102-05", "fecha": "2026-01-01", "cantidad": 25, "nota": "" },
+        { "id": "ge102-06", "fecha": "2026-02-01", "cantidad": 25, "nota": "" }
+      ]
+    },
+    {
+      "id": "g103-ee55-ff66", "nombre": "GitHub Copilot", "categoria": "software", "recurrente": "mensual", "color": "Gray", "notas": "",
+      "entradas": [
+        { "id": "ge103-01", "fecha": "2025-10-01", "cantidad": 10, "nota": "" },
+        { "id": "ge103-02", "fecha": "2025-11-01", "cantidad": 10, "nota": "" },
+        { "id": "ge103-03", "fecha": "2025-12-01", "cantidad": 10, "nota": "" },
+        { "id": "ge103-04", "fecha": "2026-01-01", "cantidad": 10, "nota": "" },
+        { "id": "ge103-05", "fecha": "2026-02-01", "cantidad": 10, "nota": "" }
+      ]
+    },
+    {
+      "id": "g104-1122-3344", "nombre": "Formación", "categoria": "formacion", "recurrente": "no", "color": "Gold", "notas": "",
+      "entradas": [
+        { "id": "ge104-01", "fecha": "2025-08-10", "cantidad": 299, "nota": "Frontend Masters anual" },
+        { "id": "ge104-02", "fecha": "2025-11-25", "cantidad": 49, "nota": "Libro: Designing Data-Intensive Applications" }
+      ]
+    },
+    {
+      "id": "g105-5566-7788", "nombre": "Dominio devboard.io", "categoria": "herramientas", "recurrente": "anual", "color": "ForestGreen", "notas": "Side project",
+      "entradas": [
+        { "id": "ge105-01", "fecha": "2025-03-15", "cantidad": 32, "nota": ".io domain" }
+      ]
+    }
+  ],
+  "settings": {
+    "emisor": { "nombre": "Pablo Serrano Dev", "direccion1": "Carrer del Comte d'Urgell 77, 2n 1a", "direccion2": "08011 Barcelona", "nif": "41234567D" },
+    "defaultIva": 21,
+    "defaultIrpf": 15,
+    "targets": { "horasMes": 160, "ingresosMes": 5000, "horasSemana": 40 },
+    "nextFacturaNum": 8,
+    "tema": "nord"
+  }
+}
