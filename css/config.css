@@ -81,6 +81,32 @@
 .cl-btn:hover { color: var(--t1); opacity: 1; }
 .cl-btn-del:hover { color: var(--bad); opacity: 1; }
 
+/* ── Selector de idioma ── */
+.lang-toggle{
+  display:flex;
+  gap:.5rem;
+}
+.lang-btn{
+  padding:.45rem 1rem;
+  border:2px solid var(--b1);
+  border-radius:var(--r);
+  background:transparent;
+  color:var(--t3);
+  font-family:'Outfit',sans-serif;
+  font-size:.82rem;
+  font-weight:500;
+  cursor:pointer;
+  transition:all var(--tr);
+}
+.lang-btn:hover{
+  border-color:var(--b2);
+  color:var(--t1);
+}
+.lang-btn.on{
+  border-color:var(--t1);
+  color:var(--t1);
+}
+
 /* ── Selector de temas ── */
 .theme-grid {
   display: flex;

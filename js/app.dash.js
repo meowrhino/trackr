@@ -2,7 +2,7 @@
  * TRACKR — App: Vista Dashboard (Proyectos)
  * Globales: extiende App
  * Dependencias: app.js (App base), utils.js, store.js,
- *               billing.js, colors.js
+ *               billing.js, colors.js, lang.js
  * ================================================ */
 
 Object.assign(App, {
@@ -13,10 +13,10 @@ Object.assign(App, {
 
     /* ── Filtros ── */
     const filters = [
-      { k: 'externos', l: 'Externos' },
-      { k: 'todos', l: 'Todos' },
-      { k: 'internos', l: 'Internos' },
-      { k: 'recurrentes', l: 'Recurrentes' }
+      { k: 'externos', l: t('dash.external') },
+      { k: 'todos', l: t('dash.all') },
+      { k: 'internos', l: t('dash.internal') },
+      { k: 'recurrentes', l: t('dash.recurring') }
     ];
     document.getElementById('dFilt').innerHTML = filters.map(f =>
       `<button class="fb ${this.pf === f.k ? 'on' : ''}" onclick="App.sf('${f.k}')">${f.l}</button>`
@@ -27,7 +27,7 @@ Object.assign(App, {
     ps.forEach(p => {
       const f = p.facturacion;
       if ((p.estado === 'completado' || p.estado === 'abandonado') && f.facturaFecha && !f.pagado) {
-        als.push({ t: `${p.nombre} — pendiente de pago`, id: p.id });
+        als.push({ t: t('info.pendingPaymentAlert', p.nombre), id: p.id });
       }
     });
     document.getElementById('dAl').innerHTML = als.map(a =>
@@ -62,11 +62,11 @@ Object.assign(App, {
 
     const c = document.getElementById('dPr');
     if (!filtered.length) {
-      c.innerHTML = '<div class="es"><div class="tx">Sin proyectos</div></div>';
+      c.innerHTML = `<div class="es"><div class="tx">${t('dash.noProjects')}</div></div>`;
       return;
     }
 
-    const labels = { activo: 'Activos', pausado: 'Pausados', completado: 'Completados', abandonado: 'Abandonados' };
+    const labels = { activo: t('est.activos'), pausado: t('est.pausados'), completado: t('est.completados'), abandonado: t('est.abandonados') };
     const collapsible = { completado: true, abandonado: true };
     let html = '';
     EST_ORDER.forEach(st => {
@@ -98,10 +98,10 @@ Object.assign(App, {
     const f = p.facturacion;
 
     let flags = '';
-    if (p.interno) flags += '<span class="pc-flag pc-flag-int">interno</span>';
-    if (p.recurrente) flags += '<span class="pc-flag pc-flag-rec">recurrente</span>';
-    if (f.pagado) flags += '<span class="pc-flag pc-flag-paid">pagado</span>';
-    else if (f.facturaFecha) flags += '<span class="pc-flag pc-flag-inv">facturado</span>';
+    if (p.interno) flags += `<span class="pc-flag pc-flag-int">${t('dash.flagInternal')}</span>`;
+    if (p.recurrente) flags += `<span class="pc-flag pc-flag-rec">${t('dash.flagRecurring')}</span>`;
+    if (f.pagado) flags += `<span class="pc-flag pc-flag-paid">${t('dash.flagPaid')}</span>`;
+    else if (f.facturaFecha) flags += `<span class="pc-flag pc-flag-inv">${t('dash.flagInvoiced')}</span>`;
 
     return `<div class="pc${p.interno ? ' pc-mr' : ''}" style="--project-color:${hex}" onclick="App.go('det','${p.id}')">
       <div class="pc-h">
@@ -115,7 +115,7 @@ Object.assign(App, {
         <span><span class="m">${th.toFixed(1)}h</span></span>
         ${f.modo !== 'gratis'
           ? `<span><span class="m">${fmtMoney(f.totalFactura || 0)}</span></span>`
-          : '<span style="color:var(--t3)">gratis</span>'}
+          : `<span style="color:var(--t3)">${t('dash.free')}</span>`}
         ${eph !== null && f.modo !== 'gratis'
           ? `<span style="color:${eph >= 30 ? 'var(--ok)' : eph >= 15 ? 'var(--warn)' : 'var(--bad)'}">${eph.toFixed(2)} &euro;/h</span>`
           : ''}

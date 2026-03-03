@@ -37,7 +37,8 @@ const D = {
         defaultIrpf: 15,
         targets: { horasMes: null, ingresosMes: null, horasSemana: null },
         nextFacturaNum: 1,
-        tema: 'oscuro'
+        tema: 'oscuro',
+        idioma: 'es'
       }
     };
     this.save();
@@ -68,6 +69,7 @@ const D = {
     if (!s.targets) s.targets = { horasMes: null, ingresosMes: null, horasSemana: null };
     if (s.nextFacturaNum == null) s.nextFacturaNum = 1;
     if (!s.tema) s.tema = 'oscuro';
+    if (!s.idioma) s.idioma = 'es';
 
     /* Migrar usuario legacy → emisor.nombre */
     if (s.usuario && !s.emisor.nombre) {
@@ -113,6 +115,7 @@ const D = {
         if (p.facturacion.facturaNum == null) p.facturacion.facturaNum = null;
         if (p.facturacion.facturaFecha == null) p.facturacion.facturaFecha = null;
         if (p.facturacion.precioHora == null) p.facturacion.precioHora = 0;
+        if (p.facturacion.idiomaFactura == null) p.facturacion.idiomaFactura = null;
       }
     });
 
@@ -153,6 +156,11 @@ const D = {
         if (cn === usr && !p.interno) p.interno = true;
       });
     }
+
+    /* Garantizar nombreCompleto en clientes (tras extracción legacy) */
+    d.clientes.forEach(c => {
+      if (c.nombreCompleto == null) c.nombreCompleto = '';
+    });
 
     d.version = 2;
   },

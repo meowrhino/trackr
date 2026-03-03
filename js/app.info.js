@@ -2,7 +2,7 @@
  * TRACKR — App: Vista Info (Dashboard)
  * Globales: extiende App
  * Dependencias: app.js (App base), utils.js, store.js,
- *               billing.js, colors.js
+ *               billing.js, colors.js, lang.js
  * ================================================ */
 
 Object.assign(App, {
@@ -47,11 +47,18 @@ Object.assign(App, {
     if (!hasData) {
       statusEl.innerHTML =
         `<div class="info-cta">`
-        + `<p class="info-cta-text">No tienes proyectos todavía. Crea uno nuevo o importa tus datos desde un JSON.</p>`
+        + `<p class="info-cta-text">${t('info.noProjects')}</p>`
         + `<div class="info-cta-actions">`
-        +   `<button class="bt bt-p" onclick="App.pModal()">+ Nuevo proyecto</button>`
-        +   `<button class="bt" onclick="document.getElementById('impA').click()">Cargar JSON</button>`
+        +   `<button class="bt bt-p" onclick="App.pModal()">${t('btn.newProject')}</button>`
+        +   `<button class="bt" onclick="document.getElementById('impA').click()">${t('btn.loadJson')}</button>`
         + `</div>`
+        + `<div class="info-examples">`
+        + `<div class="info-examples-title">${t('examples.title')}</div>`
+        + `<div class="info-examples-grid">`
+        + `<div class="info-example-card" onclick="App.loadExample('pablo_developer')"><span class="info-example-icon">🧑‍💻</span><span class="info-example-name">Pablo</span><span class="info-example-desc">${t('examples.pablo')}</span></div>`
+        + `<div class="info-example-card" onclick="App.loadExample('marina_traductora')"><span class="info-example-icon">🌍</span><span class="info-example-name">Marina</span><span class="info-example-desc">${t('examples.marina')}</span></div>`
+        + `<div class="info-example-card" onclick="App.loadExample('laura_disenadora')"><span class="info-example-icon">🎨</span><span class="info-example-name">Laura</span><span class="info-example-desc">${t('examples.laura')}</span></div>`
+        + `</div></div>`
         + `</div>`;
       mainEl.innerHTML = '';
       document.getElementById('infoFinancial').innerHTML = '';
@@ -63,19 +70,19 @@ Object.assign(App, {
       `<div class="info-stats">`
       + `<div class="info-stat-card" onclick="App.go('dash')">`
       +   `<div class="info-stat-val">${activos.length}</div>`
-      +   `<div class="info-stat-lbl">proyecto${activos.length !== 1 ? 's' : ''} activo${activos.length !== 1 ? 's' : ''}</div>`
+      +   `<div class="info-stat-lbl">${tp('info.activeProjects', activos.length)}</div>`
       + `</div>`
       + `<div class="info-stat-card" onclick="App.go('cal')">`
       +   `<div class="info-stat-val">${horasSemana.toFixed(1)}<small>h</small></div>`
-      +   `<div class="info-stat-lbl">esta semana</div>`
+      +   `<div class="info-stat-lbl">${t('info.thisWeek')}</div>`
       + `</div>`
       + `<div class="info-stat-card" onclick="App.go('cal')">`
       +   `<div class="info-stat-val">${horasMes.toFixed(1)}<small>h</small></div>`
-      +   `<div class="info-stat-lbl">este mes</div>`
+      +   `<div class="info-stat-lbl">${t('info.thisMonth')}</div>`
       + `</div>`
       + `<div class="info-stat-card${nPendiente ? ' info-stat-alert' : ''}">`
       +   `<div class="info-stat-val">${nPendiente > 0 ? fmtMoney(pendienteCobro) : '—'}</div>`
-      +   `<div class="info-stat-lbl">${nPendiente ? `${nPendiente} pendiente${nPendiente > 1 ? 's' : ''} de cobro` : 'todo cobrado'}</div>`
+      +   `<div class="info-stat-lbl">${nPendiente ? (nPendiente === 1 ? t('info.pendingPayment.one', nPendiente) : t('info.pendingPayment.other', nPendiente)) : t('info.allCollected')}</div>`
       + `</div>`
       + `</div>`;
 
@@ -114,10 +121,10 @@ Object.assign(App, {
     let actHtml = '';
     if (recent.length) {
       let lastDate = '';
-      actHtml = `<div class="info-section"><div class="info-section-title">Actividad reciente</div><div class="hl">`;
+      actHtml = `<div class="info-section"><div class="info-section-title">${t('info.recentActivity')}</div><div class="hl">`;
       recent.forEach(a => {
-        const dateLabel = a.fecha === today ? 'Hoy'
-          : a.fecha === (() => { const y = new Date(now - 86400000); return `${y.getFullYear()}-${String(y.getMonth()+1).padStart(2,'0')}-${String(y.getDate()).padStart(2,'0')}`; })() ? 'Ayer'
+        const dateLabel = a.fecha === today ? t('info.today')
+          : a.fecha === (() => { const y = new Date(now - 86400000); return `${y.getFullYear()}-${String(y.getMonth()+1).padStart(2,'0')}-${String(y.getDate()).padStart(2,'0')}`; })() ? t('info.yesterday')
           : fmtDate(a.fecha);
         if (a.fecha !== lastDate) {
           if (lastDate) actHtml += `<div class="info-act-sep"></div>`;
@@ -152,13 +159,13 @@ Object.assign(App, {
 
     let dlHtml = '';
     if (deadlines.length) {
-      dlHtml = `<div class="info-section"><div class="info-section-title">Deadlines</div><div class="hl">`;
+      dlHtml = `<div class="info-section"><div class="info-section-title">${t('info.deadlines')}</div><div class="hl">`;
       deadlines.forEach(d => {
         const urgency = d.diffDays < 0 ? 'overdue' : d.diffDays <= 7 ? 'soon' : 'ok';
-        const label = d.diffDays < 0 ? `${Math.abs(d.diffDays)}d atrasado`
-          : d.diffDays === 0 ? 'Hoy'
-          : d.diffDays === 1 ? 'Mañana'
-          : `${d.diffDays}d`;
+        const label = d.diffDays < 0 ? t('info.dOverdue', Math.abs(d.diffDays))
+          : d.diffDays === 0 ? t('info.today')
+          : d.diffDays === 1 ? t('info.tomorrow')
+          : t('info.dLeft', d.diffDays);
         dlHtml += `<div class="hr info-dl-${urgency}" style="border-left-color:${d.pc};cursor:pointer" onclick="App.go('det','${d.pid}')">`
           + `<span class="hr-d info-dl-badge">${label}</span>`
           + `<span style="color:var(--t1);font-size:.82rem;flex:1">${esc(d.pn)}</span>`
@@ -171,9 +178,9 @@ Object.assign(App, {
 
     /* ── Acciones rápidas ── */
     const quickHtml = `<div class="info-quick">`
-      + `<button class="bt bt-p" onclick="App.pModal()">+ Nuevo proyecto</button>`
-      + `<button class="bt" onclick="document.getElementById('impA').click()">Cargar otro JSON</button>`
-      + `<button class="bt" onclick="App.resetData()">Nuevo usuario</button>`
+      + `<button class="bt bt-p" onclick="App.pModal()">${t('btn.newProject')}</button>`
+      + `<button class="bt" onclick="document.getElementById('impA').click()">${t('btn.loadAnotherJson')}</button>`
+      + `<button class="bt" onclick="App.resetData()">${t('btn.newUser')}</button>`
       + `</div>`
       + `<div style="text-align:center;margin-top:1.5rem;font-size:.72rem"><a href="https://meowrhino.studio" target="_blank" style="color:var(--t3);text-decoration:none">meowrhino.studio</a></div>`;
 
@@ -269,42 +276,42 @@ Object.assign(App, {
     el.innerHTML =
       `<div class="info-fin">`
       + `<div class="info-fin-header">`
-      +   `<span class="info-fin-title">Resumen financiero</span>`
+      +   `<span class="info-fin-title">${t('info.financialSummary')}</span>`
       +   `<div class="info-fin-nav">`
       +     (hasPrev ? `<button class="bt bt-s" onclick="App._infoFinPrev()">&larr;</button>` : `<span style="width:2rem"></span>`)
       +     `<span style="min-width:120px;text-align:center;font-size:.85rem">${periodLabel}</span>`
       +     (hasNext ? `<button class="bt bt-s" onclick="App._infoFinNext()">&rarr;</button>` : `<span style="width:2rem"></span>`)
       +     `<div class="info-fin-toggle">`
-      +       `<button class="info-fin-tb${type === 'mes' ? ' on' : ''}" onclick="App._infoFinType('mes')">Mes</button>`
-      +       `<button class="info-fin-tb${type === 'trim' ? ' on' : ''}" onclick="App._infoFinType('trim')">Trim</button>`
-      +       `<button class="info-fin-tb${type === 'año' ? ' on' : ''}" onclick="App._infoFinType('año')">Año</button>`
+      +       `<button class="info-fin-tb${type === 'mes' ? ' on' : ''}" onclick="App._infoFinType('mes')">${t('info.month')}</button>`
+      +       `<button class="info-fin-tb${type === 'trim' ? ' on' : ''}" onclick="App._infoFinType('trim')">${t('info.quarter')}</button>`
+      +       `<button class="info-fin-tb${type === 'año' ? ' on' : ''}" onclick="App._infoFinType('año')">${t('info.year')}</button>`
       +     `</div>`
       +   `</div>`
       + `</div>`
       + (isEmpty
-        ? `<div class="es"><div class="tx">Sin actividad en este periodo</div></div>`
+        ? `<div class="es"><div class="tx">${t('info.noActivity')}</div></div>`
         : `<div class="fin-row">`
-        +   `<span class="fin-label">Cobrado</span>`
+        +   `<span class="fin-label">${t('info.collected')}</span>`
         +   `<div class="fin-bar"><div class="pbar"><div class="pbar-fill pbar-ok" style="width:${(cobrado / maxBar * 100).toFixed(1)}%"></div></div></div>`
         +   `<span class="fin-value" style="color:var(--ok)">${fmtMoney(cobrado)}</span>`
         + `</div>`
         + `<div class="fin-row">`
-        +   `<span class="fin-label">Gastos</span>`
+        +   `<span class="fin-label">${t('info.expensesLabel')}</span>`
         +   `<div class="fin-bar"><div class="pbar"><div class="pbar-fill pbar-warn" style="width:${(gastosTotal / maxBar * 100).toFixed(1)}%"></div></div></div>`
         +   `<span class="fin-value" style="color:var(--warn)">${fmtMoney(gastosTotal)}</span>`
         + `</div>`
         + `<div class="fin-sep"></div>`
         + `<div class="fin-row fin-total">`
-        +   `<span class="fin-label">Neto</span>`
+        +   `<span class="fin-label">${t('info.netLabel')}</span>`
         +   `<span class="fin-value" style="color:${neto >= 0 ? 'var(--ok)' : 'var(--bad)'}">${fmtMoney(neto)}</span>`
         + `</div>`
         + `<div class="info-fin-stats">`
-        +   `<div class="sc"><div class="sc-l">Horas</div><div class="sc-v m">${horas.toFixed(1)}h</div></div>`
-        +   `<div class="sc"><div class="sc-l">&euro;/hora real</div><div class="sc-v m">${fmtNum(eurH)} &euro;/h</div></div>`
+        +   `<div class="sc"><div class="sc-l">${t('info.hoursLabel')}</div><div class="sc-v m">${horas.toFixed(1)}h</div></div>`
+        +   `<div class="sc"><div class="sc-l">${t('info.realEurH')}</div><div class="sc-v m">${fmtNum(eurH)} &euro;/h</div></div>`
         + (type === 'trim'
-          ? `<div class="sc"><div class="sc-l">Base imponible</div><div class="sc-v m">${fmtMoney(baseTotal)}</div></div>`
-          + `<div class="sc"><div class="sc-l">IVA repercutido</div><div class="sc-v m">${fmtMoney(ivaTotal)}</div></div>`
-          + `<div class="sc"><div class="sc-l">IRPF retenido</div><div class="sc-v m">${fmtMoney(irpfTotal)}</div></div>`
+          ? `<div class="sc"><div class="sc-l">${t('info.taxableBase')}</div><div class="sc-v m">${fmtMoney(baseTotal)}</div></div>`
+          + `<div class="sc"><div class="sc-l">${t('info.outputVat')}</div><div class="sc-v m">${fmtMoney(ivaTotal)}</div></div>`
+          + `<div class="sc"><div class="sc-l">${t('info.irpfWithheld')}</div><div class="sc-v m">${fmtMoney(irpfTotal)}</div></div>`
           : '')
         + `</div>`
       )

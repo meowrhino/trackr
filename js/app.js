@@ -3,7 +3,7 @@
  * Estado, navegación, modales compartidos,
  * modal de proyecto, facturas, export/import
  * Globales: App
- * Dependencias: colors.js, utils.js, store.js,
+ * Dependencias: colors.js, utils.js, lang.js, store.js,
  *               billing.js, tracking.js, facturas.js,
  *               toast.js
  *
@@ -38,8 +38,9 @@ const App = {
 
     if (!D.init()) D.create();
 
-    /* Aplicar tema guardado */
+    /* Aplicar tema e idioma guardados */
     applyTheme(D.d.settings.tema || 'oscuro');
+    setLang(D.d.settings.idioma || 'es');
 
     /* Inicializar periodo del resumen al mes actual */
     const now = new Date();
@@ -131,34 +132,37 @@ const App = {
       iva: p?.facturacion?.iva ?? st.defaultIva, irpf: p?.facturacion?.irpf ?? st.defaultIrpf,
       ivaOn: p ? (p.facturacion.iva > 0) : true, irpfOn: p ? (p.facturacion.irpf > 0) : true,
       ivaExc: p?.facturacion?.ivaExcepcion || '',
-      pagado: p?.facturacion?.pagado || false, fechaPago: p?.facturacion?.fechaPago || '', gastos: p?.facturacion?.gastos || '', notas: p?.notas || ''
+      pagado: p?.facturacion?.pagado || false, fechaPago: p?.facturacion?.fechaPago || '', notas: p?.notas || '',
+      idiomaFactura: p?.facturacion?.idiomaFactura || null
     };
     const clOpts = cls.map(c => `<option value="${c.id}" ${c.id === df.clienteId ? 'selected' : ''}>${esc(c.nombre)}</option>`).join('');
 
-    this.om(`<div class="mt">${isE ? 'Editar' : 'Nuevo proyecto'}</div>`
-      + `<div class="fg"><label>Nombre</label><input type="text" id="mpN" value="${esc(df.nombre)}" placeholder="Web Conor"></div>`
-      + `<div class="fg"><label>Cliente</label><select id="mpCl" onchange="App._onClientChange(this.value)"><option value="">— Sin cliente —</option>${clOpts}<option value="_new">+ Crear nuevo...</option></select></div>`
-      + `<div id="mpClNew" style="display:none;margin-bottom:.85rem"><input type="text" id="mpClNewN" placeholder="Nombre del nuevo cliente"></div>`
-      + `<div class="fg"><label>Color</label>${this.colorSelect(df.color)}</div>`
-      + `<div class="fr"><div class="fg"><label>Estado</label><select id="mpSt">${Object.entries(EST).map(([k, v]) => `<option value="${k}" ${k === df.estado ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
+    this.om(`<div class="mt">${isE ? t('btn.edit') : t('btn.newProject').replace('+ ', '')}</div>`
+      + `<div class="fg"><label>${t('field.name')}</label><input type="text" id="mpN" value="${esc(df.nombre)}" placeholder="${t('ph.projectName')}"></div>`
+      + `<div class="fg"><label>${t('field.client')}</label><select id="mpCl" onchange="App._onClientChange(this.value)"><option value="">${t('field.noClient')}</option>${clOpts}<option value="_new">${t('btn.createNew')}</option></select></div>`
+      + `<div id="mpClNew" style="display:none;margin-bottom:.85rem"><input type="text" id="mpClNewN" placeholder="${t('ph.newClient')}"></div>`
+      + `<div class="fg"><label>${t('field.color')}</label>${this.colorSelect(df.color)}</div>`
+      + `<div class="fr"><div class="fg"><label>${t('field.status')}</label><select id="mpSt">${Object.entries(EST).map(([k, v]) => `<option value="${k}" ${k === df.estado ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
       + `<div class="fg" style="display:flex;gap:1.25rem;padding-top:1.5rem">`
-      + `<label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="mpInt" ${df.interno ? 'checked' : ''} style="width:auto;accent-color:var(--t2)"> Interno</label>`
-      + `<label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="mpRec" ${df.recurrente ? 'checked' : ''} style="width:auto;accent-color:var(--t2)"> Recurrente</label>`
+      + `<label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="mpInt" ${df.interno ? 'checked' : ''} style="width:auto;accent-color:var(--t2)"> ${t('field.internal')}</label>`
+      + `<label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="mpRec" ${df.recurrente ? 'checked' : ''} style="width:auto;accent-color:var(--t2)"> ${t('field.recurring')}</label>`
       + `</div></div>`
-      + `<div class="fr fr-3"><div class="fg"><label>Inicio</label><input type="date" id="mpI" value="${df.inicio}"></div><div class="fg"><label>Fin estimada</label><input type="date" id="mpFE" value="${df.finEst}"></div><div class="fg"><label>Fin real</label><input type="date" id="mpFR" value="${df.finR}"></div></div>`
-      + `<div class="dst" style="margin-top:1.25rem">Facturación</div>`
-      + `<div class="bms"><button class="bm ${df.modo === 'desde_base' ? 'on' : ''}" onclick="App.sBM('desde_base')">Desde base</button><button class="bm ${df.modo === 'desde_total' ? 'on' : ''}" onclick="App.sBM('desde_total')">Desde total</button><button class="bm ${df.modo === 'por_hora' ? 'on' : ''}" onclick="App.sBM('por_hora')">Por hora</button><button class="bm ${df.modo === 'gratis' ? 'on' : ''}" onclick="App.sBM('gratis')">Gratis</button></div><input type="hidden" id="mpBM" value="${df.modo}">`
+      + `<div class="fr fr-3"><div class="fg"><label>${t('field.start')}</label><input type="date" id="mpI" value="${df.inicio}"></div><div class="fg"><label>${t('field.estEnd')}</label><input type="date" id="mpFE" value="${df.finEst}"></div><div class="fg"><label>${t('field.actualEnd')}</label><input type="date" id="mpFR" value="${df.finR}"></div></div>`
+      + `<div class="dst" style="margin-top:1.25rem">${t('billing.title')}</div>`
+      + `<div class="bms"><button class="bm ${df.modo === 'desde_base' ? 'on' : ''}" onclick="App.sBM('desde_base')">${t('billing.fromBase')}</button><button class="bm ${df.modo === 'desde_total' ? 'on' : ''}" onclick="App.sBM('desde_total')">${t('billing.fromTotal')}</button><button class="bm ${df.modo === 'por_hora' ? 'on' : ''}" onclick="App.sBM('por_hora')">${t('billing.hourly')}</button><button class="bm ${df.modo === 'gratis' ? 'on' : ''}" onclick="App.sBM('gratis')">${t('billing.free')}</button></div><input type="hidden" id="mpBM" value="${df.modo}">`
       + `<div id="bF" style="${df.modo === 'gratis' ? 'display:none' : ''}">`
-      + `<div id="bfPH" style="${df.modo === 'por_hora' ? '' : 'display:none'}"><div class="fg"><label>&euro; / hora</label><input type="number" id="mpPH" value="${df.precioHora}" step="0.01" min="0" placeholder="30.00" oninput="App.cPrev()"></div></div>`
-      + `<div class="fr"><div class="fg" id="bfBase" style="${df.modo === 'desde_total' || df.modo === 'por_hora' ? 'display:none' : ''}"><label>Base (&euro;)</label><input type="number" id="mpBa" value="${df.base}" step="0.01" placeholder="0.00" oninput="App.cPrev()"></div><div class="fg" id="bfTot" style="${df.modo === 'desde_base' || df.modo === 'por_hora' ? 'display:none' : ''}"><label>Total (&euro;)</label><input type="number" id="mpTo" value="${df.total}" step="0.01" placeholder="0.00" oninput="App.cPrev()"></div><div class="fg"><label>Gastos (&euro;)</label><input type="number" id="mpGa" value="${df.gastos}" step="0.01" placeholder="0.00"></div></div>`
-      + `<div class="tr"><span class="tl">IVA (${df.iva}%)</span><label class="tg"><input type="checkbox" id="mpIva" ${df.ivaOn ? 'checked' : ''} onchange="App.cPrev()"><span class="ts"></span></label></div>`
-      + `<div class="tr"><span class="tl">IRPF (${df.irpf}%)</span><label class="tg"><input type="checkbox" id="mpIrpf" ${df.irpfOn ? 'checked' : ''} onchange="App.cPrev()"><span class="ts"></span></label></div>`
-      + `<div class="fg" style="margin-top:.4rem"><label>Excepción IVA</label><input type="text" id="mpIvaExc" value="${esc(df.ivaExc)}" placeholder="Ej: Art. 20 LIVA"></div>`
+      + `<div id="bfPH" style="${df.modo === 'por_hora' ? '' : 'display:none'}"><div class="fg"><label>${t('billing.eurPerHour')}</label><input type="number" id="mpPH" value="${df.precioHora}" step="0.01" min="0" placeholder="30.00" oninput="App.cPrev()"></div></div>`
+      + `<div class="fr"><div class="fg" id="bfBase" style="${df.modo === 'desde_total' || df.modo === 'por_hora' ? 'display:none' : ''}"><label>${t('billing.baseEur')}</label><input type="number" id="mpBa" value="${df.base}" step="0.01" placeholder="0.00" oninput="App.cPrev()"></div><div class="fg" id="bfTot" style="${df.modo === 'desde_base' || df.modo === 'por_hora' ? 'display:none' : ''}"><label>${t('billing.totalEur')}</label><input type="number" id="mpTo" value="${df.total}" step="0.01" placeholder="0.00" oninput="App.cPrev()"></div></div>`
+      + `<div class="tr"><span class="tl">${t('billing.ivaToggle', df.iva)}</span><label class="tg"><input type="checkbox" id="mpIva" ${df.ivaOn ? 'checked' : ''} onchange="App.cPrev()"><span class="ts"></span></label></div>`
+      + `<div class="tr"><span class="tl">${t('billing.irpfToggle', df.irpf)}</span><label class="tg"><input type="checkbox" id="mpIrpf" ${df.irpfOn ? 'checked' : ''} onchange="App.cPrev()"><span class="ts"></span></label></div>`
+      + `<div class="fg" style="margin-top:.4rem"><label>${t('billing.ivaException')}</label><input type="text" id="mpIvaExc" value="${esc(df.ivaExc)}" placeholder="${t('ph.ivaException')}"></div>`
       + `<div id="bPrev" class="bb" style="margin-top:.4rem"></div>`
-      + `<div class="tr" style="margin-top:.75rem"><span class="tl">Pagado</span><label class="tg"><input type="checkbox" id="mpPg" ${df.pagado ? 'checked' : ''} onchange="document.getElementById('mpFPw').style.display=this.checked?'block':'none'"><span class="ts"></span></label></div>`
-      + `<div id="mpFPw" style="${df.pagado ? '' : 'display:none'}"><div class="fg"><label>Fecha pago</label><input type="date" id="mpFP" value="${df.fechaPago}"></div></div></div>`
-      + `<div class="fg" style="margin-top:.75rem"><label>Notas</label><textarea id="mpNo" placeholder="...">${esc(df.notas)}</textarea></div>`
-      + `<div class="ma"><button class="bt" onclick="App.cm()">Cancelar</button><button class="bt bt-p" onclick="App.saveP('${eid || ''}')">${isE ? 'Guardar' : 'Crear'}</button></div>`);
+      + `<div class="tr" style="margin-top:.75rem"><span class="tl">${t('billing.paid')}</span><label class="tg"><input type="checkbox" id="mpPg" ${df.pagado ? 'checked' : ''} onchange="document.getElementById('mpFPw').style.display=this.checked?'block':'none'"><span class="ts"></span></label></div>`
+      + `<div id="mpFPw" style="${df.pagado ? '' : 'display:none'}"><div class="fg"><label>${t('field.paymentDate')}</label><input type="date" id="mpFP" value="${df.fechaPago}"></div></div>`
+      + `<div class="fg" style="margin-top:.5rem"><label>${t('field.invoiceLang')}</label><select id="mpFacLang"><option value="" ${!df.idiomaFactura ? 'selected' : ''}>${_lang === 'es' ? 'Español' : 'Spanish'} (${t('cfg.defaults').toLowerCase()})</option><option value="es" ${df.idiomaFactura === 'es' ? 'selected' : ''}>Español</option><option value="en" ${df.idiomaFactura === 'en' ? 'selected' : ''}>English</option></select></div>`
+      + `</div>`
+      + `<div class="fg" style="margin-top:.75rem"><label>${t('field.notes')}</label><textarea id="mpNo" placeholder="${t('ph.notes')}">${esc(df.notas)}</textarea></div>`
+      + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveP('${eid || ''}')">${isE ? t('btn.save') : t('btn.create')}</button></div>`);
     this.cPrev();
   },
 
@@ -199,10 +203,10 @@ const App = {
     } else if (m === 'desde_base') {
       base = parseFloat(document.getElementById('mpBa')?.value) || 0;
     } else {
-      const t = parseFloat(document.getElementById('mpTo')?.value) || 0;
+      const t2 = parseFloat(document.getElementById('mpTo')?.value) || 0;
       const fac = 1 + ivR / 100 - irR / 100;
-      base = fac ? Math.round(t / fac * 100) / 100 : 0;
-      totalF = t;
+      base = fac ? Math.round(t2 / fac * 100) / 100 : 0;
+      totalF = t2;
     }
 
     importeIva = Math.round(base * ivR / 100 * 100) / 100;
@@ -215,29 +219,29 @@ const App = {
       const ph = parseFloat(document.getElementById('mpPH')?.value) || 0;
       const th = p ? p.horas.reduce((s, h) => s + h.cantidad, 0) : 0;
       phInfo = `<div class="br"><span class="la" style="font-size:.75rem;color:var(--t3)">`
-        + (p ? `${th.toFixed(1)}h × ${fmtNum(ph)} €/h` : 'Sin horas aún')
+        + (p ? `${th.toFixed(1)}h × ${fmtNum(ph)} €/h` : t('billing.noHoursYet'))
         + `</span></div>`;
     }
 
     const el = document.getElementById('bPrev');
     if (el) el.innerHTML = phInfo
-      + `<div class="br"><span class="la">Base</span><span class="va">${fmtMoney(base)}</span></div>`
-      + (ivR ? `<div class="br"><span class="la">+ IVA ${ivR}%</span><span class="va">${fmtMoney(importeIva)}</span></div>` : '')
-      + (irR ? `<div class="br"><span class="la">- IRPF ${irR}%</span><span class="va">${fmtMoney(importeIrpf)}</span></div>` : '')
-      + `<div class="br tot"><span class="la">Total</span><span class="va">${fmtMoney(totalF)}</span></div>`
-      + `<div class="br"><span class="la">Neto</span><span class="va" style="color:var(--ok)">${fmtMoney(neto)}</span></div>`;
+      + `<div class="br"><span class="la">${t('billing.base')}</span><span class="va">${fmtMoney(base)}</span></div>`
+      + (ivR ? `<div class="br"><span class="la">${t('billing.plusIva', ivR)}</span><span class="va">${fmtMoney(importeIva)}</span></div>` : '')
+      + (irR ? `<div class="br"><span class="la">${t('billing.minusIrpf', irR)}</span><span class="va">${fmtMoney(importeIrpf)}</span></div>` : '')
+      + `<div class="br tot"><span class="la">${t('billing.total')}</span><span class="va">${fmtMoney(totalF)}</span></div>`
+      + `<div class="br"><span class="la">${t('billing.net')}</span><span class="va" style="color:var(--ok)">${fmtMoney(neto)}</span></div>`;
   },
 
   saveP(eid) {
     const nombre = document.getElementById('mpN').value.trim();
-    if (!nombre) { Toast.warn('Nombre obligatorio'); return; }
+    if (!nombre) { Toast.warn(t('msg.nameRequired')); return; }
 
     let clienteId = document.getElementById('mpCl').value;
     const color = document.getElementById('mpColor').value;
     if (clienteId === '_new') {
       const newName = document.getElementById('mpClNewN').value.trim();
-      if (!newName) { Toast.warn('Nombre de cliente obligatorio'); return; }
-      const newCl = D.addCl({ id: uid(), nombre: newName, direccion1: '', direccion2: '', nif: '', color: color || 'CornflowerBlue' });
+      if (!newName) { Toast.warn(t('msg.clientNameRequired')); return; }
+      const newCl = D.addCl({ id: uid(), nombre: newName, nombreCompleto: '', direccion1: '', direccion2: '', nif: '', color: color || 'CornflowerBlue' });
       clienteId = newCl.id;
     } else if (!clienteId) clienteId = null;
 
@@ -245,6 +249,7 @@ const App = {
     const modo = document.getElementById('mpBM').value;
     const ivaOn = document.getElementById('mpIva')?.checked;
     const irpfOn = document.getElementById('mpIrpf')?.checked;
+    const facLangVal = document.getElementById('mpFacLang')?.value || null;
 
     const proj = {
       id: eid || uid(), nombre, clienteId: clienteId || null, color, estado,
@@ -258,9 +263,10 @@ const App = {
         ivaExcepcion: document.getElementById('mpIvaExc')?.value?.trim() || '',
         importeIva: 0, importeIrpf: 0, totalFactura: 0, netoRecibido: 0,
         pagado: document.getElementById('mpPg')?.checked || false, fechaPago: document.getElementById('mpFP')?.value || null,
-        gastos: parseFloat(document.getElementById('mpGa')?.value) || 0,
+        gastos: 0,
         facturaNum: eid ? (D.p(eid)?.facturacion?.facturaNum || null) : null,
-        facturaFecha: eid ? (D.p(eid)?.facturacion?.facturaFecha || null) : null
+        facturaFecha: eid ? (D.p(eid)?.facturacion?.facturaFecha || null) : null,
+        idiomaFactura: facLangVal || null
       },
       horas: eid ? (D.p(eid)?.horas || []) : [], notas: document.getElementById('mpNo').value.trim()
     };
@@ -281,18 +287,18 @@ const App = {
     const f = p.facturacion, s = D.d.settings;
     const num = f.facturaNum || s.nextFacturaNum || 1;
     const numStr = String(num).padStart(4, '0');
-    this.om(`<div class="mt">Generar factura</div>`
-      + `<div class="fr"><div class="fg"><label>N.º factura</label><input type="text" id="facNum" value="${numStr}" style="font-family:'DM Mono',monospace"></div>`
-      + `<div class="fg"><label>Fecha</label><input type="date" id="facDate" value="${f.facturaFecha || todayStr()}"></div></div>`
-      + `<div class="fg"><label>Asunto</label><input type="text" id="facAsunto" value="${esc(p.nombre)}"></div>`
+    this.om(`<div class="mt">${t('fac.generate')}</div>`
+      + `<div class="fr"><div class="fg"><label>${t('field.invoiceNum')}</label><input type="text" id="facNum" value="${numStr}" style="font-family:'DM Mono',monospace"></div>`
+      + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="facDate" value="${f.facturaFecha || todayStr()}"></div></div>`
+      + `<div class="fg"><label>${t('field.subject')}</label><input type="text" id="facAsunto" value="${esc(p.nombre)}"></div>`
       + `<div class="bb" style="margin-top:.75rem">`
-      + `<div class="br"><span class="la">Emisor</span><span class="va">${esc(s.emisor.nombre || '(configurar)')}</span></div>`
-      + `<div class="br"><span class="la">Cliente</span><span class="va">${esc(clienteName(p))}</span></div>`
-      + `<div class="br"><span class="la">Base</span><span class="va">${fmtMoney(f.baseImponible || 0)}</span></div>`
-      + `${f.iva ? `<div class="br"><span class="la">+ IVA ${f.iva}%</span><span class="va">${fmtMoney(f.importeIva || 0)}</span></div>` : ''}`
-      + `${f.irpf ? `<div class="br"><span class="la">- IRPF ${f.irpf}%</span><span class="va">${fmtMoney(f.importeIrpf || 0)}</span></div>` : ''}`
-      + `<div class="br tot"><span class="la">Total</span><span class="va">${fmtMoney(f.totalFactura || 0)}</span></div></div>`
-      + `<div class="ma"><button class="bt" onclick="App.cm()">Cancelar</button><button class="bt bt-p" onclick="App.genFactura('${pid}')">Descargar PDF</button></div>`);
+      + `<div class="br"><span class="la">${t('fac.issuer')}</span><span class="va">${esc(s.emisor.nombre || t('fac.configure'))}</span></div>`
+      + `<div class="br"><span class="la">${t('fac.client')}</span><span class="va">${esc(clienteName(p))}</span></div>`
+      + `<div class="br"><span class="la">${t('billing.base')}</span><span class="va">${fmtMoney(f.baseImponible || 0)}</span></div>`
+      + `${f.iva ? `<div class="br"><span class="la">${t('billing.plusIva', f.iva)}</span><span class="va">${fmtMoney(f.importeIva || 0)}</span></div>` : ''}`
+      + `${f.irpf ? `<div class="br"><span class="la">${t('billing.minusIrpf', f.irpf)}</span><span class="va">${fmtMoney(f.importeIrpf || 0)}</span></div>` : ''}`
+      + `<div class="br tot"><span class="la">${t('billing.total')}</span><span class="va">${fmtMoney(f.totalFactura || 0)}</span></div></div>`
+      + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.genFactura('${pid}')">${t('btn.downloadPdf')}</button></div>`);
   },
 
   genFactura(pid) {
@@ -320,7 +326,7 @@ const App = {
     const f = ev.target.files[0]; if (!f) return;
     /* Validar tamaño (máx 5MB) */
     if (f.size > 5 * 1024 * 1024) {
-      Toast.error(`Archivo demasiado grande (${(f.size / 1024 / 1024).toFixed(1)}MB). Máximo: 5MB`);
+      Toast.error(t('msg.fileTooLarge', (f.size / 1024 / 1024).toFixed(1)));
       ev.target.value = '';
       return;
     }
@@ -328,26 +334,47 @@ const App = {
     r.onload = e => {
       try {
         const d = JSON.parse(e.target.result);
-        if (!d.projects || !Array.isArray(d.projects)) { Toast.error('JSON no válido: falta "projects"'); return; }
+        if (!d.projects || !Array.isArray(d.projects)) { Toast.error(t('msg.invalidJsonProjects')); return; }
         for (const p of d.projects) {
-          if (!p.id || !p.nombre) { Toast.error('JSON no válido: proyecto sin id o nombre'); return; }
-          if (p.horas && !Array.isArray(p.horas)) { Toast.error('JSON no válido: "horas" no es un array'); return; }
+          if (!p.id || !p.nombre) { Toast.error(t('msg.invalidJsonProjectId')); return; }
+          if (p.horas && !Array.isArray(p.horas)) { Toast.error(t('msg.invalidJsonHoras')); return; }
         }
-        if (d.clientes && !Array.isArray(d.clientes)) { Toast.error('JSON no válido: "clientes" no es un array'); return; }
-        if (d.gastos && !Array.isArray(d.gastos)) { Toast.error('JSON no válido: "gastos" no es un array'); return; }
+        if (d.clientes && !Array.isArray(d.clientes)) { Toast.error(t('msg.invalidJsonClientes')); return; }
+        if (d.gastos && !Array.isArray(d.gastos)) { Toast.error(t('msg.invalidJsonGastos')); return; }
         if (!d.settings) d.settings = { defaultIva: 21, defaultIrpf: 15 };
         D.load(d); T.ev('action', 'import');
-        Toast.ok('Datos importados correctamente');
+        applyTheme(D.d.settings.tema || 'oscuro');
+        setLang(D.d.settings.idioma || 'es');
+        Toast.ok(t('msg.importSuccess'));
         this.go(this.cv);
-      } catch (err) { Toast.error('Error al importar: ' + err.message); }
+      } catch (err) { Toast.error(t('msg.importError') + err.message); }
     };
     r.readAsText(f); ev.target.value = '';
   },
 
   resetData() {
-    if (!confirm('¿Borrar todos los datos y empezar de cero? Esta acción no se puede deshacer.')) return;
+    if (!confirm(t('msg.resetConfirm'))) return;
     localStorage.removeItem('trackr_data');
     location.reload();
+  },
+
+  /* ══════════════════════════════════════════════
+   *  CARGAR EJEMPLOS
+   * ══════════════════════════════════════════════ */
+
+  async loadExample(name) {
+    try {
+      const res = await fetch(`examples/${name}.json`);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      D.load(data);
+      applyTheme(D.d.settings.tema || 'oscuro');
+      setLang(D.d.settings.idioma || 'es');
+      Toast.ok(t('msg.exampleLoaded'));
+      this.go('info');
+    } catch (err) {
+      Toast.error(t('msg.importError') + err.message);
+    }
   }
 };
 

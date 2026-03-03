@@ -2,7 +2,7 @@
  * TRACKR — App: Vista Calendario
  * Globales: extiende App
  * Dependencias: app.js (App base), utils.js, store.js,
- *               billing.js, colors.js
+ *               billing.js, colors.js, lang.js (t())
  * ================================================ */
 
 Object.assign(App, {
@@ -85,7 +85,7 @@ Object.assign(App, {
     let mgHtml = '';
     if (monthGastos.length) {
       const mgTotal = monthGastos.reduce((s, e) => s + e.cant, 0);
-      mgHtml = `<div class="cal-nt"><div class="cal-nt-title">Gastos del mes <span class="m" style="font-weight:400;font-size:.78rem;color:var(--warn)">${fmtMoney(mgTotal)}</span></div><div class="hl">${monthGastos.map(e =>
+      mgHtml = `<div class="cal-nt"><div class="cal-nt-title">${t('cal.monthExpenses')} <span class="m" style="font-weight:400;font-size:.78rem;color:var(--warn)">${fmtMoney(mgTotal)}</span></div><div class="hl">${monthGastos.map(e =>
         `<div class="hr" style="border-left-color:${e.gc}"><span class="hr-t">€</span><span class="hr-d">${fmtDate(e.fecha)}</span><span class="hr-a m">${fmtMoney(e.cant)}</span><span style="color:var(--t1);font-size:.82rem;flex:1">${esc(e.gn)}</span>${e.nota ? `<span class="hr-n">${esc(e.nota)}</span>` : ''}</div>`
       ).join('')}</div></div>`;
     }
@@ -109,13 +109,13 @@ Object.assign(App, {
     let mcHtml = '';
     if (monthCobros.length) {
       const mcTotal = monthCobros.reduce((s, e) => s + e.total, 0);
-      mcHtml = `<div class="cal-nt"><div class="cal-nt-title">Cobros del mes <span class="m" style="font-weight:400;font-size:.78rem;color:var(--ok)">${fmtMoney(mcTotal)}</span></div><div class="hl">${monthCobros.map(e =>
+      mcHtml = `<div class="cal-nt"><div class="cal-nt-title">${t('cal.monthCollections')} <span class="m" style="font-weight:400;font-size:.78rem;color:var(--ok)">${fmtMoney(mcTotal)}</span></div><div class="hl">${monthCobros.map(e =>
         `<div class="hr" style="border-left-color:${e.pc}"><span class="hr-t">✓</span><span class="hr-d">${fmtDate(e.fecha)}</span><span class="hr-a m" style="color:var(--ok)">${fmtMoney(e.total)}</span><span style="color:var(--t1);font-size:.82rem;flex:1">${esc(e.pn)}</span></div>`
       ).join('')}</div></div>`;
     }
 
     document.getElementById('calC').innerHTML =
-      this._calHeader(`${MESES[month]} ${year}`, `Total mes: <span class="m">${mt.toFixed(1)}h</span>`)
+      this._calHeader(`${MESES[month]} ${year}`, `${t('cal.monthTotal')} <span class="m">${mt.toFixed(1)}h</span>`)
       + `<div class="cal-grid">${g}</div>`
       + mgHtml + mcHtml
       + this._calGoals('month', mt, year, month)
@@ -204,15 +204,15 @@ Object.assign(App, {
 
     let ntHtml = '';
     if (noTimeEntries.length) {
-      ntHtml = `<div class="cal-nt"><div class="cal-nt-title">Sin hora asignada</div><div class="hl">${noTimeEntries.map(e =>
-        `<div class="hr" style="border-left-color:${e.pc}"><span class="hr-t">${e.tipo === 'trabajo' ? '💻' : '👥'}</span><span class="hr-a m">${e.cant}h</span><span style="color:var(--t1);font-size:.82rem;flex:1">${esc(e.pn)}</span><span class="hr-n">${esc(e.nota || '')}</span><span class="hr-e" onclick="App.eHour('${e.pid}','${e.hid}')" title="Editar">&#9998;</span></div>`
+      ntHtml = `<div class="cal-nt"><div class="cal-nt-title">${t('cal.noTime')}</div><div class="hl">${noTimeEntries.map(e =>
+        `<div class="hr" style="border-left-color:${e.pc}"><span class="hr-t">${e.tipo === 'trabajo' ? '💻' : '👥'}</span><span class="hr-a m">${e.cant}h</span><span style="color:var(--t1);font-size:.82rem;flex:1">${esc(e.pn)}</span><span class="hr-n">${esc(e.nota || '')}</span><span class="hr-e" onclick="App.eHour('${e.pid}','${e.hid}')" title="${t('btn.edit')}">&#9998;</span></div>`
       ).join('')}</div></div>`;
     }
 
     let wgHtml = '';
     if (weekGastos.length) {
       const wgTotal = weekGastos.reduce((s, e) => s + e.cant, 0);
-      wgHtml = `<div class="cal-nt"><div class="cal-nt-title">Gastos de la semana <span class="m" style="font-weight:400;font-size:.78rem;color:var(--warn)">${fmtMoney(wgTotal)}</span></div><div class="hl">${weekGastos.map(e =>
+      wgHtml = `<div class="cal-nt"><div class="cal-nt-title">${t('cal.weekExpenses')} <span class="m" style="font-weight:400;font-size:.78rem;color:var(--warn)">${fmtMoney(wgTotal)}</span></div><div class="hl">${weekGastos.map(e =>
         `<div class="hr" style="border-left-color:${e.gc}"><span class="hr-t">€</span><span class="hr-d">${fmtDate(e.fecha)}</span><span class="hr-a m">${fmtMoney(e.cant)}</span><span style="color:var(--t1);font-size:.82rem;flex:1">${esc(e.gn)}</span></div>`
       ).join('')}</div></div>`;
     }
@@ -235,13 +235,13 @@ Object.assign(App, {
     let wcHtml = '';
     if (weekCobros.length) {
       const wcTotal = weekCobros.reduce((s, e) => s + e.total, 0);
-      wcHtml = `<div class="cal-nt"><div class="cal-nt-title">Cobros de la semana <span class="m" style="font-weight:400;font-size:.78rem;color:var(--ok)">${fmtMoney(wcTotal)}</span></div><div class="hl">${weekCobros.map(e =>
+      wcHtml = `<div class="cal-nt"><div class="cal-nt-title">${t('cal.weekCollections')} <span class="m" style="font-weight:400;font-size:.78rem;color:var(--ok)">${fmtMoney(wcTotal)}</span></div><div class="hl">${weekCobros.map(e =>
         `<div class="hr" style="border-left-color:${e.pc}"><span class="hr-t">✓</span><span class="hr-d">${fmtDate(e.fecha)}</span><span class="hr-a m" style="color:var(--ok)">${fmtMoney(e.total)}</span><span style="color:var(--t1);font-size:.82rem;flex:1">${esc(e.pn)}</span></div>`
       ).join('')}</div></div>`;
     }
 
     document.getElementById('calC').innerHTML =
-      this._calHeader(title, `Total semana: <span class="m">${wt.toFixed(1)}h</span>`)
+      this._calHeader(title, `${t('cal.weekTotal')} <span class="m">${wt.toFixed(1)}h</span>`)
       + `<div class="cal-week" style="--slot-h:${slotH}px"><div class="cal-week-hdr">${hdr}</div><div class="cal-week-body"><div class="cal-week-tl">${timeLbl}</div>${cols}</div></div>`
       + ntHtml + wgHtml + wcHtml
       + this._calGoals('week', wt, ws.getFullYear(), ws.getMonth())
@@ -256,23 +256,23 @@ Object.assign(App, {
     return `<div class="cal-hd"><button class="bt bt-s" onclick="App.calPrev()">&larr;</button>`
       + `<span class="cal-title">${title}</span>`
       + `<button class="bt bt-s" onclick="App.calNext()">&rarr;</button>`
-      + `<button class="bt bt-s" onclick="App.calToday()">Hoy</button>`
-      + `<div class="cal-vt"><button class="cal-vb${isM ? ' on' : ''}" onclick="App.calSetView('month')">Mes</button><button class="cal-vb${!isM ? ' on' : ''}" onclick="App.calSetView('week')">Semana</button></div></div>`
+      + `<button class="bt bt-s" onclick="App.calToday()">${t('cal.today')}</button>`
+      + `<div class="cal-vt"><button class="cal-vb${isM ? ' on' : ''}" onclick="App.calSetView('month')">${t('cal.month')}</button><button class="cal-vb${!isM ? ' on' : ''}" onclick="App.calSetView('week')">${t('cal.week')}</button></div></div>`
       + `<div class="cal-stat"><span class="cal-stat-l">${stat}</span></div>`;
   },
 
   _calGoals(view, actual, year, month) {
-    const t = D.d.settings.targets;
-    if (!t) return '';
+    const tgt = D.d.settings.targets;
+    if (!tgt) return '';
     const goals = [];
     let weeklyHtml = '';
 
     if (view === 'month') {
-      if (t.horasMes) goals.push({ label: 'Horas/mes', actual, target: t.horasMes, unit: 'h' });
-      else if (t.horasSemana) goals.push({ label: 'Horas/mes', actual, target: Math.round(t.horasSemana * 4.33), unit: 'h', derived: `${t.horasSemana}h/sem × 4.33` });
+      if (tgt.horasMes) goals.push({ label: t('cal.hoursMonth'), actual, target: tgt.horasMes, unit: 'h' });
+      else if (tgt.horasSemana) goals.push({ label: t('cal.hoursMonth'), actual, target: Math.round(tgt.horasSemana * 4.33), unit: 'h', derived: `${tgt.horasSemana}h/sem × 4.33` });
 
       /* ── Mini-barras semanales ── */
-      if (t.horasSemana) {
+      if (tgt.horasSemana) {
         const daysIn = new Date(year, month + 1, 0).getDate();
         const weeks = [];
         let ws = 1;
@@ -295,8 +295,8 @@ Object.assign(App, {
           });
         });
 
-        const target = t.horasSemana;
-        weeklyHtml = `<div style="margin-bottom:.6rem"><div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:.25rem"><span style="color:var(--t2)">Horas/semana</span><span style="color:var(--t3);font-size:.7rem">obj: ${target}h</span></div><div class="cal-wseg">`;
+        const target = tgt.horasSemana;
+        weeklyHtml = `<div style="margin-bottom:.6rem"><div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:.25rem"><span style="color:var(--t2)">${t('cal.hoursWeek')}</span><span style="color:var(--t3);font-size:.7rem">${t('cal.target', target + 'h')}</span></div><div class="cal-wseg">`;
         weeks.forEach(w => {
           const adjTarget = target * w.nDays / 7;
           const pct = Math.min(adjTarget > 0 ? (w.h / adjTarget * 100) : 0, 100).toFixed(1);
@@ -306,21 +306,21 @@ Object.assign(App, {
         weeklyHtml += `</div></div>`;
       }
 
-      if (t.ingresosMes) {
+      if (tgt.ingresosMes) {
         let income = 0;
         D.ps().forEach(p => {
           B.calc(p); const f = p.facturacion;
           if (f.pagado && f.fechaPago && inPeriod(f.fechaPago, 'mes', year, month)) income += f.netoRecibido || 0;
           p.horas.forEach(h => { if (h.monto && h.fecha && inPeriod(h.fecha, 'mes', year, month)) income += h.monto; });
         });
-        goals.push({ label: 'Ingresos', actual: income, target: t.ingresosMes, unit: '€' });
+        goals.push({ label: t('cal.income'), actual: income, target: tgt.ingresosMes, unit: '€' });
       }
     } else {
-      if (t.horasSemana) goals.push({ label: 'Horas', actual, target: t.horasSemana, unit: 'h' });
+      if (tgt.horasSemana) goals.push({ label: t('field.hours'), actual, target: tgt.horasSemana, unit: 'h' });
     }
-    if (!goals.length && !weeklyHtml) return `<div class="cal-ps" style="margin-top:1rem"><span style="font-size:.78rem;color:var(--t3)">Sin objetivos. <a href="#" onclick="event.preventDefault();App.go('cfg')" style="color:var(--t2)">Configurar &rarr;</a></span></div>`;
+    if (!goals.length && !weeklyHtml) return `<div class="cal-ps" style="margin-top:1rem"><span style="font-size:.78rem;color:var(--t3)">${t('cal.noGoals')} <a href="#" onclick="event.preventDefault();App.go('cfg')" style="color:var(--t2)">${t('cal.configureLink')}</a></span></div>`;
 
-    let html = `<div class="cal-ps" style="margin-top:1.25rem"><div class="cal-ps-title">Objetivos</div>`;
+    let html = `<div class="cal-ps" style="margin-top:1.25rem"><div class="cal-ps-title">${t('cal.goals')}</div>`;
     goals.forEach(g => {
       const pct = g.target > 0 ? (g.actual / g.target * 100) : 0;
       const barColor = pct >= 100 ? 'pbar-ok' : pct >= 50 ? 'pbar-neutral' : 'pbar-warn';
@@ -335,7 +335,7 @@ Object.assign(App, {
   _calProjStats(pStats) {
     const list = Object.entries(pStats).map(([id, v]) => ({ id, ...v })).sort((a, b) => b.h - a.h);
     if (!list.length) return '';
-    return `<div class="cal-ps"><div class="cal-ps-title">Proyectos en este periodo</div><div class="cal-ps-list">${
+    return `<div class="cal-ps"><div class="cal-ps-title">${t('cal.projectsInPeriod')}</div><div class="cal-ps-list">${
       list.map(p => `<div class="cal-ps-item cal-ps-click" onclick="App.go('det','${p.id}')"><span class="cal-ps-dot" style="background:${p.pc}"></span><span class="cal-ps-name">${esc(p.pn)}</span><span class="cal-ps-h m">${p.h.toFixed(1)}h</span></div>`).join('')
     }</div></div>`;
   },
@@ -353,12 +353,12 @@ Object.assign(App, {
     if (cobrado === 0 && gastosTotal === 0) return '';
     const neto = cobrado - gastosTotal;
     const eurH = horas > 0 ? neto / horas : 0;
-    return `<div class="cal-ps" style="margin-top:1.25rem"><div class="cal-ps-title">Resumen del mes</div>`
+    return `<div class="cal-ps" style="margin-top:1.25rem"><div class="cal-ps-title">${t('cal.monthSummary')}</div>`
       + `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:.5rem;font-size:.82rem">`
-      + `<div><span style="color:var(--t3)">Cobrado</span><div class="m" style="color:var(--ok)">${fmtMoney(cobrado)}</div></div>`
-      + `<div><span style="color:var(--t3)">Gastos</span><div class="m" style="color:var(--warn)">-${fmtMoney(gastosTotal)}</div></div>`
-      + `<div><span style="color:var(--t3)">Neto</span><div class="m" style="color:${neto >= 0 ? 'var(--ok)' : 'var(--bad)'}">${fmtMoney(neto)}</div></div>`
-      + `<div><span style="color:var(--t3)">&euro;/h real</span><div class="m">${fmtNum(eurH)} &euro;/h</div></div>`
+      + `<div><span style="color:var(--t3)">${t('cal.collected')}</span><div class="m" style="color:var(--ok)">${fmtMoney(cobrado)}</div></div>`
+      + `<div><span style="color:var(--t3)">${t('cal.expensesLabel')}</span><div class="m" style="color:var(--warn)">-${fmtMoney(gastosTotal)}</div></div>`
+      + `<div><span style="color:var(--t3)">${t('cal.net')}</span><div class="m" style="color:${neto >= 0 ? 'var(--ok)' : 'var(--bad)'}">${fmtMoney(neto)}</div></div>`
+      + `<div><span style="color:var(--t3)">${t('cal.realEurH')}</span><div class="m">${fmtNum(eurH)} &euro;/h</div></div>`
       + `</div></div>`;
   },
 
@@ -454,16 +454,16 @@ Object.assign(App, {
     let body = '';
     if (withTime.length) {
       body += `<div class="hl">${withTime.map(e =>
-        `<div class="hr" style="border-left-color:${e.pc}"><span class="hr-d m" style="min-width:45px">${e.horaInicio}</span><span class="hr-t">${e.tipo === 'trabajo' ? '💻' : '👥'}</span><span class="hr-a m">${e.cantidad}h</span><span style="color:var(--t1);font-size:.82rem;flex:1">${esc(e.pn)}</span><span class="hr-n">${esc(e.nota || '')}</span><span class="hr-e" onclick="App.cm();App.eHour('${e.pid}','${e.id}')" title="Editar">&#9998;</span><span class="hr-e" onclick="App.cm();App.go('det','${e.pid}')" title="Ver proyecto">&rarr;</span></div>`
+        `<div class="hr" style="border-left-color:${e.pc}"><span class="hr-d m" style="min-width:45px">${e.horaInicio}</span><span class="hr-t">${e.tipo === 'trabajo' ? '💻' : '👥'}</span><span class="hr-a m">${e.cantidad}h</span><span style="color:var(--t1);font-size:.82rem;flex:1">${esc(e.pn)}</span><span class="hr-n">${esc(e.nota || '')}</span><span class="hr-e" onclick="App.cm();App.eHour('${e.pid}','${e.id}')" title="${t('btn.edit')}">&#9998;</span><span class="hr-e" onclick="App.cm();App.go('det','${e.pid}')" title="Ver proyecto">&rarr;</span></div>`
       ).join('')}</div>`;
     }
     if (noTime.length) {
-      body += `<div style="margin-top:.75rem;font-size:.72rem;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.4rem">Sin hora asignada</div>`
+      body += `<div style="margin-top:.75rem;font-size:.72rem;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.4rem">${t('cal.noTime')}</div>`
         + `<div class="hl">${noTime.map(e =>
-          `<div class="hr" style="border-left-color:${e.pc}"><span class="hr-t">${e.tipo === 'trabajo' ? '💻' : '👥'}</span><span class="hr-a m">${e.cantidad}h</span><span style="color:var(--t1);font-size:.82rem;flex:1">${esc(e.pn)}</span><span class="hr-n">${esc(e.nota || '')}</span><span class="hr-e" onclick="App.cm();App.eHour('${e.pid}','${e.id}')" title="Editar">&#9998;</span><span class="hr-e" onclick="App.cm();App.go('det','${e.pid}')" title="Ver proyecto">&rarr;</span></div>`
+          `<div class="hr" style="border-left-color:${e.pc}"><span class="hr-t">${e.tipo === 'trabajo' ? '💻' : '👥'}</span><span class="hr-a m">${e.cantidad}h</span><span style="color:var(--t1);font-size:.82rem;flex:1">${esc(e.pn)}</span><span class="hr-n">${esc(e.nota || '')}</span><span class="hr-e" onclick="App.cm();App.eHour('${e.pid}','${e.id}')" title="${t('btn.edit')}">&#9998;</span><span class="hr-e" onclick="App.cm();App.go('det','${e.pid}')" title="Ver proyecto">&rarr;</span></div>`
         ).join('')}</div>`;
     }
-    if (!es.length) body += '<div class="es"><div class="tx">Sin horas este día</div></div>';
+    if (!es.length) body += `<div class="es"><div class="tx">${t('cal.noHoursDay')}</div></div>`;
 
     const dayGastos = [];
     D.gs().forEach(gasto => {
@@ -473,20 +473,20 @@ Object.assign(App, {
       });
     });
     if (dayGastos.length) {
-      body += `<div style="margin-top:.75rem;font-size:.72rem;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.4rem">Gastos</div>`
+      body += `<div style="margin-top:.75rem;font-size:.72rem;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.4rem">${t('cal.expensesDay')}</div>`
         + `<div class="hl">${dayGastos.map(e =>
           `<div class="hr" style="border-left-color:${e.gc}"><span class="hr-t">€</span><span class="hr-a m">${fmtMoney(e.cant)}</span><span style="color:var(--t1);font-size:.82rem;flex:1">${esc(e.gn)}</span><span class="hr-n">${esc(e.nota)}</span></div>`
         ).join('')}</div>`;
     }
 
-    this.om(`<div class="mt">${fmtDate(ds)}</div><div style="margin-bottom:.75rem;font-size:.82rem;color:var(--t3)">Total: <span class="m">${tot.toFixed(1)}h</span></div>${body}<div class="ma"><button class="bt bt-p" onclick="App.cm();App.calAddHour('${ds}','')">+ Añadir hora</button><button class="bt" onclick="App.cm()">Cerrar</button></div>`);
+    this.om(`<div class="mt">${fmtDate(ds)}</div><div style="margin-bottom:.75rem;font-size:.82rem;color:var(--t3)">Total: <span class="m">${tot.toFixed(1)}h</span></div>${body}<div class="ma"><button class="bt bt-p" onclick="App.cm();App.calAddHour('${ds}','')">${t('btn.addHourCal')}</button><button class="bt" onclick="App.cm()">${t('btn.close')}</button></div>`);
   },
 
   _projOptions(selectedId) {
     const ps = D.ps();
     const groups = {};
     ps.forEach(p => { if (!groups[p.estado]) groups[p.estado] = []; groups[p.estado].push(p); });
-    const labels = { activo: 'Activos', pausado: 'Pausados', completado: 'Completados', abandonado: 'Abandonados' };
+    const labels = { activo: t('est.activos'), pausado: t('est.pausados'), completado: t('est.completados'), abandonado: t('est.abandonados') };
     let html = '';
     EST_ORDER.forEach(st => {
       const g = groups[st];
@@ -505,18 +505,18 @@ Object.assign(App, {
     const ps = D.ps();
     const dur = duracion || 1;
     const projOpts = this._projOptions();
-    this.om(`<div class="mt">Añadir hora</div>`
-      + `<div class="fg"><label>Proyecto</label><select id="chP" onchange="App._onCalProjChange(this.value)">${projOpts}<option value="_new">+ Crear nuevo proyecto...</option></select></div>`
+    this.om(`<div class="mt">${t('cal.addHour')}</div>`
+      + `<div class="fg"><label>${t('field.project')}</label><select id="chP" onchange="App._onCalProjChange(this.value)">${projOpts}<option value="_new">${t('btn.createNewProject')}</option></select></div>`
       + `<div id="chPNew" style="display:none;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);padding:.75rem;margin-bottom:.85rem">`
-      +   `<div class="fg"><label>Nombre proyecto</label><input type="text" id="chPN" placeholder="Nombre del proyecto"></div>`
-      +   `<div class="fg"><label>Cliente</label><select id="chPCl" onchange="document.getElementById('chPClNew').style.display=this.value==='_new'?'block':'none'"><option value="">— Sin cliente —</option>${D.cls().map(c => `<option value="${c.id}">${esc(c.nombre)}</option>`).join('')}<option value="_new">+ Nuevo cliente...</option></select></div>`
-      +   `<div id="chPClNew" style="display:none"><div class="fg"><label>Nombre cliente</label><input type="text" id="chPClN" placeholder="Nombre del cliente"></div></div>`
+      +   `<div class="fg"><label>${t('field.projectName')}</label><input type="text" id="chPN" placeholder="${t('ph.newProjectName')}"></div>`
+      +   `<div class="fg"><label>${t('field.client')}</label><select id="chPCl" onchange="document.getElementById('chPClNew').style.display=this.value==='_new'?'block':'none'"><option value="">${t('field.noClient')}</option>${D.cls().map(c => `<option value="${c.id}">${esc(c.nombre)}</option>`).join('')}<option value="_new">${t('btn.newClientOpt')}</option></select></div>`
+      +   `<div id="chPClNew" style="display:none"><div class="fg"><label>${t('field.clientName')}</label><input type="text" id="chPClN" placeholder="${t('ph.newClientName')}"></div></div>`
       + `</div>`
-      + `<label>Tipo</label><div class="ts2"><div class="to on" data-type="trabajo" onclick="App.selT(this)"><span class="ic">💻</span><span class="la">Trabajo</span></div><div class="to" data-type="reunion" onclick="App.selT(this)"><span class="ic">👥</span><span class="la">Reunión</span></div></div>`
-      + `<div class="fr"><div class="fg"><label>Horas</label><input type="number" id="chA" min="0.25" step="0.25" value="${dur}"></div><div class="fg"><label>Fecha</label><input type="date" id="chD" value="${fecha || todayStr()}"></div></div>`
-      + `<div class="fr"><div class="fg"><label>Hora inicio</label><input type="time" id="chHI" value="${hora || ''}"></div><div class="fg"><label>Cobro (€)</label><input type="number" id="chMo" min="0" step="0.01" placeholder="0"></div></div>`
-      + `<div class="fg"><label>Nota</label><input type="text" id="chN" placeholder="¿Qué hiciste?"></div>`
-      + `<div class="ma"><button class="bt" onclick="App.cm()">Cancelar</button><button class="bt bt-p" onclick="App.saveCalH()">Guardar</button></div>`);
+      + `<label>Tipo</label><div class="ts2"><div class="to on" data-type="trabajo" onclick="App.selT(this)"><span class="ic">💻</span><span class="la">${t('det.work')}</span></div><div class="to" data-type="reunion" onclick="App.selT(this)"><span class="ic">👥</span><span class="la">${t('det.meeting')}</span></div></div>`
+      + `<div class="fr"><div class="fg"><label>${t('field.hours')}</label><input type="number" id="chA" min="0.25" step="0.25" value="${dur}"></div><div class="fg"><label>${t('field.date')}</label><input type="date" id="chD" value="${fecha || todayStr()}"></div></div>`
+      + `<div class="fr"><div class="fg"><label>${t('field.startTime')}</label><input type="time" id="chHI" value="${hora || ''}"></div><div class="fg"><label>${t('field.amount')}</label><input type="number" id="chMo" min="0" step="0.01" placeholder="0"></div></div>`
+      + `<div class="fg"><label>${t('field.note')}</label><input type="text" id="chN" placeholder="${t('ph.whatDidYouDo')}"></div>`
+      + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveCalH()">${t('btn.save')}</button></div>`);
   },
 
   _onCalProjChange(val) {
@@ -535,13 +535,13 @@ Object.assign(App, {
 
     if (pid === '_new') {
       const pName = document.getElementById('chPN')?.value?.trim();
-      if (!pName) { Toast.warn('Nombre de proyecto obligatorio'); return; }
+      if (!pName) { Toast.warn(t('msg.projectNameRequired')); return; }
       let clienteId = document.getElementById('chPCl')?.value || null;
       let projColor = 'CornflowerBlue';
       if (clienteId === '_new') {
         const clName = document.getElementById('chPClN')?.value?.trim();
-        if (!clName) { Toast.warn('Nombre de cliente obligatorio'); return; }
-        const newCl = D.addCl({ id: uid(), nombre: clName, direccion1: '', direccion2: '', nif: '', color: projColor });
+        if (!clName) { Toast.warn(t('msg.clientNameRequired')); return; }
+        const newCl = D.addCl({ id: uid(), nombre: clName, nombreCompleto: '', direccion1: '', direccion2: '', nif: '', color: projColor });
         clienteId = newCl.id;
       } else if (clienteId) {
         const cl = D.cl(clienteId);

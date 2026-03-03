@@ -58,6 +58,6 @@ const B={
   eph(p){
     const h=p.horas.reduce((s,x)=>s+x.cantidad,0);
     if(!h) return null;
-    return Math.round(((p.facturacion.netoRecibido||0)-(p.facturacion.gastos||0))/h*100)/100;
+    return Math.round((p.facturacion.netoRecibido||0)/h*100)/100;
   }
 };

@@ -23,6 +23,57 @@
   gap:.75rem;
 }
 
+/* ── Example cards (empty state) ── */
+.info-examples{
+  margin-top:1.5rem;
+  padding-top:1.25rem;
+  border-top:1px solid var(--b1);
+}
+.info-examples-title{
+  font-size:.72rem;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  color:var(--t3);
+  margin-bottom:.75rem;
+}
+.info-examples-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:.75rem;
+}
+.info-example-card{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:.35rem;
+  padding:1rem .75rem;
+  background:var(--bg3);
+  border:1px solid var(--b1);
+  border-radius:var(--r);
+  cursor:pointer;
+  transition:all var(--tr);
+  text-align:center;
+}
+.info-example-card:hover{
+  border-color:var(--b2);
+  transform:translateY(-2px);
+  box-shadow:0 4px 12px rgba(0,0,0,.15);
+}
+.info-example-icon{
+  font-size:1.5rem;
+  line-height:1;
+}
+.info-example-name{
+  font-size:.88rem;
+  font-weight:600;
+  color:var(--t1);
+}
+.info-example-desc{
+  font-size:.72rem;
+  color:var(--t3);
+  line-height:1.3;
+}
+
 /* ── Stats cards (4-col grid) ── */
 .info-stats{
   display:grid;
@@ -156,6 +207,7 @@
 @media(max-width:768px){
   .info-stats{grid-template-columns:repeat(2,1fr)}
   .info-quick{flex-wrap:wrap}
+  .info-examples-grid{grid-template-columns:1fr}
 }
 @media(max-width:480px){
   .info-stats{grid-template-columns:1fr 1fr}

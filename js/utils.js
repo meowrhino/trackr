@@ -12,8 +12,8 @@
  *  CONSTANTES
  * ══════════════════════════════════════════════ */
 
-/** Estados de proyecto: clave interna → etiqueta visible */
-const EST = {
+/** Estados de proyecto: clave interna → etiqueta visible (mutable para i18n) */
+let EST = {
   activo:     'Activo',
   pausado:    'Pausado',
   completado: 'Completado',
@@ -23,8 +23,8 @@ const EST = {
 /** Orden de agrupación en la vista de proyectos */
 const EST_ORDER = ['activo', 'pausado', 'completado', 'abandonado'];
 
-/** Categorías de gastos */
-const GASTO_CAT = {
+/** Categorías de gastos (mutable para i18n) */
+let GASTO_CAT = {
   herramientas: 'Herramientas',
   formacion:    'Formación',
   software:     'Software',
@@ -33,19 +33,19 @@ const GASTO_CAT = {
   otro:         'Otro'
 };
 
-/** Tipos de recurrencia de gastos */
-const RECURRENCIA = {
+/** Tipos de recurrencia de gastos (mutable para i18n) */
+let RECURRENCIA = {
   no:      'Puntual',
   mensual: 'Mensual',
   anual:   'Anual'
 };
 
-/** Meses y días de la semana en español */
-const MESES = [
+/** Meses y días de la semana (mutable para i18n) */
+let MESES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
 ];
-const DIAS_SEM = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+let DIAS_SEM = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
 /* ══════════════════════════════════════════════
  *  GENERADORES Y ESCAPE
@@ -80,19 +80,19 @@ function fmtDate(s) {
   return r;
 }
 
-/** Formatea cantidad monetaria: 1234.5 → "1.234,50 €" */
+/** Formatea cantidad monetaria: 1234.5 → "1.234,50 €" (locale dinámico) */
 function fmtMoney(n) {
   if (n == null || isNaN(n)) return '0,00 €';
-  return n.toLocaleString('es-ES', {
+  return n.toLocaleString(typeof currentLocale === 'function' ? currentLocale() : 'es-ES', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   }) + ' €';
 }
 
-/** Formatea número decimal: 1234.5 → "1.234,50" */
+/** Formatea número decimal: 1234.5 → "1.234,50" (locale dinámico) */
 function fmtNum(n) {
   if (n == null || isNaN(n)) return '0,00';
-  return n.toLocaleString('es-ES', {
+  return n.toLocaleString(typeof currentLocale === 'function' ? currentLocale() : 'es-ES', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   });
