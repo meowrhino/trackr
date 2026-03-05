@@ -131,7 +131,7 @@ const App = {
       modo: p?.facturacion?.modo || 'desde_base', base: p?.facturacion?.baseImponible || '', total: p?.facturacion?.total || '', precioHora: p?.facturacion?.precioHora || '',
       iva: p?.facturacion?.iva ?? st.defaultIva, irpf: p?.facturacion?.irpf ?? st.defaultIrpf,
       ivaOn: p ? (p.facturacion.iva > 0) : true, irpfOn: p ? (p.facturacion.irpf > 0) : true,
-      ivaExc: p?.facturacion?.ivaExcepcion || '',
+      ivaExc: p?.facturacion?.ivaExcepcion || '', asuntoFactura: p?.facturacion?.asuntoFactura || '',
       pagado: p?.facturacion?.pagado || false, fechaPago: p?.facturacion?.fechaPago || '', notas: p?.notas || '',
       idiomaFactura: p?.facturacion?.idiomaFactura || null
     };
@@ -141,6 +141,7 @@ const App = {
       + `<div class="fg"><label>${t('field.name')}</label><input type="text" id="mpN" value="${esc(df.nombre)}" placeholder="${t('ph.projectName')}"></div>`
       + `<div class="fg"><label>${t('field.client')}</label><select id="mpCl" onchange="App._onClientChange(this.value)"><option value="">${t('field.noClient')}</option>${clOpts}<option value="_new">${t('btn.createNew')}</option></select></div>`
       + `<div id="mpClNew" style="display:none;margin-bottom:.85rem"><input type="text" id="mpClNewN" placeholder="${t('ph.newClient')}"></div>`
+      + `<div class="fg"><label>${t('field.subject')}</label><input type="text" id="mpAsunto" value="${esc(df.asuntoFactura)}" placeholder="${esc(df.nombre)}"></div>`
       + `<div class="fg"><label>${t('field.color')}</label>${this.colorSelect(df.color)}</div>`
       + `<div class="fr"><div class="fg"><label>${t('field.status')}</label><select id="mpSt">${Object.entries(EST).map(([k, v]) => `<option value="${k}" ${k === df.estado ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
       + `<div class="fg" style="display:flex;gap:1.25rem;padding-top:1.5rem">`
@@ -153,8 +154,8 @@ const App = {
       + `<div id="bF" style="${df.modo === 'gratis' ? 'display:none' : ''}">`
       + `<div id="bfPH" style="${df.modo === 'por_hora' ? '' : 'display:none'}"><div class="fg"><label>${t('billing.eurPerHour')}</label><input type="number" id="mpPH" value="${df.precioHora}" step="0.01" min="0" placeholder="30.00" oninput="App.cPrev()"></div></div>`
       + `<div class="fr"><div class="fg" id="bfBase" style="${df.modo === 'desde_total' || df.modo === 'por_hora' ? 'display:none' : ''}"><label>${t('billing.baseEur')}</label><input type="number" id="mpBa" value="${df.base}" step="0.01" placeholder="0.00" oninput="App.cPrev()"></div><div class="fg" id="bfTot" style="${df.modo === 'desde_base' || df.modo === 'por_hora' ? 'display:none' : ''}"><label>${t('billing.totalEur')}</label><input type="number" id="mpTo" value="${df.total}" step="0.01" placeholder="0.00" oninput="App.cPrev()"></div></div>`
-      + `<div class="tr"><span class="tl">${t('billing.ivaToggle', df.iva)}</span><label class="tg"><input type="checkbox" id="mpIva" ${df.ivaOn ? 'checked' : ''} onchange="App.cPrev()"><span class="ts"></span></label></div>`
-      + `<div class="tr"><span class="tl">${t('billing.irpfToggle', df.irpf)}</span><label class="tg"><input type="checkbox" id="mpIrpf" ${df.irpfOn ? 'checked' : ''} onchange="App.cPrev()"><span class="ts"></span></label></div>`
+      + `<div class="tr"><span class="tl">${t('billing.ivaToggle', st.defaultIva)}</span><label class="tg"><input type="checkbox" id="mpIva" ${df.ivaOn ? 'checked' : ''} onchange="App.cPrev()"><span class="ts"></span></label></div>`
+      + `<div class="tr"><span class="tl">${t('billing.irpfToggle', st.defaultIrpf)}</span><label class="tg"><input type="checkbox" id="mpIrpf" ${df.irpfOn ? 'checked' : ''} onchange="App.cPrev()"><span class="ts"></span></label></div>`
       + `<div class="fg" style="margin-top:.4rem"><label>${t('billing.ivaException')}</label><input type="text" id="mpIvaExc" value="${esc(df.ivaExc)}" placeholder="${t('ph.ivaException')}"></div>`
       + `<div id="bPrev" class="bb" style="margin-top:.4rem"></div>`
       + `<div class="tr" style="margin-top:.75rem"><span class="tl">${t('billing.paid')}</span><label class="tg"><input type="checkbox" id="mpPg" ${df.pagado ? 'checked' : ''} onchange="document.getElementById('mpFPw').style.display=this.checked?'block':'none'"><span class="ts"></span></label></div>`
@@ -261,6 +262,7 @@ const App = {
         precioHora: parseFloat(document.getElementById('mpPH')?.value) || 0,
         iva: ivaOn ? (D.d.settings.defaultIva || 21) : 0, irpf: irpfOn ? (D.d.settings.defaultIrpf || 15) : 0,
         ivaExcepcion: document.getElementById('mpIvaExc')?.value?.trim() || '',
+        asuntoFactura: document.getElementById('mpAsunto')?.value?.trim() || '',
         importeIva: 0, importeIrpf: 0, totalFactura: 0, netoRecibido: 0,
         pagado: document.getElementById('mpPg')?.checked || false, fechaPago: document.getElementById('mpFP')?.value || null,
         gastos: 0,
@@ -286,11 +288,11 @@ const App = {
     B.calc(p);
     const f = p.facturacion, s = D.d.settings;
     const num = f.facturaNum || s.nextFacturaNum || 1;
-    const numStr = String(num).padStart(4, '0');
+    const numStr = String(num);
     this.om(`<div class="mt">${t('fac.generate')}</div>`
       + `<div class="fr"><div class="fg"><label>${t('field.invoiceNum')}</label><input type="text" id="facNum" value="${numStr}" style="font-family:'DM Mono',monospace"></div>`
       + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="facDate" value="${f.facturaFecha || todayStr()}"></div></div>`
-      + `<div class="fg"><label>${t('field.subject')}</label><input type="text" id="facAsunto" value="${esc(p.nombre)}"></div>`
+      + `<div class="fg"><label>${t('field.subject')}</label><input type="text" id="facAsunto" value="${esc(f.asuntoFactura || p.nombre)}"></div>`
       + `<div class="bb" style="margin-top:.75rem">`
       + `<div class="br"><span class="la">${t('fac.issuer')}</span><span class="va">${esc(s.emisor.nombre || t('fac.configure'))}</span></div>`
       + `<div class="br"><span class="la">${t('fac.client')}</span><span class="va">${esc(clienteName(p))}</span></div>`
@@ -304,7 +306,13 @@ const App = {
   genFactura(pid) {
     const fecha = document.getElementById('facDate').value;
     const asunto = document.getElementById('facAsunto').value.trim();
-    Fac.download(pid, { fecha, asunto });
+    const num = parseInt(document.getElementById('facNum').value) || null;
+    /* Guardar asunto en el proyecto para futuras facturas */
+    const p = D.p(pid);
+    if (p && asunto && asunto !== p.nombre) {
+      p.facturacion.asuntoFactura = asunto;
+    }
+    Fac.download(pid, { fecha, asunto, num });
     T.ev('action', 'invoice_generate');
     this.cm(); this.rDet(pid);
   },

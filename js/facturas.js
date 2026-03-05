@@ -164,9 +164,16 @@ const Fac = {
       : [];
     const noteH = noteLines.length ? noteLines.length * 4 + 2 : 0;
 
+    /* Payment section height (label + gap + text lines) */
+    const pagoFullText = data.instruccionesPago
+      ? tf('fac.bankTransferText', lang) + '\n' + data.instruccionesPago
+      : '';
+    const pagoEstLines = pagoFullText ? doc.splitTextToSize(pagoFullText, 70) : [];
+    const pagoH = pagoEstLines.length ? 4 + 5 + pagoEstLines.length * 4 : 0;
+
     /* Calculate totals Y: push to bottom, but never overlap content */
     const totalsH = rows.length * lineH;
-    let totalsY = pageH - mg - totalsH - noteH;
+    let totalsY = pageH - mg - totalsH - noteH - pagoH;
     if (totalsY < y + 4) totalsY = y + 4;
 
     /* Draw IVA exception note above totals if present */
@@ -194,6 +201,21 @@ const Fac = {
       totalsY += lineH;
     });
 
+    /* ── Payment / bank account ── */
+    if (data.instruccionesPago) {
+      totalsY += 4;
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(60);
+      doc.text(tf('fac.paymentMethod', lang) + ':', labelX, totalsY);
+      totalsY += 5;
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'normal');
+      const fullText = tf('fac.bankTransferText', lang) + '\n' + data.instruccionesPago;
+      const lines = doc.splitTextToSize(fullText, 70);
+      doc.text(lines, labelX, totalsY);
+    }
+
     return doc;
   },
 
@@ -214,8 +236,8 @@ const Fac = {
     const facLang = f.idiomaFactura || D.d.settings.idioma || 'es';
 
     /* Numero de factura */
-    const num = f.facturaNum || s.nextFacturaNum || 1;
-    const numStr = String(num).padStart(4, '0');
+    const num = opts.num || f.facturaNum || s.nextFacturaNum || 1;
+    const numStr = String(num);
 
     /* Fecha y year short */
     const fecha = opts.fecha || todayStr();
@@ -240,7 +262,8 @@ const Fac = {
         irpfRate: f.irpf || 0,
         total: f.totalFactura || 0,
         ivaExcepcion: f.ivaExcepcion || ''
-      }
+      },
+      instruccionesPago: s.emisor.instruccionesPago || ''
     };
 
     /* Generar y descargar */

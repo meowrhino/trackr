@@ -64,7 +64,7 @@ Object.assign(App, {
       + `<div class="ds"><div style="display:flex;justify-content:space-between;align-items:center"><div class="dst" style="border:none;margin:0;padding:0">${t('det.hours')}</div><button class="bt bt-add" onclick="App.hModal('${p.id}')">${t('btn.addHour')}</button></div>${hHtml}</div>`
       + `<div class="ds"><div class="dst">${t('billing.title')}</div>${bHtml}`
       + `${f.pagado ? `<div style="margin-top:.5rem;font-size:.82rem;color:var(--ok)">${f.fechaPago ? t('billing.paidOn', fmtDate(f.fechaPago)) : t('billing.paid')}</div>` : ''}`
-      + `${f.facturaFecha ? `<div style="margin-top:.3rem;font-size:.78rem;color:var(--t3)">${t('billing.invoiceNo', String(f.facturaNum).padStart(4, '0'), fmtDate(f.facturaFecha))}</div>` : ''}`
+      + `${f.facturaFecha ? `<div style="margin-top:.3rem;font-size:.78rem;color:var(--t3)">${t('billing.invoiceNo', String(f.facturaNum), fmtDate(f.facturaFecha))}</div>` : ''}`
       + `</div>`;
   },
 

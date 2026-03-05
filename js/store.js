@@ -63,7 +63,8 @@ const D = {
     /* Settings */
     if (!d.settings) d.settings = {};
     const s = d.settings;
-    if (!s.emisor) s.emisor = { nombre: '', direccion1: '', direccion2: '', nif: '' };
+    if (!s.emisor) s.emisor = { nombre: '', direccion1: '', direccion2: '', nif: '', instruccionesPago: '' };
+    if (s.emisor.instruccionesPago == null) s.emisor.instruccionesPago = '';
     if (s.defaultIva == null) s.defaultIva = 21;
     if (s.defaultIrpf == null) s.defaultIrpf = 15;
     if (!s.targets) s.targets = { horasMes: null, ingresosMes: null, horasSemana: null };
@@ -162,7 +163,27 @@ const D = {
       if (c.nombreCompleto == null) c.nombreCompleto = '';
     });
 
-    d.version = 2;
+    /* Sincronizar IVA/IRPF de proyectos con defaults (v2 → v3) */
+    if (d.version < 3) {
+      d.projects.forEach(p => {
+        const f = p.facturacion;
+        if (!f || f.modo === 'gratis') return;
+        let changed = false;
+        if (f.iva === 21 && s.defaultIva !== 21) { f.iva = s.defaultIva; changed = true; }
+        if (f.irpf === 15 && s.defaultIrpf !== 15) { f.irpf = s.defaultIrpf; changed = true; }
+        if (changed) {
+          /* Recalcular importes inline (B no disponible aún) */
+          const b = f.baseImponible || 0, iv = f.iva || 0, ir = f.irpf || 0;
+          f.importeIva = Math.round(b * iv / 100 * 100) / 100;
+          f.importeIrpf = Math.round(b * ir / 100 * 100) / 100;
+          f.totalFactura = Math.round((b + f.importeIva - f.importeIrpf) * 100) / 100;
+          f.netoRecibido = Math.round((b - f.importeIrpf) * 100) / 100;
+          f.total = f.totalFactura;
+        }
+      });
+    }
+
+    d.version = 3;
   },
 
   /** Persiste en localStorage */

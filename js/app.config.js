@@ -24,6 +24,7 @@ Object.assign(App, {
       + `<div class="cfg-section"><div class="cfg-section-title">${t('cfg.defaults')}</div><div class="cfg-grid">`
       + `<div class="fg"><label>${t('cfg.ivaPercent')}</label><input type="number" id="cfgIva" value="${s.defaultIva}" min="0" max="100" step="1"></div>`
       + `<div class="fg"><label>${t('cfg.irpfPercent')}</label><input type="number" id="cfgIrpf" value="${s.defaultIrpf}" min="0" max="100" step="1"></div>`
+      + `<div class="cfg-full fg"><label>${t('cfg.bankAccount')}</label><input type="text" id="cfgPago" placeholder="${t('ph.bankAccount')}" value="${esc(em.instruccionesPago || '')}"></div>`
       + `</div></div>`
       + `<div class="cfg-section"><div class="cfg-section-title">${t('cfg.goals')}</div><div class="cfg-grid">`
       + `<div class="fg"><label>${t('cfg.hoursMonth')}</label><input type="number" id="cfgTHm" value="${tg.horasMes || ''}" min="0" step="1" placeholder="${t('ph.hoursMonth')}"></div>`
@@ -71,8 +72,26 @@ Object.assign(App, {
     s.emisor.direccion1 = document.getElementById('cfgED1').value.trim();
     s.emisor.direccion2 = document.getElementById('cfgED2').value.trim();
     s.emisor.nif = document.getElementById('cfgENif').value.trim();
-    s.defaultIva = parseInt(document.getElementById('cfgIva').value) || 0;
-    s.defaultIrpf = parseInt(document.getElementById('cfgIrpf').value) || 0;
+    s.emisor.instruccionesPago = document.getElementById('cfgPago').value.trim();
+
+    const oldIva = s.defaultIva;
+    const oldIrpf = s.defaultIrpf;
+    const newIva = parseInt(document.getElementById('cfgIva').value) || 0;
+    const newIrpf = parseInt(document.getElementById('cfgIrpf').value) || 0;
+    s.defaultIva = newIva;
+    s.defaultIrpf = newIrpf;
+
+    /* Propagar cambios de IVA/IRPF a proyectos que usaban el valor antiguo */
+    if (oldIva !== newIva || oldIrpf !== newIrpf) {
+      D.d.projects.forEach(p => {
+        const f = p.facturacion;
+        if (!f || f.modo === 'gratis') return;
+        if (f.iva === oldIva) f.iva = newIva;
+        if (f.irpf === oldIrpf) f.irpf = newIrpf;
+        B.calc(p);
+      });
+    }
+
     s.targets.horasMes = parseFloat(document.getElementById('cfgTHm').value) || null;
     s.targets.ingresosMes = parseFloat(document.getElementById('cfgTIm').value) || null;
     s.targets.horasSemana = parseFloat(document.getElementById('cfgTHs').value) || null;

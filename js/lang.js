@@ -138,6 +138,7 @@ const LANGS = {
     'ph.street': 'Calle, número',
     'ph.cityZip': 'CP, Ciudad, País',
     'ph.nif': '12345678A',
+    'ph.bankAccount': 'ES12 3456 7890 1234 5678 9012',
     'ph.clientNameOrCompany': 'Nombre o empresa',
     'ph.fullName': 'Nombre legal completo',
     'ph.clientCity': 'CP, Ciudad',
@@ -273,6 +274,7 @@ const LANGS = {
     'cfg.defaults': 'Valores por defecto',
     'cfg.ivaPercent': 'IVA %',
     'cfg.irpfPercent': 'IRPF %',
+    'cfg.bankAccount': 'Cuenta bancaria donde efectuar el ingreso',
     'cfg.goals': 'Objetivos',
     'cfg.hoursMonth': 'Horas / mes',
     'cfg.incomeMonth': 'Ingresos / mes (€)',
@@ -311,6 +313,8 @@ const LANGS = {
     'fac.iva': 'IVA ({0}%)',
     'fac.ivaException': 'IVA: {0}',
     'fac.total': 'TOTAL',
+    'fac.paymentMethod': 'FORMA DE PAGO',
+    'fac.bankTransferText': 'Abonar mediante transferencia bancaria al número de cuenta:',
 
     /* ── Factura modal ── */
     'fac.generate': 'Generar factura',
@@ -464,6 +468,7 @@ const LANGS = {
     'ph.street': 'Street, number',
     'ph.cityZip': 'Zip, City, Country',
     'ph.nif': '12345678A',
+    'ph.bankAccount': 'ES12 3456 7890 1234 5678 9012',
     'ph.clientNameOrCompany': 'Name or company',
     'ph.fullName': 'Full legal name',
     'ph.clientCity': 'Zip, City',
@@ -599,6 +604,7 @@ const LANGS = {
     'cfg.defaults': 'Defaults',
     'cfg.ivaPercent': 'VAT %',
     'cfg.irpfPercent': 'IRPF %',
+    'cfg.bankAccount': 'Bank account for payment',
     'cfg.goals': 'Goals',
     'cfg.hoursMonth': 'Hours / month',
     'cfg.incomeMonth': 'Income / month (€)',
@@ -637,6 +643,8 @@ const LANGS = {
     'fac.iva': 'VAT ({0}%)',
     'fac.ivaException': 'VAT: {0}',
     'fac.total': 'TOTAL',
+    'fac.paymentMethod': 'PAYMENT METHOD',
+    'fac.bankTransferText': 'Pay by bank transfer to account number:',
 
     /* ── Factura modal ── */
     'fac.generate': 'Generate invoice',
