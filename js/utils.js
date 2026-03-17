@@ -33,6 +33,21 @@ let GASTO_CAT = {
   otro:         'Otro'
 };
 
+/** Categorías de deducciones para la Renta (mutable para i18n) */
+let DEDUCIBLE_CAT = {
+  autonomos:    'Cuota de autónomos',
+  alquiler:     'Alquiler',
+  suministros:  'Suministros',
+  software:     'Software',
+  formacion:    'Formación',
+  material:     'Material y equipos',
+  transporte:   'Transporte',
+  seguros:      'Seguros',
+  asesoria:     'Asesoría',
+  amortizacion: 'Amortización',
+  otro:         'Otro'
+};
+
 /** Tipos de recurrencia de gastos (mutable para i18n) */
 let RECURRENCIA = {
   no:      'Puntual',

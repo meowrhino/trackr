@@ -16,6 +16,7 @@ Object.assign(App, {
     this._rDinIngresos();
     this._rDinGastos();
     this._rDinTrim();
+    this._rDinRenta();
   },
 
   /* ── Helpers periodo ── */
@@ -299,7 +300,112 @@ Object.assign(App, {
   },
 
   /* ══════════════════════════════════════
-   *  MODALES (sin cambios)
+   *  RENTA (Modelo 100)
+   * ══════════════════════════════════════ */
+  _rDinRenta() {
+    const el = document.getElementById('dinRenta');
+    const y = this.dinY;
+
+    /* Annual income */
+    let ingresosAnual = 0;
+    D.ps().forEach(p => {
+      B.calc(p);
+      const f = p.facturacion;
+      p.horas.forEach(h => {
+        if (h.fecha && h.fecha.startsWith(String(y)) && h.monto) ingresosAnual += h.monto;
+      });
+      if (f.pagado && f.fechaPago && f.fechaPago.startsWith(String(y))) {
+        ingresosAnual += f.netoRecibido || 0;
+      }
+    });
+
+    /* Annual business expenses */
+    let gastosAnual = 0;
+    D.gs().forEach(g => {
+      (g.entradas || []).forEach(e => {
+        if (e.fecha && e.fecha.startsWith(String(y))) gastosAnual += e.cantidad || 0;
+      });
+    });
+
+    const rendimiento = ingresosAnual - gastosAnual;
+
+    /* Deducibles for this year */
+    const deds = D.deds().filter(d => d.año === y);
+    const totalDeds = deds.reduce((s, d) => s + (d.cantidad || 0), 0);
+    const baseImponible = Math.max(rendimiento - totalDeds, 0);
+
+    let html = `<div class="info-section">`
+      + `<div class="din-gastos-header">`
+      +   `<span class="info-section-title" style="margin-bottom:0">${t('renta.title')} — ${y}</span>`
+      +   `<button class="bt bt-s" onclick="App.dedModal()">+ ${t('renta.addDeduction')}</button>`
+      + `</div>`
+      + `<div class="din-trim-card" style="margin-top:.75rem">`
+      +   `<div class="din-tax-row"><span>${t('renta.annualIncome')}</span><span class="m">${fmtMoney(ingresosAnual)}</span></div>`
+      +   `<div class="din-tax-row"><span>${t('renta.businessExpenses')}</span><span class="m">${fmtMoney(gastosAnual)}</span></div>`
+      +   `<div class="din-tax-row din-tax-total"><span>${t('renta.activityProfit')}</span><span class="m">${fmtMoney(rendimiento)}</span></div>`
+      + `</div>`;
+
+    /* Deductions list */
+    if (deds.length) {
+      html += `<div class="din-ded-list">`;
+      deds.forEach(d => {
+        const catLabel = DEDUCIBLE_CAT[d.categoria] || d.categoria || 'Otro';
+        html += `<div class="din-ded-item">`
+          + `<span class="din-ded-cat">${catLabel}</span>`
+          + `<span class="din-ded-desc">${esc(d.descripcion || '')}</span>`
+          + `<span class="din-ded-amount m">${fmtMoney(d.cantidad || 0)}</span>`
+          + `<div class="gas-actions">`
+          +   `<button class="cl-btn" onclick="App.dedModal('${d.id}')" title="${t('btn.edit')}">&#9998;</button>`
+          +   `<button class="cl-btn cl-btn-del" onclick="App.delDed('${d.id}')" title="${t('btn.delete')}">&times;</button>`
+          + `</div></div>`;
+      });
+      html += `</div>`;
+    } else {
+      html += `<div class="din-empty" style="margin-top:.5rem">${t('renta.noDeductions')}</div>`;
+    }
+
+    html += `<div class="din-trim-card" style="margin-top:.75rem">`
+      + `<div class="din-tax-row"><span>${t('renta.totalDeductions')}</span><span class="m">${fmtMoney(totalDeds)}</span></div>`
+      + `<div class="din-tax-row din-tax-total"><span>${t('renta.taxableIncome')}</span><span class="m">${fmtMoney(baseImponible)}</span></div>`
+      + `</div></div>`;
+
+    el.innerHTML = html;
+  },
+
+  dedModal(dedId) {
+    const isE = !!dedId, d = isE ? D.ded(dedId) : null;
+    this.om(`<div class="mt">${isE ? t('renta.editDeduction') : t('renta.addDeduction')}</div>`
+      + `<div class="fr"><div class="fg"><label>${t('field.category')}</label><select id="dedCat">${Object.entries(DEDUCIBLE_CAT).map(([k, v]) => `<option value="${k}" ${d?.categoria === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
+      + `<div class="fg"><label>${t('field.amountEntry')}</label><input type="number" id="dedA" min="0.01" step="0.01" value="${d?.cantidad || ''}" placeholder="0,00"></div></div>`
+      + `<div class="fg"><label>${t('field.note')}</label><input type="text" id="dedD" value="${esc(d?.descripcion || '')}" placeholder="${t('ph.detail')}"></div>`
+      + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveDed('${dedId || ''}')">${isE ? t('btn.save') : t('btn.add')}</button></div>`);
+  },
+
+  saveDed(dedId) {
+    const cant = parseFloat(document.getElementById('dedA').value) || 0;
+    if (cant <= 0) return;
+    const data = {
+      categoria: document.getElementById('dedCat').value,
+      descripcion: document.getElementById('dedD').value.trim(),
+      cantidad: cant,
+      año: this.dinY
+    };
+    if (dedId) D.upDed(dedId, data);
+    else { data.id = uid(); D.addDed(data); }
+    this.cm(); this.rGas();
+  },
+
+  delDed(dedId) {
+    const d = D.ded(dedId);
+    if (!d) return;
+    const catLabel = DEDUCIBLE_CAT[d.categoria] || d.categoria;
+    if (!confirm(t('renta.deleteConfirm', catLabel))) return;
+    D.delDed(dedId);
+    this.rGas();
+  },
+
+  /* ══════════════════════════════════════
+   *  MODALES GASTOS
    * ══════════════════════════════════════ */
   gModal(gid) {
     const isE = !!gid, g = isE ? D.g(gid) : null;

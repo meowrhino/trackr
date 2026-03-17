@@ -59,6 +59,7 @@ const D = {
     if (!d.clientes) d.clientes = [];
     if (!d.gastos) d.gastos = [];
     if (!d.projects) d.projects = [];
+    if (!d.deducibles) d.deducibles = [];
 
     /* Settings */
     if (!d.settings) d.settings = {};
@@ -268,6 +269,22 @@ const D = {
   /** Elimina un gasto por ID */
   delG(id) {
     this.d.gastos = this.d.gastos.filter(g => g.id !== id);
+    this.save();
+  },
+
+  /* ══════════════════════════════════════════════
+   *  DEDUCIBLES (Renta)
+   * ══════════════════════════════════════════════ */
+
+  deds() { return this.d.deducibles; },
+  ded(id) { return this.d.deducibles.find(d => d.id === id); },
+  addDed(d) { this.d.deducibles.push(d); this.save(); },
+  upDed(id, u) {
+    const i = this.d.deducibles.findIndex(d => d.id === id);
+    if (i !== -1) { Object.assign(this.d.deducibles[i], u); this.save(); }
+  },
+  delDed(id) {
+    this.d.deducibles = this.d.deducibles.filter(d => d.id !== id);
     this.save();
   },
 

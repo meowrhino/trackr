@@ -94,6 +94,47 @@
   letter-spacing:.04em;
 }
 
+/* ── Deducibles (Renta) ── */
+.din-ded-list{
+  display:flex;
+  flex-direction:column;
+  gap:1px;
+  margin-top:.75rem;
+}
+.din-ded-item{
+  display:flex;
+  align-items:center;
+  gap:.75rem;
+  padding:.55rem .75rem;
+  background:var(--bg2);
+  font-size:.82rem;
+}
+.din-ded-cat{
+  font-size:.68rem;
+  padding:.15rem .5rem;
+  border:1px solid var(--b2);
+  border-radius:var(--r);
+  color:var(--t2);
+  text-transform:uppercase;
+  letter-spacing:.03em;
+  white-space:nowrap;
+  min-width:80px;
+  text-align:center;
+}
+.din-ded-desc{
+  flex:1;
+  color:var(--t3);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.din-ded-amount{
+  font-family:'DM Mono',monospace;
+  font-weight:500;
+  min-width:80px;
+  text-align:right;
+}
+
 /* ── Lista de gastos (existing) ── */
 .gas-list{display:flex;flex-direction:column;gap:.5rem}
 

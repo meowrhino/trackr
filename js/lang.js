@@ -310,6 +310,19 @@ const LANGS = {
     'din.netProfit': 'Rendimiento neto',
     'din.withholdings': 'Retenciones',
 
+    /* ── Renta ── */
+    'renta.title': 'Renta (Modelo 100)',
+    'renta.annualIncome': 'Ingresos anuales',
+    'renta.businessExpenses': 'Gastos actividad',
+    'renta.activityProfit': 'Rendimiento actividad',
+    'renta.deductions': 'Deducciones adicionales',
+    'renta.totalDeductions': 'Total deducciones',
+    'renta.taxableIncome': 'Base imponible estimada',
+    'renta.addDeduction': 'Añadir deducción',
+    'renta.editDeduction': 'Editar deducción',
+    'renta.deleteConfirm': '¿Eliminar deducción "{0}"?',
+    'renta.noDeductions': 'Sin deducciones registradas',
+
     /* ── Gastos (legacy keys) ── */
     'gas.noExpenses': 'Sin gastos registrados',
     'gas.thisMonth': 'Este mes',
@@ -660,6 +673,19 @@ const LANGS = {
     'din.deductibleExp': 'Deductible expenses',
     'din.netProfit': 'Net profit',
     'din.withholdings': 'Withholdings',
+
+    /* ── Renta ── */
+    'renta.title': 'Tax return (Modelo 100)',
+    'renta.annualIncome': 'Annual income',
+    'renta.businessExpenses': 'Business expenses',
+    'renta.activityProfit': 'Activity profit',
+    'renta.deductions': 'Additional deductions',
+    'renta.totalDeductions': 'Total deductions',
+    'renta.taxableIncome': 'Estimated taxable income',
+    'renta.addDeduction': 'Add deduction',
+    'renta.editDeduction': 'Edit deduction',
+    'renta.deleteConfirm': 'Delete deduction "{0}"?',
+    'renta.noDeductions': 'No deductions recorded',
 
     /* ── Gastos (legacy keys) ── */
     'gas.noExpenses': 'No expenses recorded',
