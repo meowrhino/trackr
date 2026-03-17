@@ -84,6 +84,7 @@
 .info-stat-card{
   background:var(--bg2);
   border:1px solid var(--b1);
+  border-top:2px solid var(--stat-accent,var(--b1));
   border-radius:var(--r);
   padding:1rem;
   cursor:pointer;
@@ -149,9 +150,21 @@
 /* ── Quick actions ── */
 .info-quick{
   display:flex;
-  gap:.5rem;
+  gap:.35rem;
   margin-bottom:1.5rem;
 }
+.info-quick .bt{
+  font-size:.72rem;
+  padding:.3rem .7rem;
+  border:none;
+  background:transparent;
+  color:var(--t3);
+  opacity:.7;
+  transition:all var(--tr);
+}
+.info-quick .bt:hover{opacity:1;color:var(--t2);background:var(--bg3)}
+.info-quick .bt-p{color:var(--t2);opacity:.85;background:transparent;border:1px solid var(--b1)}
+.info-quick .bt-p:hover{opacity:1;border-color:var(--b2);background:var(--bg3)}
 
 /* ── Resumen financiero en Info ── */
 .info-fin{
@@ -165,7 +178,7 @@
   display:flex;
   align-items:center;
   justify-content:space-between;
-  margin-bottom:1rem;
+  margin-bottom:.5rem;
 }
 .info-fin-title{
   font-size:.82rem;
@@ -174,12 +187,27 @@
 .info-fin-nav{
   display:flex;
   align-items:center;
-  gap:.35rem;
+  gap:.5rem;
+}
+.info-fin-nav .bt-s{
+  padding:.2rem .5rem;
+  font-size:.7rem;
+}
+.info-fin-period{
+  font-size:.82rem;
+  color:var(--t2);
+  min-width:100px;
+  text-align:center;
+}
+.info-fin-controls{
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+  margin-bottom:.75rem;
 }
 .info-fin-toggle{
   display:flex;
   gap:2px;
-  margin-left:.75rem;
 }
 .info-fin-tb{
   padding:.25rem .5rem;
@@ -194,6 +222,34 @@
 }
 .info-fin-tb:hover{border-color:var(--b2);color:var(--t1)}
 .info-fin-tb.on{border-color:var(--t2);color:var(--t1)}
+
+/* Hero neto number */
+.info-fin-neto{
+  display:flex;
+  align-items:baseline;
+  gap:.6rem;
+  padding:.75rem 0;
+}
+.info-fin-neto-lbl{
+  font-size:.78rem;
+  color:var(--t3);
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+.info-fin-neto-val{
+  font-family:'DM Mono',monospace;
+  font-size:1.6rem;
+  font-weight:500;
+  letter-spacing:-.02em;
+}
+
+/* Bars section */
+.info-fin-bars{
+  margin-top:.75rem;
+  padding-top:.75rem;
+  border-top:1px solid var(--b1);
+}
+
 .info-fin-stats{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(120px,1fr));

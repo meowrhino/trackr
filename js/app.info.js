@@ -71,19 +71,19 @@ Object.assign(App, {
     /* ── Stats cards ── */
     statusEl.innerHTML =
       `<div class="info-stats">`
-      + `<div class="info-stat-card" onclick="App.go('dash')">`
+      + `<div class="info-stat-card" style="--stat-accent:var(--t2)" onclick="App.go('dash')">`
       +   `<div class="info-stat-val">${activos.length}</div>`
       +   `<div class="info-stat-lbl">${tp('info.activeProjects', activos.length)}</div>`
       + `</div>`
-      + `<div class="info-stat-card" onclick="App.go('cal')">`
+      + `<div class="info-stat-card" style="--stat-accent:var(--b2)" onclick="App.go('cal')">`
       +   `<div class="info-stat-val">${horasSemana.toFixed(1)}<small>h</small></div>`
       +   `<div class="info-stat-lbl">${t('info.thisWeek')}</div>`
       + `</div>`
-      + `<div class="info-stat-card" onclick="App.go('cal')">`
+      + `<div class="info-stat-card" style="--stat-accent:var(--b2)" onclick="App.go('cal')">`
       +   `<div class="info-stat-val">${horasMes.toFixed(1)}<small>h</small></div>`
       +   `<div class="info-stat-lbl">${t('info.thisMonth')}</div>`
       + `</div>`
-      + `<div class="info-stat-card">`
+      + `<div class="info-stat-card" style="--stat-accent:var(--ok)">`
       +   `<div class="info-stat-val">${horasMes > 0 ? fmtNum((cobradoMes - gastosMes) / horasMes) : '—'}<small>${horasMes > 0 ? '€/h' : ''}</small></div>`
       +   `<div class="info-stat-lbl">${t('info.realEurH')}</div>`
       + `</div>`
@@ -276,38 +276,49 @@ Object.assign(App, {
     const hasPrev = this._hasPeriodData(type, prevY, prevM);
     const hasNext = this._hasPeriodData(type, nextY, nextM);
 
-    el.innerHTML =
-      `<div class="info-fin">`
-      + `<div class="info-fin-header">`
-      +   `<span class="info-fin-title">${t('info.financialSummary')}</span>`
-      +   `<div class="info-fin-nav">`
-      +     (hasPrev ? `<button class="bt bt-s" onclick="App._infoFinPrev()">&larr;</button>` : `<span style="width:2rem"></span>`)
-      +     `<span style="min-width:120px;text-align:center;font-size:.85rem">${periodLabel}</span>`
-      +     (hasNext ? `<button class="bt bt-s" onclick="App._infoFinNext()">&rarr;</button>` : `<span style="width:2rem"></span>`)
-      +     `<div class="info-fin-toggle">`
-      +       `<button class="info-fin-tb${type === 'mes' ? ' on' : ''}" onclick="App._infoFinType('mes')">${t('info.month')}</button>`
-      +       `<button class="info-fin-tb${type === 'trim' ? ' on' : ''}" onclick="App._infoFinType('trim')">${t('info.quarter')}</button>`
-      +       `<button class="info-fin-tb${type === 'año' ? ' on' : ''}" onclick="App._infoFinType('año')">${t('info.year')}</button>`
-      +     `</div>`
-      +   `</div>`
-      + `</div>`
-      + (isEmpty
-        ? `<div class="es"><div class="tx">${t('info.noActivity')}</div></div>`
-        : `<div class="fin-row">`
+    /* bars html — skip empty gastos bar */
+    let barsHtml = '';
+    if (!isEmpty) {
+      barsHtml = `<div class="info-fin-bars">`
+        + `<div class="fin-row">`
         +   `<span class="fin-label">${t('info.collected')}</span>`
         +   `<div class="fin-bar"><div class="pbar"><div class="pbar-fill pbar-ok" style="width:${(cobrado / maxBar * 100).toFixed(1)}%"></div></div></div>`
         +   `<span class="fin-value" style="color:var(--ok)">${fmtMoney(cobrado)}</span>`
         + `</div>`
-        + `<div class="fin-row">`
-        +   `<span class="fin-label">${t('info.expensesLabel')}</span>`
-        +   `<div class="fin-bar"><div class="pbar"><div class="pbar-fill pbar-warn" style="width:${(gastosTotal / maxBar * 100).toFixed(1)}%"></div></div></div>`
-        +   `<span class="fin-value" style="color:var(--warn)">${fmtMoney(gastosTotal)}</span>`
+        + (gastosTotal > 0
+          ? `<div class="fin-row">`
+          +   `<span class="fin-label">${t('info.expensesLabel')}</span>`
+          +   `<div class="fin-bar"><div class="pbar"><div class="pbar-fill pbar-warn" style="width:${(gastosTotal / maxBar * 100).toFixed(1)}%"></div></div></div>`
+          +   `<span class="fin-value" style="color:var(--warn)">${fmtMoney(gastosTotal)}</span>`
+          + `</div>`
+          : '')
+        + `</div>`;
+    }
+
+    el.innerHTML =
+      `<div class="info-fin">`
+      + `<div class="info-fin-header">`
+      +   `<span class="info-fin-title">${t('info.financialSummary')}</span>`
+      +   `<div class="info-fin-toggle">`
+      +     `<button class="info-fin-tb${type === 'mes' ? ' on' : ''}" onclick="App._infoFinType('mes')">${t('info.month')}</button>`
+      +     `<button class="info-fin-tb${type === 'trim' ? ' on' : ''}" onclick="App._infoFinType('trim')">${t('info.quarter')}</button>`
+      +     `<button class="info-fin-tb${type === 'año' ? ' on' : ''}" onclick="App._infoFinType('año')">${t('info.year')}</button>`
+      +   `</div>`
+      + `</div>`
+      + `<div class="info-fin-controls">`
+      +   `<div class="info-fin-nav">`
+      +     (hasPrev ? `<button class="bt bt-s" onclick="App._infoFinPrev()">&larr;</button>` : `<span style="width:2rem"></span>`)
+      +     `<span class="info-fin-period">${periodLabel}</span>`
+      +     (hasNext ? `<button class="bt bt-s" onclick="App._infoFinNext()">&rarr;</button>` : `<span style="width:2rem"></span>`)
+      +   `</div>`
+      + `</div>`
+      + (isEmpty
+        ? `<div class="es"><div class="tx">${t('info.noActivity')}</div></div>`
+        : `<div class="info-fin-neto">`
+        +   `<span class="info-fin-neto-lbl">${t('info.netLabel')}</span>`
+        +   `<span class="info-fin-neto-val" style="color:${neto >= 0 ? 'var(--ok)' : 'var(--bad)'};">${fmtMoney(neto)}</span>`
         + `</div>`
-        + `<div class="fin-sep"></div>`
-        + `<div class="fin-row fin-total">`
-        +   `<span class="fin-label">${t('info.netLabel')}</span>`
-        +   `<span class="fin-value" style="color:${neto >= 0 ? 'var(--ok)' : 'var(--bad)'}">${fmtMoney(neto)}</span>`
-        + `</div>`
+        + barsHtml
         + (type === 'trim'
           ? `<div class="info-fin-stats">`
           + `<div class="sc"><div class="sc-l">${t('info.taxableBase')}</div><div class="sc-v m">${fmtMoney(baseTotal)}</div></div>`
