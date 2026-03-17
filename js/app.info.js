@@ -20,7 +20,7 @@ Object.assign(App, {
 
     /* ── Stats rápidas ── */
     const activos = ps.filter(p => p.estado === 'activo');
-    let horasSemana = 0, horasMes = 0, pendienteCobro = 0, nPendiente = 0;
+    let horasSemana = 0, horasMes = 0, cobradoMes = 0, gastosMes = 0, pendienteCobro = 0, nPendiente = 0;
     const weekDates = new Set();
     for (let i = 0; i < 7; i++) {
       const d = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + i);
@@ -35,11 +35,14 @@ Object.assign(App, {
         if (h.fecha.startsWith(thisMonth)) horasMes += h.cantidad;
       });
       const f = p.facturacion;
+      if (f.pagado && f.fechaPago && f.fechaPago.startsWith(thisMonth)) cobradoMes += f.netoRecibido || 0;
+      p.horas.forEach(h => { if (h.monto && h.fecha && h.fecha.startsWith(thisMonth)) cobradoMes += h.monto; });
       if ((p.estado === 'completado' || p.estado === 'abandonado') && f.facturaFecha && !f.pagado) {
         pendienteCobro += f.netoRecibido || 0;
         nPendiente++;
       }
     });
+    D.gs().forEach(g => { (g.entradas || []).forEach(e => { if (e.fecha && e.fecha.startsWith(thisMonth)) gastosMes += e.cantidad || 0; }); });
 
     const statusEl = document.getElementById('infoStatus');
     const mainEl = document.getElementById('infoMain');
@@ -79,6 +82,10 @@ Object.assign(App, {
       + `<div class="info-stat-card" onclick="App.go('cal')">`
       +   `<div class="info-stat-val">${horasMes.toFixed(1)}<small>h</small></div>`
       +   `<div class="info-stat-lbl">${t('info.thisMonth')}</div>`
+      + `</div>`
+      + `<div class="info-stat-card">`
+      +   `<div class="info-stat-val">${horasMes > 0 ? fmtNum((cobradoMes - gastosMes) / horasMes) : '—'}<small>${horasMes > 0 ? '€/h' : ''}</small></div>`
+      +   `<div class="info-stat-lbl">${t('info.realEurH')}</div>`
       + `</div>`
       + `</div>`;
 
@@ -301,15 +308,13 @@ Object.assign(App, {
         +   `<span class="fin-label">${t('info.netLabel')}</span>`
         +   `<span class="fin-value" style="color:${neto >= 0 ? 'var(--ok)' : 'var(--bad)'}">${fmtMoney(neto)}</span>`
         + `</div>`
-        + `<div class="info-fin-stats">`
-        +   `<div class="sc"><div class="sc-l">${t('info.hoursLabel')}</div><div class="sc-v m">${horas.toFixed(1)}h</div></div>`
-        +   `<div class="sc"><div class="sc-l">${t('info.realEurH')}</div><div class="sc-v m">${fmtNum(eurH)} &euro;/h</div></div>`
         + (type === 'trim'
-          ? `<div class="sc"><div class="sc-l">${t('info.taxableBase')}</div><div class="sc-v m">${fmtMoney(baseTotal)}</div></div>`
+          ? `<div class="info-fin-stats">`
+          + `<div class="sc"><div class="sc-l">${t('info.taxableBase')}</div><div class="sc-v m">${fmtMoney(baseTotal)}</div></div>`
           + `<div class="sc"><div class="sc-l">${t('info.outputVat')}</div><div class="sc-v m">${fmtMoney(ivaTotal)}</div></div>`
           + `<div class="sc"><div class="sc-l">${t('info.irpfWithheld')}</div><div class="sc-v m">${fmtMoney(irpfTotal)}</div></div>`
+          + `</div>`
           : '')
-        + `</div>`
       )
       + `</div>`;
   },
