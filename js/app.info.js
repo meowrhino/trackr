@@ -201,7 +201,11 @@ Object.assign(App, {
     const now = new Date();
     const year = now.getFullYear();
     const month = now.getMonth();
-    const periodLabel = `${MESES[month]} ${year}`;
+    const type = this.infoPeriod || 'mes';
+
+    const periodLabel = type === 'mes' ? `${MESES[month]} ${year}`
+      : type === 'trim' ? `T${Math.floor(month / 3) + 1} ${year}`
+      : `${year}`;
 
     let cobrado = 0;
 
@@ -209,11 +213,11 @@ Object.assign(App, {
       B.calc(p);
       const f = p.facturacion;
       p.horas.forEach(h => {
-        if (h.fecha && inPeriod(h.fecha, 'mes', year, month)) {
+        if (h.fecha && inPeriod(h.fecha, type, year, month)) {
           if (h.monto) cobrado += h.monto;
         }
       });
-      if (f.pagado && f.fechaPago && inPeriod(f.fechaPago, 'mes', year, month)) {
+      if (f.pagado && f.fechaPago && inPeriod(f.fechaPago, type, year, month)) {
         cobrado += f.netoRecibido || 0;
       }
     });
@@ -221,7 +225,7 @@ Object.assign(App, {
     let gastosTotal = 0;
     D.gs().forEach(g => {
       (g.entradas || []).forEach(e => {
-        if (e.fecha && inPeriod(e.fecha, 'mes', year, month)) {
+        if (e.fecha && inPeriod(e.fecha, type, year, month)) {
           gastosTotal += e.cantidad || 0;
         }
       });
@@ -237,6 +241,11 @@ Object.assign(App, {
       `<div class="info-fin">`
       + `<div class="info-fin-header">`
       +   `<span class="info-fin-title">${t('info.financialSummary')} — ${periodLabel}</span>`
+      +   `<div class="info-fin-toggle">`
+      +     `<button class="info-fin-tb${type === 'mes' ? ' on' : ''}" onclick="App._infoType('mes')">${t('info.month')}</button>`
+      +     `<button class="info-fin-tb${type === 'trim' ? ' on' : ''}" onclick="App._infoType('trim')">${t('info.quarter')}</button>`
+      +     `<button class="info-fin-tb${type === 'año' ? ' on' : ''}" onclick="App._infoType('año')">${t('info.year')}</button>`
+      +   `</div>`
       + `</div>`
       + `<div class="fin-row">`
       +   `<span class="fin-label">${t('info.collected')}</span>`
@@ -253,9 +262,15 @@ Object.assign(App, {
       + `<div class="fin-sep"></div>`
       + `<div class="fin-row fin-total">`
       +   `<span class="fin-label">${t('info.netLabel')}</span>`
+      +   `<div class="fin-bar"></div>`
       +   `<span class="fin-value" style="color:${neto >= 0 ? 'var(--ok)' : 'var(--bad)'}">${fmtMoney(neto)}</span>`
       + `</div>`
       + `</div>`;
+  },
+
+  _infoType(tp) {
+    this.infoPeriod = tp;
+    this._rInfoFinancial();
   }
 
 });

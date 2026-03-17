@@ -22,7 +22,7 @@ const App = {
   calM: null,         /* mes del calendario 0-11 */
   calView: 'month',   /* 'month' | 'week' */
   calWeekStart: null,  /* Date del lunes de la semana */
-  /* (periodo financiero ahora solo en Dinero, Info muestra mes actual) */
+  infoPeriod: 'mes',  /* periodo del resumen Info: 'mes' | 'trim' | 'año' (solo actual) */
   _editPid: null,     /* ID del proyecto siendo editado (para preview facturación) */
 
   /* ══════════════════════════════════════════════
