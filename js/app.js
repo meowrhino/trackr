@@ -22,9 +22,7 @@ const App = {
   calM: null,         /* mes del calendario 0-11 */
   calView: 'month',   /* 'month' | 'week' */
   calWeekStart: null,  /* Date del lunes de la semana */
-  infoPeriod: 'mes',  /* periodo del resumen: 'mes' | 'trim' | 'año' */
-  infoY: null,        /* año del resumen financiero */
-  infoM: null,        /* mes del resumen financiero 0-11 */
+  /* (periodo financiero ahora solo en Dinero, Info muestra mes actual) */
   _editPid: null,     /* ID del proyecto siendo editado (para preview facturación) */
 
   /* ══════════════════════════════════════════════
@@ -41,11 +39,6 @@ const App = {
     /* Aplicar tema e idioma guardados */
     applyTheme(D.d.settings.tema || 'oscuro');
     setLang(D.d.settings.idioma || 'es');
-
-    /* Inicializar periodo del resumen al mes actual */
-    const now = new Date();
-    this.infoY = now.getFullYear();
-    this.infoM = now.getMonth();
 
     /* Cerrar modal con Escape */
     document.addEventListener('keydown', e => {

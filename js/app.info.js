@@ -198,85 +198,64 @@ Object.assign(App, {
     const ps = D.ps();
     if (!ps.length) { el.innerHTML = ''; return; }
 
-    const type = this.infoPeriod;
-    const year = this.infoY;
-    const month = this.infoM;
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const periodLabel = `${MESES[month]} ${year}`;
 
-    let cobrado = 0, horas = 0;
-    let baseTotal = 0, ivaTotal = 0, irpfTotal = 0;
+    let cobrado = 0;
 
     ps.forEach(p => {
       B.calc(p);
       const f = p.facturacion;
       p.horas.forEach(h => {
-        if (h.fecha && inPeriod(h.fecha, type, year, month)) {
-          horas += h.cantidad;
+        if (h.fecha && inPeriod(h.fecha, 'mes', year, month)) {
           if (h.monto) cobrado += h.monto;
         }
       });
-      if (f.pagado && f.fechaPago && inPeriod(f.fechaPago, type, year, month)) {
+      if (f.pagado && f.fechaPago && inPeriod(f.fechaPago, 'mes', year, month)) {
         cobrado += f.netoRecibido || 0;
-        baseTotal += f.baseImponible || 0;
-        ivaTotal += f.importeIva || 0;
-        irpfTotal += f.importeIrpf || 0;
       }
     });
 
     let gastosTotal = 0;
     D.gs().forEach(g => {
       (g.entradas || []).forEach(e => {
-        if (e.fecha && inPeriod(e.fecha, type, year, month)) {
+        if (e.fecha && inPeriod(e.fecha, 'mes', year, month)) {
           gastosTotal += e.cantidad || 0;
         }
       });
     });
 
     const neto = cobrado - gastosTotal;
-    const eurH = horas > 0 ? neto / horas : 0;
-
-    const isEmpty = cobrado === 0 && gastosTotal === 0 && horas === 0;
-    if (isEmpty) {
-      el.innerHTML = ''; return;
-    }
+    const isEmpty = cobrado === 0 && gastosTotal === 0;
+    if (isEmpty) { el.innerHTML = ''; return; }
 
     const maxBar = Math.max(cobrado, gastosTotal, 1);
 
     el.innerHTML =
       `<div class="info-fin">`
       + `<div class="info-fin-header">`
-      +   `<span class="info-fin-title">${t('info.financialSummary')}</span>`
-      +   `<div class="info-fin-toggle">`
-      +     `<button class="info-fin-tb${type === 'mes' ? ' on' : ''}" onclick="App._infoFinType('mes')">${t('info.month')}</button>`
-      +     `<button class="info-fin-tb${type === 'trim' ? ' on' : ''}" onclick="App._infoFinType('trim')">${t('info.quarter')}</button>`
-      +     `<button class="info-fin-tb${type === 'año' ? ' on' : ''}" onclick="App._infoFinType('año')">${t('info.year')}</button>`
-      +   `</div>`
+      +   `<span class="info-fin-title">${t('info.financialSummary')} — ${periodLabel}</span>`
       + `</div>`
-      + (isEmpty
-        ? `<div class="es"><div class="tx">${t('info.noActivity')}</div></div>`
-        : `<div class="fin-row">`
-        +   `<span class="fin-label">${t('info.collected')}</span>`
-        +   `<div class="fin-bar"><div class="pbar"><div class="pbar-fill pbar-ok" style="width:${(cobrado / maxBar * 100).toFixed(1)}%"></div></div></div>`
-        +   `<span class="fin-value" style="color:var(--ok)">${fmtMoney(cobrado)}</span>`
+      + `<div class="fin-row">`
+      +   `<span class="fin-label">${t('info.collected')}</span>`
+      +   `<div class="fin-bar"><div class="pbar"><div class="pbar-fill pbar-ok" style="width:${(cobrado / maxBar * 100).toFixed(1)}%"></div></div></div>`
+      +   `<span class="fin-value" style="color:var(--ok)">${fmtMoney(cobrado)}</span>`
+      + `</div>`
+      + (gastosTotal > 0
+        ? `<div class="fin-row">`
+        +   `<span class="fin-label">${t('info.expensesLabel')}</span>`
+        +   `<div class="fin-bar"><div class="pbar"><div class="pbar-fill pbar-warn" style="width:${(gastosTotal / maxBar * 100).toFixed(1)}%"></div></div></div>`
+        +   `<span class="fin-value" style="color:var(--warn)">${fmtMoney(gastosTotal)}</span>`
         + `</div>`
-        + (gastosTotal > 0
-          ? `<div class="fin-row">`
-          +   `<span class="fin-label">${t('info.expensesLabel')}</span>`
-          +   `<div class="fin-bar"><div class="pbar"><div class="pbar-fill pbar-warn" style="width:${(gastosTotal / maxBar * 100).toFixed(1)}%"></div></div></div>`
-          +   `<span class="fin-value" style="color:var(--warn)">${fmtMoney(gastosTotal)}</span>`
-          + `</div>`
-          : '')
-        + `<div class="fin-sep"></div>`
-        + `<div class="fin-row fin-total">`
-        +   `<span class="fin-label">${t('info.netLabel')}</span>`
-        +   `<span class="fin-value" style="color:${neto >= 0 ? 'var(--ok)' : 'var(--bad)'}">${fmtMoney(neto)}</span>`
-        + `</div>`
-      )
+        : '')
+      + `<div class="fin-sep"></div>`
+      + `<div class="fin-row fin-total">`
+      +   `<span class="fin-label">${t('info.netLabel')}</span>`
+      +   `<span class="fin-value" style="color:${neto >= 0 ? 'var(--ok)' : 'var(--bad)'}">${fmtMoney(neto)}</span>`
+      + `</div>`
       + `</div>`;
-  },
-
-  _infoFinType(t) {
-    this.infoPeriod = t;
-    this._rInfoFinancial();
   }
 
 });
