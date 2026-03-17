@@ -26,8 +26,6 @@
 .din-fin-period{
   font-size:.95rem;
   font-weight:500;
-  min-width:120px;
-  text-align:center;
 }
 
 /* Tax detail rows (base, IVA, IRPF) */

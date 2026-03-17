@@ -58,34 +58,44 @@ Object.assign(App, {
     const ps = D.ps();
     const type = this.dinPeriod, y = this.dinY, m = this.dinM;
 
-    let cobrado = 0, gastosTotal = 0, horas = 0;
-    let baseTotal = 0, ivaTotal = 0, irpfTotal = 0;
+    let cobrado = 0;
 
     ps.forEach(p => {
       B.calc(p);
       const f = p.facturacion;
       p.horas.forEach(h => {
         if (h.fecha && inPeriod(h.fecha, type, y, m)) {
-          horas += h.cantidad;
           if (h.monto) cobrado += h.monto;
         }
       });
       if (f.pagado && f.fechaPago && inPeriod(f.fechaPago, type, y, m)) {
         cobrado += f.netoRecibido || 0;
-        baseTotal += f.baseImponible || 0;
-        ivaTotal += f.importeIva || 0;
-        irpfTotal += f.importeIrpf || 0;
       }
     });
 
+    /* stacked expense bar: per-gasto segments */
+    const gastoSegs = [];
     D.gs().forEach(g => {
+      let tot = 0;
       (g.entradas || []).forEach(e => {
-        if (e.fecha && inPeriod(e.fecha, type, y, m)) gastosTotal += e.cantidad || 0;
+        if (e.fecha && inPeriod(e.fecha, type, y, m)) tot += e.cantidad || 0;
       });
+      if (tot > 0) gastoSegs.push({ nombre: g.nombre, total: tot, color: colorHex(g.color || 'Salmon') });
     });
+    const gastosTotal = gastoSegs.reduce((s, seg) => s + seg.total, 0);
 
     const neto = cobrado - gastosTotal;
     const maxBar = Math.max(cobrado, gastosTotal, 1);
+
+    /* stacked segments HTML */
+    let segsHtml = '';
+    if (gastosTotal > 0) {
+      gastoSegs.forEach(seg => {
+        const pct = (seg.total / gastosTotal * 100).toFixed(1);
+        segsHtml += `<div class="pbar-seg" style="width:${pct}%;background:${seg.color}" title="${esc(seg.nombre)}: ${fmtMoney(seg.total)}"></div>`;
+      });
+    }
+    const expBarWidth = (gastosTotal / maxBar * 100).toFixed(1);
 
     /* nav */
     let prevY = y, prevM = m, nextY = y, nextM = m;
@@ -98,15 +108,15 @@ Object.assign(App, {
     el.innerHTML =
       `<div class="din-fin">`
       + `<div class="din-fin-header">`
+      +   `<span class="din-fin-period">${this._dinPeriodLabel()}</span>`
       +   `<div class="din-fin-nav">`
       +     (hasPrev ? `<button class="bt bt-s" onclick="App._dinPrev()">&larr;</button>` : `<span style="width:2rem"></span>`)
-      +     `<span class="din-fin-period">${this._dinPeriodLabel()}</span>`
+      +     `<div class="info-fin-toggle">`
+      +       `<button class="info-fin-tb${type === 'mes' ? ' on' : ''}" onclick="App._dinType('mes')">${t('info.month')}</button>`
+      +       `<button class="info-fin-tb${type === 'trim' ? ' on' : ''}" onclick="App._dinType('trim')">${t('info.quarter')}</button>`
+      +       `<button class="info-fin-tb${type === 'año' ? ' on' : ''}" onclick="App._dinType('año')">${t('info.year')}</button>`
+      +     `</div>`
       +     (hasNext ? `<button class="bt bt-s" onclick="App._dinNext()">&rarr;</button>` : `<span style="width:2rem"></span>`)
-      +   `</div>`
-      +   `<div class="info-fin-toggle">`
-      +     `<button class="info-fin-tb${type === 'mes' ? ' on' : ''}" onclick="App._dinType('mes')">${t('info.month')}</button>`
-      +     `<button class="info-fin-tb${type === 'trim' ? ' on' : ''}" onclick="App._dinType('trim')">${t('info.quarter')}</button>`
-      +     `<button class="info-fin-tb${type === 'año' ? ' on' : ''}" onclick="App._dinType('año')">${t('info.year')}</button>`
       +   `</div>`
       + `</div>`
       + `<div class="din-fin-body">`
@@ -117,19 +127,15 @@ Object.assign(App, {
       +   `</div>`
       +   `<div class="fin-row">`
       +     `<span class="fin-label">${t('din.expenses')}</span>`
-      +     `<div class="fin-bar"><div class="pbar"><div class="pbar-fill pbar-warn" style="width:${(gastosTotal / maxBar * 100).toFixed(1)}%"></div></div></div>`
+      +     `<div class="fin-bar"><div class="pbar"><div class="pbar-fill pbar-stacked" style="width:${expBarWidth}%">${segsHtml}</div></div></div>`
       +     `<span class="fin-value" style="color:var(--warn)">${fmtMoney(gastosTotal)}</span>`
       +   `</div>`
       +   `<div class="fin-sep"></div>`
       +   `<div class="fin-row fin-total">`
       +     `<span class="fin-label">${t('din.net')}</span>`
+      +     `<div class="fin-bar"></div>`
       +     `<span class="fin-value" style="color:${neto >= 0 ? 'var(--ok)' : 'var(--bad)'};">${fmtMoney(neto)}</span>`
       +   `</div>`
-      + (baseTotal > 0 ? `<div class="din-fin-tax">`
-      +   `<div class="din-tax-row"><span>${t('din.taxBase')}</span><span class="m">${fmtMoney(baseTotal)}</span></div>`
-      +   `<div class="din-tax-row"><span>${t('din.vatCharged')}</span><span class="m">${fmtMoney(ivaTotal)}</span></div>`
-      +   `<div class="din-tax-row"><span>${t('din.irpfWithheld')}</span><span class="m">${fmtMoney(irpfTotal)}</span></div>`
-      + `</div>` : '')
       + `</div></div>`;
   },
 

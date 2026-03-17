@@ -64,6 +64,8 @@
 .pbar-ok{background:var(--ok)}
 .pbar-warn{background:var(--warn)}
 .pbar-neutral{background:var(--t2)}
+.pbar-stacked{display:flex;border-radius:4px;overflow:hidden}
+.pbar-seg{height:100%;min-width:2px}
 
 /* ── Resumen financiero (barras con label) ── */
 .fin-row{display:flex;align-items:center;gap:.75rem;margin-bottom:.6rem}
