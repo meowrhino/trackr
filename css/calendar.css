@@ -282,6 +282,13 @@
   align-items:center;
   gap:.35rem;
 }
+.cal-evt.cal-evt-sm .cal-evt-t{
+  flex-shrink:0;
+}
+.cal-evt.cal-evt-sm .cal-evt-n{
+  min-width:0;
+  flex:1;
+}
 
 /* Drag preview al crear hora */
 .cal-drag-pv{

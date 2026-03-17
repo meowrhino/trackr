@@ -47,6 +47,7 @@
   .cal-wh-num{font-size:.7rem}
   .cal-evt-t{font-size:.6rem}
   .cal-evt-n{display:none}
+  .cal-evt-sm .cal-evt-n{display:block}
 
   /* Gastos */
   .gas-count{display:none}

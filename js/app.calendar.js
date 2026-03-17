@@ -197,8 +197,10 @@ Object.assign(App, {
         const mins = parseInt(parts[0]) * 60 + parseInt(parts[1]);
         const top = ((mins - hStart * 60) / 60) * slotH;
         const height = e.cant * slotH;
-        const smCls = e.cant <= 0.5 ? ' cal-evt-sm' : '';
-        evts += `<div class="cal-evt${smCls}" style="top:${top}px;height:${Math.max(height, 20)}px;--ec:${e.pc}" onclick="event.stopPropagation();App.eHour('${e.pid}','${e.hid}')"><span class="cal-evt-t">${e.tipo === 'trabajo' ? '💻' : '👥'} ${e.cant}h</span><span class="cal-evt-n">${esc(e.pn)}</span></div>`;
+        const isSm = e.cant <= 0.5;
+        const smCls = isSm ? ' cal-evt-sm' : '';
+        const ico = isSm ? '' : (e.tipo === 'trabajo' ? '💻 ' : '👥 ');
+        evts += `<div class="cal-evt${smCls}" style="top:${top}px;height:${Math.max(height, 20)}px;--ec:${e.pc}" onclick="event.stopPropagation();App.eHour('${e.pid}','${e.hid}')"><span class="cal-evt-t">${ico}${e.cant}h</span><span class="cal-evt-n">${esc(e.pn)}</span></div>`;
       });
       cols += `<div class="cal-wcol" data-col="${di}">${slots}${evts}</div>`;
     });
