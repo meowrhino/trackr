@@ -177,33 +177,17 @@
 .info-fin-header{
   display:flex;
   align-items:center;
-  justify-content:space-between;
-  margin-bottom:.5rem;
+  gap:.75rem;
+  margin-bottom:1rem;
 }
 .info-fin-title{
   font-size:.82rem;
   font-weight:500;
 }
-.info-fin-nav{
-  display:flex;
-  align-items:center;
-  gap:.5rem;
-}
-.info-fin-nav .bt-s{
-  padding:.2rem .5rem;
-  font-size:.7rem;
-}
 .info-fin-period{
   font-size:.82rem;
   color:var(--t2);
-  min-width:100px;
-  text-align:center;
-}
-.info-fin-controls{
-  display:flex;
-  align-items:center;
-  gap:.5rem;
-  margin-bottom:.75rem;
+  margin-left:auto;
 }
 .info-fin-toggle{
   display:flex;
@@ -222,33 +206,6 @@
 }
 .info-fin-tb:hover{border-color:var(--b2);color:var(--t1)}
 .info-fin-tb.on{border-color:var(--t2);color:var(--t1)}
-
-/* Hero neto number */
-.info-fin-neto{
-  display:flex;
-  align-items:baseline;
-  gap:.6rem;
-  padding:.75rem 0;
-}
-.info-fin-neto-lbl{
-  font-size:.78rem;
-  color:var(--t3);
-  text-transform:uppercase;
-  letter-spacing:.04em;
-}
-.info-fin-neto-val{
-  font-family:'DM Mono',monospace;
-  font-size:1.6rem;
-  font-weight:500;
-  letter-spacing:-.02em;
-}
-
-/* Bars section */
-.info-fin-bars{
-  margin-top:.75rem;
-  padding-top:.75rem;
-  border-top:1px solid var(--b1);
-}
 
 .info-fin-stats{
   display:grid;

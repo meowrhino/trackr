@@ -193,23 +193,6 @@ Object.assign(App, {
     this._rInfoFinancial();
   },
 
-  _hasPeriodData(type, year, month) {
-    const ps = D.ps();
-    for (const p of ps) {
-      for (const h of p.horas) {
-        if (h.fecha && inPeriod(h.fecha, type, year, month)) return true;
-      }
-      const f = p.facturacion;
-      if (f.pagado && f.fechaPago && inPeriod(f.fechaPago, type, year, month)) return true;
-    }
-    for (const g of D.gs()) {
-      for (const e of (g.entradas || [])) {
-        if (e.fecha && inPeriod(e.fecha, type, year, month)) return true;
-      }
-    }
-    return false;
-  },
-
   _rInfoFinancial() {
     const el = document.getElementById('infoFinancial');
     const ps = D.ps();
@@ -265,22 +248,20 @@ Object.assign(App, {
 
     const maxBar = Math.max(cobrado, gastosTotal, 1);
 
-    let prevY = year, prevM = month, nextY = year, nextM = month;
-    if (type === 'mes') {
-      prevM--; if (prevM < 0) { prevM = 11; prevY--; }
-      nextM++; if (nextM > 11) { nextM = 0; nextY++; }
-    } else if (type === 'trim') {
-      prevM -= 3; if (prevM < 0) { prevM += 12; prevY--; }
-      nextM += 3; if (nextM > 11) { nextM -= 12; nextY++; }
-    } else { prevY--; nextY++; }
-    const hasPrev = this._hasPeriodData(type, prevY, prevM);
-    const hasNext = this._hasPeriodData(type, nextY, nextM);
-
-    /* bars html — skip empty gastos bar */
-    let barsHtml = '';
-    if (!isEmpty) {
-      barsHtml = `<div class="info-fin-bars">`
-        + `<div class="fin-row">`
+    el.innerHTML =
+      `<div class="info-fin">`
+      + `<div class="info-fin-header">`
+      +   `<span class="info-fin-title">${t('info.financialSummary')}</span>`
+      +   `<span class="info-fin-period">${periodLabel}</span>`
+      +   `<div class="info-fin-toggle">`
+      +     `<button class="info-fin-tb${type === 'mes' ? ' on' : ''}" onclick="App._infoFinType('mes')">${t('info.month')}</button>`
+      +     `<button class="info-fin-tb${type === 'trim' ? ' on' : ''}" onclick="App._infoFinType('trim')">${t('info.quarter')}</button>`
+      +     `<button class="info-fin-tb${type === 'año' ? ' on' : ''}" onclick="App._infoFinType('año')">${t('info.year')}</button>`
+      +   `</div>`
+      + `</div>`
+      + (isEmpty
+        ? `<div class="es"><div class="tx">${t('info.noActivity')}</div></div>`
+        : `<div class="fin-row">`
         +   `<span class="fin-label">${t('info.collected')}</span>`
         +   `<div class="fin-bar"><div class="pbar"><div class="pbar-fill pbar-ok" style="width:${(cobrado / maxBar * 100).toFixed(1)}%"></div></div></div>`
         +   `<span class="fin-value" style="color:var(--ok)">${fmtMoney(cobrado)}</span>`
@@ -292,64 +273,15 @@ Object.assign(App, {
           +   `<span class="fin-value" style="color:var(--warn)">${fmtMoney(gastosTotal)}</span>`
           + `</div>`
           : '')
-        + `</div>`;
-    }
-
-    el.innerHTML =
-      `<div class="info-fin">`
-      + `<div class="info-fin-header">`
-      +   `<span class="info-fin-title">${t('info.financialSummary')}</span>`
-      +   `<div class="info-fin-toggle">`
-      +     `<button class="info-fin-tb${type === 'mes' ? ' on' : ''}" onclick="App._infoFinType('mes')">${t('info.month')}</button>`
-      +     `<button class="info-fin-tb${type === 'trim' ? ' on' : ''}" onclick="App._infoFinType('trim')">${t('info.quarter')}</button>`
-      +     `<button class="info-fin-tb${type === 'año' ? ' on' : ''}" onclick="App._infoFinType('año')">${t('info.year')}</button>`
-      +   `</div>`
-      + `</div>`
-      + `<div class="info-fin-controls">`
-      +   `<div class="info-fin-nav">`
-      +     (hasPrev ? `<button class="bt bt-s" onclick="App._infoFinPrev()">&larr;</button>` : `<span style="width:2rem"></span>`)
-      +     `<span class="info-fin-period">${periodLabel}</span>`
-      +     (hasNext ? `<button class="bt bt-s" onclick="App._infoFinNext()">&rarr;</button>` : `<span style="width:2rem"></span>`)
-      +   `</div>`
-      + `</div>`
-      + (isEmpty
-        ? `<div class="es"><div class="tx">${t('info.noActivity')}</div></div>`
-        : `<div class="info-fin-neto">`
-        +   `<span class="info-fin-neto-lbl">${t('info.netLabel')}</span>`
-        +   `<span class="info-fin-neto-val" style="color:${neto >= 0 ? 'var(--ok)' : 'var(--bad)'};">${fmtMoney(neto)}</span>`
+        + `<div class="fin-sep"></div>`
+        + `<div class="fin-row fin-total">`
+        +   `<span class="fin-label">${t('info.netLabel')}</span>`
+        +   `<span class="fin-value" style="color:${neto >= 0 ? 'var(--ok)' : 'var(--bad)'}">${fmtMoney(neto)}</span>`
         + `</div>`
-        + barsHtml
-        + (type === 'trim'
-          ? `<div class="info-fin-stats">`
-          + `<div class="sc"><div class="sc-l">${t('info.taxableBase')}</div><div class="sc-v m">${fmtMoney(baseTotal)}</div></div>`
-          + `<div class="sc"><div class="sc-l">${t('info.outputVat')}</div><div class="sc-v m">${fmtMoney(ivaTotal)}</div></div>`
-          + `<div class="sc"><div class="sc-l">${t('info.irpfWithheld')}</div><div class="sc-v m">${fmtMoney(irpfTotal)}</div></div>`
-          + `</div>`
-          : '')
       )
       + `</div>`;
   },
 
-  _infoFinPrev() {
-    if (this.infoPeriod === 'mes') {
-      this.infoM--;
-      if (this.infoM < 0) { this.infoM = 11; this.infoY--; }
-    } else if (this.infoPeriod === 'trim') {
-      this.infoM -= 3;
-      if (this.infoM < 0) { this.infoM += 12; this.infoY--; }
-    } else { this.infoY--; }
-    this._rInfoFinancial();
-  },
-  _infoFinNext() {
-    if (this.infoPeriod === 'mes') {
-      this.infoM++;
-      if (this.infoM > 11) { this.infoM = 0; this.infoY++; }
-    } else if (this.infoPeriod === 'trim') {
-      this.infoM += 3;
-      if (this.infoM > 11) { this.infoM -= 12; this.infoY++; }
-    } else { this.infoY++; }
-    this._rInfoFinancial();
-  },
   _infoFinType(t) {
     this.infoPeriod = t;
     this._rInfoFinancial();
