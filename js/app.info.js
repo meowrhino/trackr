@@ -80,10 +80,6 @@ Object.assign(App, {
       +   `<div class="info-stat-val">${horasMes.toFixed(1)}<small>h</small></div>`
       +   `<div class="info-stat-lbl">${t('info.thisMonth')}</div>`
       + `</div>`
-      + `<div class="info-stat-card${nPendiente ? ' info-stat-alert' : ''}">`
-      +   `<div class="info-stat-val">${nPendiente > 0 ? fmtMoney(pendienteCobro) : '—'}</div>`
-      +   `<div class="info-stat-lbl">${nPendiente ? (nPendiente === 1 ? t('info.pendingPayment.one', nPendiente) : t('info.pendingPayment.other', nPendiente)) : t('info.allCollected')}</div>`
-      + `</div>`
       + `</div>`;
 
     /* ── Actividad reciente ── */
