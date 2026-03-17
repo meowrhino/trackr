@@ -55,6 +55,14 @@ let RECURRENCIA = {
   anual:   'Anual'
 };
 
+/** Tipos de IVA en España (mutable para i18n) */
+let TIPOS_IVA = {
+  21: 'General (21%)',
+  10: 'Reducido (10%)',
+  4:  'Superreducido (4%)',
+  0:  'Exento (0%)'
+};
+
 /** Meses y días de la semana (mutable para i18n) */
 let MESES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',

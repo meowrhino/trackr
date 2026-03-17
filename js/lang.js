@@ -323,15 +323,35 @@ const LANGS = {
     'renta.deleteConfirm': '¿Eliminar deducción "{0}"?',
     'renta.noDeductions': 'Sin deducciones registradas',
 
-    /* ── Gastos (legacy keys) ── */
+    /* ── Gastos ── */
     'gas.noExpenses': 'Sin gastos registrados',
-    'gas.thisMonth': 'Este mes',
-    'gas.thisYear': 'Este año',
     'gas.entries': 'entr.',
     'gas.editExpense': 'Editar gasto',
     'gas.newExpense': 'Nuevo gasto',
     'gas.deleteConfirm': '¿Eliminar gasto "{0}"?',
     'gas.addEntry': 'Añadir entrada',
+    'gas.deductibleBadge': 'desgravable',
+
+    /* ── Campos desgravable ── */
+    'field.deductible': 'Desgravable',
+    'field.ivaRate': 'Tipo de IVA',
+    'iva.21': 'General (21%)',
+    'iva.10': 'Reducido (10%)',
+    'iva.4': 'Superreducido (4%)',
+    'iva.0': 'Exento (0%)',
+
+    /* ── Categorías deducibles ── */
+    'ded.autonomos': 'Cuota de autónomos',
+    'ded.alquiler': 'Alquiler',
+    'ded.suministros': 'Suministros',
+    'ded.software': 'Software',
+    'ded.formacion': 'Formación',
+    'ded.material': 'Material y equipos',
+    'ded.transporte': 'Transporte',
+    'ded.seguros': 'Seguros',
+    'ded.asesoria': 'Asesoría',
+    'ded.amortizacion': 'Amortización',
+    'ded.otro': 'Otro',
 
     /* ── Factura PDF ── */
     'fac.invoice': 'Factura',
@@ -687,15 +707,35 @@ const LANGS = {
     'renta.deleteConfirm': 'Delete deduction "{0}"?',
     'renta.noDeductions': 'No deductions recorded',
 
-    /* ── Gastos (legacy keys) ── */
+    /* ── Gastos ── */
     'gas.noExpenses': 'No expenses recorded',
-    'gas.thisMonth': 'This month',
-    'gas.thisYear': 'This year',
     'gas.entries': 'entries',
     'gas.editExpense': 'Edit expense',
     'gas.newExpense': 'New expense',
     'gas.deleteConfirm': 'Delete expense "{0}"?',
     'gas.addEntry': 'Add entry',
+    'gas.deductibleBadge': 'deductible',
+
+    /* ── Campos desgravable ── */
+    'field.deductible': 'Tax deductible',
+    'field.ivaRate': 'VAT rate',
+    'iva.21': 'Standard (21%)',
+    'iva.10': 'Reduced (10%)',
+    'iva.4': 'Super-reduced (4%)',
+    'iva.0': 'Exempt (0%)',
+
+    /* ── Deductible categories ── */
+    'ded.autonomos': 'Self-employed fee',
+    'ded.alquiler': 'Rent',
+    'ded.suministros': 'Utilities',
+    'ded.software': 'Software',
+    'ded.formacion': 'Training',
+    'ded.material': 'Equipment & supplies',
+    'ded.transporte': 'Transport',
+    'ded.seguros': 'Insurance',
+    'ded.asesoria': 'Consulting',
+    'ded.amortizacion': 'Depreciation',
+    'ded.otro': 'Other',
 
     /* ── Factura PDF ── */
     'fac.invoice': 'Invoice',
@@ -805,6 +845,19 @@ function setLang(code) {
 
   RECURRENCIA = {
     no: t('rec.no'), mensual: t('rec.mensual'), anual: t('rec.anual')
+  };
+
+  TIPOS_IVA = {
+    21: t('iva.21'), 10: t('iva.10'), 4: t('iva.4'), 0: t('iva.0')
+  };
+
+  DEDUCIBLE_CAT = {
+    autonomos: t('ded.autonomos'), alquiler: t('ded.alquiler'),
+    suministros: t('ded.suministros'), software: t('ded.software'),
+    formacion: t('ded.formacion'), material: t('ded.material'),
+    transporte: t('ded.transporte'), seguros: t('ded.seguros'),
+    asesoria: t('ded.asesoria'), amortizacion: t('ded.amortizacion'),
+    otro: t('ded.otro')
   };
 
   MESES = [];

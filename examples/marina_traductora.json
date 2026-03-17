@@ -205,12 +205,14 @@
   "gastos": [
     {
       "id": "g201-0001", "nombre": "memoQ Translator Pro", "categoria": "software", "recurrente": "anual", "color": "MediumSlateBlue", "notas": "Licencia anual CAT tool",
+      "desgravable": true, "tipoIva": 21,
       "entradas": [
         { "id": "ge201-01", "fecha": "2025-06-10", "cantidad": 620, "nota": "Renovación anual" }
       ]
     },
     {
       "id": "g201-0002", "nombre": "DeepL Pro", "categoria": "software", "recurrente": "mensual", "color": "DodgerBlue", "notas": "Asistente traducción",
+      "desgravable": true, "tipoIva": 21,
       "entradas": [
         { "id": "ge202-01", "fecha": "2025-10-01", "cantidad": 24.99, "nota": "" },
         { "id": "ge202-02", "fecha": "2025-11-01", "cantidad": 24.99, "nota": "" },
@@ -221,12 +223,14 @@
     },
     {
       "id": "g201-0003", "nombre": "Correctora nativa francesa", "categoria": "otro", "recurrente": "no", "color": "RosyBrown", "notas": "Subcontratación web Solera",
+      "desgravable": true, "tipoIva": 21,
       "entradas": [
         { "id": "ge203-01", "fecha": "2025-09-15", "cantidad": 180, "nota": "Revisión web Solera FR" }
       ]
     },
     {
       "id": "g201-0004", "nombre": "Cuota autónomos", "categoria": "otro", "recurrente": "mensual", "color": "Gray", "notas": "Seguridad social",
+      "desgravable": false, "tipoIva": 0,
       "entradas": [
         { "id": "ge204-01", "fecha": "2025-10-01", "cantidad": 293, "nota": "" },
         { "id": "ge204-02", "fecha": "2025-11-01", "cantidad": 293, "nota": "" },
@@ -237,6 +241,7 @@
     },
     {
       "id": "g201-0005", "nombre": "Coworking La Nau", "categoria": "oficina", "recurrente": "mensual", "color": "Peru", "notas": "",
+      "desgravable": true, "tipoIva": 21,
       "entradas": [
         { "id": "ge205-01", "fecha": "2025-10-01", "cantidad": 160, "nota": "" },
         { "id": "ge205-02", "fecha": "2025-11-01", "cantidad": 160, "nota": "" },
@@ -247,16 +252,25 @@
     },
     {
       "id": "g201-0006", "nombre": "Diccionario técnico italiano", "categoria": "herramientas", "recurrente": "no", "color": "Teal", "notas": "",
+      "desgravable": true, "tipoIva": 4,
       "entradas": [
         { "id": "ge206-01", "fecha": "2025-12-01", "cantidad": 35, "nota": "Libro físico" }
       ]
     },
     {
       "id": "g201-0007", "nombre": "Dominio marinacrespo.com", "categoria": "herramientas", "recurrente": "anual", "color": "DarkOrange", "notas": "",
+      "desgravable": true, "tipoIva": 21,
       "entradas": [
         { "id": "ge207-01", "fecha": "2025-07-20", "cantidad": 14, "nota": "Renovación anual" }
       ]
     }
+  ],
+  "deducibles": [
+    { "id": "ded01", "categoria": "autonomos", "descripcion": "Cuota enero", "cantidad": 293, "fecha": "2026-01-15" },
+    { "id": "ded02", "categoria": "autonomos", "descripcion": "Cuota febrero", "cantidad": 293, "fecha": "2026-02-15" },
+    { "id": "ded03", "categoria": "autonomos", "descripcion": "Cuota marzo", "cantidad": 293, "fecha": "2026-03-15" },
+    { "id": "ded04", "categoria": "alquiler_oficina", "descripcion": "Alquiler oficina febrero", "cantidad": 450, "fecha": "2026-02-01" },
+    { "id": "ded05", "categoria": "asesoria", "descripcion": "Asesoría/gestoría enero", "cantidad": 150, "fecha": "2026-01-15" }
   ],
   "settings": {
     "emisor": { "nombre": "Marina Crespo — Traducción & Copy", "direccion1": "Carrer de Russafa 17, 2a", "direccion2": "46004 València", "nif": "26789012F" },

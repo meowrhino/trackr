@@ -187,6 +187,7 @@
   "gastos": [
     {
       "id": "g001-aa11-bb22", "nombre": "Figma Pro", "categoria": "software", "recurrente": "mensual", "color": "Violet", "notas": "Plan profesional",
+      "desgravable": true, "tipoIva": 21,
       "entradas": [
         { "id": "ge01-0001", "fecha": "2025-10-01", "cantidad": 12, "nota": "" },
         { "id": "ge01-0002", "fecha": "2025-11-01", "cantidad": 12, "nota": "" },
@@ -197,6 +198,7 @@
     },
     {
       "id": "g002-cc33-dd44", "nombre": "Adobe CC", "categoria": "software", "recurrente": "mensual", "color": "Crimson", "notas": "Suite completa",
+      "desgravable": true, "tipoIva": 21,
       "entradas": [
         { "id": "ge02-0001", "fecha": "2025-10-05", "cantidad": 59.99, "nota": "" },
         { "id": "ge02-0002", "fecha": "2025-11-05", "cantidad": 59.99, "nota": "" },
@@ -207,12 +209,14 @@
     },
     {
       "id": "g003-ee55-ff66", "nombre": "Dominio lauraestudio.com", "categoria": "herramientas", "recurrente": "anual", "color": "DodgerBlue", "notas": "",
+      "desgravable": true, "tipoIva": 21,
       "entradas": [
         { "id": "ge03-0001", "fecha": "2025-08-15", "cantidad": 14.99, "nota": "Renovación anual" }
       ]
     },
     {
       "id": "g004-1122-3344", "nombre": "Coworking", "categoria": "oficina", "recurrente": "mensual", "color": "Peru", "notas": "WeWork Malasaña",
+      "desgravable": true, "tipoIva": 21,
       "entradas": [
         { "id": "ge04-0001", "fecha": "2025-10-01", "cantidad": 250, "nota": "" },
         { "id": "ge04-0002", "fecha": "2025-11-01", "cantidad": 250, "nota": "" },
@@ -223,6 +227,7 @@
     },
     {
       "id": "g005-5566-7788", "nombre": "Imprenta muestras", "categoria": "otro", "recurrente": "no", "color": "DarkKhaki", "notas": "Pruebas de impresión para clientes",
+      "desgravable": true, "tipoIva": 21,
       "entradas": [
         { "id": "ge05-0001", "fecha": "2025-07-18", "cantidad": 45, "nota": "Muestras Café Malasaña" },
         { "id": "ge05-0002", "fecha": "2025-10-30", "cantidad": 85, "nota": "Papelería Estudio Legal Rivas" },
@@ -231,10 +236,18 @@
     },
     {
       "id": "g006-7788-9900", "nombre": "Curso Domestika", "categoria": "formacion", "recurrente": "no", "color": "MediumPurple", "notas": "",
+      "desgravable": true, "tipoIva": 21,
       "entradas": [
         { "id": "ge06-0001", "fecha": "2025-09-01", "cantidad": 39.99, "nota": "Figma avanzado para UX" }
       ]
     }
+  ],
+  "deducibles": [
+    { "id": "ded01", "categoria": "autonomos", "descripcion": "Cuota enero", "cantidad": 293, "fecha": "2026-01-15" },
+    { "id": "ded02", "categoria": "autonomos", "descripcion": "Cuota febrero", "cantidad": 293, "fecha": "2026-02-15" },
+    { "id": "ded03", "categoria": "autonomos", "descripcion": "Cuota marzo", "cantidad": 293, "fecha": "2026-03-15" },
+    { "id": "ded04", "categoria": "suministros", "descripcion": "Internet febrero", "cantidad": 35, "fecha": "2026-02-01" },
+    { "id": "ded05", "categoria": "formacion", "descripcion": "Curso UX", "cantidad": 250, "fecha": "2026-03-01" }
   ],
   "settings": {
     "emisor": { "nombre": "Laura Martín Estudio", "direccion1": "Calle de la Palma 28, 3ºA", "direccion2": "28004 Madrid", "nif": "55443322B" },

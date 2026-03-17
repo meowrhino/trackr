@@ -18,14 +18,11 @@
   /* Grids a 1 columna */
   .fr{grid-template-columns:1fr}
   .pg{grid-template-columns:1fr}
-  .info-grid{grid-template-columns:1fr}
   .cfg-grid{grid-template-columns:1fr}
-  .gas-summary{grid-template-columns:1fr 1fr}
+  .din-trim-grid{grid-template-columns:1fr}
 
-  /* Info: CTA y status a columna */
-  .info-cta-actions,.info-status{flex-direction:column}
-  .info-status-actions{width:100%}
-  .info-status-actions .bt{flex:1}
+  /* Info: CTA a columna */
+  .info-cta-actions{flex-direction:column}
 
   /* Calendario mensual: celdas compactas, ocultar nombre proyecto */
   .cal-day{min-height:60px;padding:.25rem}
@@ -49,6 +46,11 @@
   .cal-evt-n{display:none}
   .cal-evt-sm .cal-evt-n{display:block}
 
-  /* Gastos */
+  /* Dinero */
   .gas-count{display:none}
+  .din-fin-header{flex-wrap:wrap;gap:.5rem}
+  .din-fin-nav{flex-wrap:wrap}
+  .din-gastos-header{flex-wrap:wrap;gap:.5rem}
+  .din-ded-item{flex-wrap:wrap;gap:.25rem}
+  .din-ded-desc{min-width:0}
 }

@@ -164,6 +164,7 @@
   "gastos": [
     {
       "id": "g101-aa11-bb22", "nombre": "Vercel Pro", "categoria": "herramientas", "recurrente": "mensual", "color": "DimGray", "notas": "Hosting proyectos",
+      "desgravable": true, "tipoIva": 21,
       "entradas": [
         { "id": "ge101-01", "fecha": "2025-10-01", "cantidad": 20, "nota": "" },
         { "id": "ge101-02", "fecha": "2025-11-01", "cantidad": 20, "nota": "" },
@@ -174,6 +175,7 @@
     },
     {
       "id": "g102-cc33-dd44", "nombre": "Supabase Pro", "categoria": "herramientas", "recurrente": "mensual", "color": "LimeGreen", "notas": "Para Vinissimo",
+      "desgravable": true, "tipoIva": 21,
       "entradas": [
         { "id": "ge102-01", "fecha": "2025-09-01", "cantidad": 25, "nota": "" },
         { "id": "ge102-02", "fecha": "2025-10-01", "cantidad": 25, "nota": "" },
@@ -185,6 +187,7 @@
     },
     {
       "id": "g103-ee55-ff66", "nombre": "GitHub Copilot", "categoria": "software", "recurrente": "mensual", "color": "Gray", "notas": "",
+      "desgravable": true, "tipoIva": 21,
       "entradas": [
         { "id": "ge103-01", "fecha": "2025-10-01", "cantidad": 10, "nota": "" },
         { "id": "ge103-02", "fecha": "2025-11-01", "cantidad": 10, "nota": "" },
@@ -195,6 +198,7 @@
     },
     {
       "id": "g104-1122-3344", "nombre": "Formación", "categoria": "formacion", "recurrente": "no", "color": "Gold", "notas": "",
+      "desgravable": false, "tipoIva": 21,
       "entradas": [
         { "id": "ge104-01", "fecha": "2025-08-10", "cantidad": 299, "nota": "Frontend Masters anual" },
         { "id": "ge104-02", "fecha": "2025-11-25", "cantidad": 49, "nota": "Libro: Designing Data-Intensive Applications" }
@@ -202,10 +206,16 @@
     },
     {
       "id": "g105-5566-7788", "nombre": "Dominio devboard.io", "categoria": "herramientas", "recurrente": "anual", "color": "ForestGreen", "notas": "Side project",
+      "desgravable": true, "tipoIva": 21,
       "entradas": [
         { "id": "ge105-01", "fecha": "2025-03-15", "cantidad": 32, "nota": ".io domain" }
       ]
     }
+  ],
+  "deducibles": [
+    { "id": "ded01", "categoria": "autonomos", "descripcion": "Cuota enero", "cantidad": 293, "fecha": "2026-01-15" },
+    { "id": "ded02", "categoria": "autonomos", "descripcion": "Cuota febrero", "cantidad": 293, "fecha": "2026-02-15" },
+    { "id": "ded03", "categoria": "autonomos", "descripcion": "Cuota marzo", "cantidad": 293, "fecha": "2026-03-15" }
   ],
   "settings": {
     "emisor": { "nombre": "Pablo Serrano Dev", "direccion1": "Carrer del Comte d'Urgell 77, 2n 1a", "direccion2": "08011 Barcelona", "nif": "41234567D" },

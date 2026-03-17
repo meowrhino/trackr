@@ -60,6 +60,10 @@ const D = {
     if (!d.gastos) d.gastos = [];
     if (!d.projects) d.projects = [];
     if (!d.deducibles) d.deducibles = [];
+    /* Migrar deducibles: año → fecha */
+    d.deducibles.forEach(dd => {
+      if (dd.año && !dd.fecha) dd.fecha = `${dd.año}-01-01`;
+    });
 
     /* Settings */
     if (!d.settings) d.settings = {};
@@ -128,7 +132,12 @@ const D = {
         c.color = linked ? linked.color : 'CornflowerBlue';
       }
     });
-    d.gastos.forEach(g => { if (!g.color) g.color = 'Salmon'; });
+    d.gastos.forEach(g => {
+      if (!g.entradas) g.entradas = [];
+      if (!g.color) g.color = 'Salmon';
+      if (g.desgravable == null) g.desgravable = false;
+      if (g.tipoIva == null) g.tipoIva = 21;
+    });
 
     /* Extraer clientes únicos de proyectos legacy (campo string) */
     const hasLegacy = d.projects.some(p => p.cliente && !p.clienteId);

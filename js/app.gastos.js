@@ -111,13 +111,13 @@ Object.assign(App, {
       + `<div class="din-fin-header">`
       +   `<span class="din-fin-period">${this._dinPeriodLabel()}</span>`
       +   `<div class="din-fin-nav">`
-      +     (hasPrev ? `<button class="bt bt-s" onclick="App._dinPrev()">&larr;</button>` : `<span style="width:2rem"></span>`)
+      +     (hasPrev ? `<button class="bt bt-s" onclick="App._dinPrev()">&larr;</button>` : '')
       +     `<div class="info-fin-toggle">`
       +       `<button class="info-fin-tb${type === 'mes' ? ' on' : ''}" onclick="App._dinType('mes')">${t('info.month')}</button>`
       +       `<button class="info-fin-tb${type === 'trim' ? ' on' : ''}" onclick="App._dinType('trim')">${t('info.quarter')}</button>`
       +       `<button class="info-fin-tb${type === 'año' ? ' on' : ''}" onclick="App._dinType('año')">${t('info.year')}</button>`
       +     `</div>`
-      +     (hasNext ? `<button class="bt bt-s" onclick="App._dinNext()">&rarr;</button>` : `<span style="width:2rem"></span>`)
+      +     (hasNext ? `<button class="bt bt-s" onclick="App._dinNext()">&rarr;</button>` : '')
       +   `</div>`
       + `</div>`
       + `<div class="din-fin-body">`
@@ -213,6 +213,7 @@ Object.assign(App, {
         html += `<div class="gas-card" style="border-left:3px solid ${gHex}"><div class="gas-header" onclick="this.nextElementSibling.classList.toggle('open')">`
           + `<span class="gas-name">${esc(g.nombre)}</span><span class="gas-cat">${catLabel}</span>`
           + `${g.recurrente && g.recurrente !== 'no' ? `<span class="gas-rec">${RECURRENCIA[g.recurrente]}</span>` : ''}`
+          + `${g.desgravable ? `<span class="gas-ded">${t('gas.deductibleBadge')}</span>` : ''}`
           + `<span class="gas-total m">${fmtMoney(total)}</span><span class="gas-count">${count} ${t('gas.entries')}</span>`
           + `<div class="gas-actions"><button class="cl-btn" onclick="event.stopPropagation();App.gModal('${g.id}')" title="${t('btn.edit')}">&#9998;</button><button class="cl-btn cl-btn-del" onclick="event.stopPropagation();App.delG('${g.id}')" title="${t('btn.delete')}">&times;</button></div>`
           + `</div><div class="gas-body">`;
@@ -234,16 +235,15 @@ Object.assign(App, {
    * ══════════════════════════════════════ */
   _rDinTrim() {
     const el = document.getElementById('dinTrim');
+    const y = this.dinY, m = this.dinM;
     const type = this.dinPeriod;
 
-    /* solo mostrar en vista trimestral o anual */
-    if (type === 'mes') { el.innerHTML = ''; return; }
-
-    const y = this.dinY, m = this.dinM;
+    /* En vista mes usamos trimestre actual para 303/130 */
+    const trimType = type === 'mes' ? 'trim' : type;
     const ps = D.ps();
 
     /* 303: IVA */
-    let ivaRepercutido = 0, ivaSoportado = 0, baseFacturado = 0;
+    let ivaRepercutido = 0, ivaSoportado = 0;
     /* 130: IRPF */
     let ingresos130 = 0, gastos130 = 0, retenciones = 0;
 
@@ -251,42 +251,71 @@ Object.assign(App, {
       B.calc(p);
       const f = p.facturacion;
       p.horas.forEach(h => {
-        if (h.fecha && inPeriod(h.fecha, type, y, m)) {
+        if (h.fecha && inPeriod(h.fecha, trimType, y, m)) {
           if (h.monto) ingresos130 += h.monto;
         }
       });
-      if (f.pagado && f.fechaPago && inPeriod(f.fechaPago, type, y, m)) {
-        ingresos130 += f.netoRecibido || 0;
-        baseFacturado += f.baseImponible || 0;
+      if (f.pagado && f.fechaPago && inPeriod(f.fechaPago, trimType, y, m)) {
+        ingresos130 += f.baseImponible || 0;
         ivaRepercutido += f.importeIva || 0;
         retenciones += f.importeIrpf || 0;
       }
     });
 
     D.gs().forEach(g => {
+      let gastoSum = 0;
       (g.entradas || []).forEach(e => {
-        if (e.fecha && inPeriod(e.fecha, type, y, m)) gastos130 += e.cantidad || 0;
+        if (e.fecha && inPeriod(e.fecha, trimType, y, m)) gastoSum += e.cantidad || 0;
       });
+      if (g.desgravable && gastoSum > 0) {
+        gastos130 += gastoSum;
+        const rate = (g.tipoIva || 0) / 100;
+        ivaSoportado += gastoSum * rate / (1 + rate);
+      }
     });
 
-    /* rough IVA soportado estimate: ~21% of expenses */
-    ivaSoportado = gastos130 * 0.21 / 1.21;
+    /* Deducciones del periodo */
+    const trimDeds = D.deds().filter(d => d.fecha && inPeriod(d.fecha, trimType, y, m));
+    const totalTrimDeds = trimDeds.reduce((s, d) => s + (d.cantidad || 0), 0);
+    gastos130 += totalTrimDeds;
 
     const rNeto130 = ingresos130 - gastos130;
     const pago130 = Math.max(rNeto130 * 0.20, 0);
     const iva303 = ivaRepercutido - ivaSoportado;
 
-    const qLabel = type === 'trim' ? `T${Math.floor(m / 3) + 1} ${y}` : `${y}`;
+    const qLabel = trimType === 'trim' ? `T${Math.floor(m / 3) + 1} ${y}` : `${y}`;
+
+    /* Deductions list HTML */
+    let dedsHtml = '';
+    if (trimDeds.length) {
+      dedsHtml = `<div class="din-ded-list" style="margin-top:.5rem">`;
+      trimDeds.forEach(d => {
+        const catLabel = DEDUCIBLE_CAT[d.categoria] || d.categoria || 'Otro';
+        dedsHtml += `<div class="din-ded-item">`
+          + `<span class="din-ded-cat">${catLabel}</span>`
+          + `<span class="gas-e-date">${fmtDate(d.fecha)}</span>`
+          + `<span class="din-ded-desc">${esc(d.descripcion || '')}</span>`
+          + `<span class="din-ded-amount m">${fmtMoney(d.cantidad || 0)}</span>`
+          + `<div class="gas-actions">`
+          +   `<button class="cl-btn" onclick="App.dedModal('${d.id}')" title="${t('btn.edit')}">&#9998;</button>`
+          +   `<button class="cl-btn cl-btn-del" onclick="App.delDed('${d.id}')" title="${t('btn.delete')}">&times;</button>`
+          + `</div></div>`;
+      });
+      dedsHtml += `</div>`;
+    }
 
     el.innerHTML =
       `<div class="info-section">`
-      + `<div class="info-section-title">${t('din.taxSummary')} — ${qLabel}</div>`
+      + `<div class="din-gastos-header">`
+      +   `<span class="info-section-title" style="margin-bottom:0">${t('din.taxSummary')} — ${qLabel}</span>`
+      +   `<button class="bt bt-s" onclick="App.dedModal()">+ ${t('renta.addDeduction')}</button>`
+      + `</div>`
       + `<div class="din-trim-grid">`
       +   `<div class="din-trim-card">`
       +     `<div class="din-trim-title">${t('din.model303')}</div>`
       +     `<div class="din-tax-row"><span>${t('din.vatCharged')}</span><span class="m">${fmtMoney(ivaRepercutido)}</span></div>`
       +     `<div class="din-tax-row"><span>${t('din.vatDeductible')}</span><span class="m">${fmtMoney(ivaSoportado)}</span></div>`
-      +     `<div class="din-tax-row din-tax-total"><span>${t('din.toPay')}</span><span class="m" style="color:${iva303 > 0 ? 'var(--warn)' : 'var(--ok)'}">${fmtMoney(iva303)}</span></div>`
+      +     `<div class="din-tax-row din-tax-total"><span>${t('din.toPay')}</span><span class="m" style="color:${iva303 > 0 ? 'var(--warn)' : 'var(--ok)'}">${fmtMoney(Math.max(iva303, 0))}</span></div>`
       +   `</div>`
       +   `<div class="din-trim-card">`
       +     `<div class="din-trim-title">${t('din.model130')}</div>`
@@ -294,9 +323,11 @@ Object.assign(App, {
       +     `<div class="din-tax-row"><span>${t('din.deductibleExp')}</span><span class="m">${fmtMoney(gastos130)}</span></div>`
       +     `<div class="din-tax-row"><span>${t('din.netProfit')}</span><span class="m">${fmtMoney(rNeto130)}</span></div>`
       +     `<div class="din-tax-row"><span>${t('din.withholdings')}</span><span class="m">${fmtMoney(retenciones)}</span></div>`
-      +     `<div class="din-tax-row din-tax-total"><span>${t('din.toPay')} (20%)</span><span class="m" style="color:${pago130 > 0 ? 'var(--warn)' : 'var(--ok)'}">${fmtMoney(Math.max(pago130 - retenciones, 0))}</span></div>`
+      +     `<div class="din-tax-row din-tax-total"><span>${t('din.toPay')} (20%)</span><span class="m" style="color:${pago130 - retenciones > 0 ? 'var(--warn)' : 'var(--ok)'}">${fmtMoney(Math.max(pago130 - retenciones, 0))}</span></div>`
       +   `</div>`
-      + `</div></div>`;
+      + `</div>`
+      + dedsHtml
+      + `</div>`;
   },
 
   /* ══════════════════════════════════════
@@ -315,13 +346,14 @@ Object.assign(App, {
         if (h.fecha && h.fecha.startsWith(String(y)) && h.monto) ingresosAnual += h.monto;
       });
       if (f.pagado && f.fechaPago && f.fechaPago.startsWith(String(y))) {
-        ingresosAnual += f.netoRecibido || 0;
+        ingresosAnual += f.baseImponible || 0;
       }
     });
 
-    /* Annual business expenses */
+    /* Annual business expenses (only desgravable) */
     let gastosAnual = 0;
     D.gs().forEach(g => {
+      if (!g.desgravable) return;
       (g.entradas || []).forEach(e => {
         if (e.fecha && e.fecha.startsWith(String(y))) gastosAnual += e.cantidad || 0;
       });
@@ -330,9 +362,10 @@ Object.assign(App, {
     const rendimiento = ingresosAnual - gastosAnual;
 
     /* Deducibles for this year */
-    const deds = D.deds().filter(d => d.año === y);
+    const yStr = String(y);
+    const deds = D.deds().filter(d => d.fecha && d.fecha.startsWith(yStr));
     const totalDeds = deds.reduce((s, d) => s + (d.cantidad || 0), 0);
-    const baseImponible = Math.max(rendimiento - totalDeds, 0);
+    const baseImponible = rendimiento - totalDeds;
 
     let html = `<div class="info-section">`
       + `<div class="din-gastos-header">`
@@ -352,6 +385,7 @@ Object.assign(App, {
         const catLabel = DEDUCIBLE_CAT[d.categoria] || d.categoria || 'Otro';
         html += `<div class="din-ded-item">`
           + `<span class="din-ded-cat">${catLabel}</span>`
+          + `<span class="gas-e-date">${fmtDate(d.fecha)}</span>`
           + `<span class="din-ded-desc">${esc(d.descripcion || '')}</span>`
           + `<span class="din-ded-amount m">${fmtMoney(d.cantidad || 0)}</span>`
           + `<div class="gas-actions">`
@@ -366,7 +400,7 @@ Object.assign(App, {
 
     html += `<div class="din-trim-card" style="margin-top:.75rem">`
       + `<div class="din-tax-row"><span>${t('renta.totalDeductions')}</span><span class="m">${fmtMoney(totalDeds)}</span></div>`
-      + `<div class="din-tax-row din-tax-total"><span>${t('renta.taxableIncome')}</span><span class="m">${fmtMoney(baseImponible)}</span></div>`
+      + `<div class="din-tax-row din-tax-total"><span>${t('renta.taxableIncome')}</span><span class="m" style="color:${baseImponible >= 0 ? 'var(--ok)' : 'var(--warn)'}">${fmtMoney(baseImponible)}</span></div>`
       + `</div></div>`;
 
     el.innerHTML = html;
@@ -377,7 +411,8 @@ Object.assign(App, {
     this.om(`<div class="mt">${isE ? t('renta.editDeduction') : t('renta.addDeduction')}</div>`
       + `<div class="fr"><div class="fg"><label>${t('field.category')}</label><select id="dedCat">${Object.entries(DEDUCIBLE_CAT).map(([k, v]) => `<option value="${k}" ${d?.categoria === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
       + `<div class="fg"><label>${t('field.amountEntry')}</label><input type="number" id="dedA" min="0.01" step="0.01" value="${d?.cantidad || ''}" placeholder="0,00"></div></div>`
-      + `<div class="fg"><label>${t('field.note')}</label><input type="text" id="dedD" value="${esc(d?.descripcion || '')}" placeholder="${t('ph.detail')}"></div>`
+      + `<div class="fr"><div class="fg"><label>${t('field.date')}</label><input type="date" id="dedF" value="${d?.fecha || todayStr()}"></div>`
+      + `<div class="fg"><label>${t('field.note')}</label><input type="text" id="dedD" value="${esc(d?.descripcion || '')}" placeholder="${t('ph.detail')}"></div></div>`
       + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveDed('${dedId || ''}')">${isE ? t('btn.save') : t('btn.add')}</button></div>`);
   },
 
@@ -388,7 +423,7 @@ Object.assign(App, {
       categoria: document.getElementById('dedCat').value,
       descripcion: document.getElementById('dedD').value.trim(),
       cantidad: cant,
-      año: this.dinY
+      fecha: document.getElementById('dedF').value || todayStr()
     };
     if (dedId) D.upDed(dedId, data);
     else { data.id = uid(); D.addDed(data); }
@@ -398,8 +433,8 @@ Object.assign(App, {
   delDed(dedId) {
     const d = D.ded(dedId);
     if (!d) return;
-    const catLabel = DEDUCIBLE_CAT[d.categoria] || d.categoria;
-    if (!confirm(t('renta.deleteConfirm', catLabel))) return;
+    const label = d.descripcion || DEDUCIBLE_CAT[d.categoria] || d.categoria;
+    if (!confirm(t('renta.deleteConfirm', label))) return;
     D.delDed(dedId);
     this.rGas();
   },
@@ -414,6 +449,8 @@ Object.assign(App, {
       + `<div class="fg"><label>${t('field.name')}</label><input type="text" id="gN" value="${esc(g?.nombre || '')}" placeholder="${t('ph.expenseName')}"></div>`
       + `<div class="fr"><div class="fg"><label>${t('field.category')}</label><select id="gCat">${Object.entries(GASTO_CAT).map(([k, v]) => `<option value="${k}" ${g?.categoria === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
       + `<div class="fg"><label>${t('field.recurrence')}</label><select id="gRec">${Object.entries(RECURRENCIA).map(([k, v]) => `<option value="${k}" ${g?.recurrente === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div></div>`
+      + `<div class="fr"><div class="fg"><label>${t('field.deductible')}</label><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="gDes" ${g?.desgravable ? 'checked' : ''}> ${t('gas.deductibleBadge')}</label></div>`
+      + `<div class="fg"><label>${t('field.ivaRate')}</label><select id="gIva">${Object.entries(TIPOS_IVA).map(([k, v]) => `<option value="${k}" ${(g?.tipoIva ?? 21) == k ? 'selected' : ''}>${v}</option>`).join('')}</select></div></div>`
       + `<div class="fg"><label>${t('field.color')}</label>${this.colorSelect(gColor)}</div>`
       + `<div class="fg"><label>${t('field.notes')}</label><textarea id="gNo" placeholder="${t('ph.notes')}">${esc(g?.notas || '')}</textarea></div>`
       + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveG('${gid || ''}')">${isE ? t('btn.save') : t('btn.create')}</button></div>`);
@@ -423,7 +460,7 @@ Object.assign(App, {
     const nombre = document.getElementById('gN').value.trim();
     if (!nombre) { Toast.warn(t('msg.nameRequired')); return; }
     const color = document.getElementById('mpColor')?.value || 'Salmon';
-    const data = { nombre, categoria: document.getElementById('gCat').value, recurrente: document.getElementById('gRec').value, color, notas: document.getElementById('gNo').value.trim() };
+    const data = { nombre, categoria: document.getElementById('gCat').value, recurrente: document.getElementById('gRec').value, color, notas: document.getElementById('gNo').value.trim(), desgravable: document.getElementById('gDes').checked, tipoIva: parseInt(document.getElementById('gIva').value) || 21 };
     if (gid) D.upG(gid, data); else { data.id = uid(); data.entradas = []; D.addG(data); }
     this.cm(); this.rGas();
   },
@@ -443,7 +480,8 @@ Object.assign(App, {
     if (cant <= 0) return;
     const g = D.g(gid); if (!g) return;
     if (!g.entradas) g.entradas = [];
-    g.entradas.push({ id: uid(), fecha: document.getElementById('geD').value || null, cantidad: cant, nota: document.getElementById('geN').value.trim() });
+    const fecha = document.getElementById('geD').value || todayStr();
+    g.entradas.push({ id: uid(), fecha, cantidad: cant, nota: document.getElementById('geN').value.trim() });
     D.upG(gid, { entradas: g.entradas }); this.cm(); this.rGas();
   },
 
