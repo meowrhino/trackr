@@ -289,7 +289,28 @@ const LANGS = {
     'cfg.importOldInvoices': 'Importar facturas antiguas',
     'cfg.importOldDesc': 'Importa JSONs del generador de facturas anterior',
 
-    /* ── Gastos ── */
+    /* ── Dinero ── */
+    'din.income': 'Ingresos',
+    'din.expenses': 'Gastos',
+    'din.net': 'Neto',
+    'din.incomeTitle': 'Ingresos',
+    'din.expensesTitle': 'Gastos',
+    'din.noIncome': 'Sin ingresos en este periodo',
+    'din.invoice': 'Factura',
+    'din.hourly': 'Por hora',
+    'din.taxBase': 'Base imponible',
+    'din.vatCharged': 'IVA repercutido',
+    'din.vatDeductible': 'IVA soportado',
+    'din.irpfWithheld': 'IRPF retenido',
+    'din.taxSummary': 'Resumen fiscal',
+    'din.model303': 'Modelo 303 — IVA',
+    'din.model130': 'Modelo 130 — IRPF',
+    'din.toPay': 'A pagar',
+    'din.deductibleExp': 'Gastos deducibles',
+    'din.netProfit': 'Rendimiento neto',
+    'din.withholdings': 'Retenciones',
+
+    /* ── Gastos (legacy keys) ── */
     'gas.noExpenses': 'Sin gastos registrados',
     'gas.thisMonth': 'Este mes',
     'gas.thisYear': 'Este año',
@@ -619,7 +640,28 @@ const LANGS = {
     'cfg.importOldInvoices': 'Import old invoices',
     'cfg.importOldDesc': 'Import JSONs from the old invoice generator',
 
-    /* ── Gastos ── */
+    /* ── Dinero ── */
+    'din.income': 'Income',
+    'din.expenses': 'Expenses',
+    'din.net': 'Net',
+    'din.incomeTitle': 'Income',
+    'din.expensesTitle': 'Expenses',
+    'din.noIncome': 'No income in this period',
+    'din.invoice': 'Invoice',
+    'din.hourly': 'Hourly',
+    'din.taxBase': 'Tax base',
+    'din.vatCharged': 'Output VAT',
+    'din.vatDeductible': 'Input VAT',
+    'din.irpfWithheld': 'IRPF withheld',
+    'din.taxSummary': 'Tax summary',
+    'din.model303': 'Model 303 — VAT',
+    'din.model130': 'Model 130 — Income tax',
+    'din.toPay': 'To pay',
+    'din.deductibleExp': 'Deductible expenses',
+    'din.netProfit': 'Net profit',
+    'din.withholdings': 'Withholdings',
+
+    /* ── Gastos (legacy keys) ── */
     'gas.noExpenses': 'No expenses recorded',
     'gas.thisMonth': 'This month',
     'gas.thisYear': 'This year',

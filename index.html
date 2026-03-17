@@ -35,7 +35,7 @@
       <div class="ni on" data-v="info" onclick="App.go('info')"><span class="ic">?</span><span class="nt">Info</span></div>
       <div class="ni" data-v="dash" onclick="App.go('dash')"><span class="ic">◩</span><span class="nt">Proyectos</span></div>
       <div class="ni" data-v="cal" onclick="App.go('cal')"><span class="ic">▣</span><span class="nt">Calendario</span></div>
-      <div class="ni" data-v="gas" onclick="App.go('gas')"><span class="ic">€</span><span class="nt">Gastos</span></div>
+      <div class="ni" data-v="gas" onclick="App.go('gas')"><span class="ic">€</span><span class="nt">Dinero</span></div>
       <div class="sep"></div>
       <div class="ni" data-v="cfg" onclick="App.go('cfg')"><span class="ic">⚙</span><span class="nt">Configuración</span></div>
       <div class="ni" onclick="App.exp()"><span class="ic">↓</span><span class="nt">Exportar</span></div>
@@ -74,13 +74,13 @@
       <div id="calC"></div>
     </div>
 
-    <!-- ── Vista: Gastos ── -->
+    <!-- ── Vista: Dinero ── -->
     <div id="vGas" class="vw">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
-        <h1 class="pt" style="margin:0">Gastos</h1>
-        <button class="bt bt-p" onclick="App.gModal()">+ Nuevo gasto</button>
-      </div>
-      <div id="gasC"></div>
+      <h1 class="pt">Dinero</h1>
+      <div id="dinFin"></div>
+      <div id="dinIngresos"></div>
+      <div id="dinGastos"></div>
+      <div id="dinTrim"></div>
     </div>
 
     <!-- ── Vista: Configuración ── -->
