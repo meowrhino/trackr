@@ -181,15 +181,14 @@
   margin-bottom:1rem;
 }
 .info-fin-title{
-  font-size:.82rem;
+  font-size:.72rem;
   font-weight:500;
-}
-.info-fin-period{
-  font-size:.82rem;
-  color:var(--t2);
-  margin-left:auto;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  color:var(--t3);
 }
 .info-fin-toggle{
+  margin-left:auto;
   display:flex;
   gap:2px;
 }

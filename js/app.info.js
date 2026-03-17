@@ -235,16 +235,9 @@ Object.assign(App, {
     const eurH = horas > 0 ? neto / horas : 0;
 
     const isEmpty = cobrado === 0 && gastosTotal === 0 && horas === 0;
-    if (isEmpty && !this._hasPeriodData(type, year, month)) {
+    if (isEmpty) {
       el.innerHTML = ''; return;
     }
-
-    let periodLabel;
-    if (type === 'mes') periodLabel = `${MESES[month]} ${year}`;
-    else if (type === 'trim') {
-      const q = Math.floor(month / 3) + 1;
-      periodLabel = `T${q} ${year}`;
-    } else periodLabel = `${year}`;
 
     const maxBar = Math.max(cobrado, gastosTotal, 1);
 
@@ -252,7 +245,6 @@ Object.assign(App, {
       `<div class="info-fin">`
       + `<div class="info-fin-header">`
       +   `<span class="info-fin-title">${t('info.financialSummary')}</span>`
-      +   `<span class="info-fin-period">${periodLabel}</span>`
       +   `<div class="info-fin-toggle">`
       +     `<button class="info-fin-tb${type === 'mes' ? ' on' : ''}" onclick="App._infoFinType('mes')">${t('info.month')}</button>`
       +     `<button class="info-fin-tb${type === 'trim' ? ' on' : ''}" onclick="App._infoFinType('trim')">${t('info.quarter')}</button>`
