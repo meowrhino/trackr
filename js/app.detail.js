@@ -14,15 +14,47 @@ Object.assign(App, {
     if (!p) { this.go('dash'); return; }
     B.calc(p);
 
+    const hex = colorHex(p.color);
+    const cn = clienteName(p);
+    const f = p.facturacion;
     const th = p.horas.reduce((s, h) => s + h.cantidad, 0);
     const wh = p.horas.filter(h => h.tipo === 'trabajo').reduce((s, h) => s + h.cantidad, 0);
     const mh = p.horas.filter(h => h.tipo === 'reunion').reduce((s, h) => s + h.cantidad, 0);
     const eph = B.eph(p);
-    const hex = colorHex(p.color);
-    const cn = clienteName(p);
-    const f = p.facturacion;
 
-    const hHtml = !p.horas.length
+    document.getElementById('detC').innerHTML =
+      this._detHeader(p, hex, cn, f)
+      + this._detInfo(p, th, wh, mh)
+      + this._detHours(p, hex)
+      + this._detBilling(p, f, eph);
+  },
+
+  /* ── rDet sub-renderers ── */
+
+  _detHeader(p, hex, cn, f) {
+    let flags = '';
+    if (p.interno) flags += ` <span class="pc-flag pc-flag-int">${t('dash.flagInternal')}</span>`;
+    if (p.recurrente) flags += ` <span class="pc-flag pc-flag-rec">${t('dash.flagRecurring')}</span>`;
+
+    return `<div class="db" onclick="App.go('dash')">${t('det.backProjects')}</div>`
+      + `<div class="dh"><div><div class="dt" style="color:${hex}">${esc(p.nombre)}</div><div class="dc">${esc(cn)}${flags}</div></div>`
+      + `<div class="bg"><span class="bd bd-${p.estado}">${EST[p.estado] || p.estado}</span>`
+      +   `<button class="bt bt-s" onclick="App.pModal('${p.id}')">${t('btn.edit')}</button>`
+      +   `${f.modo !== 'gratis' ? `<button class="bt bt-s" onclick="App.facModal('${p.id}')">${t('det.invoice')}</button>` : ''}`
+      +   `<button class="bt bt-s bt-d" onclick="App.xProj('${p.id}')">${t('btn.delete')}</button></div></div>`;
+  },
+
+  _detInfo(p, th, wh, mh) {
+    return `<div class="ds"><div class="dst">${t('det.info')}</div><div class="dg">`
+      + `<div><div class="dfl">${t('field.start')}</div><div class="dfv">${fmtDate(p.fechas.inicio)}</div></div>`
+      + `<div><div class="dfl">${t('field.estEnd')}</div><div class="dfv">${fmtDate(p.fechas.finEstimada)}</div></div>`
+      + `<div><div class="dfl">${t('field.actualEnd')}</div><div class="dfv">${fmtDate(p.fechas.finReal)}</div></div>`
+      + `<div><div class="dfl">${t('field.hours')}</div><div class="dfv">${th.toFixed(1)}h <span style="color:var(--t3);font-size:.72rem">💻${wh.toFixed(1)} 👥${mh.toFixed(1)}</span></div></div>`
+      + `</div>${p.notas ? `<div style="margin-top:.75rem"><div class="dfl">${t('field.notes')}</div><div style="color:var(--t3);font-size:.85rem">${esc(p.notas)}</div></div>` : ''}</div>`;
+  },
+
+  _detHours(p, hex) {
+    const list = !p.horas.length
       ? `<div class="es"><div class="tx">${t('det.noHours')}</div></div>`
       : `<div class="hl">${p.horas.map(h =>
           `<div class="hr hr-click" style="border-left-color:${hex}" onclick="App.eHour('${p.id}','${h.id}')">
@@ -33,38 +65,24 @@ Object.assign(App, {
             <span class="hr-x" onclick="event.stopPropagation();App.xHour('${p.id}','${h.id}')" title="${t('btn.delete')}">&times;</span>
           </div>`).join('')}</div>`;
 
-    const bHtml = f.modo === 'gratis'
+    return `<div class="ds"><div style="display:flex;justify-content:space-between;align-items:center"><div class="dst" style="border:none;margin:0;padding:0">${t('det.hours')}</div><button class="bt bt-add" onclick="App.hModal('${p.id}')">${t('btn.addHour')}</button></div>${list}</div>`;
+  },
+
+  _detBilling(p, f, eph) {
+    const breakdown = f.modo === 'gratis'
       ? `<div style="color:var(--t3);font-size:.85rem">${t('billing.freeProject')}</div>`
-      : `<div class="bb">
-          <div class="br"><span class="la">${t('billing.taxableBase')}</span><span class="va">${fmtMoney(f.baseImponible || 0)}</span></div>
-          ${f.iva ? `<div class="br"><span class="la">${t('billing.plusIvaAmt', f.iva)}</span><span class="va">${fmtMoney(f.importeIva || 0)}</span></div>` : ''}
-          ${f.irpf ? `<div class="br"><span class="la">${t('billing.minusIrpfAmt', f.irpf)}</span><span class="va">${fmtMoney(f.importeIrpf || 0)}</span></div>` : ''}
-          <div class="br tot"><span class="la">${t('billing.invoiceTotal')}</span><span class="va">${fmtMoney(f.totalFactura || 0)}</span></div>
-          <div class="br"><span class="la">${t('billing.netToReceive')}</span><span class="va" style="color:var(--ok)">${fmtMoney(f.netoRecibido || 0)}</span></div>
-          ${eph !== null ? `<div class="br"><span class="la">${t('billing.profitability')}</span><span class="va" style="color:${eph >= 30 ? 'var(--ok)' : eph >= 15 ? 'var(--warn)' : 'var(--bad)'}">${eph.toFixed(2)} &euro;/h</span></div>` : ''}
-        </div>`;
+      : `<div class="bb">`
+        + `<div class="br"><span class="la">${t('billing.taxableBase')}</span><span class="va">${fmtMoney(f.baseImponible || 0)}</span></div>`
+        + (f.iva ? `<div class="br"><span class="la">${t('billing.plusIvaAmt', f.iva)}</span><span class="va">${fmtMoney(f.importeIva || 0)}</span></div>` : '')
+        + (f.irpf ? `<div class="br"><span class="la">${t('billing.minusIrpfAmt', f.irpf)}</span><span class="va">${fmtMoney(f.importeIrpf || 0)}</span></div>` : '')
+        + `<div class="br tot"><span class="la">${t('billing.invoiceTotal')}</span><span class="va">${fmtMoney(f.totalFactura || 0)}</span></div>`
+        + `<div class="br"><span class="la">${t('billing.netToReceive')}</span><span class="va" style="color:var(--ok)">${fmtMoney(f.netoRecibido || 0)}</span></div>`
+        + (eph !== null ? `<div class="br"><span class="la">${t('billing.profitability')}</span><span class="va" style="color:${eph >= 30 ? 'var(--ok)' : eph >= 15 ? 'var(--warn)' : 'var(--bad)'}">${eph.toFixed(2)} &euro;/h</span></div>` : '')
+        + `</div>`;
 
-    let flagsHtml = '';
-    if (p.interno) flagsHtml += ` <span class="pc-flag pc-flag-int">${t('dash.flagInternal')}</span>`;
-    if (p.recurrente) flagsHtml += ` <span class="pc-flag pc-flag-rec">${t('dash.flagRecurring')}</span>`;
-
-    document.getElementById('detC').innerHTML =
-      `<div class="db" onclick="App.go('dash')">${t('det.backProjects')}</div>`
-      + `<div class="dh"><div><div class="dt" style="color:${hex}">${esc(p.nombre)}</div><div class="dc">${esc(cn)}${flagsHtml}</div></div>`
-      + `<div class="bg"><span class="bd bd-${p.estado}">${EST[p.estado] || p.estado}</span>`
-      +   `<button class="bt bt-s" onclick="App.pModal('${p.id}')">${t('btn.edit')}</button>`
-      +   `${f.modo !== 'gratis' ? `<button class="bt bt-s" onclick="App.facModal('${p.id}')">${t('det.invoice')}</button>` : ''}`
-      +   `<button class="bt bt-s bt-d" onclick="App.xProj('${p.id}')">${t('btn.delete')}</button></div></div>`
-      + `<div class="ds"><div class="dst">${t('det.info')}</div><div class="dg">`
-      +   `<div><div class="dfl">${t('field.start')}</div><div class="dfv">${fmtDate(p.fechas.inicio)}</div></div>`
-      +   `<div><div class="dfl">${t('field.estEnd')}</div><div class="dfv">${fmtDate(p.fechas.finEstimada)}</div></div>`
-      +   `<div><div class="dfl">${t('field.actualEnd')}</div><div class="dfv">${fmtDate(p.fechas.finReal)}</div></div>`
-      +   `<div><div class="dfl">${t('field.hours')}</div><div class="dfv">${th.toFixed(1)}h <span style="color:var(--t3);font-size:.72rem">💻${wh.toFixed(1)} 👥${mh.toFixed(1)}</span></div></div>`
-      + `</div>${p.notas ? `<div style="margin-top:.75rem"><div class="dfl">${t('field.notes')}</div><div style="color:var(--t3);font-size:.85rem">${esc(p.notas)}</div></div>` : ''}</div>`
-      + `<div class="ds"><div style="display:flex;justify-content:space-between;align-items:center"><div class="dst" style="border:none;margin:0;padding:0">${t('det.hours')}</div><button class="bt bt-add" onclick="App.hModal('${p.id}')">${t('btn.addHour')}</button></div>${hHtml}</div>`
-      + `<div class="ds"><div class="dst">${t('billing.title')}</div>${bHtml}`
-      + `${f.pagado ? `<div style="margin-top:.5rem;font-size:.82rem;color:var(--ok)">${f.fechaPago ? t('billing.paidOn', fmtDate(f.fechaPago)) : t('billing.paid')}</div>` : ''}`
-      + `${f.facturaFecha ? `<div style="margin-top:.3rem;font-size:.78rem;color:var(--t3)">${t('billing.invoiceNo', String(f.facturaNum), fmtDate(f.facturaFecha))}</div>` : ''}`
+    return `<div class="ds"><div class="dst">${t('billing.title')}</div>${breakdown}`
+      + (f.pagado ? `<div style="margin-top:.5rem;font-size:.82rem;color:var(--ok)">${f.fechaPago ? t('billing.paidOn', fmtDate(f.fechaPago)) : t('billing.paid')}</div>` : '')
+      + (f.facturaFecha ? `<div style="margin-top:.3rem;font-size:.78rem;color:var(--t3)">${t('billing.invoiceNo', String(f.facturaNum), fmtDate(f.facturaFecha))}</div>` : '')
       + `</div>`;
   },
 

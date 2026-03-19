@@ -137,36 +137,73 @@ const App = {
       pagado: p?.facturacion?.pagado || false, fechaPago: p?.facturacion?.fechaPago || '', notas: p?.notas || '',
       idiomaFactura: p?.facturacion?.idiomaFactura || null
     };
-    const clOpts = cls.map(c => `<option value="${c.id}" ${c.id === df.clienteId ? 'selected' : ''}>${esc(c.nombre)}</option>`).join('');
+    this.om(
+      this._pmHeader(isE)
+      + this._pmBasicFields(df, cls)
+      + this._pmDates(df)
+      + this._pmBilling(df, st)
+      + this._pmFooter(eid, isE, df)
+    );
+    this.cPrev();
+  },
 
-    this.om(`<div class="mt">${isE ? t('btn.edit') : t('btn.newProject').replace('+ ', '')}</div>`
-      + `<div class="fg"><label>${t('field.name')}</label><input type="text" id="mpN" value="${esc(df.nombre)}" placeholder="${t('ph.projectName')}"></div>`
+  /* ── pModal sub-renderers ── */
+
+  _pmHeader(isE) {
+    return `<div class="mt">${isE ? t('btn.edit') : t('btn.newProject').replace('+ ', '')}</div>`;
+  },
+
+  _pmBasicFields(df, cls) {
+    const clOpts = cls.map(c => `<option value="${c.id}" ${c.id === df.clienteId ? 'selected' : ''}>${esc(c.nombre)}</option>`).join('');
+    const ckStyle = 'display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0';
+    return `<div class="fg"><label>${t('field.name')}</label><input type="text" id="mpN" value="${esc(df.nombre)}" placeholder="${t('ph.projectName')}"></div>`
       + `<div class="fg"><label>${t('field.client')}</label><select id="mpCl" onchange="App._onClientChange(this.value)"><option value="">${t('field.noClient')}</option>${clOpts}<option value="_new">${t('btn.createNew')}</option></select></div>`
       + `<div id="mpClNew" style="display:none;margin-bottom:.85rem"><input type="text" id="mpClNewN" placeholder="${t('ph.newClient')}"></div>`
       + `<div class="fg"><label>${t('field.subject')}</label><input type="text" id="mpAsunto" value="${esc(df.asuntoFactura)}" placeholder="${esc(df.nombre)}"></div>`
       + `<div class="fg"><label>${t('field.color')}</label>${this.colorSelect(df.color)}</div>`
       + `<div class="fr"><div class="fg"><label>${t('field.status')}</label><select id="mpSt">${Object.entries(EST).map(([k, v]) => `<option value="${k}" ${k === df.estado ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
       + `<div class="fg" style="display:flex;gap:1.25rem;padding-top:1.5rem">`
-      + `<label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="mpInt" ${df.interno ? 'checked' : ''} style="width:auto;accent-color:var(--t2)"> ${t('field.internal')}</label>`
-      + `<label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="mpRec" ${df.recurrente ? 'checked' : ''} style="width:auto;accent-color:var(--t2)"> ${t('field.recurring')}</label>`
-      + `</div></div>`
-      + `<div class="fr fr-3"><div class="fg"><label>${t('field.start')}</label><input type="date" id="mpI" value="${df.inicio}"></div><div class="fg"><label>${t('field.estEnd')}</label><input type="date" id="mpFE" value="${df.finEst}"></div><div class="fg"><label>${t('field.actualEnd')}</label><input type="date" id="mpFR" value="${df.finR}"></div></div>`
-      + `<div class="dst" style="margin-top:1.25rem">${t('billing.title')}</div>`
-      + `<div class="bms"><button class="bm ${df.modo === 'desde_base' ? 'on' : ''}" onclick="App.sBM('desde_base')">${t('billing.fromBase')}</button><button class="bm ${df.modo === 'desde_total' ? 'on' : ''}" onclick="App.sBM('desde_total')">${t('billing.fromTotal')}</button><button class="bm ${df.modo === 'por_hora' ? 'on' : ''}" onclick="App.sBM('por_hora')">${t('billing.hourly')}</button><button class="bm ${df.modo === 'gratis' ? 'on' : ''}" onclick="App.sBM('gratis')">${t('billing.free')}</button></div><input type="hidden" id="mpBM" value="${df.modo}">`
-      + `<div id="bF" style="${df.modo === 'gratis' ? 'display:none' : ''}">`
-      + `<div id="bfPH" style="${df.modo === 'por_hora' ? '' : 'display:none'}"><div class="fg"><label>${t('billing.eurPerHour')}</label><input type="number" id="mpPH" value="${df.precioHora}" step="0.01" min="0" placeholder="30.00" oninput="App.cPrev()"></div></div>`
-      + `<div class="fr"><div class="fg" id="bfBase" style="${df.modo === 'desde_total' || df.modo === 'por_hora' ? 'display:none' : ''}"><label>${t('billing.baseEur')}</label><input type="number" id="mpBa" value="${df.base}" step="0.01" placeholder="0.00" oninput="App.cPrev()"></div><div class="fg" id="bfTot" style="${df.modo === 'desde_base' || df.modo === 'por_hora' ? 'display:none' : ''}"><label>${t('billing.totalEur')}</label><input type="number" id="mpTo" value="${df.total}" step="0.01" placeholder="0.00" oninput="App.cPrev()"></div></div>`
-      + `<div class="tr"><span class="tl">${t('billing.ivaToggle', st.defaultIva)}</span><label class="tg"><input type="checkbox" id="mpIva" ${df.ivaOn ? 'checked' : ''} onchange="App.cPrev()"><span class="ts"></span></label></div>`
-      + `<div class="tr"><span class="tl">${t('billing.irpfToggle', st.defaultIrpf)}</span><label class="tg"><input type="checkbox" id="mpIrpf" ${df.irpfOn ? 'checked' : ''} onchange="App.cPrev()"><span class="ts"></span></label></div>`
-      + `<div class="fg" style="margin-top:.4rem"><label>${t('billing.ivaException')}</label><input type="text" id="mpIvaExc" value="${esc(df.ivaExc)}" placeholder="${t('ph.ivaException')}"></div>`
-      + `<div id="bPrev" class="bb" style="margin-top:.4rem"></div>`
-      + `<div class="tr" style="margin-top:.75rem"><span class="tl">${t('billing.paid')}</span><label class="tg"><input type="checkbox" id="mpPg" ${df.pagado ? 'checked' : ''} onchange="document.getElementById('mpFPw').style.display=this.checked?'block':'none';if(this.checked&&!document.getElementById('mpFP').value)document.getElementById('mpFP').value=todayStr()"><span class="ts"></span></label></div>`
-      + `<div id="mpFPw" style="${df.pagado ? '' : 'display:none'}"><div class="fg"><label>${t('field.paymentDate')}</label><input type="date" id="mpFP" value="${df.fechaPago}"></div></div>`
-      + `<div class="fg" style="margin-top:.5rem"><label>${t('field.invoiceLang')}</label><select id="mpFacLang"><option value="" ${!df.idiomaFactura ? 'selected' : ''}>${_lang === 'es' ? 'Español' : 'Spanish'} (${t('cfg.defaults').toLowerCase()})</option><option value="es" ${df.idiomaFactura === 'es' ? 'selected' : ''}>Español</option><option value="en" ${df.idiomaFactura === 'en' ? 'selected' : ''}>English</option></select></div>`
-      + `</div>`
-      + `<div class="fg" style="margin-top:.75rem"><label>${t('field.notes')}</label><textarea id="mpNo" placeholder="${t('ph.notes')}">${esc(df.notas)}</textarea></div>`
-      + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveP('${eid || ''}')">${isE ? t('btn.save') : t('btn.create')}</button></div>`);
-    this.cPrev();
+      + `<label style="${ckStyle}"><input type="checkbox" id="mpInt" ${df.interno ? 'checked' : ''} style="width:auto;accent-color:var(--t2)"> ${t('field.internal')}</label>`
+      + `<label style="${ckStyle}"><input type="checkbox" id="mpRec" ${df.recurrente ? 'checked' : ''} style="width:auto;accent-color:var(--t2)"> ${t('field.recurring')}</label>`
+      + `</div></div>`;
+  },
+
+  _pmDates(df) {
+    return `<div class="fr fr-3">`
+      + `<div class="fg"><label>${t('field.start')}</label><input type="date" id="mpI" value="${df.inicio}"></div>`
+      + `<div class="fg"><label>${t('field.estEnd')}</label><input type="date" id="mpFE" value="${df.finEst}"></div>`
+      + `<div class="fg"><label>${t('field.actualEnd')}</label><input type="date" id="mpFR" value="${df.finR}"></div>`
+      + `</div>`;
+  },
+
+  _pmBilling(df, st) {
+    const m = df.modo;
+    return `<div class="dst" style="margin-top:1.25rem">${t('billing.title')}</div>`
+      + `<div class="bms">`
+      +   `<button class="bm ${m === 'desde_base' ? 'on' : ''}" onclick="App.sBM('desde_base')">${t('billing.fromBase')}</button>`
+      +   `<button class="bm ${m === 'desde_total' ? 'on' : ''}" onclick="App.sBM('desde_total')">${t('billing.fromTotal')}</button>`
+      +   `<button class="bm ${m === 'por_hora' ? 'on' : ''}" onclick="App.sBM('por_hora')">${t('billing.hourly')}</button>`
+      +   `<button class="bm ${m === 'gratis' ? 'on' : ''}" onclick="App.sBM('gratis')">${t('billing.free')}</button>`
+      + `</div><input type="hidden" id="mpBM" value="${m}">`
+      + `<div id="bF" style="${m === 'gratis' ? 'display:none' : ''}">`
+      +   `<div id="bfPH" style="${m === 'por_hora' ? '' : 'display:none'}"><div class="fg"><label>${t('billing.eurPerHour')}</label><input type="number" id="mpPH" value="${df.precioHora}" step="0.01" min="0" placeholder="30.00" oninput="App.cPrev()"></div></div>`
+      +   `<div class="fr">`
+      +     `<div class="fg" id="bfBase" style="${m === 'desde_total' || m === 'por_hora' ? 'display:none' : ''}"><label>${t('billing.baseEur')}</label><input type="number" id="mpBa" value="${df.base}" step="0.01" placeholder="0.00" oninput="App.cPrev()"></div>`
+      +     `<div class="fg" id="bfTot" style="${m === 'desde_base' || m === 'por_hora' ? 'display:none' : ''}"><label>${t('billing.totalEur')}</label><input type="number" id="mpTo" value="${df.total}" step="0.01" placeholder="0.00" oninput="App.cPrev()"></div>`
+      +   `</div>`
+      +   `<div class="tr"><span class="tl">${t('billing.ivaToggle', st.defaultIva)}</span><label class="tg"><input type="checkbox" id="mpIva" ${df.ivaOn ? 'checked' : ''} onchange="App.cPrev()"><span class="ts"></span></label></div>`
+      +   `<div class="tr"><span class="tl">${t('billing.irpfToggle', st.defaultIrpf)}</span><label class="tg"><input type="checkbox" id="mpIrpf" ${df.irpfOn ? 'checked' : ''} onchange="App.cPrev()"><span class="ts"></span></label></div>`
+      +   `<div class="fg" style="margin-top:.4rem"><label>${t('billing.ivaException')}</label><input type="text" id="mpIvaExc" value="${esc(df.ivaExc)}" placeholder="${t('ph.ivaException')}"></div>`
+      +   `<div id="bPrev" class="bb" style="margin-top:.4rem"></div>`
+      +   `<div class="tr" style="margin-top:.75rem"><span class="tl">${t('billing.paid')}</span><label class="tg"><input type="checkbox" id="mpPg" ${df.pagado ? 'checked' : ''} onchange="document.getElementById('mpFPw').style.display=this.checked?'block':'none';if(this.checked&&!document.getElementById('mpFP').value)document.getElementById('mpFP').value=todayStr()"><span class="ts"></span></label></div>`
+      +   `<div id="mpFPw" style="${df.pagado ? '' : 'display:none'}"><div class="fg"><label>${t('field.paymentDate')}</label><input type="date" id="mpFP" value="${df.fechaPago}"></div></div>`
+      +   `<div class="fg" style="margin-top:.5rem"><label>${t('field.invoiceLang')}</label><select id="mpFacLang"><option value="" ${!df.idiomaFactura ? 'selected' : ''}>${_lang === 'es' ? 'Español' : 'Spanish'} (${t('cfg.defaults').toLowerCase()})</option><option value="es" ${df.idiomaFactura === 'es' ? 'selected' : ''}>Español</option><option value="en" ${df.idiomaFactura === 'en' ? 'selected' : ''}>English</option></select></div>`
+      + `</div>`;
+  },
+
+  _pmFooter(eid, isE, df) {
+    return `<div class="fg" style="margin-top:.75rem"><label>${t('field.notes')}</label><textarea id="mpNo" placeholder="${t('ph.notes')}">${esc(df.notas)}</textarea></div>`
+      + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveP('${eid || ''}')">${isE ? t('btn.save') : t('btn.create')}</button></div>`;
   },
 
   sBM(m) {
@@ -292,18 +329,20 @@ const App = {
     B.calc(p);
     const f = p.facturacion, s = D.d.settings;
     const num = f.facturaNum || s.nextFacturaNum || 1;
-    const numStr = String(num);
-    this.om(`<div class="mt">${t('fac.generate')}</div>`
-      + `<div class="fr"><div class="fg"><label>${t('field.invoiceNum')}</label><input type="text" id="facNum" value="${numStr}" style="font-family:'DM Mono',monospace"></div>`
-      + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="facDate" value="${f.facturaFecha || todayStr()}"></div></div>`
-      + `<div class="fg"><label>${t('field.subject')}</label><input type="text" id="facAsunto" value="${esc(defaultAsunto(p))}"></div>`
-      + `<div class="bb" style="margin-top:.75rem">`
+
+    const summary = `<div class="bb" style="margin-top:.75rem">`
       + `<div class="br"><span class="la">${t('fac.issuer')}</span><span class="va">${esc(s.emisor.nombre || t('fac.configure'))}</span></div>`
       + `<div class="br"><span class="la">${t('fac.client')}</span><span class="va">${esc(clienteName(p))}</span></div>`
       + `<div class="br"><span class="la">${t('billing.base')}</span><span class="va">${fmtMoney(f.baseImponible || 0)}</span></div>`
-      + `${f.iva ? `<div class="br"><span class="la">${t('billing.plusIva', f.iva)}</span><span class="va">${fmtMoney(f.importeIva || 0)}</span></div>` : ''}`
-      + `${f.irpf ? `<div class="br"><span class="la">${t('billing.minusIrpf', f.irpf)}</span><span class="va">${fmtMoney(f.importeIrpf || 0)}</span></div>` : ''}`
-      + `<div class="br tot"><span class="la">${t('billing.total')}</span><span class="va">${fmtMoney(f.totalFactura || 0)}</span></div></div>`
+      + (f.iva ? `<div class="br"><span class="la">${t('billing.plusIva', f.iva)}</span><span class="va">${fmtMoney(f.importeIva || 0)}</span></div>` : '')
+      + (f.irpf ? `<div class="br"><span class="la">${t('billing.minusIrpf', f.irpf)}</span><span class="va">${fmtMoney(f.importeIrpf || 0)}</span></div>` : '')
+      + `<div class="br tot"><span class="la">${t('billing.total')}</span><span class="va">${fmtMoney(f.totalFactura || 0)}</span></div></div>`;
+
+    this.om(`<div class="mt">${t('fac.generate')}</div>`
+      + `<div class="fr"><div class="fg"><label>${t('field.invoiceNum')}</label><input type="text" id="facNum" value="${String(num)}" style="font-family:'DM Mono',monospace"></div>`
+      + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="facDate" value="${f.facturaFecha || todayStr()}"></div></div>`
+      + `<div class="fg"><label>${t('field.subject')}</label><input type="text" id="facAsunto" value="${esc(defaultAsunto(p))}"></div>`
+      + summary
       + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.genFactura('${pid}')">${t('btn.downloadPdf')}</button></div>`);
   },
 
