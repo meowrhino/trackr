@@ -23,7 +23,6 @@
 .cal-vt{
   display:flex;
   gap:2px;
-  margin-left:auto;
 }
 .cal-vb{
   padding:.35rem .7rem;
@@ -73,17 +72,21 @@
   text-transform:uppercase;
   letter-spacing:.06em;
   color:var(--t3);
+  min-width:0;
+  overflow:hidden;
 }
 
 /* ── Celda de día ── */
 .cal-day{
   background:var(--bg2);
   min-height:90px;
+  min-width:0;
   padding:.4rem;
   cursor:pointer;
   transition:background var(--tr);
   display:flex;
   flex-direction:column;
+  overflow:hidden;
 }
 .cal-day:hover{background:var(--bg3)}
 
@@ -347,3 +350,85 @@
 .cal-wseg-bar{width:100%;height:8px;border-radius:4px;background:var(--bg3);position:relative;overflow:hidden}
 .cal-wseg-fill{position:absolute;left:0;top:0;height:100%;background:var(--t2);border-radius:4px;transition:width .3s ease}
 .cal-wseg-lbl{font-size:.58rem;color:var(--t3);margin-top:2px;white-space:nowrap}
+
+/* ══════════════════════════════════════
+ *  MOBILE WEEK (stacked day list)
+ * ══════════════════════════════════════ */
+
+/* Hidden on desktop, shown on mobile via responsive.css */
+.cal-week-mobile{display:none}
+
+.cal-mday{
+  background:var(--bg2);
+  border:1px solid var(--b1);
+  border-radius:var(--r);
+  padding:.6rem .75rem;
+  margin-bottom:.4rem;
+  cursor:pointer;
+  transition:background var(--tr);
+}
+.cal-mday:hover{background:var(--bg3)}
+.cal-mday.today{border-color:var(--t2)}
+.cal-mday-hdr{
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+  margin-bottom:.25rem;
+}
+.cal-mday-dow{
+  font-size:.7rem;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  color:var(--t3);
+  min-width:28px;
+}
+.cal-mday-num{
+  font-family:'DM Mono',monospace;
+  font-size:.9rem;
+  color:var(--t1);
+}
+.cal-mday.today .cal-mday-num{
+  background:var(--t1);
+  color:var(--bg);
+  border-radius:50%;
+  width:24px;
+  height:24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.cal-mday-total{
+  margin-left:auto;
+  font-size:.78rem;
+  color:var(--t2);
+}
+.cal-mday-entries{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  margin-top:.3rem;
+}
+.cal-mday-entry{
+  font-size:.75rem;
+  padding:.2rem .4rem;
+  border-left:2px solid var(--b2);
+  border-radius:0 var(--r) var(--r) 0;
+  background:var(--bg3);
+  display:flex;
+  gap:.4rem;
+  align-items:center;
+}
+.cal-mday-pn{
+  color:var(--t2);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  flex:1;
+  min-width:0;
+}
+.cal-mday-time{
+  font-family:'DM Mono',monospace;
+  font-size:.68rem;
+  color:var(--t3);
+  flex-shrink:0;
+}

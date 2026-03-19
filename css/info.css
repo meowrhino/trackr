@@ -220,6 +220,9 @@
   .info-stats{grid-template-columns:repeat(2,1fr)}
   .info-quick{flex-wrap:wrap}
   .info-examples-grid{grid-template-columns:1fr}
+  .info-fin{overflow:hidden}
+  .info-fin-header{flex-wrap:wrap}
+  .info-fin-toggle{margin-left:0}
 }
 @media(max-width:480px){
   .info-stats{grid-template-columns:1fr 1fr}

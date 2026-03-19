@@ -243,9 +243,33 @@ Object.assign(App, {
       ).join('')}</div></div>`;
     }
 
+    /* ── Mobile stacked view ── */
+    let mobileWeek = `<div class="cal-week-mobile">`;
+    days.forEach((d, di) => {
+      const dayEntries = hm[d.date] || [];
+      const dayGastos = weekGastos.filter(g => g.fecha === d.date);
+      const dayTotal = dayEntries.reduce((s, e) => s + e.cant, 0);
+      mobileWeek += `<div class="cal-mday${d.today ? ' today' : ''}" onclick="App.calDetail('${d.date}')">`
+        + `<div class="cal-mday-hdr"><span class="cal-mday-dow">${d.dow}</span><span class="cal-mday-num">${d.num}</span>`
+        + `${dayTotal ? `<span class="cal-mday-total m">${dayTotal.toFixed(1)}h</span>` : ''}</div>`;
+      if (dayEntries.length || dayGastos.length) {
+        mobileWeek += `<div class="cal-mday-entries">`;
+        dayEntries.forEach(e => {
+          mobileWeek += `<div class="cal-mday-entry" style="border-left-color:${e.pc}"><span>${e.tipo === 'trabajo' ? '💻' : '👥'}</span><span class="m">${e.cant}h</span><span class="cal-mday-pn">${esc(e.pn)}</span>${e.hi ? `<span class="cal-mday-time">${e.hi}</span>` : ''}</div>`;
+        });
+        dayGastos.forEach(e => {
+          mobileWeek += `<div class="cal-mday-entry" style="border-left-color:${e.gc}"><span>€</span><span class="m">${fmtMoney(e.cant)}</span><span class="cal-mday-pn">${esc(e.gn)}</span></div>`;
+        });
+        mobileWeek += `</div>`;
+      }
+      mobileWeek += `</div>`;
+    });
+    mobileWeek += `</div>`;
+
     document.getElementById('calC').innerHTML =
       this._calHeader(title, `${t('cal.weekTotal')} <span class="m">${wt.toFixed(1)}h</span>`)
       + `<div class="cal-week" style="--slot-h:${slotH}px"><div class="cal-week-hdr">${hdr}</div><div class="cal-week-body"><div class="cal-week-tl">${timeLbl}</div>${cols}</div></div>`
+      + mobileWeek
       + ntHtml + wgHtml + wcHtml
       + this._calGoals('week', wt, ws.getFullYear(), ws.getMonth())
       + this._calProjStats(pStats)
@@ -260,7 +284,8 @@ Object.assign(App, {
       + `<span class="cal-title">${title}</span>`
       + `<button class="bt bt-s" onclick="App.calNext()">&rarr;</button>`
       + `<button class="bt bt-s" onclick="App.calToday()">${t('cal.today')}</button>`
-      + `<div class="cal-vt"><button class="cal-vb${isM ? ' on' : ''}" onclick="App.calSetView('month')">${t('cal.month')}</button><button class="cal-vb${!isM ? ' on' : ''}" onclick="App.calSetView('week')">${t('cal.week')}</button></div></div>`
+      + `<div class="cal-vt"><button class="cal-vb${isM ? ' on' : ''}" onclick="App.calSetView('month')">${t('cal.month')}</button><button class="cal-vb${!isM ? ' on' : ''}" onclick="App.calSetView('week')">${t('cal.week')}</button></div>`
+      + `</div>`
       + `<div class="cal-stat"><span class="cal-stat-l">${stat}</span></div>`;
   },
 
