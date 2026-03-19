@@ -5,6 +5,17 @@
  * Dependencias: jsPDF (CDN), store.js, billing.js, utils.js, lang.js
  * ================================================ */
 
+/* PDF layout constants */
+const PDF_MARGIN = 20;       /* mm */
+const PDF_LINE_H = 6;        /* mm entre filas de totales */
+const PDF_TOTALS_W = 70;     /* mm ancho de bloque totales */
+
+/** Extrae los dos últimos dígitos del año de una fecha YYYY-MM-DD */
+function yearShort(fecha) {
+  const parts = fecha.split('-');
+  return parts.length >= 1 ? parts[0].slice(-2) : '';
+}
+
 const Fac = {
 
   /**
@@ -20,19 +31,13 @@ const Fac = {
     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
     const pageW = doc.internal.pageSize.getWidth();   /* 210 */
     const pageH = doc.internal.pageSize.getHeight();   /* 297 */
-    const mg = 20;
+    const mg = PDF_MARGIN;
     let y = mg;
 
     /* ── Helpers ── */
     const fmt = n => n.toLocaleString('es-ES', {
       minimumFractionDigits: 2, maximumFractionDigits: 2
     });
-
-    /* Year short from fecha (yyyy-mm-dd) */
-    const yearShort = (fecha) => {
-      const parts = fecha.split('-');
-      return parts.length >= 1 ? parts[0].slice(-2) : '';
-    };
 
     /* Format date dd/mm/yyyy from yyyy-mm-dd */
     const fmtDate = (fecha) => {
@@ -124,9 +129,9 @@ const Fac = {
     y += conceptoLines.length * 5 + 6;
 
     /* ── Totals (positioned at bottom of page when possible) ── */
-    const labelX = pageW - mg - 70;
+    const labelX = pageW - mg - PDF_TOTALS_W;
     const valueX = pageW - mg;
-    const lineH = 6;
+    const lineH = PDF_LINE_H;
 
     /* Build totals rows */
     const rows = [];
@@ -160,7 +165,7 @@ const Fac = {
 
     /* IVA exception note (if IVA is 0 and there is exception text) */
     const noteLines = (data.calculos.ivaRate === 0 && data.calculos.ivaExcepcion)
-      ? doc.splitTextToSize(tf('fac.ivaException', lang, data.calculos.ivaExcepcion), 70)
+      ? doc.splitTextToSize(tf('fac.ivaException', lang, data.calculos.ivaExcepcion), PDF_TOTALS_W)
       : [];
     const noteH = noteLines.length ? noteLines.length * 4 + 2 : 0;
 
@@ -168,7 +173,7 @@ const Fac = {
     const pagoFullText = data.instruccionesPago
       ? tf('fac.bankTransferText', lang) + '\n' + data.instruccionesPago
       : '';
-    const pagoEstLines = pagoFullText ? doc.splitTextToSize(pagoFullText, 70) : [];
+    const pagoEstLines = pagoFullText ? doc.splitTextToSize(pagoFullText, PDF_TOTALS_W) : [];
     const pagoH = pagoEstLines.length ? 4 + 5 + pagoEstLines.length * 4 : 0;
 
     /* Calculate totals Y: push to bottom, but never overlap content */
@@ -212,7 +217,7 @@ const Fac = {
       doc.setFontSize(8);
       doc.setFont('helvetica', 'normal');
       const fullText = tf('fac.bankTransferText', lang) + '\n' + data.instruccionesPago;
-      const lines = doc.splitTextToSize(fullText, 70);
+      const lines = doc.splitTextToSize(fullText, PDF_TOTALS_W);
       doc.text(lines, labelX, totalsY);
     }
 
@@ -241,7 +246,7 @@ const Fac = {
 
     /* Fecha y year short */
     const fecha = opts.fecha || todayStr();
-    const ys = fecha.split('-').length >= 1 ? fecha.split('-')[0].slice(-2) : '';
+    const ys = yearShort(fecha);
 
     /* Construir datos */
     const data = {

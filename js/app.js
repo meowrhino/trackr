@@ -238,6 +238,7 @@ const App = {
   saveP(eid) {
     const nombre = document.getElementById('mpN').value.trim();
     if (!nombre) { Toast.warn(t('msg.nameRequired')); return; }
+    const prev = eid ? D.p(eid) : null;
 
     let clienteId = document.getElementById('mpCl').value;
     const color = document.getElementById('mpColor').value;
@@ -269,11 +270,11 @@ const App = {
         pagado: document.getElementById('mpPg')?.checked || false,
         fechaPago: document.getElementById('mpFP')?.value || (document.getElementById('mpPg')?.checked ? todayStr() : null),
         gastos: 0,
-        facturaNum: eid ? (D.p(eid)?.facturacion?.facturaNum || null) : null,
-        facturaFecha: eid ? (D.p(eid)?.facturacion?.facturaFecha || null) : null,
+        facturaNum: prev?.facturacion?.facturaNum || null,
+        facturaFecha: prev?.facturacion?.facturaFecha || null,
         idiomaFactura: facLangVal || null
       },
-      horas: eid ? (D.p(eid)?.horas || []) : [], notas: document.getElementById('mpNo').value.trim()
+      horas: prev?.horas || [], notas: document.getElementById('mpNo').value.trim()
     };
     B.calc(proj);
     if (eid) { D.up(eid, proj); T.ev('action', 'project_edit'); } else { D.add(proj); T.ev('action', 'project_create'); }
@@ -341,7 +342,7 @@ const App = {
   imp(ev) {
     const f = ev.target.files[0]; if (!f) return;
     /* Validar tamaño (máx 5MB) */
-    if (f.size > 5 * 1024 * 1024) {
+    if (f.size > MAX_IMPORT_BYTES) {
       Toast.error(t('msg.fileTooLarge', (f.size / 1024 / 1024).toFixed(1)));
       ev.target.value = '';
       return;
