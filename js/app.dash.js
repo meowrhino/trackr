@@ -103,7 +103,6 @@ Object.assign(App, {
     if (f.pagado) flags += `<span class="pc-flag pc-flag-paid">${t('dash.flagPaid')}</span>`;
     else if (f.facturaFecha) {
       flags += `<span class="pc-flag pc-flag-inv">${t('dash.flagInvoiced')}</span>`;
-      flags += `<button class="pc-flag pc-flag-pay" onclick="event.stopPropagation();App.quickPay('${p.id}')" title="${t('dash.markPaid')}">💰</button>`;
     }
 
     return `<div class="pc${p.interno ? ' pc-mr' : ''}" style="--project-color:${hex}" onclick="App.go('det','${p.id}')">
@@ -135,7 +134,7 @@ Object.assign(App, {
     p.facturacion.fechaPago = p.facturacion.fechaPago || todayStr();
     D.up(pid, { facturacion: p.facturacion });
     Toast.ok(t('dash.markPaid') + ' ✓');
-    this.rDash();
+    if (this.cv === 'det') this.rDet(pid); else this.rDash();
   },
 
   toggleGroup(st) {

@@ -26,7 +26,8 @@ Object.assign(App, {
       this._detHeader(p, hex, cn, f)
       + this._detInfo(p, th, wh, mh)
       + this._detHours(p, hex)
-      + this._detBilling(p, f, eph);
+      + this._detBilling(p, f, eph)
+      + `<div style="display:flex;justify-content:flex-end;margin-top:1.5rem;padding-bottom:1rem"><button class="bt bt-s bt-d" onclick="App.xProj('${p.id}')">${t('btn.delete')}</button></div>`;
   },
 
   /* ── rDet sub-renderers ── */
@@ -36,12 +37,18 @@ Object.assign(App, {
     if (p.interno) flags += ` <span class="pc-flag pc-flag-int">${t('dash.flagInternal')}</span>`;
     if (p.recurrente) flags += ` <span class="pc-flag pc-flag-rec">${t('dash.flagRecurring')}</span>`;
 
+    let payBtn = '';
+    if (f.facturaFecha && !f.pagado && f.modo !== 'gratis') {
+      payBtn = `<button class="bt bt-s" onclick="App.quickPay('${p.id}')" title="${t('dash.markPaid')}">💰 ${t('dash.markPaid')}</button>`;
+    }
+
     return `<div class="db" onclick="App.go('dash')">${t('det.backProjects')}</div>`
       + `<div class="dh"><div><div class="dt" style="color:${hex}">${esc(p.nombre)}</div><div class="dc">${esc(cn)}${flags}</div></div>`
       + `<div class="bg"><span class="bd bd-${p.estado}">${EST[p.estado] || p.estado}</span>`
       +   `<button class="bt bt-s" onclick="App.pModal('${p.id}')">${t('btn.edit')}</button>`
       +   `${f.modo !== 'gratis' ? `<button class="bt bt-s" onclick="App.facModal('${p.id}')">${t('det.invoice')}</button>` : ''}`
-      +   `<button class="bt bt-s bt-d" onclick="App.xProj('${p.id}')">${t('btn.delete')}</button></div></div>`;
+      +   payBtn
+      + `</div></div>`;
   },
 
   _detInfo(p, th, wh, mh) {
