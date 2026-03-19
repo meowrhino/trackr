@@ -45,6 +45,15 @@ const App = {
       if (e.key === 'Escape') this.cm();
     });
 
+    /* Cerrar modal solo con click limpio en backdrop (no drag) */
+    const mo = document.getElementById('mO');
+    let mdTarget = null;
+    mo.addEventListener('mousedown', e => { mdTarget = e.target; });
+    mo.addEventListener('mouseup', e => {
+      if (e.target === mo && mdTarget === mo) this.cm();
+      mdTarget = null;
+    });
+
     this.enter();
   },
 
@@ -151,7 +160,7 @@ const App = {
       + `<div class="tr"><span class="tl">${t('billing.irpfToggle', st.defaultIrpf)}</span><label class="tg"><input type="checkbox" id="mpIrpf" ${df.irpfOn ? 'checked' : ''} onchange="App.cPrev()"><span class="ts"></span></label></div>`
       + `<div class="fg" style="margin-top:.4rem"><label>${t('billing.ivaException')}</label><input type="text" id="mpIvaExc" value="${esc(df.ivaExc)}" placeholder="${t('ph.ivaException')}"></div>`
       + `<div id="bPrev" class="bb" style="margin-top:.4rem"></div>`
-      + `<div class="tr" style="margin-top:.75rem"><span class="tl">${t('billing.paid')}</span><label class="tg"><input type="checkbox" id="mpPg" ${df.pagado ? 'checked' : ''} onchange="document.getElementById('mpFPw').style.display=this.checked?'block':'none'"><span class="ts"></span></label></div>`
+      + `<div class="tr" style="margin-top:.75rem"><span class="tl">${t('billing.paid')}</span><label class="tg"><input type="checkbox" id="mpPg" ${df.pagado ? 'checked' : ''} onchange="document.getElementById('mpFPw').style.display=this.checked?'block':'none';if(this.checked&&!document.getElementById('mpFP').value)document.getElementById('mpFP').value=todayStr()"><span class="ts"></span></label></div>`
       + `<div id="mpFPw" style="${df.pagado ? '' : 'display:none'}"><div class="fg"><label>${t('field.paymentDate')}</label><input type="date" id="mpFP" value="${df.fechaPago}"></div></div>`
       + `<div class="fg" style="margin-top:.5rem"><label>${t('field.invoiceLang')}</label><select id="mpFacLang"><option value="" ${!df.idiomaFactura ? 'selected' : ''}>${_lang === 'es' ? 'Español' : 'Spanish'} (${t('cfg.defaults').toLowerCase()})</option><option value="es" ${df.idiomaFactura === 'es' ? 'selected' : ''}>Español</option><option value="en" ${df.idiomaFactura === 'en' ? 'selected' : ''}>English</option></select></div>`
       + `</div>`
@@ -257,7 +266,8 @@ const App = {
         ivaExcepcion: document.getElementById('mpIvaExc')?.value?.trim() || '',
         asuntoFactura: document.getElementById('mpAsunto')?.value?.trim() || '',
         importeIva: 0, importeIrpf: 0, totalFactura: 0, netoRecibido: 0,
-        pagado: document.getElementById('mpPg')?.checked || false, fechaPago: document.getElementById('mpFP')?.value || null,
+        pagado: document.getElementById('mpPg')?.checked || false,
+        fechaPago: document.getElementById('mpFP')?.value || (document.getElementById('mpPg')?.checked ? todayStr() : null),
         gastos: 0,
         facturaNum: eid ? (D.p(eid)?.facturacion?.facturaNum || null) : null,
         facturaFecha: eid ? (D.p(eid)?.facturacion?.facturaFecha || null) : null,
