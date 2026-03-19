@@ -75,15 +75,15 @@ Object.assign(App, {
       +   `<div class="info-stat-val">${activos.length}</div>`
       +   `<div class="info-stat-lbl">${tp('info.activeProjects', activos.length)}</div>`
       + `</div>`
-      + `<div class="info-stat-card" style="--stat-accent:var(--b2)" onclick="App.go('cal')">`
+      + `<div class="info-stat-card" style="--stat-accent:var(--b2)" onclick="App.calView='week';App.go('cal')">`
       +   `<div class="info-stat-val">${horasSemana.toFixed(1)}<small>h</small></div>`
       +   `<div class="info-stat-lbl">${t('info.thisWeek')}</div>`
       + `</div>`
-      + `<div class="info-stat-card" style="--stat-accent:var(--b2)" onclick="App.go('cal')">`
+      + `<div class="info-stat-card" style="--stat-accent:var(--b2)" onclick="App.calView='month';App.go('cal')">`
       +   `<div class="info-stat-val">${horasMes.toFixed(1)}<small>h</small></div>`
       +   `<div class="info-stat-lbl">${t('info.thisMonth')}</div>`
       + `</div>`
-      + `<div class="info-stat-card" style="--stat-accent:${horasMes > 0 && (cobradoMes - gastosMes) < 0 ? 'var(--bad)' : 'var(--ok)'}">`
+      + `<div class="info-stat-card" style="--stat-accent:${horasMes > 0 && (cobradoMes - gastosMes) < 0 ? 'var(--bad)' : 'var(--ok)'}" onclick="App.go('din')">`
       +   `<div class="info-stat-val"${horasMes > 0 && (cobradoMes - gastosMes) < 0 ? ' style="color:var(--bad)"' : ''}>${horasMes > 0 ? fmtNum((cobradoMes - gastosMes) / horasMes) : '—'}<small>${horasMes > 0 ? '€/h' : ''}</small></div>`
       +   `<div class="info-stat-lbl">${t('info.realEurH')}</div>`
       + `</div>`
