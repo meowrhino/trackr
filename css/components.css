@@ -6,7 +6,7 @@
 
 /* ── Stats grid ── */
 .sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.75rem;margin-bottom:1.5rem}
-.sc{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:1rem}
+.sc{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:1rem;box-shadow:var(--sh)}
 .sc-l{font-size:.72rem;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.3rem}
 .sc-v{font-family:'DM Mono',monospace;font-size:1.4rem;font-weight:400}
 .sc-d{font-size:.72rem;color:var(--t3);margin-top:.15rem}
@@ -14,8 +14,8 @@
 /* ── Botones ── */
 .bt{padding:.45rem 1rem;border-radius:var(--r);border:1px solid var(--b1);background:var(--bg2);color:var(--t1);font-family:'Outfit',sans-serif;font-size:.82rem;cursor:pointer;transition:all var(--tr);display:inline-flex;align-items:center;gap:.4rem}
 .bt:hover{border-color:var(--b2);background:var(--bg3)}
-.bt-p{background:var(--t1);border-color:var(--t1);color:var(--bg)}
-.bt-p:hover{opacity:.85}
+.bt-p{background:var(--ac);border-color:var(--ac);color:#fff}
+.bt-p:hover{filter:brightness(1.15)}
 .bt-d{border-color:var(--bad);color:var(--bad)}.bt-d:hover{background:rgba(204,85,85,.08)}
 .bt-s{padding:.35rem .7rem;font-size:.78rem}
 .bt-add{padding:.4rem .9rem;font-size:.78rem;border:1px dashed var(--b2);color:var(--t2);background:transparent;border-radius:var(--r);margin-bottom:.75rem}
@@ -34,9 +34,9 @@
 
 /* ── Project cards ── */
 .pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:.75rem}
-.pc{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:1rem;cursor:pointer;transition:all var(--tr);position:relative;border-left:3px solid var(--project-color,var(--b2))}
+.pc{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:1rem;cursor:pointer;transition:all var(--tr);position:relative;border-left:3px solid var(--project-color,var(--b2));box-shadow:var(--sh)}
 .pc:hover{background:var(--bg3)}
-.pc-mr{background:#ccc;border-color:#ddd;border-left-color:var(--project-color,#ddd)}.pc-mr .pc-n,.pc-mr .pc-s span,.pc-mr .pc-s .m{color:#222}.pc-mr .pc-c{color:#666}.pc-mr .pc-s{color:#555}.pc-mr:hover{background:#e6e6de}
+.pc-mr{background:var(--bg4);border-color:var(--b2);border-left-color:var(--project-color,var(--b2));opacity:.6}.pc-mr .pc-n,.pc-mr .pc-s span,.pc-mr .pc-s .m{color:var(--t2)}.pc-mr .pc-c{color:var(--t3)}.pc-mr .pc-s{color:var(--t3)}.pc-mr:hover{background:var(--bg3);opacity:.8}
 .pc-h{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.5rem}
 .pc-n{font-weight:500;font-size:.95rem}
 .pc-c{font-size:.78rem;color:var(--t3);margin-top:.1rem}
@@ -45,18 +45,18 @@
 
 /* ── Badges de estado ── */
 .bd{font-family:'DM Mono',monospace;font-size:.68rem;padding:.15rem .5rem;border:1px solid var(--b1);border-radius:var(--r);text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;color:var(--t3)}
-.bd-activo{border-color:rgba(100,160,220,.3);color:#78b4e8}
-.bd-pausado{border-color:rgba(200,160,60,.3);color:#c9a43c}
-.bd-completado{border-color:rgba(90,170,140,.3);color:#5aac8c}
-.bd-abandonado{border-color:rgba(160,100,100,.3);color:#a07070}
+.bd-activo{border-color:color-mix(in srgb,var(--ac) 30%,transparent);color:var(--ac)}
+.bd-pausado{border-color:color-mix(in srgb,var(--warn) 30%,transparent);color:var(--warn)}
+.bd-completado{border-color:color-mix(in srgb,var(--ok) 30%,transparent);color:var(--ok)}
+.bd-abandonado{border-color:color-mix(in srgb,var(--t3) 40%,transparent);color:var(--t3)}
 
 /* ── Flags de proyecto (iconos en card) ── */
 .pc-flags{display:flex;gap:.3rem;align-items:center;font-size:.65rem}
 .pc-flag{padding:.1rem .35rem;border-radius:var(--r);background:var(--bg4);color:var(--t2);white-space:nowrap}
-.pc-flag-int{background:rgba(100,160,220,.1);color:#78b4e8}
-.pc-flag-rec{background:rgba(180,140,100,.1);color:#c4a06a}
-.pc-flag-paid{background:rgba(90,170,140,.15);color:#5aac8c}
-.pc-flag-inv{background:rgba(160,120,200,.15);color:#b08cd8}
+.pc-flag-int{background:color-mix(in srgb,var(--ac) 12%,transparent);color:var(--ac)}
+.pc-flag-rec{background:color-mix(in srgb,var(--warn) 12%,transparent);color:var(--warn)}
+.pc-flag-paid{background:color-mix(in srgb,var(--ok) 15%,transparent);color:var(--ok)}
+.pc-flag-inv{background:color-mix(in srgb,var(--bad) 15%,transparent);color:var(--bad)}
 
 /* ── Barra de progreso (objetivos, financiero) ── */
 .pbar{height:8px;background:var(--bg3);border-radius:4px;overflow:hidden}
@@ -83,9 +83,9 @@
 .fb.on{border-color:var(--t2);color:var(--t1)}
 
 /* ── Modal ── */
-.mo{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:1000;padding:2rem;opacity:0;pointer-events:none;transition:opacity var(--tr)}
+.mo{position:fixed;inset:0;background:color-mix(in srgb,var(--bg) 75%,transparent);display:flex;align-items:center;justify-content:center;z-index:1000;padding:2rem;opacity:0;pointer-events:none;transition:opacity var(--tr)}
 .mo.on{opacity:1;pointer-events:all}
-.md{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:1.75rem;width:100%;max-width:520px;max-height:85vh;overflow-y:auto}
+.md{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:1.75rem;width:100%;max-width:520px;max-height:85vh;overflow-y:auto;box-shadow:var(--sh)}
 .mt{font-size:1.1rem;font-weight:500;margin-bottom:1.25rem}
 .ma{display:flex;justify-content:flex-end;gap:.5rem;margin-top:1.25rem}
 
@@ -116,7 +116,7 @@
 
 /* ── Toast notifications ── */
 #toasts{position:fixed;bottom:1.5rem;right:1.5rem;z-index:2000;display:flex;flex-direction:column-reverse;gap:.5rem;pointer-events:none}
-.toast{padding:.65rem 1.1rem;border-radius:var(--r);font-size:.82rem;color:var(--t1);background:var(--bg2);border:1px solid var(--b1);box-shadow:0 4px 12px rgba(0,0,0,.3);transform:translateX(120%);transition:transform .25s ease,opacity .25s ease;opacity:0;pointer-events:all;max-width:340px}
+.toast{padding:.65rem 1.1rem;border-radius:var(--r);font-size:.82rem;color:var(--t1);background:var(--bg2);border:1px solid var(--b1);box-shadow:0 4px 12px color-mix(in srgb,var(--bg) 50%,transparent);transform:translateX(120%);transition:transform .25s ease,opacity .25s ease;opacity:0;pointer-events:all;max-width:340px}
 .toast.on{transform:translateX(0);opacity:1}
 .toast-ok{border-left:3px solid var(--ok)}
 .toast-warn{border-left:3px solid var(--warn)}

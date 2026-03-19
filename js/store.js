@@ -74,6 +74,8 @@ const D = {
     if (s.defaultIrpf == null) s.defaultIrpf = 15;
     if (!s.targets) s.targets = { horasMes: null, ingresosMes: null, horasSemana: null };
     if (s.nextFacturaNum == null) s.nextFacturaNum = 1;
+    if (s.conceptoDefault == null) s.conceptoDefault = '';
+    if (s.conceptoAppendCliente == null) s.conceptoAppendCliente = false;
     if (!s.tema) s.tema = 'oscuro';
     if (!s.idioma) s.idioma = 'es';
 

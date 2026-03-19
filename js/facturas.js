@@ -252,7 +252,7 @@ const Fac = {
       factura: {
         numero: numStr,
         fecha: fecha,
-        asunto: opts.asunto || p.nombre
+        asunto: opts.asunto || defaultAsunto(p)
       },
       calculos: {
         base: f.baseImponible || 0,

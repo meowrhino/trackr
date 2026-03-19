@@ -156,6 +156,26 @@ function clienteName(p) {
 }
 
 /**
+ * Resuelve el concepto/asunto por defecto para una factura.
+ * Prioridad: asuntoFactura guardado > fórmula de config > nombre proyecto.
+ */
+function defaultAsunto(p) {
+  const f = p.facturacion || {};
+  if (f.asuntoFactura) return f.asuntoFactura;
+  const s = D.d.settings;
+  if (s.conceptoDefault) {
+    let asunto = s.conceptoDefault;
+    if (s.conceptoAppendCliente) {
+      const cl = p.clienteId ? D.cl(p.clienteId) : null;
+      const name = cl ? (cl.nombreCompleto || cl.nombre) : (p.cliente || '');
+      if (name) asunto += ' ' + name;
+    }
+    return asunto;
+  }
+  return p.nombre;
+}
+
+/**
  * Comprueba si una fecha YYYY-MM-DD cae dentro de un periodo.
  * @param {string} date  - Fecha YYYY-MM-DD
  * @param {string} type  - 'mes' | 'trim' | 'año'

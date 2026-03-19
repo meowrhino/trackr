@@ -11,10 +11,12 @@
   --b1:#262626;--b2:#333;--b3:#444;
   --t1:#ccc;--t2:#888;--t3:#555;
   --ok:#5a9;--warn:#c93;--bad:#c55;
-  --r:3px;--tr:0.15s ease;
+  --ac:#5a9;--r:3px;--sh:none;--tr:0.15s ease;
 }
 
-body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;accent-color:var(--ac);caret-color:var(--ac)}
+::selection{background:color-mix(in srgb,var(--ac) 30%,transparent);color:var(--t1)}
+::placeholder{color:var(--t3);opacity:1}
 
 /* Clase helper para monospace */
 .m{font-family:'DM Mono',monospace}

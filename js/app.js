@@ -285,7 +285,7 @@ const App = {
     this.om(`<div class="mt">${t('fac.generate')}</div>`
       + `<div class="fr"><div class="fg"><label>${t('field.invoiceNum')}</label><input type="text" id="facNum" value="${numStr}" style="font-family:'DM Mono',monospace"></div>`
       + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="facDate" value="${f.facturaFecha || todayStr()}"></div></div>`
-      + `<div class="fg"><label>${t('field.subject')}</label><input type="text" id="facAsunto" value="${esc(f.asuntoFactura || p.nombre)}"></div>`
+      + `<div class="fg"><label>${t('field.subject')}</label><input type="text" id="facAsunto" value="${esc(defaultAsunto(p))}"></div>`
       + `<div class="bb" style="margin-top:.75rem">`
       + `<div class="br"><span class="la">${t('fac.issuer')}</span><span class="va">${esc(s.emisor.nombre || t('fac.configure'))}</span></div>`
       + `<div class="br"><span class="la">${t('fac.client')}</span><span class="va">${esc(clienteName(p))}</span></div>`
@@ -300,12 +300,17 @@ const App = {
     const fecha = document.getElementById('facDate').value;
     const asunto = document.getElementById('facAsunto').value.trim();
     const num = parseInt(document.getElementById('facNum').value) || null;
-    /* Guardar asunto en el proyecto para futuras facturas */
+    /* Guardar asunto en el proyecto si difiere del default; borrar si vacío o igual al default */
     const p = D.p(pid);
-    if (p && asunto && asunto !== p.nombre) {
-      p.facturacion.asuntoFactura = asunto;
+    if (p) {
+      const def = defaultAsunto(Object.assign({}, p, { facturacion: Object.assign({}, p.facturacion, { asuntoFactura: '' }) }));
+      if (!asunto || asunto === def) {
+        p.facturacion.asuntoFactura = '';
+      } else {
+        p.facturacion.asuntoFactura = asunto;
+      }
     }
-    Fac.download(pid, { fecha, asunto, num });
+    Fac.download(pid, { fecha, asunto: asunto || defaultAsunto(p), num });
     T.ev('action', 'invoice_generate');
     this.cm(); this.rDet(pid);
   },
@@ -357,6 +362,15 @@ const App = {
     if (!confirm(t('msg.resetConfirm'))) return;
     localStorage.removeItem('trackr_data');
     location.reload();
+  },
+
+  logoutModal() {
+    this.om(`<div class="mt">${t('msg.logoutTitle')}</div>`
+      + `<p style="font-size:.88rem;color:var(--t2);line-height:1.5;margin-bottom:1rem">${t('msg.logoutBody')}</p>`
+      + `<div style="display:flex;gap:.5rem;margin-bottom:.5rem">`
+      + `<button class="bt" onclick="App.exp()" style="flex:1">${t('nav.export')} JSON</button>`
+      + `</div>`
+      + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-d" onclick="App.resetData()">${t('btn.logout')}</button></div>`);
   },
 
   /* ══════════════════════════════════════════════

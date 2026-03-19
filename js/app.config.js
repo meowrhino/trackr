@@ -12,7 +12,7 @@ Object.assign(App, {
 
     document.getElementById('cfgC').innerHTML =
       `<div class="cfg-section"><div class="cfg-section-title">${t('lang.label')}</div>`
-      + `<div class="lang-toggle">${['es', 'en'].map(code =>
+      + `<div class="lang-toggle">${['es', 'en', 'ca'].map(code =>
           `<button class="lang-btn${_lang === code ? ' on' : ''}" onclick="App.setLanguage('${code}')">${t('lang.' + code)}</button>`
         ).join('')}</div></div>`
       + `<div class="cfg-section"><div class="cfg-section-title">${t('cfg.issuerTitle')}</div><div class="cfg-grid">`
@@ -20,17 +20,18 @@ Object.assign(App, {
       + `<div class="fg"><label>${t('cfg.address1')}</label><input type="text" id="cfgED1" value="${esc(em.direccion1)}" placeholder="${t('ph.street')}"></div>`
       + `<div class="fg"><label>${t('cfg.address2')}</label><input type="text" id="cfgED2" value="${esc(em.direccion2)}" placeholder="${t('ph.cityZip')}"></div>`
       + `<div class="fg"><label>${t('cfg.nif')}</label><input type="text" id="cfgENif" value="${esc(em.nif)}" placeholder="${t('ph.nif')}"></div>`
-      + `</div></div>`
+      + `</div><div class="cfg-save"><button class="bt bt-p" onclick="App.saveEmisor()">${t('btn.save')}</button></div></div>`
       + `<div class="cfg-section"><div class="cfg-section-title">${t('cfg.defaults')}</div><div class="cfg-grid">`
       + `<div class="fg"><label>${t('cfg.ivaPercent')}</label><input type="number" id="cfgIva" value="${s.defaultIva}" min="0" max="100" step="1"></div>`
       + `<div class="fg"><label>${t('cfg.irpfPercent')}</label><input type="number" id="cfgIrpf" value="${s.defaultIrpf}" min="0" max="100" step="1"></div>`
       + `<div class="cfg-full fg"><label>${t('cfg.bankAccount')}</label><input type="text" id="cfgPago" placeholder="${t('ph.bankAccount')}" value="${esc(em.instruccionesPago || '')}"></div>`
-      + `</div></div>`
+      + `<div class="cfg-full fg"><label>${t('cfg.defaultSubject')}</label><input type="text" id="cfgConcepto" value="${esc(s.conceptoDefault || '')}" placeholder="${t('ph.defaultSubject')}"><label style="font-size:.82rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;margin-top:.45rem;text-transform:none;letter-spacing:0;color:var(--t2);white-space:nowrap"><input type="checkbox" id="cfgConceptoCl" style="margin:0;width:14px;height:14px;accent-color:var(--ac)" ${s.conceptoAppendCliente ? 'checked' : ''}>${t('cfg.appendClientName')}</label></div>`
+      + `</div><div class="cfg-save"><button class="bt bt-p" onclick="App.saveDefaults()">${t('btn.save')}</button></div></div>`
       + `<div class="cfg-section"><div class="cfg-section-title">${t('cfg.goals')}</div><div class="cfg-grid">`
       + `<div class="fg"><label>${t('cfg.hoursMonth')}</label><input type="number" id="cfgTHm" value="${tg.horasMes || ''}" min="0" step="1" placeholder="${t('ph.hoursMonth')}"></div>`
       + `<div class="fg"><label>${t('cfg.incomeMonth')}</label><input type="number" id="cfgTIm" value="${tg.ingresosMes || ''}" min="0" step="100" placeholder="${t('ph.incomeMonth')}"></div>`
       + `<div class="fg"><label>${t('cfg.hoursWeek')}</label><input type="number" id="cfgTHs" value="${tg.horasSemana || ''}" min="0" step="1" placeholder="${t('ph.hoursWeek')}"></div>`
-      + `</div></div>`
+      + `</div><div class="cfg-save"><button class="bt bt-p" onclick="App.saveGoals()">${t('btn.save')}</button></div></div>`
       + `<div class="cfg-section"><div class="cfg-section-title">${t('cfg.theme')}</div>`
       + `<div class="theme-grid">${THEME_ORDER.map(id => {
           const th = THEMES[id];
@@ -38,9 +39,9 @@ Object.assign(App, {
             + `<div class="theme-preview" style="background:${th.vars.bg};border-color:${th.vars.b2}">`
             + `<div style="background:${th.vars.bg2};border:1px solid ${th.vars.b1};border-radius:2px;padding:3px 5px;margin-bottom:2px"><span style="color:${th.vars.t1};font-size:8px">Aa</span></div>`
             + `<div style="display:flex;gap:2px"><span style="width:8px;height:4px;border-radius:1px;background:${th.vars.ok}"></span><span style="width:8px;height:4px;border-radius:1px;background:${th.vars.warn}"></span><span style="width:8px;height:4px;border-radius:1px;background:${th.vars.bad}"></span></div>`
+            + `<div style="width:100%;height:3px;border-radius:1px;background:${th.vars.ac || th.vars.ok};margin-top:3px"></div>`
             + `</div><span class="theme-name">${t('theme.' + id)}</span></button>`;
         }).join('')}</div></div>`
-      + `<div class="cfg-save"><button class="bt bt-p" onclick="App.saveCfg()">${t('btn.saveCfg')}</button></div>`
       + `<div class="cfg-section" style="margin-top:2.5rem"><div class="cfg-section-title">${t('cfg.clients')}</div>`
       + (cls.length
         ? `<div class="cl-list">${cls.map(c => `<div class="cl-item"><span class="cl-dot" style="background:${colorHex(c.color || 'CornflowerBlue')}"></span><span class="cl-name">${esc(c.nombre)}</span>${c.nif ? `<span class="cl-nif">${esc(c.nif)}</span>` : ''}<div class="cl-actions"><button class="cl-btn" onclick="App.clModal('${c.id}')" title="${t('btn.edit')}">&#9998;</button><button class="cl-btn cl-btn-del" onclick="App.delCl('${c.id}')" title="${t('btn.delete')}">&times;</button></div></div>`).join('')}</div>`
@@ -66,13 +67,21 @@ Object.assign(App, {
     this.rCfg();
   },
 
-  saveCfg() {
+  saveEmisor() {
+    const em = D.d.settings.emisor;
+    em.nombre = document.getElementById('cfgEN').value.trim();
+    em.direccion1 = document.getElementById('cfgED1').value.trim();
+    em.direccion2 = document.getElementById('cfgED2').value.trim();
+    em.nif = document.getElementById('cfgENif').value.trim();
+    D.save();
+    Toast.ok(t('cfg.saved'));
+  },
+
+  saveDefaults() {
     const s = D.d.settings;
-    s.emisor.nombre = document.getElementById('cfgEN').value.trim();
-    s.emisor.direccion1 = document.getElementById('cfgED1').value.trim();
-    s.emisor.direccion2 = document.getElementById('cfgED2').value.trim();
-    s.emisor.nif = document.getElementById('cfgENif').value.trim();
     s.emisor.instruccionesPago = document.getElementById('cfgPago').value.trim();
+    s.conceptoDefault = document.getElementById('cfgConcepto').value.trim();
+    s.conceptoAppendCliente = document.getElementById('cfgConceptoCl').checked;
 
     const oldIva = s.defaultIva;
     const oldIrpf = s.defaultIrpf;
@@ -81,7 +90,6 @@ Object.assign(App, {
     s.defaultIva = newIva;
     s.defaultIrpf = newIrpf;
 
-    /* Propagar cambios de IVA/IRPF a proyectos que usaban el valor antiguo */
     if (oldIva !== newIva || oldIrpf !== newIrpf) {
       D.d.projects.forEach(p => {
         const f = p.facturacion;
@@ -91,10 +99,15 @@ Object.assign(App, {
         B.calc(p);
       });
     }
+    D.save();
+    Toast.ok(t('cfg.saved'));
+  },
 
-    s.targets.horasMes = parseFloat(document.getElementById('cfgTHm').value) || null;
-    s.targets.ingresosMes = parseFloat(document.getElementById('cfgTIm').value) || null;
-    s.targets.horasSemana = parseFloat(document.getElementById('cfgTHs').value) || null;
+  saveGoals() {
+    const tg = D.d.settings.targets;
+    tg.horasMes = parseFloat(document.getElementById('cfgTHm').value) || null;
+    tg.ingresosMes = parseFloat(document.getElementById('cfgTIm').value) || null;
+    tg.horasSemana = parseFloat(document.getElementById('cfgTHs').value) || null;
     D.save();
     Toast.ok(t('cfg.saved'));
   },

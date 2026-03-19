@@ -295,7 +295,7 @@
   position:absolute;
   left:2px;
   right:2px;
-  background:rgba(200,200,200,.18);
+  background:color-mix(in srgb,var(--t2) 18%,transparent);
   border-left:3px solid var(--t2);
   border-radius:0 var(--r) var(--r) 0;
   pointer-events:none;

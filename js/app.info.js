@@ -181,9 +181,7 @@ Object.assign(App, {
 
     /* ── Acciones rápidas ── */
     const quickHtml = `<div class="info-quick">`
-      + `<button class="bt bt-p" onclick="App.pModal()">${t('btn.newProject')}</button>`
-      + `<button class="bt" onclick="document.getElementById('impA').click()">${t('btn.loadAnotherJson')}</button>`
-      + `<button class="bt" onclick="App.resetData()">${t('btn.newUser')}</button>`
+      + `<button class="bt" onclick="App.logoutModal()">${t('btn.logout')}</button>`
       + `</div>`
       + `<div style="text-align:center;margin-top:1.5rem;font-size:.72rem"><a href="https://meowrhino.studio" target="_blank" style="color:var(--t3);text-decoration:none">meowrhino.studio</a></div>`;
 
