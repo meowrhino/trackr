@@ -101,7 +101,10 @@ Object.assign(App, {
     if (p.interno) flags += `<span class="pc-flag pc-flag-int">${t('dash.flagInternal')}</span>`;
     if (p.recurrente) flags += `<span class="pc-flag pc-flag-rec">${t('dash.flagRecurring')}</span>`;
     if (f.pagado) flags += `<span class="pc-flag pc-flag-paid">${t('dash.flagPaid')}</span>`;
-    else if (f.facturaFecha) flags += `<span class="pc-flag pc-flag-inv">${t('dash.flagInvoiced')}</span>`;
+    else if (f.facturaFecha) {
+      flags += `<span class="pc-flag pc-flag-inv">${t('dash.flagInvoiced')}</span>`;
+      flags += `<button class="pc-flag pc-flag-pay" onclick="event.stopPropagation();App.quickPay('${p.id}')" title="${t('dash.markPaid')}">💰</button>`;
+    }
 
     return `<div class="pc${p.interno ? ' pc-mr' : ''}" style="--project-color:${hex}" onclick="App.go('det','${p.id}')">
       <div class="pc-h">
@@ -124,6 +127,16 @@ Object.assign(App, {
   },
 
   sf(f) { this.pf = f; this.rDash(); },
+
+  quickPay(pid) {
+    const p = D.p(pid);
+    if (!p) return;
+    p.facturacion.pagado = true;
+    p.facturacion.fechaPago = p.facturacion.fechaPago || todayStr();
+    D.up(pid, { facturacion: p.facturacion });
+    Toast.ok(t('dash.markPaid') + ' ✓');
+    this.rDash();
+  },
 
   toggleGroup(st) {
     if (!this._groupOpen) this._groupOpen = {};
