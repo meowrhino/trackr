@@ -57,6 +57,7 @@
 .pc-flag-rec{background:color-mix(in srgb,var(--warn) 12%,transparent);color:var(--warn)}
 .pc-flag-paid{background:color-mix(in srgb,var(--ok) 15%,transparent);color:var(--ok)}
 .pc-flag-inv{background:color-mix(in srgb,var(--bad) 15%,transparent);color:var(--bad)}
+.pc-flag-partial{background:color-mix(in srgb,var(--warn) 15%,transparent);color:var(--warn)}
 .pc-flag-pay{border:1px solid var(--b2);cursor:pointer;font-size:.7rem;line-height:1;padding:.15rem .3rem}.pc-flag-pay:hover{background:color-mix(in srgb,var(--ok) 20%,transparent);border-color:var(--ok)}
 
 /* ── Barra de progreso (objetivos, financiero) ── */

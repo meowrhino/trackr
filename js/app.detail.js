@@ -38,8 +38,8 @@ Object.assign(App, {
     if (p.recurrente) flags += ` <span class="pc-flag pc-flag-rec">${t('dash.flagRecurring')}</span>`;
 
     let payBtn = '';
-    if (f.facturaFecha && !f.pagado && f.modo !== 'gratis') {
-      payBtn = `<button class="bt bt-s" onclick="App.quickPay('${p.id}')" title="${t('dash.markPaid')}">💰 ${t('dash.markPaid')}</button>`;
+    if (f.modo !== 'gratis' && f.netoRecibido > 0 && !f.pagado) {
+      payBtn = `<button class="bt bt-s" onclick="App.cobroModal('${p.id}')" title="${t('billing.addPayment')}">💰 ${t('billing.addPayment')}</button>`;
     }
 
     return `<div class="db" onclick="App.go('dash')">${t('det.backProjects')}</div>`
@@ -87,9 +87,42 @@ Object.assign(App, {
         + (eph !== null ? `<div class="br"><span class="la">${t('billing.profitability')}</span><span class="va" style="color:${eph >= 30 ? 'var(--ok)' : eph >= 15 ? 'var(--warn)' : 'var(--bad)'}">${eph.toFixed(2)} &euro;/h</span></div>` : '')
         + `</div>`;
 
+    /* ── Cobros parciales ── */
+    let cobrosHtml = '';
+    if (f.modo !== 'gratis' && f.netoRecibido > 0) {
+      const cobros = f.cobros || [];
+      const tc = B.totalCobrado(p);
+      const pend = B.pendiente(p);
+      const pct = Math.min(tc / f.netoRecibido * 100, 100).toFixed(1);
+
+      let listHtml = '';
+      if (cobros.length) {
+        listHtml = `<div class="hl" style="margin-top:.5rem">${cobros.map(c =>
+          `<div class="hr"><span class="hr-d">${fmtDate(c.fecha)}</span><span class="hr-a m" style="color:var(--ok)">${fmtMoney(c.cantidad)}</span><span class="hr-x" onclick="App.delCobro('${p.id}','${c.id}')" title="${t('btn.delete')}">&times;</span></div>`
+        ).join('')}</div>`;
+      }
+
+      const statusColor = f.pagado ? 'var(--ok)' : tc > 0 ? 'var(--warn)' : 'var(--t3)';
+      const statusText = f.pagado
+        ? t('billing.paid')
+        : tc > 0
+          ? t('billing.progress', fmtMoney(tc), fmtMoney(f.netoRecibido))
+          : t('billing.remaining', fmtMoney(pend));
+
+      cobrosHtml = `<div style="margin-top:.75rem">`
+        + `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem">`
+        +   `<span class="dst" style="border:none;margin:0;padding:0">${t('billing.payments')}</span>`
+        +   (!f.pagado ? `<button class="bt bt-add" onclick="App.cobroModal('${p.id}')">${t('billing.addPayment')}</button>` : '')
+        + `</div>`
+        + `<div class="pbar" style="margin-bottom:.4rem"><div class="pbar-fill ${f.pagado ? 'pbar-ok' : 'pbar-neutral'}" style="width:${pct}%"></div></div>`
+        + `<div style="font-size:.78rem;color:${statusColor}">${statusText}</div>`
+        + listHtml
+        + `</div>`;
+    }
+
     return `<div class="ds"><div class="dst">${t('billing.title')}</div>${breakdown}`
-      + (f.pagado ? `<div style="margin-top:.5rem;font-size:.82rem;color:var(--ok)">${f.fechaPago ? t('billing.paidOn', fmtDate(f.fechaPago)) : t('billing.paid')}</div>` : '')
       + (f.facturaFecha ? `<div style="margin-top:.3rem;font-size:.78rem;color:var(--t3)">${t('billing.invoiceNo', String(f.facturaNum), fmtDate(f.facturaFecha))}</div>` : '')
+      + cobrosHtml
       + `</div>`;
   },
 

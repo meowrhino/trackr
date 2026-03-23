@@ -96,9 +96,11 @@ Object.assign(App, {
       B.calc(p);
       const f = p.facturacion;
       const hex = colorHex(p.color);
-      if (f.pagado && f.fechaPago && f.fechaPago.startsWith(mKey)) {
-        monthCobros.push({ pn: p.nombre, pc: hex, total: f.netoRecibido || 0, fecha: f.fechaPago });
-      }
+      (f.cobros || []).forEach(c => {
+        if (c.fecha && c.fecha.startsWith(mKey)) {
+          monthCobros.push({ pn: p.nombre, pc: hex, total: c.cantidad || 0, fecha: c.fecha });
+        }
+      });
       p.horas.forEach(h => {
         if (h.monto && h.fecha && h.fecha.startsWith(mKey)) {
           monthCobros.push({ pn: p.nombre, pc: hex, total: h.monto, fecha: h.fecha });
@@ -226,9 +228,11 @@ Object.assign(App, {
       B.calc(p);
       const f = p.facturacion;
       const hex = colorHex(p.color);
-      if (f.pagado && f.fechaPago && dateSet.has(f.fechaPago)) {
-        weekCobros.push({ pn: p.nombre, pc: hex, total: f.netoRecibido || 0, fecha: f.fechaPago });
-      }
+      (f.cobros || []).forEach(c => {
+        if (c.fecha && dateSet.has(c.fecha)) {
+          weekCobros.push({ pn: p.nombre, pc: hex, total: c.cantidad || 0, fecha: c.fecha });
+        }
+      });
       p.horas.forEach(h => {
         if (h.monto && h.fecha && dateSet.has(h.fecha)) {
           weekCobros.push({ pn: p.nombre, pc: hex, total: h.monto, fecha: h.fecha });
@@ -338,7 +342,7 @@ Object.assign(App, {
         let income = 0;
         D.ps().forEach(p => {
           B.calc(p); const f = p.facturacion;
-          if (f.pagado && f.fechaPago && inPeriod(f.fechaPago, 'mes', year, month)) income += f.netoRecibido || 0;
+          (f.cobros || []).forEach(c => { if (c.fecha && inPeriod(c.fecha, 'mes', year, month)) income += c.cantidad || 0; });
           p.horas.forEach(h => { if (h.monto && h.fecha && inPeriod(h.fecha, 'mes', year, month)) income += h.monto; });
         });
         goals.push({ label: t('cal.income'), actual: income, target: tgt.ingresosMes, unit: '€' });
@@ -372,7 +376,7 @@ Object.assign(App, {
     let cobrado = 0, horas = 0, gastosTotal = 0;
     D.ps().forEach(p => {
       B.calc(p);
-      if (p.facturacion.pagado && p.facturacion.fechaPago && inPeriod(p.facturacion.fechaPago, 'mes', year, month)) cobrado += p.facturacion.netoRecibido || 0;
+      (p.facturacion.cobros || []).forEach(c => { if (c.fecha && inPeriod(c.fecha, 'mes', year, month)) cobrado += c.cantidad || 0; });
       p.horas.forEach(h => {
         if (h.fecha && inPeriod(h.fecha, 'mes', year, month)) { horas += h.cantidad; if (h.monto) cobrado += h.monto; }
       });

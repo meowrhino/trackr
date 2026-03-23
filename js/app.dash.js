@@ -101,6 +101,7 @@ Object.assign(App, {
     if (p.interno) flags += `<span class="pc-flag pc-flag-int">${t('dash.flagInternal')}</span>`;
     if (p.recurrente) flags += `<span class="pc-flag pc-flag-rec">${t('dash.flagRecurring')}</span>`;
     if (f.pagado) flags += `<span class="pc-flag pc-flag-paid">${t('dash.flagPaid')}</span>`;
+    else if ((f.cobros || []).length > 0) flags += `<span class="pc-flag pc-flag-partial">${t('dash.flagPartial')}</span>`;
     else if (f.facturaFecha) {
       flags += `<span class="pc-flag pc-flag-inv">${t('dash.flagInvoiced')}</span>`;
     }
@@ -130,8 +131,12 @@ Object.assign(App, {
   quickPay(pid) {
     const p = D.p(pid);
     if (!p) return;
-    p.facturacion.pagado = true;
-    p.facturacion.fechaPago = p.facturacion.fechaPago || todayStr();
+    B.calc(p);
+    const pend = B.pendiente(p);
+    if (pend <= 0) { Toast.ok(t('billing.alreadyPaid')); return; }
+    if (!p.facturacion.cobros) p.facturacion.cobros = [];
+    p.facturacion.cobros.push({ id: uid(), fecha: todayStr(), cantidad: pend });
+    B.calc(p);
     D.up(pid, { facturacion: p.facturacion });
     Toast.ok(t('dash.markPaid') + ' ✓');
     if (this.cv === 'det') this.rDet(pid); else this.rDash();

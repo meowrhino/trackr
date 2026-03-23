@@ -30,7 +30,7 @@ Object.assign(App, {
     for (const p of D.ps()) {
       for (const h of p.horas) if (h.fecha && inPeriod(h.fecha, type, y, m)) return true;
       const f = p.facturacion;
-      if (f.pagado && f.fechaPago && inPeriod(f.fechaPago, type, y, m)) return true;
+      if ((f.cobros || []).some(c => c.fecha && inPeriod(c.fecha, type, y, m))) return true;
     }
     for (const g of D.gs()) {
       for (const e of (g.entradas || [])) if (e.fecha && inPeriod(e.fecha, type, y, m)) return true;
@@ -69,9 +69,9 @@ Object.assign(App, {
           if (h.monto) cobrado += h.monto;
         }
       });
-      if (f.pagado && f.fechaPago && inPeriod(f.fechaPago, type, y, m)) {
-        cobrado += f.netoRecibido || 0;
-      }
+      (f.cobros || []).forEach(c => {
+        if (c.fecha && inPeriod(c.fecha, type, y, m)) cobrado += c.cantidad || 0;
+      });
     });
 
     /* stacked expense bar: per-gasto segments */
@@ -152,10 +152,12 @@ Object.assign(App, {
       B.calc(p);
       const hex = colorHex(p.color);
       const f = p.facturacion;
-      /* cobros por factura */
-      if (f.pagado && f.fechaPago && inPeriod(f.fechaPago, type, y, m)) {
-        ingresos.push({ fecha: f.fechaPago, monto: f.netoRecibido || 0, proyecto: p.nombre, color: hex, tipo: 'factura' });
-      }
+      /* cobros por factura (parciales) */
+      (f.cobros || []).forEach(c => {
+        if (c.fecha && inPeriod(c.fecha, type, y, m)) {
+          ingresos.push({ fecha: c.fecha, monto: c.cantidad || 0, proyecto: p.nombre, color: hex, tipo: 'factura' });
+        }
+      });
       /* cobros por hora */
       p.horas.forEach(h => {
         if (h.monto && h.fecha && inPeriod(h.fecha, type, y, m)) {
@@ -255,11 +257,15 @@ Object.assign(App, {
           if (h.monto) ingresos130 += h.monto;
         }
       });
-      if (f.pagado && f.fechaPago && inPeriod(f.fechaPago, trimType, y, m)) {
-        ingresos130 += f.baseImponible || 0;
-        ivaRepercutido += f.importeIva || 0;
-        retenciones += f.importeIrpf || 0;
-      }
+      (f.cobros || []).forEach(c => {
+        if (c.fecha && inPeriod(c.fecha, trimType, y, m)) {
+          const nr = f.netoRecibido || 0;
+          const ratio = nr > 0 ? (c.cantidad / nr) : 0;
+          ingresos130 += (f.baseImponible || 0) * ratio;
+          ivaRepercutido += (f.importeIva || 0) * ratio;
+          retenciones += (f.importeIrpf || 0) * ratio;
+        }
+      });
     });
 
     D.gs().forEach(g => {
@@ -345,9 +351,13 @@ Object.assign(App, {
       p.horas.forEach(h => {
         if (h.fecha && h.fecha.startsWith(String(y)) && h.monto) ingresosAnual += h.monto;
       });
-      if (f.pagado && f.fechaPago && f.fechaPago.startsWith(String(y))) {
-        ingresosAnual += f.baseImponible || 0;
-      }
+      (f.cobros || []).forEach(c => {
+        if (c.fecha && c.fecha.startsWith(String(y))) {
+          const nr = f.netoRecibido || 0;
+          const ratio = nr > 0 ? (c.cantidad / nr) : 0;
+          ingresosAnual += (f.baseImponible || 0) * ratio;
+        }
+      });
     });
 
     /* Annual business expenses (only desgravable) */

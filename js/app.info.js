@@ -35,10 +35,10 @@ Object.assign(App, {
         if (h.fecha.startsWith(thisMonth)) horasMes += h.cantidad;
       });
       const f = p.facturacion;
-      if (f.pagado && f.fechaPago && f.fechaPago.startsWith(thisMonth)) cobradoMes += f.netoRecibido || 0;
+      (f.cobros || []).forEach(c => { if (c.fecha && c.fecha.startsWith(thisMonth)) cobradoMes += c.cantidad || 0; });
       p.horas.forEach(h => { if (h.monto && h.fecha && h.fecha.startsWith(thisMonth)) cobradoMes += h.monto; });
       if ((p.estado === 'completado' || p.estado === 'abandonado') && f.facturaFecha && !f.pagado) {
-        pendienteCobro += f.netoRecibido || 0;
+        pendienteCobro += B.pendiente(p);
         nPendiente++;
       }
     });
@@ -215,9 +215,9 @@ Object.assign(App, {
           if (h.monto) cobrado += h.monto;
         }
       });
-      if (f.pagado && f.fechaPago && inPeriod(f.fechaPago, type, year, month)) {
-        cobrado += f.netoRecibido || 0;
-      }
+      (f.cobros || []).forEach(c => {
+        if (c.fecha && inPeriod(c.fecha, type, year, month)) cobrado += c.cantidad || 0;
+      });
     });
 
     let gastosTotal = 0;

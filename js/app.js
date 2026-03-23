@@ -135,7 +135,8 @@ const App = {
       ivaOn: p ? (p.facturacion.iva > 0) : true, irpfOn: p ? (p.facturacion.irpf > 0) : true,
       ivaExc: p?.facturacion?.ivaExcepcion || '', asuntoFactura: p?.facturacion?.asuntoFactura || '',
       pagado: p?.facturacion?.pagado || false, fechaPago: p?.facturacion?.fechaPago || '', notas: p?.notas || '',
-      idiomaFactura: p?.facturacion?.idiomaFactura || null
+      idiomaFactura: p?.facturacion?.idiomaFactura || null,
+      cobros: p?.facturacion?.cobros || [], neto: p?.facturacion?.netoRecibido || 0
     };
     this.om(
       this._pmHeader(isE)
@@ -195,8 +196,7 @@ const App = {
       +   `<div class="tr"><span class="tl">${t('billing.irpfToggle', st.defaultIrpf)}</span><label class="tg"><input type="checkbox" id="mpIrpf" ${df.irpfOn ? 'checked' : ''} onchange="App.cPrev()"><span class="ts"></span></label></div>`
       +   `<div class="fg" style="margin-top:.4rem"><label>${t('billing.ivaException')}</label><input type="text" id="mpIvaExc" value="${esc(df.ivaExc)}" placeholder="${t('ph.ivaException')}"></div>`
       +   `<div id="bPrev" class="bb" style="margin-top:.4rem"></div>`
-      +   `<div class="tr" style="margin-top:.75rem"><span class="tl">${t('billing.paid')}</span><label class="tg"><input type="checkbox" id="mpPg" ${df.pagado ? 'checked' : ''} onchange="document.getElementById('mpFPw').style.display=this.checked?'block':'none';if(this.checked&&!document.getElementById('mpFP').value)document.getElementById('mpFP').value=todayStr()"><span class="ts"></span></label></div>`
-      +   `<div id="mpFPw" style="${df.pagado ? '' : 'display:none'}"><div class="fg"><label>${t('field.paymentDate')}</label><input type="date" id="mpFP" value="${df.fechaPago}"></div></div>`
+      +   (df.cobros && df.cobros.length ? `<div style="margin-top:.75rem;font-size:.78rem;color:${df.pagado ? 'var(--ok)' : 'var(--warn)'}">${df.pagado ? t('billing.paid') : t('billing.progress', fmtMoney(df.cobros.reduce((s,c) => s + c.cantidad, 0)), fmtMoney(df.neto || 0))} (${df.cobros.length} ${t('billing.payments').toLowerCase()})</div>` : '')
       +   `<div class="fg" style="margin-top:.5rem"><label>${t('field.invoiceLang')}</label><select id="mpFacLang"><option value="" ${!df.idiomaFactura ? 'selected' : ''}>${_lang === 'es' ? 'Español' : 'Spanish'} (${t('cfg.defaults').toLowerCase()})</option><option value="es" ${df.idiomaFactura === 'es' ? 'selected' : ''}>Español</option><option value="en" ${df.idiomaFactura === 'en' ? 'selected' : ''}>English</option></select></div>`
       + `</div>`;
   },
@@ -304,8 +304,8 @@ const App = {
         ivaExcepcion: document.getElementById('mpIvaExc')?.value?.trim() || '',
         asuntoFactura: document.getElementById('mpAsunto')?.value?.trim() || '',
         importeIva: 0, importeIrpf: 0, totalFactura: 0, netoRecibido: 0,
-        pagado: document.getElementById('mpPg')?.checked || false,
-        fechaPago: document.getElementById('mpFP')?.value || (document.getElementById('mpPg')?.checked ? todayStr() : null),
+        cobros: prev?.facturacion?.cobros || [],
+        pagado: false, fechaPago: null,
         gastos: 0,
         facturaNum: prev?.facturacion?.facturaNum || null,
         facturaFecha: prev?.facturacion?.facturaFecha || null,
@@ -363,6 +363,50 @@ const App = {
     Fac.download(pid, { fecha, asunto: asunto || defaultAsunto(p), num });
     T.ev('action', 'invoice_generate');
     this.cm(); this.rDet(pid);
+  },
+
+
+  /* ══════════════════════════════════════════════
+   *  COBROS PARCIALES (Partial Payments)
+   * ══════════════════════════════════════════════ */
+
+  cobroModal(pid) {
+    const p = D.p(pid); if (!p) return;
+    B.calc(p);
+    const pend = B.pendiente(p);
+    if (pend <= 0) { Toast.ok(t('billing.alreadyPaid')); return; }
+    this.om(
+      `<div class="mt">${t('billing.addPayment')}</div>`
+      + `<div class="fr"><div class="fg"><label>${t('billing.paymentAmount')}</label><input type="number" id="mcA" min="0.01" step="0.01" value="${pend.toFixed(2)}"></div>`
+      + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="mcD" value="${todayStr()}"></div></div>`
+      + `<div style="font-size:.78rem;color:var(--t3);margin-bottom:.75rem">${t('billing.remaining', fmtMoney(pend))}</div>`
+      + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveCobro('${pid}')">${t('btn.save')}</button></div>`
+    );
+  },
+
+  saveCobro(pid) {
+    const cant = parseFloat(document.getElementById('mcA').value) || 0;
+    const fecha = document.getElementById('mcD').value || todayStr();
+    if (cant <= 0) return;
+    const p = D.p(pid); if (!p) return;
+    if (!p.facturacion.cobros) p.facturacion.cobros = [];
+    p.facturacion.cobros.push({ id: uid(), fecha, cantidad: Math.round(cant * 100) / 100 });
+    B.calc(p);
+    D.up(pid, { facturacion: p.facturacion });
+    Toast.ok(t('billing.addPayment') + ' ✓');
+    this.cm();
+    if (this.cv === 'det') this.rDet(pid); else this.rDash();
+  },
+
+  delCobro(pid, cid) {
+    const p = D.p(pid); if (!p) return;
+    const c = (p.facturacion.cobros || []).find(x => x.id === cid);
+    if (!c) return;
+    if (!confirm(t('billing.deletePayment', fmtMoney(c.cantidad)))) return;
+    p.facturacion.cobros = p.facturacion.cobros.filter(x => x.id !== cid);
+    B.calc(p);
+    D.up(pid, { facturacion: p.facturacion });
+    if (this.cv === 'det') this.rDet(pid); else this.rDash();
   },
 
 

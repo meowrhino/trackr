@@ -17,6 +17,7 @@ const B={
     /* Proyecto gratuito: todo a cero */
     if(f.modo==='gratis'){
       f.importeIva=0;f.importeIrpf=0;f.totalFactura=0;f.netoRecibido=0;f.baseImponible=0;f.total=0;
+      f.pagado=false;f.fechaPago=null;
       return f;
     }
 
@@ -51,7 +52,28 @@ const B={
       f.netoRecibido=Math.round((b-f.importeIrpf)*100)/100;
     }
 
+    /* ── Sincronizar pagado/fechaPago desde cobros ── */
+    const cobros = f.cobros || [];
+    const tc = cobros.reduce((s, c) => s + (c.cantidad || 0), 0);
+    f.pagado = f.netoRecibido > 0 && tc >= f.netoRecibido;
+    if (cobros.length) {
+      const sorted = [...cobros].sort((a, b) => (a.fecha || '').localeCompare(b.fecha || ''));
+      f.fechaPago = sorted[sorted.length - 1].fecha || null;
+    } else {
+      f.fechaPago = null;
+    }
+
     return f;
+  },
+
+  /* Suma total cobrada */
+  totalCobrado(p) {
+    return (p.facturacion.cobros || []).reduce((s, c) => s + (c.cantidad || 0), 0);
+  },
+
+  /* Cantidad pendiente de cobro */
+  pendiente(p) {
+    return Math.max((p.facturacion.netoRecibido || 0) - this.totalCobrado(p), 0);
   },
 
   /* Calcula €/hora (rentabilidad) */

@@ -124,6 +124,15 @@ const D = {
         if (p.facturacion.facturaFecha == null) p.facturacion.facturaFecha = null;
         if (p.facturacion.precioHora == null) p.facturacion.precioHora = 0;
         if (p.facturacion.idiomaFactura == null) p.facturacion.idiomaFactura = null;
+
+        /* Cobros parciales — migración */
+        if (!p.facturacion.cobros) p.facturacion.cobros = [];
+        if (p.facturacion.pagado && p.facturacion.cobros.length === 0) {
+          const nr = p.facturacion.netoRecibido || 0;
+          if (nr > 0) {
+            p.facturacion.cobros = [{ id: uid(), fecha: p.facturacion.fechaPago || todayStr(), cantidad: nr }];
+          }
+        }
       }
     });
 
