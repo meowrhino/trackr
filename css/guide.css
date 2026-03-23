@@ -1,14 +1,18 @@
 /* ================================================
- * TRACKR — Guía / Help (acordeón)
+ * TRACKR — Guía / Help
+ * Acordeón anidado: secciones + sub-secciones
  * Dependencias: variables.css
  * ================================================ */
 
+/* ── Sección principal ── */
 .guide-section{
   border:1px solid var(--b1);
   border-radius:var(--r);
   margin-bottom:.5rem;
   overflow:hidden;
 }
+
+/* ── Header de sección ── */
 .guide-header{
   display:flex;
   align-items:center;
@@ -18,6 +22,7 @@
   transition:background var(--tr);
 }
 .guide-header:hover{background:var(--bg3)}
+
 .guide-icon{
   font-size:1rem;
   flex-shrink:0;
@@ -40,17 +45,63 @@
   font-size:.8rem;
   color:var(--t3);
   flex-shrink:0;
-  transition:transform var(--tr);
 }
+
+/* ── Body de sección ── */
 .guide-body{
   padding:0 1rem 1rem 1rem;
   font-size:.82rem;
   line-height:1.6;
   color:var(--t2);
 }
-.guide-body p{margin:0 0 .6rem 0}
-.guide-body strong{color:var(--t1)}
-.guide-body code{
+
+/* ── Intro text (antes de sub-secciones) ── */
+.guide-intro{
+  font-size:.82rem;
+  line-height:1.6;
+  color:var(--t2);
+  margin-bottom:.75rem;
+}
+.guide-intro p{margin:0 0 .5rem 0}
+
+/* ── Sub-sección (acordeón anidado) ── */
+.guide-sub{
+  border:1px solid var(--b1);
+  border-radius:var(--r);
+  margin-bottom:.4rem;
+}
+.guide-sub-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:.6rem .85rem;
+  cursor:pointer;
+  transition:background var(--tr);
+}
+.guide-sub-header:hover{background:var(--bg3)}
+.guide-sub-title{
+  font-size:.82rem;
+  font-weight:500;
+  color:var(--t1);
+}
+.guide-chev-sub{font-size:.7rem}
+
+.guide-sub-body{
+  padding:0 .85rem .75rem .85rem;
+  font-size:.8rem;
+  line-height:1.6;
+  color:var(--t2);
+}
+
+/* ── Contenido compartido (body + sub-body) ── */
+.guide-body p,
+.guide-sub-body p{margin:0 0 .6rem 0}
+
+.guide-body strong,
+.guide-sub-body strong{color:var(--t1)}
+
+.guide-body code,
+.guide-sub-body code{
   font-family:'DM Mono',monospace;
   font-size:.78rem;
   background:var(--bg3);
@@ -58,11 +109,16 @@
   border-radius:3px;
   color:var(--ac);
 }
-.guide-body ul{
+
+.guide-body ul,
+.guide-sub-body ul{
   margin:0 0 .6rem 0;
   padding-left:1.2rem;
 }
-.guide-body li{margin-bottom:.3rem}
+.guide-body li,
+.guide-sub-body li{margin-bottom:.3rem}
+
+/* ── Tip box ── */
 .guide-tip{
   background:color-mix(in srgb,var(--ac) 8%,transparent);
   border-left:3px solid var(--ac);
