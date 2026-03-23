@@ -430,10 +430,25 @@ const LANGS = {
     'guide.title': 'Guía',
     'guide.nav': 'Guía',
 
+    /* Qué es Trackr */
+    'guide.about.title': '¿Qué es Trackr?',
+    'guide.about.desc': 'La historia, la filosofía y quién hay detrás',
+    'guide.about.intro': '<p>Trackr es una herramienta <strong>gratuita, abierta y sin registro</strong> para que autónomos y freelancers lleven el control de sus proyectos, horas, facturas e impuestos — todo desde el navegador, con un simple archivo de guardado que nunca sale de tu ordenador.</p>',
+    'guide.about.origin.title': 'Cómo empezó todo',
+    'guide.about.origin.body': '<p>Trackr nació en <strong>meowrhino studio</strong>, un pequeño estudio creativo donde hacíamos malabares entre proyectos de diseño, música, programación y mil cosas más. Llevábamos el control del tiempo y la facturación con hojas de cálculo, apps de pago que no nos convencían y notas sueltas que se perdían. Ninguna herramienta se adaptaba a cómo trabajamos realmente.</p><p>Así que decidimos construir la nuestra. Una que fuera <strong>sencilla, honesta y que no pidiera ni email para empezar</strong>.</p>',
+    'guide.about.evolution.title': 'Cómo fue creciendo',
+    'guide.about.evolution.body': '<p>Lo que empezó como un tracker de horas básico fue creciendo poco a poco: primero llegó la gestión de proyectos y clientes, luego la facturación con IVA e IRPF, después el calendario visual, los gastos, los impuestos trimestrales… Cada función nació de una necesidad real, no de un roadmap corporativo.</p><p>Desde el principio tuvimos claro que queríamos hacer algo <strong>abierto</strong>: sin cuentas, sin servidores, sin suscripciones. Tus datos viven en tu archivo de guardado y tú decides qué hacer con él.</p>',
+    'guide.about.howworks.title': 'Cómo funciona',
+    'guide.about.howworks.body': '<p>Trackr funciona con un <strong>archivo de guardado</strong> en formato .json que contiene todos tus proyectos, horas, gastos y configuración. No necesitas cuenta, no hay servidor y nada sale de tu ordenador.</p><ul><li><strong>Guardar</strong> — cada cambio se guarda automáticamente en tu navegador. Mientras no borres los datos del navegador, todo sigue ahí.</li><li><strong>Exportar</strong> — descarga tu archivo .json como backup. Te recomendamos hacerlo a menudo.</li><li><strong>Importar</strong> — carga un archivo .json para restaurar tus datos o moverlos a otro navegador.</li></ul><div class="guide-tip">Tu archivo de guardado es tuyo. Puedes guardarlo donde quieras, hacer copias o incluso editarlo a mano si sabes lo que haces.</div>',
+    'guide.about.now.title': 'Dónde estamos ahora',
+    'guide.about.now.body': '<p>Trackr está en <strong>beta abierta</strong>. Lo usamos a diario en nuestro propio trabajo y lo vamos mejorando con cada semana que pasa. Aún hay cosas por pulir y funcionalidades por añadir, pero ya es una herramienta completa y funcional.</p><p>Creemos que las herramientas para autónomos no deberían costar una suscripción mensual ni obligarte a crear una cuenta. Por eso Trackr es y seguirá siendo <strong>gratuito y de código abierto</strong>.</p>',
+    'guide.about.contact.title': 'Escríbenos',
+    'guide.about.contact.body': '<p>¿Tienes una idea, una sugerencia o has encontrado un bug? ¡Nos encanta recibir feedback! Escríbenos a <strong>hola@meowrhino.studio</strong> y te respondemos encantados.</p><p>Trackr lo hace <a href="https://meowrhino.studio" target="_blank"><strong>meowrhino studio</strong></a> con mucho cariño. Gracias por probarlo. 🐱🦏</p>',
+
     /* Proyectos */
     'guide.projects.title': 'Proyectos',
     'guide.projects.desc': 'Crea, organiza y sigue tus proyectos',
-    'guide.projects.intro': '<p>Cada proyecto tiene un <strong>nombre</strong>, un <strong>cliente</strong> (opcional), un <strong>color</strong> y un <strong>estado</strong>. También puedes marcarlo como <strong>interno</strong> (sin cliente) o <strong>recurrente</strong> (trabajo continuado).</p>',
+    'guide.projects.intro': '<p>Los proyectos son el corazón de Trackr — aquí es donde organizas todo tu trabajo. Cada proyecto tiene un <strong>nombre</strong>, un <strong>cliente</strong> (opcional), un <strong>color</strong> y un <strong>estado</strong>. También puedes marcarlo como <strong>interno</strong> (sin cliente) o <strong>recurrente</strong> (trabajo continuado).</p>',
     'guide.projects.states.title': 'Estados de proyecto',
     'guide.projects.states.body': '<ul><li><strong>Potencial</strong> — un lead o propuesta que aún no se ha confirmado. Puedes registrar el tiempo de llamadas y reuniones iniciales.</li><li><strong>Activo</strong> — proyecto en marcha.</li><li><strong>Pausado</strong> — esperando feedback del cliente o detenido temporalmente.</li><li><strong>Completado</strong> — trabajo terminado.</li><li><strong>Abandonado</strong> — cancelado o descartado.</li></ul>',
     'guide.projects.clients.title': 'Clientes',
@@ -444,12 +459,13 @@ const LANGS = {
     /* Horas */
     'guide.hours.title': 'Registro de horas',
     'guide.hours.desc': 'Apunta tu tiempo de trabajo y reuniones',
+    'guide.hours.intro': '<p>¿Cuántas horas le dedicaste a ese proyecto? Con Trackr es fácil saberlo. Registra tu tiempo de trabajo y reuniones para tener siempre el control.</p>',
     'guide.hours.body': '<p>Dentro de cada proyecto puedes añadir <strong>entradas de horas</strong> con:</p><ul><li><strong>Tipo</strong>: 💻 trabajo o 👥 reunión.</li><li><strong>Cantidad</strong>: horas dedicadas (ej. 2.5h).</li><li><strong>Fecha</strong> y opcionalmente <strong>hora de inicio</strong> (para el timeline semanal).</li><li><strong>Nota</strong>: qué hiciste.</li><li><strong>Cobro (€)</strong>: importe directo si cobras por hora o por sesión.</li></ul><p>También puedes añadir horas desde el <strong>calendario</strong> (botón + o arrastrando en la vista semanal) y asignarlas a cualquier proyecto.</p><div class="guide-tip">Las horas sin fecha aparecen en una sección "Sin hora asignada" en el calendario semanal.</div>',
 
     /* Facturación */
     'guide.billing.title': 'Facturación',
     'guide.billing.desc': 'IVA, IRPF, modos de cobro y cobros parciales',
-    'guide.billing.intro': '<p>Cada proyecto tiene su propia configuración de facturación. Puedes elegir cómo calcular los importes y qué impuestos aplicar.</p>',
+    'guide.billing.intro': '<p>Sabemos que la facturación puede ser un dolor de cabeza — por eso intentamos que sea lo más fácil posible. Cada proyecto tiene su propia configuración: elige cómo calcular los importes y qué impuestos aplicar, y Trackr hace las cuentas por ti.</p>',
     'guide.billing.modes.title': 'Modos de facturación',
     'guide.billing.modes.body': '<ul><li><strong>Desde base</strong> — introduces la base imponible (lo que cobras antes de impuestos). Los importes de IVA e IRPF se calculan automáticamente.</li><li><strong>Desde total</strong> — introduces el total que te pagan y se calcula la base hacia atrás.</li><li><strong>Por hora</strong> — defines un €/hora. La base se calcula según las horas registradas.</li><li><strong>Gratis</strong> — proyecto sin facturación (internos, favores, voluntariado).</li></ul><div class="guide-tip">El modo "Por hora" recalcula el importe automáticamente cada vez que añades horas al proyecto.</div>',
     'guide.billing.tax.title': 'IVA e IRPF por proyecto',
@@ -460,17 +476,19 @@ const LANGS = {
     /* Calendario */
     'guide.calendar.title': 'Calendario',
     'guide.calendar.desc': 'Vista semanal, mensual y arrastrar para añadir',
+    'guide.calendar.intro': '<p>Tu semana de un vistazo. El calendario te ayuda a visualizar cómo repartes tu tiempo entre proyectos y a detectar semanas demasiado cargadas (o demasiado vacías).</p>',
     'guide.calendar.body': '<p>El calendario tiene dos vistas:</p><ul><li><strong>Semana</strong> (por defecto): timeline con las horas del día. Puedes <strong>arrastrar</strong> sobre un día para crear una entrada directamente.</li><li><strong>Mes</strong>: vista general con las entradas de cada día. Haz click en un día para ver el detalle.</li></ul><p>Debajo del calendario verás:</p><ul><li><strong>Gastos</strong> de la semana/mes.</li><li><strong>Cobros</strong> recibidos en el periodo.</li><li><strong>Objetivos</strong>: barras de progreso de horas y ingresos (configurables en Configuración).</li><li><strong>Resumen financiero</strong>: cobrado, gastos, neto y €/hora real del periodo.</li></ul><div class="guide-tip">Las 4 tarjetas de la vista Info son clickables: te llevan a Proyectos, Calendario (semana/mes) y Dineros.</div>',
 
     /* Facturas */
     'guide.invoices.title': 'Facturas PDF',
     'guide.invoices.desc': 'Genera facturas profesionales en PDF',
+    'guide.invoices.intro': '<p>Olvídate de plantillas de Word o calculadoras de IVA. Trackr genera facturas en PDF con todos los datos fiscales, listas para enviar al cliente.</p>',
     'guide.invoices.body': '<p>Desde el detalle de un proyecto con facturación, pulsa <strong>"Factura"</strong> para generar un PDF.</p><ul><li>Se asigna un <strong>número de factura</strong> automático y correlativo (o puedes editarlo).</li><li>El PDF incluye los datos del <strong>emisor</strong> (tú, de Configuración), del <strong>cliente</strong>, el desglose de importes y tu <strong>cuenta bancaria</strong>.</li><li>Puedes elegir el <strong>idioma de la factura</strong> (español o inglés) por proyecto.</li><li>Si el proyecto tiene <strong>excepción IVA</strong>, aparece en la factura.</li></ul><div class="guide-tip">Rellena tus datos del emisor y cuenta bancaria en Configuración antes de generar tu primera factura.</div>',
 
     /* Dineros */
     'guide.money.title': 'Dineros',
     'guide.money.desc': 'Ingresos, gastos, impuestos y renta',
-    'guide.money.intro': '<p>La sección <strong>Dineros</strong> te da una visión financiera completa. Puedes navegar por mes, trimestre o año.</p>',
+    'guide.money.intro': '<p>¿Cómo vas este trimestre? La sección <strong>Dineros</strong> te da una visión financiera completa para que no te lleves sorpresas. Navega por mes, trimestre o año y ten siempre claro cuánto entra, cuánto sale y cuánto toca pagar.</p>',
     'guide.money.income.title': 'Ingresos y resumen',
     'guide.money.income.body': '<p>Arriba verás un <strong>resumen</strong> con barras de ingresos vs gastos. Debajo, la lista de <strong>ingresos</strong> del periodo: cobros de facturas (parciales incluidos) y cobros por hora.</p>',
     'guide.money.expenses.title': 'Gastos y categorías',
@@ -481,12 +499,14 @@ const LANGS = {
     /* Configuración */
     'guide.config.title': 'Configuración',
     'guide.config.desc': 'Idioma, tema, datos del emisor y objetivos',
+    'guide.config.intro': '<p>Haz que Trackr se sienta tuyo. Aquí ajustas desde el idioma y los colores hasta tus datos fiscales y objetivos de trabajo.</p>',
     'guide.config.body': '<p>En Configuración puedes ajustar:</p><ul><li><strong>Idioma</strong>: español, inglés o catalán.</li><li><strong>Tema</strong>: 8 paletas de colores con personalidades distintas.</li><li><strong>Datos del emisor</strong>: nombre, dirección, NIF — aparecen en las facturas PDF.</li><li><strong>Cuenta bancaria</strong>: IBAN para incluir en las facturas.</li><li><strong>Concepto por defecto</strong>: texto base para el asunto de las facturas.</li><li><strong>IVA/IRPF por defecto</strong>: los valores que se rellenan al crear un proyecto nuevo.</li><li><strong>Objetivos</strong>: horas/semana, horas/mes, ingresos/mes — para las barras de progreso del calendario.</li><li><strong>Clientes</strong>: lista de todos tus clientes con NIF, dirección y color.</li></ul>',
 
     /* Datos */
     'guide.data.title': 'Tus datos',
     'guide.data.desc': 'Exportar, importar, ejemplos y privacidad',
-    'guide.data.body': '<p>Trackr guarda todos los datos en tu navegador (<strong>localStorage</strong>). No hay servidor, no hay cuenta, no hay cloud. Tus datos son 100% tuyos.</p><ul><li><strong>Exportar</strong> (⤓): descarga un archivo .json con todos tus proyectos, horas, gastos y configuración.</li><li><strong>Importar</strong> (⤒): carga un .json para restaurar o mover tus datos a otro navegador.</li><li><strong>Datos de ejemplo</strong>: en la pantalla de bienvenida puedes cargar 3 perfiles de prueba (traductora, música, formador) para explorar Trackr antes de usarlo con tus datos reales.</li></ul><div class="guide-tip">Haz backups regulares exportando tu archivo. Si cambias de navegador o borras datos, necesitarás el .json para recuperar todo.</div>'
+    'guide.data.intro': '<p>Tu privacidad es sagrada. Trackr no tiene servidor, no tiene cuenta y no guarda nada en la nube. Todo vive en tu archivo de guardado — y tú decides cuándo exportarlo o importarlo.</p>',
+    'guide.data.body': '<ul><li><strong>Exportar</strong> (⤓): descarga tu archivo de guardado .json con todos tus proyectos, horas, gastos y configuración.</li><li><strong>Importar</strong> (⤒): carga un .json para restaurar o mover tus datos a otro navegador.</li><li><strong>Datos de ejemplo</strong>: en la pantalla de bienvenida puedes cargar 3 perfiles de prueba (traductora, música, formador) para explorar Trackr antes de usarlo con tus datos reales.</li></ul><div class="guide-tip">Haz backups regulares exportando tu archivo. Si cambias de navegador o borras datos, necesitarás el .json para recuperar todo.</div>'
   },
 
   en: {
@@ -908,9 +928,24 @@ const LANGS = {
     'guide.title': 'Guide',
     'guide.nav': 'Guide',
 
+    /* What is Trackr */
+    'guide.about.title': 'What is Trackr?',
+    'guide.about.desc': 'The story, the philosophy and who\'s behind it',
+    'guide.about.intro': '<p>Trackr is a <strong>free, open and no-signup</strong> tool for freelancers to manage projects, hours, invoices and taxes — all from your browser, with a simple save file that never leaves your computer.</p>',
+    'guide.about.origin.title': 'How it all started',
+    'guide.about.origin.body': '<p>Trackr was born at <strong>meowrhino studio</strong>, a small creative studio where we juggled design, music, coding and a thousand other things. We tracked time and billing with spreadsheets, paid apps that never quite fit, and random notes that got lost. No tool matched how we actually work.</p><p>So we decided to build our own. One that was <strong>simple, honest and didn\'t even ask for an email to get started</strong>.</p>',
+    'guide.about.evolution.title': 'How it grew',
+    'guide.about.evolution.body': '<p>What started as a basic hour tracker grew step by step: first came project and client management, then billing with VAT and income tax, then the visual calendar, expenses, quarterly taxes… Every feature was born from a real need, not a corporate roadmap.</p><p>From the very beginning we knew we wanted to make something <strong>open</strong>: no accounts, no servers, no subscriptions. Your data lives in your save file and you decide what to do with it.</p>',
+    'guide.about.howworks.title': 'How it works',
+    'guide.about.howworks.body': '<p>Trackr works with a <strong>save file</strong> in .json format that contains all your projects, hours, expenses and settings. No account needed, no server, and nothing leaves your computer.</p><ul><li><strong>Save</strong> — every change is saved automatically in your browser. As long as you don\'t clear browser data, everything stays.</li><li><strong>Export</strong> — download your .json file as a backup. We recommend doing this often.</li><li><strong>Import</strong> — load a .json file to restore your data or move it to another browser.</li></ul><div class="guide-tip">Your save file is yours. You can store it wherever you want, make copies or even edit it by hand if you know what you\'re doing.</div>',
+    'guide.about.now.title': 'Where we are now',
+    'guide.about.now.body': '<p>Trackr is in <strong>open beta</strong>. We use it daily in our own work and improve it every week. There\'s still polish and features to add, but it\'s already a complete, functional tool.</p><p>We believe freelancer tools shouldn\'t cost a monthly subscription or force you to create an account. That\'s why Trackr is and will remain <strong>free and open source</strong>.</p>',
+    'guide.about.contact.title': 'Get in touch',
+    'guide.about.contact.body': '<p>Got an idea, a suggestion or found a bug? We love hearing from you! Drop us a line at <strong>hola@meowrhino.studio</strong> and we\'ll get back to you.</p><p>Trackr is made by <a href="https://meowrhino.studio" target="_blank"><strong>meowrhino studio</strong></a> with lots of love. Thanks for trying it out. 🐱🦏</p>',
+
     'guide.projects.title': 'Projects',
     'guide.projects.desc': 'Create, organize and track your projects',
-    'guide.projects.intro': '<p>Each project has a <strong>name</strong>, a <strong>client</strong> (optional), a <strong>color</strong> and a <strong>status</strong>. You can also mark it as <strong>internal</strong> (no client) or <strong>recurring</strong> (ongoing work).</p>',
+    'guide.projects.intro': '<p>Projects are the heart of Trackr — this is where you organize all your work. Each project has a <strong>name</strong>, a <strong>client</strong> (optional), a <strong>color</strong> and a <strong>status</strong>. You can also mark it as <strong>internal</strong> (no client) or <strong>recurring</strong> (ongoing work).</p>',
     'guide.projects.states.title': 'Project statuses',
     'guide.projects.states.body': '<ul><li><strong>Potential</strong> — a lead or proposal not yet confirmed. Log time for initial calls and meetings.</li><li><strong>Active</strong> — ongoing project.</li><li><strong>Paused</strong> — waiting for client feedback or temporarily stopped.</li><li><strong>Completed</strong> — work finished.</li><li><strong>Archived</strong> — cancelled or discarded.</li></ul>',
     'guide.projects.clients.title': 'Clients',
@@ -920,11 +955,12 @@ const LANGS = {
 
     'guide.hours.title': 'Time tracking',
     'guide.hours.desc': 'Log your work and meeting hours',
+    'guide.hours.intro': '<p>How many hours did you spend on that project? With Trackr it\'s easy to know. Log your work and meeting time so you always stay in control.</p>',
     'guide.hours.body': '<p>Inside each project you can add <strong>hour entries</strong> with:</p><ul><li><strong>Type</strong>: 💻 work or 👥 meeting.</li><li><strong>Amount</strong>: hours spent (e.g. 2.5h).</li><li><strong>Date</strong> and optionally <strong>start time</strong> (for the weekly timeline).</li><li><strong>Note</strong>: what you did.</li><li><strong>Amount (€)</strong>: direct billing amount per entry.</li></ul><p>You can also add hours from the <strong>calendar</strong> (+ button or dragging on the weekly view) and assign them to any project.</p><div class="guide-tip">Hours without a date appear in a "No time assigned" section in the weekly calendar.</div>',
 
     'guide.billing.title': 'Billing',
     'guide.billing.desc': 'VAT, income tax, billing modes and partial payments',
-    'guide.billing.intro': '<p>Each project has its own billing setup. Choose how to calculate amounts and which taxes to apply.</p>',
+    'guide.billing.intro': '<p>We know billing can be a headache — so we try to make it as easy as possible. Each project has its own setup: choose how to calculate amounts and which taxes to apply, and Trackr does the math for you.</p>',
     'guide.billing.modes.title': 'Billing modes',
     'guide.billing.modes.body': '<ul><li><strong>From base</strong> — enter the taxable base (before taxes). VAT and income tax are calculated automatically.</li><li><strong>From total</strong> — enter the total paid and the base is reverse-calculated.</li><li><strong>Hourly</strong> — set a €/hour rate. The base is calculated from logged hours.</li><li><strong>Free</strong> — no billing (internal projects, favors, volunteering).</li></ul><div class="guide-tip">The "Hourly" mode recalculates automatically every time you add hours to the project.</div>',
     'guide.billing.tax.title': 'VAT and income tax per project',
@@ -934,15 +970,17 @@ const LANGS = {
 
     'guide.calendar.title': 'Calendar',
     'guide.calendar.desc': 'Weekly, monthly view and drag to add',
+    'guide.calendar.intro': '<p>Your week at a glance. The calendar helps you see how you spread your time across projects and spot weeks that are too packed (or too empty).</p>',
     'guide.calendar.body': '<p>The calendar has two views:</p><ul><li><strong>Week</strong> (default): timeline with hours of the day. <strong>Drag</strong> on a day to create an entry directly.</li><li><strong>Month</strong>: overview with entries for each day. Click a day for details.</li></ul><p>Below the calendar you\'ll find:</p><ul><li><strong>Expenses</strong> for the week/month.</li><li><strong>Payments</strong> received in the period.</li><li><strong>Goals</strong>: progress bars for hours and income (configurable in Settings).</li><li><strong>Financial summary</strong>: collected, expenses, net and real €/hour for the period.</li></ul><div class="guide-tip">The 4 stat cards in the Info view are clickable: they navigate to Projects, Calendar (week/month) and Money.</div>',
 
     'guide.invoices.title': 'PDF Invoices',
     'guide.invoices.desc': 'Generate professional PDF invoices',
+    'guide.invoices.intro': '<p>Forget Word templates or VAT calculators. Trackr generates PDF invoices with all the tax details, ready to send to your client.</p>',
     'guide.invoices.body': '<p>From a project detail with billing, click <strong>"Invoice"</strong> to generate a PDF.</p><ul><li>An auto-incrementing <strong>invoice number</strong> is assigned (or you can edit it).</li><li>The PDF includes <strong>issuer</strong> details (you, from Settings), <strong>client</strong> info, amount breakdown and your <strong>bank account</strong>.</li><li>Choose the <strong>invoice language</strong> (Spanish or English) per project.</li><li>If the project has a <strong>VAT exception</strong>, it appears on the invoice.</li></ul><div class="guide-tip">Fill in your issuer details and bank account in Settings before generating your first invoice.</div>',
 
     'guide.money.title': 'Money',
     'guide.money.desc': 'Income, expenses, taxes and annual summary',
-    'guide.money.intro': '<p>The <strong>Money</strong> section gives you a complete financial overview. Navigate by month, quarter or year.</p>',
+    'guide.money.intro': '<p>How\'s your quarter going? The <strong>Money</strong> section gives you a complete financial overview so there are no surprises. Navigate by month, quarter or year and always know how much is coming in, going out, and what\'s due.</p>',
     'guide.money.income.title': 'Income and summary',
     'guide.money.income.body': '<p>At the top you\'ll see a <strong>summary</strong> with income vs expense bars. Below, the <strong>income</strong> list for the period: invoice payments (including partial) and per-hour charges.</p>',
     'guide.money.expenses.title': 'Expenses and categories',
@@ -952,11 +990,13 @@ const LANGS = {
 
     'guide.config.title': 'Settings',
     'guide.config.desc': 'Language, theme, issuer details and goals',
+    'guide.config.intro': '<p>Make Trackr feel like yours. Here you can adjust everything from language and colors to your tax details and work goals.</p>',
     'guide.config.body': '<p>In Settings you can adjust:</p><ul><li><strong>Language</strong>: Spanish, English or Catalan.</li><li><strong>Theme</strong>: 8 color palettes with distinct personalities.</li><li><strong>Issuer details</strong>: name, address, tax ID — shown on PDF invoices.</li><li><strong>Bank account</strong>: IBAN to include on invoices.</li><li><strong>Default subject</strong>: base text for invoice subjects.</li><li><strong>Default VAT/tax</strong>: values pre-filled when creating a new project.</li><li><strong>Goals</strong>: hours/week, hours/month, income/month — for calendar progress bars.</li><li><strong>Clients</strong>: list of all your clients with tax ID, address and color.</li></ul>',
 
     'guide.data.title': 'Your data',
     'guide.data.desc': 'Export, import, examples and privacy',
-    'guide.data.body': '<p>Trackr stores all data in your browser (<strong>localStorage</strong>). No server, no account, no cloud. Your data is 100% yours.</p><ul><li><strong>Export</strong> (⤓): download a .json file with all your projects, hours, expenses and settings.</li><li><strong>Import</strong> (⤒): load a .json to restore or move your data to another browser.</li><li><strong>Sample data</strong>: on the welcome screen you can load 3 test profiles (translator, musician, trainer) to explore Trackr before using your real data.</li></ul><div class="guide-tip">Make regular backups by exporting your file. If you switch browsers or clear data, you\'ll need the .json to recover everything.</div>'
+    'guide.data.intro': '<p>Your privacy is sacred. Trackr has no server, no account and stores nothing in the cloud. Everything lives in your save file — and you decide when to export or import it.</p>',
+    'guide.data.body': '<ul><li><strong>Export</strong> (⤓): download your .json save file with all your projects, hours, expenses and settings.</li><li><strong>Import</strong> (⤒): load a .json to restore or move your data to another browser.</li><li><strong>Sample data</strong>: on the welcome screen you can load 3 test profiles (translator, musician, trainer) to explore Trackr before using your real data.</li></ul><div class="guide-tip">Make regular backups by exporting your file. If you switch browsers or clear data, you\'ll need the .json to recover everything.</div>'
   },
 
   ca: {
@@ -1378,9 +1418,24 @@ const LANGS = {
     'guide.title': 'Guia',
     'guide.nav': 'Guia',
 
+    /* Què és Trackr */
+    'guide.about.title': 'Què és Trackr?',
+    'guide.about.desc': 'La història, la filosofia i qui hi ha darrere',
+    'guide.about.intro': '<p>Trackr és una eina <strong>gratuïta, oberta i sense registre</strong> perquè autònoms i freelancers portin el control dels seus projectes, hores, factures i impostos — tot des del navegador, amb un simple fitxer de guardat que mai surt del teu ordinador.</p>',
+    'guide.about.origin.title': 'Com va començar tot',
+    'guide.about.origin.body': '<p>Trackr va néixer a <strong>meowrhino studio</strong>, un petit estudi creatiu on fèiem malabars entre projectes de disseny, música, programació i mil coses més. Portàvem el control del temps i la facturació amb fulls de càlcul, apps de pagament que no ens convencien i notes soltes que es perdien. Cap eina s\'adaptava a com treballem realment.</p><p>Així que vam decidir construir la nostra. Una que fos <strong>senzilla, honesta i que no demanés ni email per començar</strong>.</p>',
+    'guide.about.evolution.title': 'Com va anar creixent',
+    'guide.about.evolution.body': '<p>El que va començar com un tracker d\'hores bàsic va anar creixent poc a poc: primer va arribar la gestió de projectes i clients, després la facturació amb IVA i IRPF, després el calendari visual, les despeses, els impostos trimestrals… Cada funció va néixer d\'una necessitat real, no d\'un roadmap corporatiu.</p><p>Des del principi teníem clar que volíem fer alguna cosa <strong>oberta</strong>: sense comptes, sense servidors, sense subscripcions. Les teves dades viuen al teu fitxer de guardat i tu decideixes què fer-ne.</p>',
+    'guide.about.howworks.title': 'Com funciona',
+    'guide.about.howworks.body': '<p>Trackr funciona amb un <strong>fitxer de guardat</strong> en format .json que conté tots els teus projectes, hores, despeses i configuració. No necessites compte, no hi ha servidor i res surt del teu ordinador.</p><ul><li><strong>Guardar</strong> — cada canvi es guarda automàticament al teu navegador. Mentre no esborris les dades del navegador, tot segueix allà.</li><li><strong>Exportar</strong> — descarrega el teu fitxer .json com a backup. Et recomanem fer-ho sovint.</li><li><strong>Importar</strong> — carrega un fitxer .json per restaurar les teves dades o moure-les a un altre navegador.</li></ul><div class="guide-tip">El teu fitxer de guardat és teu. Pots guardar-lo on vulguis, fer còpies o fins i tot editar-lo a mà si saps el que fas.</div>',
+    'guide.about.now.title': 'On som ara',
+    'guide.about.now.body': '<p>Trackr està en <strong>beta oberta</strong>. L\'usem cada dia a la nostra feina i el millorem cada setmana. Encara hi ha coses per polir i funcionalitats per afegir, però ja és una eina completa i funcional.</p><p>Creiem que les eines per autònoms no haurien de costar una subscripció mensual ni obligar-te a crear un compte. Per això Trackr és i continuarà sent <strong>gratuït i de codi obert</strong>.</p>',
+    'guide.about.contact.title': 'Escriu-nos',
+    'guide.about.contact.body': '<p>Tens una idea, un suggeriment o has trobat un bug? Ens encanta rebre feedback! Escriu-nos a <strong>hola@meowrhino.studio</strong> i et respondrem encantats.</p><p>Trackr el fa <a href="https://meowrhino.studio" target="_blank"><strong>meowrhino studio</strong></a> amb molta estima. Gràcies per provar-lo. 🐱🦏</p>',
+
     'guide.projects.title': 'Projectes',
     'guide.projects.desc': 'Crea, organitza i segueix els teus projectes',
-    'guide.projects.intro': '<p>Cada projecte té un <strong>nom</strong>, un <strong>client</strong> (opcional), un <strong>color</strong> i un <strong>estat</strong>. També pots marcar-lo com a <strong>intern</strong> (sense client) o <strong>recurrent</strong> (feina continuada).</p>',
+    'guide.projects.intro': '<p>Els projectes són el cor de Trackr — aquí és on organitzes tota la teva feina. Cada projecte té un <strong>nom</strong>, un <strong>client</strong> (opcional), un <strong>color</strong> i un <strong>estat</strong>. També pots marcar-lo com a <strong>intern</strong> (sense client) o <strong>recurrent</strong> (feina continuada).</p>',
     'guide.projects.states.title': 'Estats de projecte',
     'guide.projects.states.body': '<ul><li><strong>Potencial</strong> — un lead o proposta que encara no s\'ha confirmat. Pots registrar el temps de trucades i reunions inicials.</li><li><strong>Actiu</strong> — projecte en marxa.</li><li><strong>Pausat</strong> — esperant feedback del client o aturat temporalment.</li><li><strong>Completat</strong> — feina acabada.</li><li><strong>Abandonat</strong> — cancel·lat o descartat.</li></ul>',
     'guide.projects.clients.title': 'Clients',
@@ -1390,11 +1445,12 @@ const LANGS = {
 
     'guide.hours.title': 'Registre d\'hores',
     'guide.hours.desc': 'Apunta el teu temps de treball i reunions',
+    'guide.hours.intro': '<p>Quantes hores li vas dedicar a aquell projecte? Amb Trackr és fàcil saber-ho. Registra el teu temps de treball i reunions per tenir sempre el control.</p>',
     'guide.hours.body': '<p>Dins de cada projecte pots afegir <strong>entrades d\'hores</strong> amb:</p><ul><li><strong>Tipus</strong>: 💻 treball o 👥 reunió.</li><li><strong>Quantitat</strong>: hores dedicades (ex. 2.5h).</li><li><strong>Data</strong> i opcionalment <strong>hora d\'inici</strong> (per al timeline setmanal).</li><li><strong>Nota</strong>: què has fet.</li><li><strong>Cobrament (€)</strong>: import directe si cobres per hora o per sessió.</li></ul><p>També pots afegir hores des del <strong>calendari</strong> (botó + o arrossegant a la vista setmanal) i assignar-les a qualsevol projecte.</p><div class="guide-tip">Les hores sense data apareixen en una secció "Sense hora assignada" al calendari setmanal.</div>',
 
     'guide.billing.title': 'Facturació',
     'guide.billing.desc': 'IVA, IRPF, modes de cobrament i cobraments parcials',
-    'guide.billing.intro': '<p>Cada projecte té la seva pròpia configuració de facturació. Pots triar com calcular els imports i quins impostos aplicar.</p>',
+    'guide.billing.intro': '<p>Sabem que la facturació pot ser un maldecap — per això intentem que sigui el més fàcil possible. Cada projecte té la seva pròpia configuració: tria com calcular els imports i quins impostos aplicar, i Trackr fa els números per tu.</p>',
     'guide.billing.modes.title': 'Modes de facturació',
     'guide.billing.modes.body': '<ul><li><strong>Des de base</strong> — introdueixes la base imposable (abans d\'impostos). Els imports d\'IVA i IRPF es calculen automàticament.</li><li><strong>Des de total</strong> — introdueixes el total i es calcula la base cap enrere.</li><li><strong>Per hora</strong> — defineixes un €/hora. La base es calcula segons les hores registrades.</li><li><strong>Gratuït</strong> — projecte sense facturació (interns, favors, voluntariat).</li></ul><div class="guide-tip">El mode "Per hora" recalcula automàticament cada cop que afegeixes hores al projecte.</div>',
     'guide.billing.tax.title': 'IVA i IRPF per projecte',
@@ -1404,15 +1460,17 @@ const LANGS = {
 
     'guide.calendar.title': 'Calendari',
     'guide.calendar.desc': 'Vista setmanal, mensual i arrossegar per afegir',
+    'guide.calendar.intro': '<p>La teva setmana d\'un cop d\'ull. El calendari t\'ajuda a visualitzar com reparteixes el temps entre projectes i a detectar setmanes massa carregades (o massa buides).</p>',
     'guide.calendar.body': '<p>El calendari té dues vistes:</p><ul><li><strong>Setmana</strong> (per defecte): timeline amb les hores del dia. Pots <strong>arrossegar</strong> sobre un dia per crear una entrada directament.</li><li><strong>Mes</strong>: vista general amb les entrades de cada dia. Fes clic en un dia per veure el detall.</li></ul><p>Sota el calendari trobaràs:</p><ul><li><strong>Despeses</strong> de la setmana/mes.</li><li><strong>Cobraments</strong> rebuts en el període.</li><li><strong>Objectius</strong>: barres de progrés d\'hores i ingressos (configurables a Configuració).</li><li><strong>Resum financer</strong>: cobrat, despeses, net i €/hora real del període.</li></ul><div class="guide-tip">Les 4 targetes de la vista Info són clicables: et porten a Projectes, Calendari (setmana/mes) i Diners.</div>',
 
     'guide.invoices.title': 'Factures PDF',
     'guide.invoices.desc': 'Genera factures professionals en PDF',
+    'guide.invoices.intro': '<p>Oblida\'t de plantilles de Word o calculadores d\'IVA. Trackr genera factures en PDF amb totes les dades fiscals, llestes per enviar al client.</p>',
     'guide.invoices.body': '<p>Des del detall d\'un projecte amb facturació, prem <strong>"Factura"</strong> per generar un PDF.</p><ul><li>S\'assigna un <strong>número de factura</strong> automàtic i correlatiu (o pots editar-lo).</li><li>El PDF inclou les dades de l\'<strong>emissor</strong> (tu, de Configuració), del <strong>client</strong>, el desglossament d\'imports i el teu <strong>compte bancari</strong>.</li><li>Pots triar l\'<strong>idioma de la factura</strong> (castellà o anglès) per projecte.</li><li>Si el projecte té <strong>excepció IVA</strong>, apareix a la factura.</li></ul><div class="guide-tip">Omple les teves dades d\'emissor i compte bancari a Configuració abans de generar la primera factura.</div>',
 
     'guide.money.title': 'Diners',
     'guide.money.desc': 'Ingressos, despeses, impostos i renda',
-    'guide.money.intro': '<p>La secció <strong>Diners</strong> et dona una visió financera completa. Navega per mes, trimestre o any.</p>',
+    'guide.money.intro': '<p>Com vas aquest trimestre? La secció <strong>Diners</strong> et dona una visió financera completa perquè no t\'emportis sorpreses. Navega per mes, trimestre o any i tingues sempre clar quant entra, quant surt i quant toca pagar.</p>',
     'guide.money.income.title': 'Ingressos i resum',
     'guide.money.income.body': '<p>A dalt veuràs un <strong>resum</strong> amb barres d\'ingressos vs despeses. A sota, la llista d\'<strong>ingressos</strong> del període: cobraments de factures (parcials inclosos) i cobraments per hora.</p>',
     'guide.money.expenses.title': 'Despeses i categories',
@@ -1422,11 +1480,13 @@ const LANGS = {
 
     'guide.config.title': 'Configuració',
     'guide.config.desc': 'Idioma, tema, dades de l\'emissor i objectius',
+    'guide.config.intro': '<p>Fes que Trackr se senti teu. Aquí ajustes des de l\'idioma i els colors fins a les teves dades fiscals i objectius de feina.</p>',
     'guide.config.body': '<p>A Configuració pots ajustar:</p><ul><li><strong>Idioma</strong>: castellà, anglès o català.</li><li><strong>Tema</strong>: 8 paletes de colors amb personalitats diferents.</li><li><strong>Dades de l\'emissor</strong>: nom, adreça, NIF — apareixen a les factures PDF.</li><li><strong>Compte bancari</strong>: IBAN per incloure a les factures.</li><li><strong>Concepte per defecte</strong>: text base per l\'assumpte de les factures.</li><li><strong>IVA/IRPF per defecte</strong>: els valors que s\'omplen en crear un projecte nou.</li><li><strong>Objectius</strong>: hores/setmana, hores/mes, ingressos/mes — per les barres de progrés del calendari.</li><li><strong>Clients</strong>: llista de tots els teus clients amb NIF, adreça i color.</li></ul>',
 
     'guide.data.title': 'Les teves dades',
     'guide.data.desc': 'Exportar, importar, exemples i privacitat',
-    'guide.data.body': '<p>Trackr guarda totes les dades al teu navegador (<strong>localStorage</strong>). No hi ha servidor, no hi ha compte, no hi ha cloud. Les teves dades són 100% teves.</p><ul><li><strong>Exportar</strong> (⤓): descarrega un fitxer .json amb tots els teus projectes, hores, despeses i configuració.</li><li><strong>Importar</strong> (⤒): carrega un .json per restaurar o moure les teves dades a un altre navegador.</li><li><strong>Dades d\'exemple</strong>: a la pantalla de benvinguda pots carregar 3 perfils de prova (traductora, música, formador) per explorar Trackr abans d\'usar-lo amb les teves dades reals.</li></ul><div class="guide-tip">Fes backups regulars exportant el teu fitxer. Si canvies de navegador o esborres dades, necessitaràs el .json per recuperar-ho tot.</div>'
+    'guide.data.intro': '<p>La teva privacitat és sagrada. Trackr no té servidor, no té compte i no guarda res al núvol. Tot viu al teu fitxer de guardat — i tu decideixes quan exportar-lo o importar-lo.</p>',
+    'guide.data.body': '<ul><li><strong>Exportar</strong> (⤓): descarrega el teu fitxer de guardat .json amb tots els teus projectes, hores, despeses i configuració.</li><li><strong>Importar</strong> (⤒): carrega un .json per restaurar o moure les teves dades a un altre navegador.</li><li><strong>Dades d\'exemple</strong>: a la pantalla de benvinguda pots carregar 3 perfils de prova (traductora, música, formador) per explorar Trackr abans d\'usar-lo amb les teves dades reals.</li></ul><div class="guide-tip">Fes backups regulars exportant el teu fitxer. Si canvies de navegador o esborres dades, necessitaràs el .json per recuperar-ho tot.</div>'
   }
 
 };

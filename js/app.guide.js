@@ -17,10 +17,10 @@ Object.assign(App, {
   /* ── Renderizar una sección (con posibles sub-secciones) ── */
   _guideSection(s, i) {
     const hasSubs = s.subs && s.subs.length;
+    const intro = s.intro ? `<div class="guide-intro">${t(s.intro)}</div>` : '';
     const bodyContent = hasSubs
-      ? (s.intro ? `<div class="guide-intro">${t(s.intro)}</div>` : '')
-        + s.subs.map((sub, j) => this._guideSub(sub, i, j)).join('')
-      : t(s.body);
+      ? intro + s.subs.map((sub, j) => this._guideSub(sub, i, j)).join('')
+      : intro + (s.body ? t(s.body) : '');
 
     return `<div class="guide-section">`
       + `<div class="guide-header" onclick="App._gToggle('g${i}')">`
@@ -65,7 +65,18 @@ Object.assign(App, {
   _guideStructure() {
     return [
       {
-        icon: '◩', title: 'guide.projects.title', desc: 'guide.projects.desc',
+        icon: '✦', title: 'guide.about.title', desc: 'guide.about.desc',
+        intro: 'guide.about.intro',
+        subs: [
+          { title: 'guide.about.origin.title', body: 'guide.about.origin.body' },
+          { title: 'guide.about.evolution.title', body: 'guide.about.evolution.body' },
+          { title: 'guide.about.howworks.title', body: 'guide.about.howworks.body' },
+          { title: 'guide.about.now.title', body: 'guide.about.now.body' },
+          { title: 'guide.about.contact.title', body: 'guide.about.contact.body' }
+        ]
+      },
+      {
+        icon: '▣', title: 'guide.projects.title', desc: 'guide.projects.desc',
         intro: 'guide.projects.intro',
         subs: [
           { title: 'guide.projects.states.title', body: 'guide.projects.states.body' },
@@ -75,7 +86,7 @@ Object.assign(App, {
       },
       {
         icon: '◔', title: 'guide.hours.title', desc: 'guide.hours.desc',
-        body: 'guide.hours.body'
+        intro: 'guide.hours.intro', body: 'guide.hours.body'
       },
       {
         icon: '€', title: 'guide.billing.title', desc: 'guide.billing.desc',
@@ -87,15 +98,15 @@ Object.assign(App, {
         ]
       },
       {
-        icon: '▣', title: 'guide.calendar.title', desc: 'guide.calendar.desc',
-        body: 'guide.calendar.body'
+        icon: '▨', title: 'guide.calendar.title', desc: 'guide.calendar.desc',
+        intro: 'guide.calendar.intro', body: 'guide.calendar.body'
       },
       {
         icon: '⎙', title: 'guide.invoices.title', desc: 'guide.invoices.desc',
-        body: 'guide.invoices.body'
+        intro: 'guide.invoices.intro', body: 'guide.invoices.body'
       },
       {
-        icon: '≡', title: 'guide.money.title', desc: 'guide.money.desc',
+        icon: '€', title: 'guide.money.title', desc: 'guide.money.desc',
         intro: 'guide.money.intro',
         subs: [
           { title: 'guide.money.income.title', body: 'guide.money.income.body' },
@@ -105,11 +116,11 @@ Object.assign(App, {
       },
       {
         icon: '⚙', title: 'guide.config.title', desc: 'guide.config.desc',
-        body: 'guide.config.body'
+        intro: 'guide.config.intro', body: 'guide.config.body'
       },
       {
         icon: '↕', title: 'guide.data.title', desc: 'guide.data.desc',
-        body: 'guide.data.body'
+        intro: 'guide.data.intro', body: 'guide.data.body'
       }
     ];
   }
