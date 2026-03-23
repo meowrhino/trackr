@@ -43,17 +43,22 @@ Object.assign(App, {
     else if (this.pf === 'externos') filtered = ps.filter(p => !p.interno);
     else if (this.pf === 'recurrentes') filtered = ps.filter(p => p.recurrente);
 
-    /* ── Agrupar por estado ── */
+    /* ── Agrupar por estado, subdividiendo activos ── */
     const groups = {};
     filtered.forEach(p => {
-      if (!groups[p.estado]) groups[p.estado] = [];
-      groups[p.estado].push(p);
+      let key = p.estado;
+      /* En "Todos": activos se subdividen en externos / internos / recurrentes */
+      if (key === 'activo' && (!this.pf || this.pf === 'todos')) {
+        if (p.recurrente) key = '_recurrente';
+        else if (p.interno) key = '_interno';
+      }
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(p);
     });
 
-    /* Ordenar cada grupo: internos primero, luego por horas desc */
+    /* Ordenar cada grupo por horas desc */
     Object.keys(groups).forEach(st => {
       groups[st].sort((a, b) => {
-        if (a.interno !== b.interno) return a.interno ? -1 : 1;
         const ha = a.horas.reduce((s, h) => s + h.cantidad, 0);
         const hb = b.horas.reduce((s, h) => s + h.cantidad, 0);
         return hb - ha;
@@ -66,10 +71,14 @@ Object.assign(App, {
       return;
     }
 
-    const labels = { potencial: t('est.potenciales'), activo: t('est.activos'), pausado: t('est.pausados'), completado: t('est.completados'), abandonado: t('est.abandonados') };
+    const labels = { potencial: t('est.potenciales'), activo: t('est.activos'), _interno: t('dash.flagInternal'), _recurrente: t('dash.flagRecurring'), pausado: t('est.pausados'), completado: t('est.completados'), abandonado: t('est.abandonados') };
     const collapsible = { completado: true, abandonado: true };
+    /* Orden de renderizado: activos externos, internos, recurrentes, luego el resto */
+    const renderOrder = (!this.pf || this.pf === 'todos')
+      ? ['activo', '_interno', '_recurrente', 'potencial', 'pausado', 'completado', 'abandonado']
+      : EST_ORDER;
     let html = '';
-    EST_ORDER.forEach(st => {
+    renderOrder.forEach(st => {
       const g = groups[st];
       if (!g || !g.length) return;
       if (collapsible[st]) {
