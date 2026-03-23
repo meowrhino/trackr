@@ -115,7 +115,7 @@ Object.assign(App, {
       flags += `<span class="pc-flag pc-flag-inv">${t('dash.flagInvoiced')}</span>`;
     }
 
-    return `<div class="pc${p.interno ? ' pc-mr' : ''}" style="--project-color:${hex}" onclick="App.go('det','${p.id}')">
+    return `<div class="pc" style="--project-color:${hex}" onclick="App.go('det','${p.id}')">
       <div class="pc-h">
         <div>
           <div class="pc-n">${esc(p.nombre)}</div>
