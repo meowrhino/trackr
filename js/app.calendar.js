@@ -518,7 +518,7 @@ Object.assign(App, {
     const ps = D.ps();
     const groups = {};
     ps.forEach(p => { if (!groups[p.estado]) groups[p.estado] = []; groups[p.estado].push(p); });
-    const labels = { activo: t('est.activos'), pausado: t('est.pausados'), completado: t('est.completados'), abandonado: t('est.abandonados') };
+    const labels = { potencial: t('est.potenciales'), activo: t('est.activos'), pausado: t('est.pausados'), completado: t('est.completados'), abandonado: t('est.abandonados') };
     let html = '';
     EST_ORDER.forEach(st => {
       const g = groups[st];

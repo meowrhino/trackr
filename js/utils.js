@@ -21,6 +21,7 @@ const MAX_IMPORT_BYTES = 5 * 1024 * 1024;
 
 /** Estados de proyecto: clave interna → etiqueta visible (mutable para i18n) */
 let EST = {
+  potencial:  'Potencial',
   activo:     'Activo',
   pausado:    'Pausado',
   completado: 'Completado',
@@ -28,7 +29,7 @@ let EST = {
 };
 
 /** Orden de agrupación en la vista de proyectos */
-const EST_ORDER = ['activo', 'pausado', 'completado', 'abandonado'];
+const EST_ORDER = ['potencial', 'activo', 'pausado', 'completado', 'abandonado'];
 
 /** Categorías de gastos (mutable para i18n) */
 let GASTO_CAT = {

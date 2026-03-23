@@ -66,7 +66,7 @@ Object.assign(App, {
       return;
     }
 
-    const labels = { activo: t('est.activos'), pausado: t('est.pausados'), completado: t('est.completados'), abandonado: t('est.abandonados') };
+    const labels = { potencial: t('est.potenciales'), activo: t('est.activos'), pausado: t('est.pausados'), completado: t('est.completados'), abandonado: t('est.abandonados') };
     const collapsible = { completado: true, abandonado: true };
     let html = '';
     EST_ORDER.forEach(st => {

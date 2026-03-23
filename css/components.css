@@ -45,6 +45,7 @@
 
 /* ── Badges de estado ── */
 .bd{font-family:'DM Mono',monospace;font-size:.68rem;padding:.15rem .5rem;border:1px solid var(--b1);border-radius:var(--r);text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;color:var(--t3)}
+.bd-potencial{border-color:color-mix(in srgb,var(--t2) 30%,transparent);color:var(--t2);border-style:dashed}
 .bd-activo{border-color:color-mix(in srgb,var(--ac) 30%,transparent);color:var(--ac)}
 .bd-pausado{border-color:color-mix(in srgb,var(--warn) 30%,transparent);color:var(--warn)}
 .bd-completado{border-color:color-mix(in srgb,var(--ok) 30%,transparent);color:var(--ok)}

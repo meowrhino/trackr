@@ -49,12 +49,14 @@ const LANGS = {
     'btn.newClientOpt': '+ Nuevo cliente...',
 
     /* ── Constantes: Estados ── */
+    'est.potencial': 'Potencial',
     'est.activo': 'Activo',
     'est.pausado': 'Pausado',
     'est.completado': 'Completado',
     'est.abandonado': 'Abandonado',
 
     /* ── Constantes: Estados plural (para grupos) ── */
+    'est.potenciales': 'Potenciales',
     'est.activos': 'Activos',
     'est.pausados': 'Pausados',
     'est.completados': 'Completados',
@@ -462,12 +464,14 @@ const LANGS = {
     'btn.newClientOpt': '+ New client...',
 
     /* ── Constantes: Estados ── */
+    'est.potencial': 'Potential',
     'est.activo': 'Active',
     'est.pausado': 'Paused',
     'est.completado': 'Completed',
     'est.abandonado': 'Archived',
 
     /* ── Constantes: Estados plural (para grupos) ── */
+    'est.potenciales': 'Potential',
     'est.activos': 'Active',
     'est.pausados': 'Paused',
     'est.completados': 'Completed',
@@ -875,12 +879,14 @@ const LANGS = {
     'btn.newClientOpt': '+ Nou client...',
 
     /* ── Constants: Estats ── */
+    'est.potencial': 'Potencial',
     'est.activo': 'Actiu',
     'est.pausado': 'Pausat',
     'est.completado': 'Completat',
     'est.abandonado': 'Abandonat',
 
     /* ── Constants: Estats plural ── */
+    'est.potenciales': 'Potencials',
     'est.activos': 'Actius',
     'est.pausados': 'Pausats',
     'est.completados': 'Completats',
@@ -1304,7 +1310,7 @@ function setLang(code) {
 
   /* Reasignar constants globales */
   EST = {
-    activo: t('est.activo'), pausado: t('est.pausado'),
+    potencial: t('est.potencial'), activo: t('est.activo'), pausado: t('est.pausado'),
     completado: t('est.completado'), abandonado: t('est.abandonado')
   };
 
