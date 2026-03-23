@@ -236,7 +236,7 @@ const THEME_ORDER = ['lavanda', 'monokai', 'medianoche', 'cerezo', 'nord', 'sepi
  * @param {string} id — Clave del tema en THEMES
  */
 function applyTheme(id) {
-  const theme = THEMES[id];
+  const theme = THEMES[id] || THEMES.oscuro;
   if (!theme) return;
   const root = document.documentElement.style;
   /* Reset optional vars to defaults before applying */
