@@ -1,0 +1,74 @@
+/* ================================================
+ * TRACKR — Guía / Help (acordeón)
+ * Dependencias: variables.css
+ * ================================================ */
+
+.guide-section{
+  border:1px solid var(--b1);
+  border-radius:var(--r);
+  margin-bottom:.5rem;
+  overflow:hidden;
+}
+.guide-header{
+  display:flex;
+  align-items:center;
+  gap:.75rem;
+  padding:.85rem 1rem;
+  cursor:pointer;
+  transition:background var(--tr);
+}
+.guide-header:hover{background:var(--bg3)}
+.guide-icon{
+  font-size:1rem;
+  flex-shrink:0;
+  width:24px;
+  text-align:center;
+  color:var(--ac);
+}
+.guide-htext{flex:1;min-width:0}
+.guide-htitle{
+  font-size:.88rem;
+  font-weight:500;
+  color:var(--t1);
+}
+.guide-hdesc{
+  font-size:.75rem;
+  color:var(--t3);
+  margin-top:.1rem;
+}
+.guide-chev{
+  font-size:.8rem;
+  color:var(--t3);
+  flex-shrink:0;
+  transition:transform var(--tr);
+}
+.guide-body{
+  padding:0 1rem 1rem 1rem;
+  font-size:.82rem;
+  line-height:1.6;
+  color:var(--t2);
+}
+.guide-body p{margin:0 0 .6rem 0}
+.guide-body strong{color:var(--t1)}
+.guide-body code{
+  font-family:'DM Mono',monospace;
+  font-size:.78rem;
+  background:var(--bg3);
+  padding:.1rem .35rem;
+  border-radius:3px;
+  color:var(--ac);
+}
+.guide-body ul{
+  margin:0 0 .6rem 0;
+  padding-left:1.2rem;
+}
+.guide-body li{margin-bottom:.3rem}
+.guide-tip{
+  background:color-mix(in srgb,var(--ac) 8%,transparent);
+  border-left:3px solid var(--ac);
+  padding:.5rem .75rem;
+  border-radius:0 var(--r) var(--r) 0;
+  margin:.6rem 0;
+  font-size:.78rem;
+  color:var(--t2);
+}

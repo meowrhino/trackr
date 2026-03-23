@@ -19,6 +19,7 @@
 <link rel="stylesheet" href="css/calendar.css">
 <link rel="stylesheet" href="css/config.css">
 <link rel="stylesheet" href="css/gastos.css">
+<link rel="stylesheet" href="css/guide.css">
 <link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
@@ -38,6 +39,7 @@
       <div class="ni" data-v="gas" onclick="App.go('gas')"><span class="ic">€</span><span class="nt">Dineros</span></div>
       <div class="sep"></div>
       <div class="ni" data-v="cfg" onclick="App.go('cfg')"><span class="ic">⚙</span><span class="nt">Configuración</span></div>
+      <div class="ni" data-v="guide" onclick="App.go('guide')"><span class="ic">☰</span><span class="nt">Guía</span></div>
       <div class="ni" onclick="App.exp()"><span class="ic">↓</span><span class="nt">Exportar</span></div>
       <div class="ni" onclick="document.getElementById('impA').click()"><span class="ic">↑</span><span class="nt">Importar</span></div>
       <input type="file" id="impA" class="fh" accept=".json" onchange="App.imp(event)">
@@ -90,6 +92,12 @@
       <div id="cfgC"></div>
     </div>
 
+    <!-- ── Vista: Guía ── -->
+    <div id="vGuide" class="vw">
+      <h1 class="pt" id="guideTitle">Guía</h1>
+      <div id="guideC"></div>
+    </div>
+
   </main>
 </div>
 
@@ -116,6 +124,7 @@
 <script src="js/app.detail.js"></script>
 <script src="js/app.calendar.js"></script>
 <script src="js/app.config.js"></script>
+<script src="js/app.guide.js"></script>
 <script src="js/app.gastos.js"></script>
 </body>
 </html>
