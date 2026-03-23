@@ -29,7 +29,7 @@ let EST = {
 };
 
 /** Orden de agrupación en la vista de proyectos */
-const EST_ORDER = ['potencial', 'activo', 'pausado', 'completado', 'abandonado'];
+const EST_ORDER = ['activo', 'potencial', 'pausado', 'completado', 'abandonado'];
 
 /** Categorías de gastos (mutable para i18n) */
 let GASTO_CAT = {
