@@ -20,7 +20,7 @@ const App = {
   pf: 'externos',     /* filtro de proyectos */
   calY: null,         /* año del calendario */
   calM: null,         /* mes del calendario 0-11 */
-  calView: 'month',   /* 'month' | 'week' */
+  calView: 'week',   /* 'month' | 'week' */
   calWeekStart: null,  /* Date del lunes de la semana */
   infoPeriod: 'mes',  /* periodo del resumen Info: 'mes' | 'trim' | 'año' (solo actual) */
   _editPid: null,     /* ID del proyecto siendo editado (para preview facturación) */
