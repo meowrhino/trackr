@@ -42,7 +42,7 @@
         "totalFactura": 0, "netoRecibido": 0, "ivaExcepcion": "",
         "pagado": false, "fechaPago": null, "gastos": 0,
         "cobros": [],
-        "facturaNum": null, "facturaFecha": null,
+        "facturaNum": 3, "facturaFecha": "2026-03-11",
         "idiomaFactura": "en"
       },
       "horas": [

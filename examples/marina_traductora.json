@@ -41,7 +41,7 @@
         "iva": 0, "irpf": 0, "importeIva": 0, "importeIrpf": 0,
         "totalFactura": 0, "netoRecibido": 0, "ivaExcepcion": "Operación intracomunitaria exenta (art. 25 Ley 37/1992)",
         "pagado": false, "fechaPago": null, "gastos": 0,
-        "facturaNum": null, "facturaFecha": null
+        "facturaNum": 5, "facturaFecha": "2026-03-01"
       },
       "horas": [
         { "id": "h202-0001", "fecha": "2025-09-03", "tipo": "reunion", "cantidad": 1.5, "nota": "Onboarding + acceso Crowdin", "horaInicio": "15:00" },
@@ -91,7 +91,7 @@
     },
     {
       "id": "p204-s7s7-t8t8", "nombre": "Novela Mediterráneo (trad. literaria)", "clienteId": "c201-xa11-yb22", "color": "Teal",
-      "estado": "activo", "interno": false, "recurrente": false,
+      "estado": "pausado", "interno": false, "recurrente": false,
       "fechas": { "inicio": "2025-12-01", "finEstimada": "2026-04-30", "finReal": null },
       "facturacion": {
         "modo": "desde_base", "baseImponible": 4500, "total": 0, "precioHora": 0,
@@ -116,7 +116,7 @@
         { "id": "h204-0013", "fecha": "2026-02-17", "tipo": "trabajo", "cantidad": 5, "nota": "Capítulos 28-30 (fin borrador)", "horaInicio": "08:00" },
         { "id": "h204-0014", "fecha": "2026-02-24", "tipo": "trabajo", "cantidad": 3, "nota": "Revisión estilística global", "horaInicio": "09:00" }
       ],
-      "notas": "Novela italiana contemporánea, IT→ES. ~280 páginas. IVA reducido 4% por ser traducción literaria."
+      "notas": "Novela italiana contemporánea, IT→ES. ~280 páginas. IVA reducido 4% por ser traducción literaria. PAUSADO: esperando revisión editorial caps. 1-30."
     },
     {
       "id": "p205-u9u9-v0v0", "nombre": "RRSS Solera (textos)", "clienteId": "c202-xc33-yd44", "color": "RosyBrown",
