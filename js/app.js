@@ -37,8 +37,8 @@ const App = {
     if (!D.init()) D.create();
 
     /* Aplicar tema e idioma guardados */
-    applyTheme(D.d.settings.tema || 'oscuro');
-    setLang(D.d.settings.idioma || 'es');
+    applyTheme(D.d.settings.theme || D.d.settings.tema || 'oscuro');
+    setLang(D.d.settings.lang || D.d.settings.idioma || 'es');
 
     /* Cerrar modal con Escape */
     document.addEventListener('keydown', e => {
@@ -443,8 +443,8 @@ const App = {
         if (d.gastos && !Array.isArray(d.gastos)) { Toast.error(t('msg.invalidJsonGastos')); return; }
         if (!d.settings) d.settings = { defaultIva: 21, defaultIrpf: 15 };
         D.load(d); T.ev('action', 'import');
-        applyTheme(D.d.settings.tema || 'oscuro');
-        setLang(D.d.settings.idioma || 'es');
+        applyTheme(D.d.settings.theme || D.d.settings.tema || 'oscuro');
+        setLang(D.d.settings.lang || D.d.settings.idioma || 'es');
         Toast.ok(t('msg.importSuccess'));
         this.go(this.cv);
       } catch (err) { Toast.error(t('msg.importError') + err.message); }
@@ -477,8 +477,8 @@ const App = {
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
       D.load(data);
-      applyTheme(D.d.settings.tema || 'oscuro');
-      setLang(D.d.settings.idioma || 'es');
+      applyTheme(D.d.settings.theme || D.d.settings.tema || 'oscuro');
+      setLang(D.d.settings.lang || D.d.settings.idioma || 'es');
       Toast.ok(t('msg.exampleLoaded'));
       this.go('info');
     } catch (err) {

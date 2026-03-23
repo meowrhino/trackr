@@ -1,0 +1,195 @@
+{
+  "version": 2,
+  "clientes": [
+    { "id": "c301-aa11-bb22", "nombre": "Samantha Vega", "nombreCompleto": "Samantha Vega Producciones", "direccion1": "Carrer del Rec 42", "direccion2": "08003 Barcelona", "nif": "47123456B", "color": "MediumPurple" },
+    { "id": "c302-cc33-dd44", "nombre": "Sala Apolo", "nombreCompleto": "Sala Apolo S.L.", "direccion1": "Carrer Nou de la Rambla 113", "direccion2": "08004 Barcelona", "nif": "B59876543", "color": "Crimson" },
+    { "id": "c303-ee55-ff66", "nombre": "Ajuntament de Girona", "nombreCompleto": "Ajuntament de Girona — Cultura", "direccion1": "Plaça del Vi 1", "direccion2": "17004 Girona", "nif": "P1707900B", "color": "Gold" },
+    { "id": "c304-gg77-hh88", "nombre": "Festival Cruïlla", "nombreCompleto": "Festival Cruïlla S.L.", "direccion1": "Parc del Fòrum", "direccion2": "08019 Barcelona", "nif": "B66112233", "color": "OrangeRed" }
+  ],
+  "projects": [
+    {
+      "id": "p301-m1m1-n1n1", "nombre": "Producción EP Samantha", "clienteId": "c301-aa11-bb22", "color": "MediumPurple",
+      "estado": "activo", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2026-01-15", "finEstimada": "2026-04-30", "finReal": null },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 3500, "total": 0, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 735, "importeIrpf": 525,
+        "totalFactura": 3710, "netoRecibido": 2975, "ivaExcepcion": "",
+        "pagado": false, "fechaPago": null, "gastos": 0,
+        "cobros": [
+          { "id": "cb301-01", "fecha": "2026-02-01", "cantidad": 1500 }
+        ],
+        "facturaNum": 3, "facturaFecha": "2026-01-20",
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h301-01", "fecha": "2026-01-15", "tipo": "reunion", "cantidad": 2, "nota": "Preproducción: selección temas + estilo", "horaInicio": "11:00" },
+        { "id": "h301-02", "fecha": "2026-01-20", "tipo": "trabajo", "cantidad": 5, "nota": "Grabación bases track 1", "horaInicio": "10:00" },
+        { "id": "h301-03", "fecha": "2026-01-22", "tipo": "trabajo", "cantidad": 6, "nota": "Grabación bases track 2 + 3", "horaInicio": "09:00" },
+        { "id": "h301-04", "fecha": "2026-01-28", "tipo": "trabajo", "cantidad": 4, "nota": "Sesión voces track 1", "horaInicio": "15:00" },
+        { "id": "h301-05", "fecha": "2026-02-03", "tipo": "trabajo", "cantidad": 5, "nota": "Sesión voces tracks 2 y 3", "horaInicio": "10:00" },
+        { "id": "h301-06", "fecha": "2026-02-10", "tipo": "trabajo", "cantidad": 7, "nota": "Mezcla track 1 + 2", "horaInicio": "09:00" },
+        { "id": "h301-07", "fecha": "2026-02-17", "tipo": "trabajo", "cantidad": 6, "nota": "Mezcla track 3 + master previo", "horaInicio": "09:00" },
+        { "id": "h301-08", "fecha": "2026-02-24", "tipo": "reunion", "cantidad": 1.5, "nota": "Escucha con Samantha + feedback", "horaInicio": "18:00" },
+        { "id": "h301-09", "fecha": "2026-03-03", "tipo": "trabajo", "cantidad": 4, "nota": "Correcciones mezcla + stems", "horaInicio": "10:00" },
+        { "id": "h301-10", "fecha": "2026-03-10", "tipo": "trabajo", "cantidad": 3, "nota": "Master final", "horaInicio": "10:00" }
+      ],
+      "notas": "EP de 3 tracks: pop electrónico. Cobro parcial: 50% al empezar, 50% al entregar master."
+    },
+    {
+      "id": "p302-m2m2-n2n2", "nombre": "Concierto Apolo (marzo)", "clienteId": "c302-cc33-dd44", "color": "Crimson",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2026-03-01", "finEstimada": "2026-03-15", "finReal": "2026-03-15" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 800, "total": 0, "precioHora": 0,
+        "iva": 10, "irpf": 15, "importeIva": 80, "importeIrpf": 120,
+        "totalFactura": 760, "netoRecibido": 680, "ivaExcepcion": "",
+        "pagado": true, "fechaPago": "2026-03-20", "gastos": 0,
+        "cobros": [
+          { "id": "cb302-01", "fecha": "2026-03-20", "cantidad": 680 }
+        ],
+        "facturaNum": 4, "facturaFecha": "2026-03-16",
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h302-01", "fecha": "2026-03-01", "tipo": "trabajo", "cantidad": 2, "nota": "Preparación set + repertorio", "horaInicio": "11:00" },
+        { "id": "h302-02", "fecha": "2026-03-10", "tipo": "trabajo", "cantidad": 3, "nota": "Ensayo general con banda", "horaInicio": "17:00" },
+        { "id": "h302-03", "fecha": "2026-03-14", "tipo": "trabajo", "cantidad": 2, "nota": "Prueba de sonido Apolo", "horaInicio": "16:00" },
+        { "id": "h302-04", "fecha": "2026-03-15", "tipo": "trabajo", "cantidad": 4, "nota": "Concierto en vivo", "horaInicio": "20:00" }
+      ],
+      "notas": "Concierto acústico + banda. IVA reducido 10% (espectáculos en vivo)."
+    },
+    {
+      "id": "p303-m3m3-n3n3", "nombre": "Festival Cruïlla 2026", "clienteId": "c304-gg77-hh88", "color": "OrangeRed",
+      "estado": "activo", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2026-02-01", "finEstimada": "2026-07-12", "finReal": null },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 2000, "total": 0, "precioHora": 0,
+        "iva": 10, "irpf": 15, "importeIva": 200, "importeIrpf": 300,
+        "totalFactura": 1900, "netoRecibido": 1700, "ivaExcepcion": "",
+        "pagado": false, "fechaPago": null, "gastos": 0,
+        "cobros": [],
+        "facturaNum": null, "facturaFecha": null,
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h303-01", "fecha": "2026-02-05", "tipo": "reunion", "cantidad": 1, "nota": "Briefing artístico + rider técnico", "horaInicio": "12:00" },
+        { "id": "h303-02", "fecha": "2026-03-12", "tipo": "trabajo", "cantidad": 3, "nota": "Composición set festival", "horaInicio": "10:00" },
+        { "id": "h303-03", "fecha": "2026-03-18", "tipo": "trabajo", "cantidad": 2, "nota": "Ensayo repertorio festival", "horaInicio": "17:00" }
+      ],
+      "notas": "Actuación en festival de verano. IVA 10%. Pago a 30 días después del evento."
+    },
+    {
+      "id": "p304-m4m4-n4n4", "nombre": "Jornades Música Girona", "clienteId": "c303-ee55-ff66", "color": "Gold",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2025-11-01", "finEstimada": "2025-11-20", "finReal": "2025-11-18" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 600, "total": 0, "precioHora": 0,
+        "iva": 10, "irpf": 15, "importeIva": 60, "importeIrpf": 90,
+        "totalFactura": 570, "netoRecibido": 510, "ivaExcepcion": "",
+        "pagado": true, "fechaPago": "2025-12-15", "gastos": 0,
+        "cobros": [
+          { "id": "cb304-01", "fecha": "2025-12-15", "cantidad": 510 }
+        ],
+        "facturaNum": 2, "facturaFecha": "2025-11-19",
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h304-01", "fecha": "2025-11-05", "tipo": "trabajo", "cantidad": 2, "nota": "Preparación repertorio jornades", "horaInicio": "10:00" },
+        { "id": "h304-02", "fecha": "2025-11-15", "tipo": "trabajo", "cantidad": 1.5, "nota": "Ensayo + prueba sonido", "horaInicio": "16:00" },
+        { "id": "h304-03", "fecha": "2025-11-18", "tipo": "trabajo", "cantidad": 3, "nota": "Actuación + masterclass", "horaInicio": "18:00" }
+      ],
+      "notas": "Concierto + masterclass de producción musical para jóvenes."
+    },
+    {
+      "id": "p305-m5m5-n5n5", "nombre": "Producción beats (Beatstars)", "clienteId": null, "color": "SlateGray",
+      "estado": "activo", "interno": true, "recurrente": true,
+      "fechas": { "inicio": "2025-06-01", "finEstimada": null, "finReal": null },
+      "facturacion": {
+        "modo": "gratis", "baseImponible": 0, "total": 0, "precioHora": 0,
+        "iva": 0, "irpf": 0, "importeIva": 0, "importeIrpf": 0,
+        "totalFactura": 0, "netoRecibido": 0, "ivaExcepcion": "",
+        "pagado": false, "fechaPago": null, "gastos": 0,
+        "cobros": [],
+        "facturaNum": null, "facturaFecha": null,
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h305-01", "fecha": "2026-01-08", "tipo": "trabajo", "cantidad": 3, "nota": "Beat trap melódico #14", "horaInicio": "22:00" },
+        { "id": "h305-02", "fecha": "2026-01-18", "tipo": "trabajo", "cantidad": 4, "nota": "Beat afrobeat #15", "horaInicio": "21:00" },
+        { "id": "h305-03", "fecha": "2026-02-08", "tipo": "trabajo", "cantidad": 3.5, "nota": "Beat lo-fi #16", "horaInicio": "23:00" },
+        { "id": "h305-04", "fecha": "2026-03-05", "tipo": "trabajo", "cantidad": 2.5, "nota": "Beat reggaeton #17", "horaInicio": "22:00" },
+        { "id": "h305-05", "fecha": "2026-03-19", "tipo": "trabajo", "cantidad": 3, "nota": "Beat pop urbano #18", "horaInicio": "21:00" }
+      ],
+      "notas": "Catálogo propio de beats para venta online. Sin facturación directa."
+    },
+    {
+      "id": "p306-m6m6-n6n6", "nombre": "Clases producción (privadas)", "clienteId": null, "color": "LightSeaGreen",
+      "estado": "activo", "interno": false, "recurrente": true,
+      "fechas": { "inicio": "2025-10-01", "finEstimada": null, "finReal": null },
+      "facturacion": {
+        "modo": "por_hora", "baseImponible": 0, "total": 0, "precioHora": 35,
+        "iva": 21, "irpf": 15, "importeIva": 0, "importeIrpf": 0,
+        "totalFactura": 0, "netoRecibido": 0, "ivaExcepcion": "",
+        "pagado": false, "fechaPago": null, "gastos": 0,
+        "cobros": [],
+        "facturaNum": null, "facturaFecha": null,
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h306-01", "fecha": "2025-10-07", "tipo": "trabajo", "cantidad": 1.5, "nota": "Clase Ableton basics", "horaInicio": "18:00", "monto": 52.5 },
+        { "id": "h306-02", "fecha": "2025-10-21", "tipo": "trabajo", "cantidad": 1.5, "nota": "Clase síntesis + sampling", "horaInicio": "18:00", "monto": 52.5 },
+        { "id": "h306-03", "fecha": "2025-11-04", "tipo": "trabajo", "cantidad": 1.5, "nota": "Clase mezcla básica", "horaInicio": "18:00", "monto": 52.5 },
+        { "id": "h306-04", "fecha": "2025-11-18", "tipo": "trabajo", "cantidad": 1.5, "nota": "Clase mastering intro", "horaInicio": "18:00", "monto": 52.5 },
+        { "id": "h306-05", "fecha": "2025-12-02", "tipo": "trabajo", "cantidad": 1.5, "nota": "Clase sound design", "horaInicio": "18:00", "monto": 52.5 },
+        { "id": "h306-06", "fecha": "2026-01-13", "tipo": "trabajo", "cantidad": 1.5, "nota": "Clase composición electrónica", "horaInicio": "18:00", "monto": 52.5 },
+        { "id": "h306-07", "fecha": "2026-02-10", "tipo": "trabajo", "cantidad": 1.5, "nota": "Clase producción vocal", "horaInicio": "18:00", "monto": 52.5 },
+        { "id": "h306-08", "fecha": "2026-03-10", "tipo": "trabajo", "cantidad": 1.5, "nota": "Clase mezcla avanzada", "horaInicio": "18:00", "monto": 52.5 }
+      ],
+      "notas": "Clases particulares quincenales de producción musical. 35€/h."
+    }
+  ],
+  "gastos": [
+    { "id": "g301-aa01", "nombre": "Splice", "entradas": [
+      { "fecha": "2025-12-01", "cantidad": 14.99, "nota": "Mensual" },
+      { "fecha": "2026-01-01", "cantidad": 14.99, "nota": "Mensual" },
+      { "fecha": "2026-02-01", "cantidad": 14.99, "nota": "Mensual" },
+      { "fecha": "2026-03-01", "cantidad": 14.99, "nota": "Mensual" }
+    ], "color": "Orchid", "categoria": "herramientas", "periodicidad": "mensual", "desgravable": true },
+    { "id": "g302-bb02", "nombre": "Ableton Suite", "entradas": [
+      { "fecha": "2025-09-01", "cantidad": 599, "nota": "Licencia anual" }
+    ], "color": "MediumSlateBlue", "categoria": "software", "periodicidad": null, "desgravable": true },
+    { "id": "g303-cc03", "nombre": "Alquiler estudio", "entradas": [
+      { "fecha": "2025-12-01", "cantidad": 250, "nota": "" },
+      { "fecha": "2026-01-01", "cantidad": 250, "nota": "" },
+      { "fecha": "2026-02-01", "cantidad": 250, "nota": "" },
+      { "fecha": "2026-03-01", "cantidad": 250, "nota": "" }
+    ], "color": "Peru", "categoria": "alquiler_oficina", "periodicidad": "mensual", "desgravable": true },
+    { "id": "g304-dd04", "nombre": "Autónomos", "entradas": [
+      { "fecha": "2025-12-01", "cantidad": 230, "nota": "" },
+      { "fecha": "2026-01-01", "cantidad": 230, "nota": "" },
+      { "fecha": "2026-02-01", "cantidad": 230, "nota": "" },
+      { "fecha": "2026-03-01", "cantidad": 230, "nota": "" }
+    ], "color": "DarkGray", "categoria": "autonomos", "periodicidad": "mensual", "desgravable": true },
+    { "id": "g305-ee05", "nombre": "Cuerdas + púas", "entradas": [
+      { "fecha": "2026-01-15", "cantidad": 45, "nota": "Juego cuerdas Elixir + púas" },
+      { "fecha": "2026-03-08", "cantidad": 32, "nota": "Cuerdas acústica" }
+    ], "color": "SandyBrown", "categoria": "material", "periodicidad": null, "desgravable": true }
+  ],
+  "settings": {
+    "lang": "ca",
+    "theme": "cerezo",
+    "defaultIva": 21,
+    "defaultIrpf": 15,
+    "targets": {
+      "horasSemana": 25,
+      "horasMes": 100,
+      "ingresosMes": 2500
+    },
+    "nombre": "Ana Ríos",
+    "nombreCompleto": "Ana Ríos García",
+    "nif": "43987654K",
+    "direccion1": "Carrer de Verdi 78, 2n 1a",
+    "direccion2": "08012 Barcelona"
+  }
+}

@@ -58,9 +58,9 @@ Object.assign(App, {
         + `<div class="info-examples">`
         + `<div class="info-examples-title">${t('examples.title')}</div>`
         + `<div class="info-examples-grid">`
-        + `<div class="info-example-card" onclick="App.loadExample('pablo_developer')"><span class="info-example-icon">🧑‍💻</span><span class="info-example-name">Pablo</span><span class="info-example-desc">${t('examples.pablo')}</span></div>`
         + `<div class="info-example-card" onclick="App.loadExample('marina_traductora')"><span class="info-example-icon">🌍</span><span class="info-example-name">Marina</span><span class="info-example-desc">${t('examples.marina')}</span></div>`
-        + `<div class="info-example-card" onclick="App.loadExample('laura_disenadora')"><span class="info-example-icon">🎨</span><span class="info-example-name">Laura</span><span class="info-example-desc">${t('examples.laura')}</span></div>`
+        + `<div class="info-example-card" onclick="App.loadExample('ana_musica')"><span class="info-example-icon">🎵</span><span class="info-example-name">Ana</span><span class="info-example-desc">${t('examples.ana')}</span></div>`
+        + `<div class="info-example-card" onclick="App.loadExample('dani_formador')"><span class="info-example-icon">🎓</span><span class="info-example-name">Dani</span><span class="info-example-desc">${t('examples.dani')}</span></div>`
         + `</div></div>`
         + `</div>`;
       mainEl.innerHTML = '';

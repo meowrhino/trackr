@@ -1,0 +1,183 @@
+{
+  "version": 2,
+  "clientes": [
+    { "id": "c401-aa11-bb22", "nombre": "Thoughtworks", "nombreCompleto": "Thoughtworks Spain S.L.", "direccion1": "Carrer de Tànger 98", "direccion2": "08018 Barcelona", "nif": "B87654321", "color": "CornflowerBlue" },
+    { "id": "c402-cc33-dd44", "nombre": "Glovo", "nombreCompleto": "Glovoapp 23 S.L.", "direccion1": "Carrer de Pujades 94", "direccion2": "08005 Barcelona", "nif": "B66778899", "color": "DarkOrange" },
+    { "id": "c403-ee55-ff66", "nombre": "Barcelona Activa", "nombreCompleto": "Barcelona Activa S.A.", "direccion1": "Carrer de Llacuna 162", "direccion2": "08018 Barcelona", "nif": "A58295296", "color": "MediumSeaGreen" },
+    { "id": "c404-gg77-hh88", "nombre": "UPC", "nombreCompleto": "Universitat Politècnica de Catalunya", "direccion1": "Carrer de Jordi Girona 1-3", "direccion2": "08034 Barcelona", "nif": "Q0818003F", "color": "DarkSlateBlue" }
+  ],
+  "projects": [
+    {
+      "id": "p401-m1m1-n1n1", "nombre": "React Advanced — Thoughtworks", "clienteId": "c401-aa11-bb22", "color": "CornflowerBlue",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2025-10-01", "finEstimada": "2025-10-31", "finReal": "2025-10-28" },
+      "facturacion": {
+        "modo": "desde_total", "baseImponible": 0, "total": 4200, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 0, "importeIrpf": 0,
+        "totalFactura": 4200, "netoRecibido": 0, "ivaExcepcion": "",
+        "pagado": true, "fechaPago": "2025-11-15", "gastos": 0,
+        "cobros": [
+          { "id": "cb401-01", "fecha": "2025-11-15", "cantidad": 3396.23 }
+        ],
+        "facturaNum": 1, "facturaFecha": "2025-10-29",
+        "idiomaFactura": "en"
+      },
+      "horas": [
+        { "id": "h401-01", "fecha": "2025-10-01", "tipo": "trabajo", "cantidad": 8, "nota": "Prepare curriculum + exercises", "horaInicio": "09:00" },
+        { "id": "h401-02", "fecha": "2025-10-06", "tipo": "trabajo", "cantidad": 6, "nota": "Build demo app + slides day 1", "horaInicio": "09:00" },
+        { "id": "h401-03", "fecha": "2025-10-08", "tipo": "trabajo", "cantidad": 5, "nota": "Slides day 2 + code challenges", "horaInicio": "10:00" },
+        { "id": "h401-04", "fecha": "2025-10-14", "tipo": "trabajo", "cantidad": 8, "nota": "Workshop Day 1 (hooks, patterns, perf)", "horaInicio": "09:00" },
+        { "id": "h401-05", "fecha": "2025-10-15", "tipo": "trabajo", "cantidad": 8, "nota": "Workshop Day 2 (testing, arch, SSR)", "horaInicio": "09:00" },
+        { "id": "h401-06", "fecha": "2025-10-21", "tipo": "trabajo", "cantidad": 3, "nota": "Follow-up Q&A session + resources", "horaInicio": "15:00" }
+      ],
+      "notas": "2-day intensive React workshop for 15 senior devs. Includes hands-on exercises."
+    },
+    {
+      "id": "p402-m2m2-n2n2", "nombre": "Agile for PMs — Glovo", "clienteId": "c402-cc33-dd44", "color": "DarkOrange",
+      "estado": "activo", "interno": false, "recurrente": true,
+      "fechas": { "inicio": "2026-01-15", "finEstimada": "2026-06-30", "finReal": null },
+      "facturacion": {
+        "modo": "por_hora", "baseImponible": 0, "total": 0, "precioHora": 90,
+        "iva": 21, "irpf": 15, "importeIva": 0, "importeIrpf": 0,
+        "totalFactura": 0, "netoRecibido": 0, "ivaExcepcion": "",
+        "pagado": false, "fechaPago": null, "gastos": 0,
+        "cobros": [],
+        "facturaNum": null, "facturaFecha": null,
+        "idiomaFactura": "en"
+      },
+      "horas": [
+        { "id": "h402-01", "fecha": "2026-01-20", "tipo": "reunion", "cantidad": 1.5, "nota": "Needs assessment with Head of Product", "horaInicio": "10:00" },
+        { "id": "h402-02", "fecha": "2026-01-27", "tipo": "trabajo", "cantidad": 4, "nota": "Session 1: Scrum fundamentals + Kanban", "horaInicio": "09:00", "monto": 360 },
+        { "id": "h402-03", "fecha": "2026-02-10", "tipo": "trabajo", "cantidad": 4, "nota": "Session 2: User stories + estimation", "horaInicio": "09:00", "monto": 360 },
+        { "id": "h402-04", "fecha": "2026-02-24", "tipo": "trabajo", "cantidad": 4, "nota": "Session 3: Sprint planning + retros", "horaInicio": "09:00", "monto": 360 },
+        { "id": "h402-05", "fecha": "2026-03-10", "tipo": "trabajo", "cantidad": 4, "nota": "Session 4: Metrics + continuous improvement", "horaInicio": "09:00", "monto": 360 },
+        { "id": "h402-06", "fecha": "2026-03-17", "tipo": "reunion", "cantidad": 1, "nota": "Mid-program review with stakeholders", "horaInicio": "11:00" }
+      ],
+      "notas": "Monthly agile coaching sessions for Glovo product managers. 6-month program."
+    },
+    {
+      "id": "p403-m3m3-n3n3", "nombre": "Meetup: Intro to TypeScript", "clienteId": null, "color": "Teal",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2026-02-01", "finEstimada": "2026-02-20", "finReal": "2026-02-20" },
+      "facturacion": {
+        "modo": "gratis", "baseImponible": 0, "total": 0, "precioHora": 0,
+        "iva": 0, "irpf": 0, "importeIva": 0, "importeIrpf": 0,
+        "totalFactura": 0, "netoRecibido": 0, "ivaExcepcion": "",
+        "pagado": false, "fechaPago": null, "gastos": 0,
+        "cobros": [],
+        "facturaNum": null, "facturaFecha": null,
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h403-01", "fecha": "2026-02-15", "tipo": "trabajo", "cantidad": 3, "nota": "Prepare slides + live coding demo", "horaInicio": "20:00" },
+        { "id": "h403-02", "fecha": "2026-02-20", "tipo": "trabajo", "cantidad": 2.5, "nota": "Meetup talk (BarcelonaJS)", "horaInicio": "19:00" }
+      ],
+      "notas": "Free community talk at BarcelonaJS meetup. Good for networking + brand."
+    },
+    {
+      "id": "p404-m4m4-n4n4", "nombre": "Workshop UPC (guest lecture)", "clienteId": "c404-gg77-hh88", "color": "DarkSlateBlue",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2026-03-01", "finEstimada": "2026-03-07", "finReal": "2026-03-07" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 400, "total": 0, "precioHora": 0,
+        "iva": 0, "irpf": 15, "importeIva": 0, "importeIrpf": 60,
+        "totalFactura": 340, "netoRecibido": 340, "ivaExcepcion": "Formación exenta de IVA (art. 20.1.9 LIVA)",
+        "pagado": true, "fechaPago": "2026-03-20", "gastos": 0,
+        "cobros": [
+          { "id": "cb404-01", "fecha": "2026-03-20", "cantidad": 340 }
+        ],
+        "facturaNum": 2, "facturaFecha": "2026-03-08",
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h404-01", "fecha": "2026-03-03", "tipo": "trabajo", "cantidad": 2, "nota": "Prepare case study + slides", "horaInicio": "14:00" },
+        { "id": "h404-02", "fecha": "2026-03-07", "tipo": "trabajo", "cantidad": 3, "nota": "Guest lecture: Real-world React architecture", "horaInicio": "10:00" }
+      ],
+      "notas": "Guest lecture at UPC master's program. IVA-exempt (educational)."
+    },
+    {
+      "id": "p405-m5m5-n5n5", "nombre": "Taller Barcelona Activa", "clienteId": "c403-ee55-ff66", "color": "MediumSeaGreen",
+      "estado": "activo", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2026-03-15", "finEstimada": "2026-04-15", "finReal": null },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 1800, "total": 0, "precioHora": 0,
+        "iva": 0, "irpf": 15, "importeIva": 0, "importeIrpf": 270,
+        "totalFactura": 1530, "netoRecibido": 1530, "ivaExcepcion": "Formación exenta de IVA (art. 20.1.9 LIVA)",
+        "pagado": false, "fechaPago": null, "gastos": 0,
+        "cobros": [],
+        "facturaNum": null, "facturaFecha": null,
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h405-01", "fecha": "2026-03-15", "tipo": "trabajo", "cantidad": 5, "nota": "Curriculum design + exercise prep", "horaInicio": "09:00" },
+        { "id": "h405-02", "fecha": "2026-03-18", "tipo": "trabajo", "cantidad": 4, "nota": "Session 1: HTML/CSS/JS basics", "horaInicio": "10:00" },
+        { "id": "h405-03", "fecha": "2026-03-20", "tipo": "trabajo", "cantidad": 4, "nota": "Session 2: React intro + components", "horaInicio": "10:00" }
+      ],
+      "notas": "4-session web dev bootcamp for job seekers. Public funding, IVA exempt."
+    },
+    {
+      "id": "p406-m6m6-n6n6", "nombre": "Online course (Udemy)", "clienteId": null, "color": "Goldenrod",
+      "estado": "activo", "interno": true, "recurrente": true,
+      "fechas": { "inicio": "2025-08-01", "finEstimada": null, "finReal": null },
+      "facturacion": {
+        "modo": "gratis", "baseImponible": 0, "total": 0, "precioHora": 0,
+        "iva": 0, "irpf": 0, "importeIva": 0, "importeIrpf": 0,
+        "totalFactura": 0, "netoRecibido": 0, "ivaExcepcion": "",
+        "pagado": false, "fechaPago": null, "gastos": 0,
+        "cobros": [],
+        "facturaNum": null, "facturaFecha": null,
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h406-01", "fecha": "2025-12-10", "tipo": "trabajo", "cantidad": 6, "nota": "Record section 3: State management", "horaInicio": "09:00" },
+        { "id": "h406-02", "fecha": "2025-12-18", "tipo": "trabajo", "cantidad": 4, "nota": "Edit + subtitles section 3", "horaInicio": "10:00" },
+        { "id": "h406-03", "fecha": "2026-01-10", "tipo": "trabajo", "cantidad": 5, "nota": "Record section 4: API integration", "horaInicio": "09:00" },
+        { "id": "h406-04", "fecha": "2026-02-05", "tipo": "trabajo", "cantidad": 3, "nota": "Q&A responses + community", "horaInicio": "20:00" },
+        { "id": "h406-05", "fecha": "2026-03-12", "tipo": "trabajo", "cantidad": 5, "nota": "Record section 5: Testing", "horaInicio": "09:00" }
+      ],
+      "notas": "\"Modern React from Zero\" — Udemy course. Revenue tracked outside Trackr (Udemy pays monthly)."
+    }
+  ],
+  "gastos": [
+    { "id": "g401-aa01", "nombre": "Notion", "entradas": [
+      { "fecha": "2026-01-01", "cantidad": 8, "nota": "Monthly" },
+      { "fecha": "2026-02-01", "cantidad": 8, "nota": "Monthly" },
+      { "fecha": "2026-03-01", "cantidad": 8, "nota": "Monthly" }
+    ], "color": "DimGray", "categoria": "herramientas", "periodicidad": "mensual", "desgravable": true },
+    { "id": "g402-bb02", "nombre": "Loom Pro", "entradas": [
+      { "fecha": "2026-01-01", "cantidad": 12.50, "nota": "" },
+      { "fecha": "2026-02-01", "cantidad": 12.50, "nota": "" },
+      { "fecha": "2026-03-01", "cantidad": 12.50, "nota": "" }
+    ], "color": "MediumOrchid", "categoria": "herramientas", "periodicidad": "mensual", "desgravable": true },
+    { "id": "g403-cc03", "nombre": "Autonomos", "entradas": [
+      { "fecha": "2025-12-01", "cantidad": 230, "nota": "" },
+      { "fecha": "2026-01-01", "cantidad": 230, "nota": "" },
+      { "fecha": "2026-02-01", "cantidad": 230, "nota": "" },
+      { "fecha": "2026-03-01", "cantidad": 230, "nota": "" }
+    ], "color": "DarkGray", "categoria": "autonomos", "periodicidad": "mensual", "desgravable": true },
+    { "id": "g404-dd04", "nombre": "Coworking (MOB)", "entradas": [
+      { "fecha": "2026-01-01", "cantidad": 180, "nota": "Desk + meeting room" },
+      { "fecha": "2026-02-01", "cantidad": 180, "nota": "" },
+      { "fecha": "2026-03-01", "cantidad": 180, "nota": "" }
+    ], "color": "Sienna", "categoria": "alquiler_oficina", "periodicidad": "mensual", "desgravable": true },
+    { "id": "g405-ee05", "nombre": "Screenflow license", "entradas": [
+      { "fecha": "2025-09-15", "cantidad": 149, "nota": "Screen recording for courses" }
+    ], "color": "SteelBlue", "categoria": "software", "periodicidad": null, "desgravable": true }
+  ],
+  "settings": {
+    "lang": "en",
+    "theme": "nord",
+    "defaultIva": 21,
+    "defaultIrpf": 15,
+    "targets": {
+      "horasSemana": 30,
+      "horasMes": 120,
+      "ingresosMes": 4000
+    },
+    "nombre": "Dani Ortega",
+    "nombreCompleto": "Daniel Ortega Martín",
+    "nif": "41876543J",
+    "direccion1": "Carrer de Bailèn 55, 4t 2a",
+    "direccion2": "08010 Barcelona"
+  }
+}

@@ -232,9 +232,9 @@ const LANGS = {
 
     /* ── Ejemplos ── */
     'examples.title': 'Probar con datos de ejemplo',
-    'examples.pablo': 'Desarrollador full-stack',
     'examples.marina': 'Traductora freelance',
-    'examples.laura': 'Diseñadora gráfica',
+    'examples.ana': 'Música y productora',
+    'examples.dani': 'Formador tech',
 
     /* ── Proyectos (Dash) ── */
     'dash.external': 'Externos',
@@ -645,9 +645,9 @@ const LANGS = {
 
     /* ── Ejemplos ── */
     'examples.title': 'Try with sample data',
-    'examples.pablo': 'Full-stack developer',
     'examples.marina': 'Freelance translator',
-    'examples.laura': 'Graphic designer',
+    'examples.ana': 'Musician & producer',
+    'examples.dani': 'Tech trainer',
 
     /* ── Proyectos (Dash) ── */
     'dash.external': 'External',
@@ -1058,9 +1058,9 @@ const LANGS = {
 
     /* ── Exemples ── */
     'examples.title': 'Provar amb dades d\'exemple',
-    'examples.pablo': 'Desenvolupador full-stack',
     'examples.marina': 'Traductora freelance',
-    'examples.laura': 'Dissenyadora gràfica',
+    'examples.ana': 'Música i productora',
+    'examples.dani': 'Formador tech',
 
     /* ── Projectes (Dash) ── */
     'dash.external': 'Externs',
