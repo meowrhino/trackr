@@ -24,63 +24,15 @@
  */
 const THEMES = {
 
-  /* ── Oscuro: carbón frío + destellos dorados (inspo: becasDigMeow dark) ── */
-  oscuro: {
-    label: 'Oscuro',
+  /* ── Lavanda: noche púrpura suave + violeta y oro (inspo: light rain) ── */
+  lavanda: {
+    label: 'Lavanda',
     vars: {
-      bg: '#101216', bg2: '#181c22', bg3: '#20242c', bg4: '#282e36',
-      b1: '#262c34', b2: '#363e48', b3: '#48505c',
-      t1: '#d0d4dc', t2: '#7c8490', t3: '#586068',
-      ok: '#e8b84c', warn: '#e07840', bad: '#d0486a',
-      ac: '#2a7ca8', r: '3px', sh: 'none'
-    }
-  },
-
-  /* ── Claro: papel viejo + tinta y terracota (inspo: fog/pottery) ── */
-  claro: {
-    label: 'Claro',
-    vars: {
-      bg: '#eee8dc', bg2: '#f6f0e4', bg3: '#e4dccf', bg4: '#d8cfc0',
-      b1: '#ccc2b0', b2: '#b8ae9c', b3: '#9e9484',
-      t1: '#1e1610', t2: '#584e3e', t3: '#8a8070',
-      ok: '#3a8856', warn: '#c07018', bad: '#b83838',
-      ac: '#a85028', r: '4px', sh: '0 1px 3px rgba(0,0,0,.06)'
-    }
-  },
-
-  /* ── Medianoche: espacio profundo + estrellas eléctricas (inspo: storm) ── */
-  medianoche: {
-    label: 'Medianoche',
-    vars: {
-      bg: '#080c1c', bg2: '#0e142a', bg3: '#161e3a', bg4: '#1e284a',
-      b1: '#1a2644', b2: '#283a64', b3: '#384c78',
-      t1: '#c8d0e4', t2: '#6878a4', t3: '#44587c',
-      ok: '#50c0e8', warn: '#ecc050', bad: '#d05880',
-      ac: '#4854c8', r: '3px', sh: 'none'
-    }
-  },
-
-  /* ── Sepia: mapa del tesoro + oro y cobre (inspo: vintage treasure) ── */
-  sepia: {
-    label: 'Sepia',
-    vars: {
-      bg: '#1c1610', bg2: '#261e14', bg3: '#322820', bg4: '#3c3228',
-      b1: '#3c3020', b2: '#544838', b3: '#645a48',
-      t1: '#e0c8a0', t2: '#a09068', t3: '#6c5e42',
-      ok: '#dab050', warn: '#d88838', bad: '#c45848',
-      ac: '#b07828', r: '3px', sh: 'none'
-    }
-  },
-
-  /* ── Nord: aurora boreal sobre polar night (canon Nord + más vida) ── */
-  nord: {
-    label: 'Nord',
-    vars: {
-      bg: '#2e3440', bg2: '#3b4252', bg3: '#434c5e', bg4: '#4c566a',
-      b1: '#434c5e', b2: '#4c566a', b3: '#5c6880',
-      t1: '#eceff4', t2: '#88c0d0', t3: '#6a90ac',
-      ok: '#a3be8c', warn: '#ebcb8b', bad: '#d07078',
-      ac: '#5e81ac', r: '3px', sh: 'none'
+      bg: '#141018', bg2: '#1a1520', bg3: '#221c2a', bg4: '#2a2434',
+      b1: '#261e30', b2: '#362e42', b3: '#463e52',
+      t1: '#d0c8dc', t2: '#8a7ea0', t3: '#665480',
+      ok: '#a088d0', warn: '#d4a84c', bad: '#c85a6a',
+      ac: '#7a50b0', r: '5px', sh: 'none'
     }
   },
 
@@ -96,87 +48,15 @@ const THEMES = {
     }
   },
 
-  /* ── Pizarra: tormenta eléctrica + relámpagos (inspo: dark cloud) ── */
-  pizarra: {
-    label: 'Pizarra',
+  /* ── Medianoche: espacio profundo + estrellas eléctricas (inspo: storm) ── */
+  medianoche: {
+    label: 'Medianoche',
     vars: {
-      bg: '#40484c', bg2: '#4c5458', bg3: '#384044', bg4: '#30383c',
-      b1: '#38424a', b2: '#586068', b3: '#6c7880',
-      t1: '#e4e8ec', t2: '#a4acb8', t3: '#9098a8',
-      ok: '#50d0c0', warn: '#ecc040', bad: '#f88898',
-      ac: '#4088b8', r: '3px', sh: 'none'
-    }
-  },
-
-  /* ── Ocaso: hora mágica + cielo en llamas (inspo: heat + sunset) ── */
-  ocaso: {
-    label: 'Ocaso',
-    vars: {
-      bg: '#4c3424', bg2: '#5c4030', bg3: '#422c1c', bg4: '#382414',
-      b1: '#483424', b2: '#685444', b3: '#806858',
-      t1: '#f4dcc4', t2: '#c0a484', t3: '#988068',
-      ok: '#ecb848', warn: '#e87840', bad: '#f06868',
-      ac: '#c86028', r: '4px', sh: 'none'
-    }
-  },
-
-  /* ── Arena: oasis en el desierto + cactus y arcilla ── */
-  arena: {
-    label: 'Arena',
-    vars: {
-      bg: '#ece0c8', bg2: '#f4ecd8', bg3: '#e0d4bc', bg4: '#d4c8b0',
-      b1: '#c8bca4', b2: '#b0a48c', b3: '#988c74',
-      t1: '#282010', t2: '#5c4c38', t3: '#887c64',
-      ok: '#508840', warn: '#b07018', bad: '#b84030',
-      ac: '#8c5424', r: '4px', sh: '0 1px 3px rgba(0,0,0,.06)'
-    }
-  },
-
-  /* ── Hacker: fósforo verde CRT + glitch eléctrico ── */
-  hacker: {
-    label: 'Hacker',
-    vars: {
-      bg: '#040804', bg2: '#0a100a', bg3: '#101810', bg4: '#162016',
-      b1: '#122012', b2: '#1c2e1c', b3: '#283c28',
-      t1: '#30d030', t2: '#1c8c1c', t3: '#186818',
-      ok: '#30d030', warn: '#c8d030', bad: '#d03030',
-      ac: '#1a7a1a', r: '1px', sh: 'none'
-    }
-  },
-
-  /* ── Lavanda: noche púrpura suave + violeta y oro (inspo: light rain) ── */
-  lavanda: {
-    label: 'Lavanda',
-    vars: {
-      bg: '#141018', bg2: '#1a1520', bg3: '#221c2a', bg4: '#2a2434',
-      b1: '#261e30', b2: '#362e42', b3: '#463e52',
-      t1: '#d0c8dc', t2: '#8a7ea0', t3: '#665480',
-      ok: '#a088d0', warn: '#d4a84c', bad: '#c85a6a',
-      ac: '#7a50b0', r: '5px', sh: 'none'
-    }
-  },
-
-  /* ── Tinta: brutal b/w + neón rojo/verde (inspo: noir + neon signs) ── */
-  tinta: {
-    label: 'Tinta',
-    vars: {
-      bg: '#000000', bg2: '#080808', bg3: '#141414', bg4: '#1c1c1c',
-      b1: '#1e1e1e', b2: '#303030', b3: '#484848',
-      t1: '#f0f0f0', t2: '#a0a0a0', t3: '#606060',
-      ok: '#00e070', warn: '#f0c000', bad: '#f02040',
-      ac: '#d01830', r: '1px', sh: 'none'
-    }
-  },
-
-  /* ── Bosque: selva nocturna + luciérnagas y ámbar (inspo: rain theme) ── */
-  bosque: {
-    label: 'Bosque',
-    vars: {
-      bg: '#0c1410', bg2: '#121c14', bg3: '#1a261c', bg4: '#223026',
-      b1: '#1e2c20', b2: '#2c3e30', b3: '#3c5240',
-      t1: '#c8dcc8', t2: '#70a478', t3: '#4c6450',
-      ok: '#48d880', warn: '#e8a838', bad: '#d06040',
-      ac: '#2e9858', r: '4px', sh: 'none'
+      bg: '#080c1c', bg2: '#0e142a', bg3: '#161e3a', bg4: '#1e284a',
+      b1: '#1a2644', b2: '#283a64', b3: '#384c78',
+      t1: '#c8d0e4', t2: '#6878a4', t3: '#44587c',
+      ok: '#50c0e8', warn: '#ecc050', bad: '#d05880',
+      ac: '#4854c8', r: '3px', sh: 'none'
     }
   },
 
@@ -192,7 +72,119 @@ const THEMES = {
     }
   },
 
-  /* ── Nube: cielo lluvioso + rayos de sol entre nubes ── */
+  /* ── Nord: aurora boreal sobre polar night (canon Nord + más vida) ── */
+  nord: {
+    label: 'Nord',
+    vars: {
+      bg: '#2e3440', bg2: '#3b4252', bg3: '#434c5e', bg4: '#4c566a',
+      b1: '#434c5e', b2: '#4c566a', b3: '#5c6880',
+      t1: '#eceff4', t2: '#88c0d0', t3: '#6a90ac',
+      ok: '#a3be8c', warn: '#ebcb8b', bad: '#d07078',
+      ac: '#5e81ac', r: '3px', sh: 'none'
+    }
+  },
+
+  /* ── Sepia: mapa del tesoro + oro y cobre (inspo: vintage treasure) ── */
+  sepia: {
+    label: 'Sepia',
+    vars: {
+      bg: '#1c1610', bg2: '#261e14', bg3: '#322820', bg4: '#3c3228',
+      b1: '#3c3020', b2: '#544838', b3: '#645a48',
+      t1: '#e0c8a0', t2: '#a09068', t3: '#6c5e42',
+      ok: '#dab050', warn: '#d88838', bad: '#c45848',
+      ac: '#b07828', r: '3px', sh: 'none'
+    }
+  },
+
+  /* ── Tinta: brutal b/w + neón rojo/verde (inspo: noir + neon signs) ── */
+  tinta: {
+    label: 'Tinta',
+    vars: {
+      bg: '#000000', bg2: '#080808', bg3: '#141414', bg4: '#1c1c1c',
+      b1: '#1e1e1e', b2: '#303030', b3: '#484848',
+      t1: '#f0f0f0', t2: '#a0a0a0', t3: '#606060',
+      ok: '#00e070', warn: '#f0c000', bad: '#f02040',
+      ac: '#d01830', r: '1px', sh: 'none'
+    }
+  },
+
+  /* ── Oscuro: carbón frío + destellos dorados (inspo: becasDigMeow dark) ── */
+  oscuro: {
+    label: 'Oscuro',
+    vars: {
+      bg: '#101216', bg2: '#181c22', bg3: '#20242c', bg4: '#282e36',
+      b1: '#262c34', b2: '#363e48', b3: '#48505c',
+      t1: '#d0d4dc', t2: '#7c8490', t3: '#586068',
+      ok: '#e8b84c', warn: '#e07840', bad: '#d0486a',
+      ac: '#2a7ca8', r: '3px', sh: 'none'
+    }
+  }
+
+  /* ════════════════════════════════════════════════
+   *  TEMAS ARCHIVADOS — guardados por si se reactivan
+   * ════════════════════════════════════════════════ */
+
+  /*
+  hacker: {
+    label: 'Hacker',
+    vars: {
+      bg: '#040804', bg2: '#0a100a', bg3: '#101810', bg4: '#162016',
+      b1: '#122012', b2: '#1c2e1c', b3: '#283c28',
+      t1: '#30d030', t2: '#1c8c1c', t3: '#186818',
+      ok: '#30d030', warn: '#c8d030', bad: '#d03030',
+      ac: '#1a7a1a', r: '1px', sh: 'none'
+    }
+  },
+  bosque: {
+    label: 'Bosque',
+    vars: {
+      bg: '#0c1410', bg2: '#121c14', bg3: '#1a261c', bg4: '#223026',
+      b1: '#1e2c20', b2: '#2c3e30', b3: '#3c5240',
+      t1: '#c8dcc8', t2: '#70a478', t3: '#4c6450',
+      ok: '#48d880', warn: '#e8a838', bad: '#d06040',
+      ac: '#2e9858', r: '4px', sh: 'none'
+    }
+  },
+  claro: {
+    label: 'Claro',
+    vars: {
+      bg: '#eee8dc', bg2: '#f6f0e4', bg3: '#e4dccf', bg4: '#d8cfc0',
+      b1: '#ccc2b0', b2: '#b8ae9c', b3: '#9e9484',
+      t1: '#1e1610', t2: '#584e3e', t3: '#8a8070',
+      ok: '#3a8856', warn: '#c07018', bad: '#b83838',
+      ac: '#a85028', r: '4px', sh: '0 1px 3px rgba(0,0,0,.06)'
+    }
+  },
+  pizarra: {
+    label: 'Pizarra',
+    vars: {
+      bg: '#40484c', bg2: '#4c5458', bg3: '#384044', bg4: '#30383c',
+      b1: '#38424a', b2: '#586068', b3: '#6c7880',
+      t1: '#e4e8ec', t2: '#a4acb8', t3: '#9098a8',
+      ok: '#50d0c0', warn: '#ecc040', bad: '#f88898',
+      ac: '#4088b8', r: '3px', sh: 'none'
+    }
+  },
+  ocaso: {
+    label: 'Ocaso',
+    vars: {
+      bg: '#4c3424', bg2: '#5c4030', bg3: '#422c1c', bg4: '#382414',
+      b1: '#483424', b2: '#685444', b3: '#806858',
+      t1: '#f4dcc4', t2: '#c0a484', t3: '#988068',
+      ok: '#ecb848', warn: '#e87840', bad: '#f06868',
+      ac: '#c86028', r: '4px', sh: 'none'
+    }
+  },
+  arena: {
+    label: 'Arena',
+    vars: {
+      bg: '#ece0c8', bg2: '#f4ecd8', bg3: '#e0d4bc', bg4: '#d4c8b0',
+      b1: '#c8bca4', b2: '#b0a48c', b3: '#988c74',
+      t1: '#282010', t2: '#5c4c38', t3: '#887c64',
+      ok: '#508840', warn: '#b07018', bad: '#b84030',
+      ac: '#8c5424', r: '4px', sh: '0 1px 3px rgba(0,0,0,.06)'
+    }
+  },
   nube: {
     label: 'Nube',
     vars: {
@@ -203,8 +195,6 @@ const THEMES = {
       ac: '#2860a8', r: '5px', sh: '0 1px 3px rgba(0,0,0,.05)'
     }
   },
-
-  /* ── Melocotón: atardecer mediterráneo + coral y buganvilla ── */
   melocoton: {
     label: 'Melocotón',
     vars: {
@@ -215,8 +205,6 @@ const THEMES = {
       ac: '#c85038', r: '6px', sh: '0 1px 3px rgba(0,0,0,.06)'
     }
   },
-
-  /* ── Menta: agua turquesa + espuma y coral (inspo: snow theme) ── */
   menta: {
     label: 'Menta',
     vars: {
@@ -227,8 +215,6 @@ const THEMES = {
       ac: '#18786c', r: '5px', sh: '0 1px 3px rgba(0,0,0,.05)'
     }
   },
-
-  /* ── Sol: mañana dorada + miel, ámbar y cielo cálido ── */
   sol: {
     label: 'Sol',
     vars: {
@@ -239,10 +225,11 @@ const THEMES = {
       ac: '#98680c', r: '4px', sh: '0 1px 3px rgba(0,0,0,.06)'
     }
   }
+  */
 };
 
 /** Orden de temas en el selector */
-const THEME_ORDER = ['oscuro', 'claro', 'medianoche', 'sepia', 'nord', 'monokai', 'pizarra', 'ocaso', 'arena', 'hacker', 'lavanda', 'tinta', 'bosque', 'cerezo', 'nube', 'melocoton', 'menta', 'sol'];
+const THEME_ORDER = ['lavanda', 'monokai', 'medianoche', 'cerezo', 'nord', 'sepia', 'tinta', 'oscuro'];
 
 /**
  * Aplica un tema al documento.
