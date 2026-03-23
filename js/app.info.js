@@ -100,7 +100,8 @@ Object.assign(App, {
           type: 'hora', fecha: h.fecha, sort: h.fecha + (h.horaInicio || '99:99'),
           icon: h.tipo === 'trabajo' ? '💻' : '👥',
           text: `${h.cantidad}h — ${p.nombre}`,
-          note: h.nota || '', color: hex
+          note: h.nota || '', color: hex,
+          pid: p.id, hid: h.id
         });
       });
     });
@@ -133,7 +134,9 @@ Object.assign(App, {
           if (lastDate) actHtml += `<div class="info-act-sep"></div>`;
           lastDate = a.fecha;
         }
-        actHtml += `<div class="hr" style="border-left-color:${a.color}">`
+        const click = a.pid ? ` onclick="App.eHour('${a.pid}','${a.hid}')" style="border-left-color:${a.color};cursor:pointer"`
+          : ` style="border-left-color:${a.color}"`;
+        actHtml += `<div class="hr"${click}>`
           + `<span class="hr-t">${a.icon}</span>`
           + `<span class="hr-d">${dateLabel}</span>`
           + `<span style="color:var(--t1);font-size:.82rem;flex:1">${esc(a.text)}</span>`
