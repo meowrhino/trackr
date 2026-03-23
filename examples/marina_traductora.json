@@ -278,6 +278,6 @@
     "defaultIrpf": 15,
     "targets": { "horasMes": 100, "ingresosMes": 3000, "horasSemana": 25 },
     "nextFacturaNum": 4,
-    "tema": "sepia"
+    "tema": "monokai"
   }
 }

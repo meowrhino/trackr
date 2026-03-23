@@ -58,9 +58,9 @@ Object.assign(App, {
         + `<div class="info-examples">`
         + `<div class="info-examples-title">${t('examples.title')}</div>`
         + `<div class="info-examples-grid">`
-        + `<div class="info-example-card" onclick="App.loadExample('marina_traductora')"><span class="info-example-icon">🌍</span><span class="info-example-name">Marina</span><span class="info-example-desc">${t('examples.marina')}</span></div>`
-        + `<div class="info-example-card" onclick="App.loadExample('ana_musica')"><span class="info-example-icon">🎵</span><span class="info-example-name">Ana</span><span class="info-example-desc">${t('examples.ana')}</span></div>`
-        + `<div class="info-example-card" onclick="App.loadExample('dani_formador')"><span class="info-example-icon">🎓</span><span class="info-example-name">Dani</span><span class="info-example-desc">${t('examples.dani')}</span></div>`
+        + `<div class="info-example-card" onclick="App.loadExample('marina_traductora')"><span class="info-example-icon">🌍</span><span class="info-example-name">Marina</span><span class="info-example-desc">Traductora freelance</span><span class="info-example-lang">ES</span></div>`
+        + `<div class="info-example-card" onclick="App.loadExample('ana_musica')"><span class="info-example-icon">🎵</span><span class="info-example-name">Ana</span><span class="info-example-desc">Música i productora</span><span class="info-example-lang">CA</span></div>`
+        + `<div class="info-example-card" onclick="App.loadExample('dani_formador')"><span class="info-example-icon">🎓</span><span class="info-example-name">Dani</span><span class="info-example-desc">Tech trainer</span><span class="info-example-lang">EN</span></div>`
         + `</div></div>`
         + `</div>`;
       mainEl.innerHTML = '';
@@ -139,7 +139,7 @@ Object.assign(App, {
         actHtml += `<div class="hr"${click}>`
           + `<span class="hr-t">${a.icon}</span>`
           + `<span class="hr-d">${dateLabel}</span>`
-          + `<span style="color:var(--t1);font-size:.82rem;flex:1">${esc(a.text)}</span>`
+          + `<span style="color:var(--t1);font-size:.82rem;flex:0 0 auto;white-space:nowrap">${esc(a.text)}</span>`
           + (a.note ? `<span class="hr-n">${esc(a.note)}</span>` : '')
           + `</div>`;
       });

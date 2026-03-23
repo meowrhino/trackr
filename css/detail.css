@@ -20,7 +20,7 @@
 
 /* ── Lista de horas ── */
 .hl{display:flex;flex-direction:column;gap:1px}
-.hr{display:flex;align-items:center;gap:.75rem;padding:.55rem .75rem;background:var(--bg2);font-size:.82rem;transition:background var(--tr);border-left:2px solid transparent}
+.hr{display:flex;align-items:center;gap:.75rem;padding:.55rem .75rem;background:var(--bg2);font-size:.82rem;transition:background var(--tr);border-left:2px solid transparent;overflow:hidden;min-width:0}
 .hr:first-child{border-radius:var(--r) var(--r) 0 0}
 .hr:last-child{border-radius:0 0 var(--r) var(--r)}
 .hr:only-child{border-radius:var(--r)}
