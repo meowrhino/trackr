@@ -17,7 +17,8 @@
         "totalFactura": 3710, "netoRecibido": 2975, "ivaExcepcion": "",
         "pagado": false, "fechaPago": null, "gastos": 0,
         "cobros": [
-          { "id": "cb301-01", "fecha": "2026-02-01", "cantidad": 1500 }
+          { "id": "cb301-01", "fecha": "2026-02-01", "cantidad": 1500 },
+          { "id": "cb301-02", "fecha": "2026-03-12", "cantidad": 1000 }
         ],
         "facturaNum": 3, "facturaFecha": "2026-01-20",
         "idiomaFactura": null

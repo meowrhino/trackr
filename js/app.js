@@ -192,8 +192,10 @@ const App = {
       +     `<div class="fg" id="bfBase" style="${m === 'desde_total' || m === 'por_hora' ? 'display:none' : ''}"><label>${t('billing.baseEur')}</label><input type="number" id="mpBa" value="${df.base}" step="0.01" placeholder="0.00" oninput="App.cPrev()"></div>`
       +     `<div class="fg" id="bfTot" style="${m === 'desde_base' || m === 'por_hora' ? 'display:none' : ''}"><label>${t('billing.totalEur')}</label><input type="number" id="mpTo" value="${df.total}" step="0.01" placeholder="0.00" oninput="App.cPrev()"></div>`
       +   `</div>`
-      +   `<div class="tr"><span class="tl">${t('billing.ivaToggle', st.defaultIva)}</span><label class="tg"><input type="checkbox" id="mpIva" ${df.ivaOn ? 'checked' : ''} onchange="App.cPrev()"><span class="ts"></span></label></div>`
-      +   `<div class="tr"><span class="tl">${t('billing.irpfToggle', st.defaultIrpf)}</span><label class="tg"><input type="checkbox" id="mpIrpf" ${df.irpfOn ? 'checked' : ''} onchange="App.cPrev()"><span class="ts"></span></label></div>`
+      +   `<div class="fr">`
+      +     `<div class="fg"><label>IVA %</label><input type="number" id="mpIva" value="${df.iva}" min="0" max="100" step="1" oninput="App.cPrev()"></div>`
+      +     `<div class="fg"><label>IRPF %</label><input type="number" id="mpIrpf" value="${df.irpf}" min="0" max="100" step="1" oninput="App.cPrev()"></div>`
+      +   `</div>`
       +   `<div class="fg" style="margin-top:.4rem"><label>${t('billing.ivaException')}</label><input type="text" id="mpIvaExc" value="${esc(df.ivaExc)}" placeholder="${t('ph.ivaException')}"></div>`
       +   `<div id="bPrev" class="bb" style="margin-top:.4rem"></div>`
       +   (df.cobros && df.cobros.length ? `<div style="margin-top:.75rem;font-size:.78rem;color:${df.pagado ? 'var(--ok)' : 'var(--warn)'}">${df.pagado ? t('billing.paid') : t('billing.progress', fmtMoney(df.cobros.reduce((s,c) => s + c.cantidad, 0)), fmtMoney(df.neto || 0))} (${df.cobros.length} ${t('billing.payments').toLowerCase()})</div>` : '')
@@ -227,10 +229,8 @@ const App = {
     const m = document.getElementById('mpBM')?.value;
     if (!m || m === 'gratis') return;
 
-    const ivaOn = document.getElementById('mpIva')?.checked;
-    const irpfOn = document.getElementById('mpIrpf')?.checked;
-    const ivR = ivaOn ? (D.d.settings.defaultIva || 21) : 0;
-    const irR = irpfOn ? (D.d.settings.defaultIrpf || 15) : 0;
+    const ivR = parseFloat(document.getElementById('mpIva')?.value) || 0;
+    const irR = parseFloat(document.getElementById('mpIrpf')?.value) || 0;
 
     let base, importeIva, importeIrpf, totalF, neto;
 
@@ -288,8 +288,6 @@ const App = {
 
     const estado = document.getElementById('mpSt').value;
     const modo = document.getElementById('mpBM').value;
-    const ivaOn = document.getElementById('mpIva')?.checked;
-    const irpfOn = document.getElementById('mpIrpf')?.checked;
     const facLangVal = document.getElementById('mpFacLang')?.value || null;
 
     const proj = {
@@ -300,7 +298,7 @@ const App = {
       facturacion: {
         modo, baseImponible: parseFloat(document.getElementById('mpBa')?.value) || 0, total: parseFloat(document.getElementById('mpTo')?.value) || 0,
         precioHora: parseFloat(document.getElementById('mpPH')?.value) || 0,
-        iva: ivaOn ? (D.d.settings.defaultIva || 21) : 0, irpf: irpfOn ? (D.d.settings.defaultIrpf || 15) : 0,
+        iva: parseFloat(document.getElementById('mpIva')?.value) || 0, irpf: parseFloat(document.getElementById('mpIrpf')?.value) || 0,
         ivaExcepcion: document.getElementById('mpIvaExc')?.value?.trim() || '',
         asuntoFactura: document.getElementById('mpAsunto')?.value?.trim() || '',
         importeIva: 0, importeIrpf: 0, totalFactura: 0, netoRecibido: 0,
