@@ -24,6 +24,7 @@ Object.assign(App, {
       + `<div class="cfg-section"><div class="cfg-section-title">${t('cfg.defaults')}</div><div class="cfg-grid">`
       + `<div class="fg"><label>${t('cfg.ivaPercent')}</label><input type="number" id="cfgIva" value="${s.defaultIva}" min="0" max="100" step="1"></div>`
       + `<div class="fg"><label>${t('cfg.irpfPercent')}</label><input type="number" id="cfgIrpf" value="${s.defaultIrpf}" min="0" max="100" step="1"></div>`
+      + `<div class="cfg-full fg"><label>${t('cfg.beneficiary')}</label><input type="text" id="cfgBenef" placeholder="${t('ph.beneficiary')}" value="${esc(em.beneficiarioPago || '')}"></div>`
       + `<div class="cfg-full fg"><label>${t('cfg.bankAccount')}</label><input type="text" id="cfgPago" placeholder="${t('ph.bankAccount')}" value="${esc(em.instruccionesPago || '')}"></div>`
       + `<div class="cfg-full fg"><label>${t('cfg.defaultSubject')}</label><input type="text" id="cfgConcepto" value="${esc(s.conceptoDefault || '')}" placeholder="${t('ph.defaultSubject')}"><label style="font-size:.82rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;margin-top:.45rem;text-transform:none;letter-spacing:0;color:var(--t2);white-space:nowrap"><input type="checkbox" id="cfgConceptoCl" style="margin:0;width:14px;height:14px;accent-color:var(--ac)" ${s.conceptoAppendCliente ? 'checked' : ''}>${t('cfg.appendClientName')}</label></div>`
       + `</div><div class="cfg-save"><button class="bt bt-p" onclick="App.saveDefaults()">${t('btn.save')}</button></div></div>`
@@ -79,6 +80,7 @@ Object.assign(App, {
 
   saveDefaults() {
     const s = D.d.settings;
+    s.emisor.beneficiarioPago = document.getElementById('cfgBenef').value.trim();
     s.emisor.instruccionesPago = document.getElementById('cfgPago').value.trim();
     s.conceptoDefault = document.getElementById('cfgConcepto').value.trim();
     s.conceptoAppendCliente = document.getElementById('cfgConceptoCl').checked;

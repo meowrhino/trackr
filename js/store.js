@@ -70,6 +70,7 @@ const D = {
     const s = d.settings;
     if (!s.emisor) s.emisor = { nombre: '', direccion1: '', direccion2: '', nif: '', instruccionesPago: '' };
     if (s.emisor.instruccionesPago == null) s.emisor.instruccionesPago = '';
+    if (s.emisor.beneficiarioPago == null) s.emisor.beneficiarioPago = '';
     if (s.defaultIva == null) s.defaultIva = 21;
     if (s.defaultIrpf == null) s.defaultIrpf = 15;
     if (!s.targets) s.targets = { horasMes: null, ingresosMes: null, horasSemana: null };

@@ -170,9 +170,10 @@ const Fac = {
     const noteH = noteLines.length ? noteLines.length * 4 + 2 : 0;
 
     /* Payment section height (label + gap + text lines) */
-    const pagoFullText = data.instruccionesPago
-      ? tf('fac.bankTransferText', lang) + '\n' + data.instruccionesPago
-      : '';
+    let pagoFullParts = [];
+    if (data.beneficiarioPago) pagoFullParts.push(tf('fac.beneficiary', lang) + ' ' + data.beneficiarioPago);
+    if (data.instruccionesPago) pagoFullParts.push(tf('fac.bankTransferText', lang), data.instruccionesPago);
+    const pagoFullText = pagoFullParts.join('\n');
     const pagoEstLines = pagoFullText ? doc.splitTextToSize(pagoFullText, PDF_TOTALS_W) : [];
     const pagoH = pagoEstLines.length ? 4 + 5 + pagoEstLines.length * 4 : 0;
 
@@ -207,7 +208,7 @@ const Fac = {
     });
 
     /* ── Payment / bank account ── */
-    if (data.instruccionesPago) {
+    if (data.instruccionesPago || data.beneficiarioPago) {
       totalsY += 4;
       doc.setFontSize(9);
       doc.setFont('helvetica', 'bold');
@@ -216,8 +217,10 @@ const Fac = {
       totalsY += 5;
       doc.setFontSize(8);
       doc.setFont('helvetica', 'normal');
-      const fullText = tf('fac.bankTransferText', lang) + '\n' + data.instruccionesPago;
-      const lines = doc.splitTextToSize(fullText, PDF_TOTALS_W);
+      let payLines = [];
+      if (data.beneficiarioPago) payLines.push(tf('fac.beneficiary', lang) + ' ' + data.beneficiarioPago);
+      if (data.instruccionesPago) payLines.push(tf('fac.bankTransferText', lang), data.instruccionesPago);
+      const lines = doc.splitTextToSize(payLines.join('\n'), PDF_TOTALS_W);
       doc.text(lines, labelX, totalsY);
     }
 
@@ -268,6 +271,7 @@ const Fac = {
         total: f.totalFactura || 0,
         ivaExcepcion: f.ivaExcepcion || ''
       },
+      beneficiarioPago: s.emisor.beneficiarioPago || '',
       instruccionesPago: s.emisor.instruccionesPago || ''
     };
 

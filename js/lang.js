@@ -157,6 +157,7 @@ const LANGS = {
     'ph.street': 'Calle, número',
     'ph.cityZip': 'CP, Ciudad, País',
     'ph.nif': '12345678A',
+    'ph.beneficiary': 'Nombre completo del titular',
     'ph.bankAccount': 'ES12 3456 7890 1234 5678 9012',
     'ph.clientNameOrCompany': 'Nombre o empresa',
     'ph.fullName': 'Nombre legal completo',
@@ -303,6 +304,7 @@ const LANGS = {
     'cfg.defaults': 'Valores por defecto',
     'cfg.ivaPercent': 'IVA %',
     'cfg.irpfPercent': 'IRPF %',
+    'cfg.beneficiary': 'Beneficiario de la transferencia',
     'cfg.bankAccount': 'Cuenta bancaria donde efectuar el ingreso',
     'cfg.defaultSubject': 'Concepto por defecto',
     'cfg.appendClientName': 'Añadir nombre del cliente',
@@ -400,6 +402,7 @@ const LANGS = {
     'fac.ivaException': 'IVA: {0}',
     'fac.total': 'TOTAL',
     'fac.paymentMethod': 'FORMA DE PAGO',
+    'fac.beneficiary': 'Beneficiario:',
     'fac.bankTransferText': 'Abonar mediante transferencia bancaria al número de cuenta:',
 
     /* ── Factura modal ── */
@@ -655,6 +658,7 @@ const LANGS = {
     'ph.street': 'Street, number',
     'ph.cityZip': 'Zip, City, Country',
     'ph.nif': '12345678A',
+    'ph.beneficiary': 'Account holder full name',
     'ph.bankAccount': 'ES12 3456 7890 1234 5678 9012',
     'ph.clientNameOrCompany': 'Name or company',
     'ph.fullName': 'Full legal name',
@@ -801,6 +805,7 @@ const LANGS = {
     'cfg.defaults': 'Defaults',
     'cfg.ivaPercent': 'VAT %',
     'cfg.irpfPercent': 'IRPF %',
+    'cfg.beneficiary': 'Transfer recipient name',
     'cfg.bankAccount': 'Bank account for payment',
     'cfg.defaultSubject': 'Default subject',
     'cfg.appendClientName': 'Append client name',
@@ -898,6 +903,7 @@ const LANGS = {
     'fac.ivaException': 'VAT: {0}',
     'fac.total': 'TOTAL',
     'fac.paymentMethod': 'PAYMENT METHOD',
+    'fac.beneficiary': 'Beneficiary:',
     'fac.bankTransferText': 'Pay by bank transfer to account number:',
 
     /* ── Factura modal ── */
@@ -1145,6 +1151,7 @@ const LANGS = {
     'ph.street': 'Carrer, número',
     'ph.cityZip': 'CP, Ciutat, País',
     'ph.nif': '12345678A',
+    'ph.beneficiary': 'Nom complet del titular',
     'ph.bankAccount': 'ES12 3456 7890 1234 5678 9012',
     'ph.clientNameOrCompany': 'Nom o empresa',
     'ph.fullName': 'Nom legal complet',
@@ -1291,6 +1298,7 @@ const LANGS = {
     'cfg.defaults': 'Valors per defecte',
     'cfg.ivaPercent': 'IVA %',
     'cfg.irpfPercent': 'IRPF %',
+    'cfg.beneficiary': 'Beneficiari de la transferència',
     'cfg.bankAccount': 'Compte bancari on fer l\'ingrés',
     'cfg.defaultSubject': 'Concepte per defecte',
     'cfg.appendClientName': 'Afegir nom del client',
@@ -1388,6 +1396,7 @@ const LANGS = {
     'fac.ivaException': 'IVA: {0}',
     'fac.total': 'TOTAL',
     'fac.paymentMethod': 'FORMA DE PAGAMENT',
+    'fac.beneficiary': 'Beneficiari:',
     'fac.bankTransferText': 'Cal abonar mitjançant transferència bancària al nombre de compte:',
 
     /* ── Factura modal ── */
