@@ -4,7 +4,11 @@
     { "id": "c401-aa11-bb22", "nombre": "Thoughtworks", "nombreCompleto": "Thoughtworks Spain S.L.", "direccion1": "Carrer de Tànger 98", "direccion2": "08018 Barcelona", "nif": "B87654321", "color": "CornflowerBlue" },
     { "id": "c402-cc33-dd44", "nombre": "Glovo", "nombreCompleto": "Glovoapp 23 S.L.", "direccion1": "Carrer de Pujades 94", "direccion2": "08005 Barcelona", "nif": "B66778899", "color": "DarkOrange" },
     { "id": "c403-ee55-ff66", "nombre": "Barcelona Activa", "nombreCompleto": "Barcelona Activa S.A.", "direccion1": "Carrer de Llacuna 162", "direccion2": "08018 Barcelona", "nif": "A58295296", "color": "MediumSeaGreen" },
-    { "id": "c404-gg77-hh88", "nombre": "UPC", "nombreCompleto": "Universitat Politècnica de Catalunya", "direccion1": "Carrer de Jordi Girona 1-3", "direccion2": "08034 Barcelona", "nif": "Q0818003F", "color": "DarkSlateBlue" }
+    { "id": "c404-gg77-hh88", "nombre": "UPC", "nombreCompleto": "Universitat Politècnica de Catalunya", "direccion1": "Carrer de Jordi Girona 1-3", "direccion2": "08034 Barcelona", "nif": "Q0818003F", "color": "DarkSlateBlue" },
+    { "id": "c405-jj99-kk00", "nombre": "CaixaBank Tech", "nombreCompleto": "CaixaBank Tech S.A.", "direccion1": "Avinguda Diagonal 621", "direccion2": "08028 Barcelona", "nif": "A08663619", "color": "Teal" },
+    { "id": "c406-ll11-mm22", "nombre": "Vueling", "nombreCompleto": "Vueling Airlines S.A.", "direccion1": "Plaça del Pla de l'Estany 5", "direccion2": "08820 El Prat de Llobregat", "nif": "B63876024", "color": "Gold" },
+    { "id": "c407-nn33-pp44", "nombre": "N26", "nombreCompleto": "N26 GmbH", "direccion1": "Voltairestraße 8", "direccion2": "10179 Berlin, Germany", "nif": "DE300347560", "color": "Turquoise" },
+    { "id": "c408-qq55-rr66", "nombre": "Seat/Cupra", "nombreCompleto": "SEAT S.A. — Cupra Division", "direccion1": "Autovía A-2, Km 585", "direccion2": "08760 Martorell, Barcelona", "nif": "A28049161", "color": "Crimson" }
   ],
   "projects": [
     {
@@ -34,15 +38,18 @@
     },
     {
       "id": "p402-m2m2-n2n2", "nombre": "Agile for PMs — Glovo", "clienteId": "c402-cc33-dd44", "color": "DarkOrange",
-      "estado": "activo", "interno": false, "recurrente": true,
-      "fechas": { "inicio": "2026-01-15", "finEstimada": "2026-06-30", "finReal": null },
+      "estado": "completado", "interno": false, "recurrente": true,
+      "fechas": { "inicio": "2026-01-15", "finEstimada": "2026-06-30", "finReal": "2026-06-25" },
       "facturacion": {
         "modo": "por_hora", "baseImponible": 0, "total": 0, "precioHora": 90,
         "iva": 21, "irpf": 15, "importeIva": 0, "importeIrpf": 0,
         "totalFactura": 0, "netoRecibido": 0, "ivaExcepcion": "",
-        "pagado": false, "fechaPago": null, "gastos": 0,
-        "cobros": [],
-        "facturaNum": 3, "facturaFecha": "2026-03-11",
+        "pagado": true, "fechaPago": "2026-07-15", "gastos": 0,
+        "cobros": [
+          { "id": "cb402-01", "fecha": "2026-04-10", "cantidad": 1360 },
+          { "id": "cb402-02", "fecha": "2026-07-15", "cantidad": 1620 }
+        ],
+        "facturaNum": 4, "facturaFecha": "2026-06-26",
         "idiomaFactura": "en"
       },
       "horas": [
@@ -51,7 +58,12 @@
         { "id": "h402-03", "fecha": "2026-02-10", "tipo": "trabajo", "cantidad": 4, "nota": "Session 2: User stories + estimation", "horaInicio": "09:00", "monto": 360 },
         { "id": "h402-04", "fecha": "2026-02-24", "tipo": "trabajo", "cantidad": 4, "nota": "Session 3: Sprint planning + retros", "horaInicio": "09:00", "monto": 360 },
         { "id": "h402-05", "fecha": "2026-03-10", "tipo": "trabajo", "cantidad": 4, "nota": "Session 4: Metrics + continuous improvement", "horaInicio": "09:00", "monto": 360 },
-        { "id": "h402-06", "fecha": "2026-03-17", "tipo": "reunion", "cantidad": 1, "nota": "Mid-program review with stakeholders", "horaInicio": "11:00" }
+        { "id": "h402-06", "fecha": "2026-03-17", "tipo": "reunion", "cantidad": 1, "nota": "Mid-program review with stakeholders", "horaInicio": "11:00" },
+        { "id": "h402-07", "fecha": "2026-04-07", "tipo": "trabajo", "cantidad": 4, "nota": "Session 5: Product roadmaps + prioritization", "horaInicio": "09:00", "monto": 360 },
+        { "id": "h402-08", "fecha": "2026-05-05", "tipo": "trabajo", "cantidad": 4, "nota": "Session 6: Stakeholder management + OKRs", "horaInicio": "09:00", "monto": 360 },
+        { "id": "h402-09", "fecha": "2026-06-02", "tipo": "trabajo", "cantidad": 4, "nota": "Session 7: Final workshop — simulación sprint real", "horaInicio": "09:00", "monto": 360 },
+        { "id": "h402-10", "fecha": "2026-06-16", "tipo": "reunion", "cantidad": 1.5, "nota": "Wrap-up + feedback with leadership team", "horaInicio": "10:00" },
+        { "id": "h402-11", "fecha": "2026-06-25", "tipo": "trabajo", "cantidad": 3, "nota": "Final report + certificate prep", "horaInicio": "14:00" }
       ],
       "notas": "Monthly agile coaching sessions for Glovo product managers. 6-month program."
     },
@@ -97,21 +109,26 @@
     },
     {
       "id": "p405-m5m5-n5n5", "nombre": "Taller Barcelona Activa", "clienteId": "c403-ee55-ff66", "color": "MediumSeaGreen",
-      "estado": "activo", "interno": false, "recurrente": false,
-      "fechas": { "inicio": "2026-03-15", "finEstimada": "2026-04-15", "finReal": null },
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2026-03-15", "finEstimada": "2026-04-15", "finReal": "2026-04-10" },
       "facturacion": {
         "modo": "desde_base", "baseImponible": 1800, "total": 0, "precioHora": 0,
         "iva": 0, "irpf": 15, "importeIva": 0, "importeIrpf": 270,
         "totalFactura": 1530, "netoRecibido": 1530, "ivaExcepcion": "Formación exenta de IVA (art. 20.1.9 LIVA)",
-        "pagado": false, "fechaPago": null, "gastos": 0,
-        "cobros": [],
-        "facturaNum": null, "facturaFecha": null,
+        "pagado": true, "fechaPago": "2026-05-02", "gastos": 0,
+        "cobros": [
+          { "id": "cb405-01", "fecha": "2026-05-02", "cantidad": 1530 }
+        ],
+        "facturaNum": 3, "facturaFecha": "2026-04-11",
         "idiomaFactura": null
       },
       "horas": [
         { "id": "h405-01", "fecha": "2026-03-15", "tipo": "trabajo", "cantidad": 5, "nota": "Curriculum design + exercise prep", "horaInicio": "09:00" },
         { "id": "h405-02", "fecha": "2026-03-18", "tipo": "trabajo", "cantidad": 4, "nota": "Session 1: HTML/CSS/JS basics", "horaInicio": "10:00" },
-        { "id": "h405-03", "fecha": "2026-03-20", "tipo": "trabajo", "cantidad": 4, "nota": "Session 2: React intro + components", "horaInicio": "10:00" }
+        { "id": "h405-03", "fecha": "2026-03-20", "tipo": "trabajo", "cantidad": 4, "nota": "Session 2: React intro + components", "horaInicio": "10:00" },
+        { "id": "h405-04", "fecha": "2026-03-27", "tipo": "trabajo", "cantidad": 4, "nota": "Session 3: State + API calls", "horaInicio": "10:00" },
+        { "id": "h405-05", "fecha": "2026-04-03", "tipo": "trabajo", "cantidad": 4, "nota": "Session 4: Final project + presentations", "horaInicio": "10:00" },
+        { "id": "h405-06", "fecha": "2026-04-10", "tipo": "trabajo", "cantidad": 2, "nota": "Grading + feedback reports", "horaInicio": "15:00" }
       ],
       "notas": "4-session web dev bootcamp for job seekers. Public funding, IVA exempt."
     },
@@ -133,36 +150,1028 @@
         { "id": "h406-02", "fecha": "2025-12-18", "tipo": "trabajo", "cantidad": 4, "nota": "Edit + subtitles section 3", "horaInicio": "10:00" },
         { "id": "h406-03", "fecha": "2026-01-10", "tipo": "trabajo", "cantidad": 5, "nota": "Record section 4: API integration", "horaInicio": "09:00" },
         { "id": "h406-04", "fecha": "2026-02-05", "tipo": "trabajo", "cantidad": 3, "nota": "Q&A responses + community", "horaInicio": "20:00" },
-        { "id": "h406-05", "fecha": "2026-03-12", "tipo": "trabajo", "cantidad": 5, "nota": "Record section 5: Testing", "horaInicio": "09:00" }
+        { "id": "h406-05", "fecha": "2026-03-12", "tipo": "trabajo", "cantidad": 5, "nota": "Record section 5: Testing", "horaInicio": "09:00" },
+        { "id": "h406-06", "fecha": "2026-05-20", "tipo": "trabajo", "cantidad": 6, "nota": "Record section 6: Routing + navigation", "horaInicio": "09:00" },
+        { "id": "h406-07", "fecha": "2026-06-15", "tipo": "trabajo", "cantidad": 4, "nota": "Edit section 6 + thumbnails", "horaInicio": "10:00" },
+        { "id": "h406-08", "fecha": "2026-08-22", "tipo": "trabajo", "cantidad": 6, "nota": "Record section 7: Deployment + CI/CD", "horaInicio": "09:00" },
+        { "id": "h406-09", "fecha": "2026-09-10", "tipo": "trabajo", "cantidad": 3, "nota": "Edit section 7 + subtítulos", "horaInicio": "14:00" },
+        { "id": "h406-10", "fecha": "2027-01-15", "tipo": "trabajo", "cantidad": 5, "nota": "Update sections 1-3 for React 19", "horaInicio": "09:00" },
+        { "id": "h406-11", "fecha": "2027-04-10", "tipo": "trabajo", "cantidad": 4, "nota": "Community Q&A marathon + new exercises", "horaInicio": "14:00" },
+        { "id": "h406-12", "fecha": "2027-09-18", "tipo": "trabajo", "cantidad": 3, "nota": "Record bonus section: Server Components", "horaInicio": "09:00" },
+        { "id": "h406-13", "fecha": "2028-03-05", "tipo": "trabajo", "cantidad": 4, "nota": "Major update — rebrand + new intro video", "horaInicio": "09:00" },
+        { "id": "h406-14", "fecha": "2028-08-20", "tipo": "trabajo", "cantidad": 3, "nota": "Respond to reviews + update exercises", "horaInicio": "20:00" },
+        { "id": "h406-15", "fecha": "2029-02-12", "tipo": "trabajo", "cantidad": 4, "nota": "React 20 migration guide added", "horaInicio": "09:00" },
+        { "id": "h406-16", "fecha": "2029-09-25", "tipo": "trabajo", "cantidad": 3, "nota": "Annual refresh — update all code repos", "horaInicio": "10:00" },
+        { "id": "h406-17", "fecha": "2030-03-15", "tipo": "trabajo", "cantidad": 4, "nota": "New section: React + AI integrations", "horaInicio": "09:00" }
       ],
       "notas": "\"Modern React from Zero\" — Udemy course. Revenue tracked outside Trackr (Udemy pays monthly)."
+    },
+    {
+      "id": "p407-a1a1-b1b1", "nombre": "Advanced Scrum — Glovo", "clienteId": "c402-cc33-dd44", "color": "DarkOrange",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2026-07-01", "finEstimada": "2026-12-15", "finReal": "2026-12-10" },
+      "facturacion": {
+        "modo": "por_hora", "baseImponible": 0, "total": 0, "precioHora": 90,
+        "iva": 21, "irpf": 15, "importeIva": 0, "importeIrpf": 0,
+        "totalFactura": 0, "netoRecibido": 0, "ivaExcepcion": "",
+        "pagado": true, "fechaPago": "2027-01-10", "gastos": 0,
+        "cobros": [
+          { "id": "cb407-01", "fecha": "2026-09-20", "cantidad": 980 },
+          { "id": "cb407-02", "fecha": "2027-01-10", "cantidad": 1420 }
+        ],
+        "facturaNum": 6, "facturaFecha": "2026-12-11",
+        "idiomaFactura": "en"
+      },
+      "horas": [
+        { "id": "h407-01", "fecha": "2026-07-07", "tipo": "trabajo", "cantidad": 4, "nota": "Session 1: Advanced estimation — story points vs no-estimates", "horaInicio": "09:00", "monto": 360 },
+        { "id": "h407-02", "fecha": "2026-07-21", "tipo": "trabajo", "cantidad": 3, "nota": "Prep materials: case studies from Spotify model", "horaInicio": "14:00" },
+        { "id": "h407-03", "fecha": "2026-08-04", "tipo": "trabajo", "cantidad": 4, "nota": "Session 2: Scaling Scrum — SAFe vs LeSS", "horaInicio": "09:00", "monto": 360 },
+        { "id": "h407-04", "fecha": "2026-09-15", "tipo": "trabajo", "cantidad": 4, "nota": "Session 3: Advanced retrospectives + team dynamics", "horaInicio": "09:00", "monto": 360 },
+        { "id": "h407-05", "fecha": "2026-10-20", "tipo": "trabajo", "cantidad": 4, "nota": "Session 4: Continuous delivery + DevOps mindset", "horaInicio": "09:00", "monto": 360 },
+        { "id": "h407-06", "fecha": "2026-11-17", "tipo": "trabajo", "cantidad": 4, "nota": "Session 5: Metrics that matter — DORA, flow metrics", "horaInicio": "09:00", "monto": 360 },
+        { "id": "h407-07", "fecha": "2026-12-01", "tipo": "trabajo", "cantidad": 4, "nota": "Session 6: Organizational agility workshop", "horaInicio": "09:00", "monto": 360 },
+        { "id": "h407-08", "fecha": "2026-12-10", "tipo": "reunion", "cantidad": 1.5, "nota": "Final review + certificates entrega", "horaInicio": "11:00" }
+      ],
+      "notas": "Follow-up to Agile for PMs. Deeper dive for the same Glovo team, más técnico."
+    },
+    {
+      "id": "p408-a2a2-b2b2", "nombre": "React Workshop — CaixaBank Tech", "clienteId": "c405-jj99-kk00", "color": "Teal",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2026-09-01", "finEstimada": "2026-09-30", "finReal": "2026-09-25" },
+      "facturacion": {
+        "modo": "desde_total", "baseImponible": 0, "total": 5000, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 0, "importeIrpf": 0,
+        "totalFactura": 5000, "netoRecibido": 0, "ivaExcepcion": "",
+        "pagado": true, "fechaPago": "2026-10-20", "gastos": 0,
+        "cobros": [
+          { "id": "cb408-01", "fecha": "2026-10-20", "cantidad": 4042.02 }
+        ],
+        "facturaNum": 5, "facturaFecha": "2026-09-26",
+        "idiomaFactura": "en"
+      },
+      "horas": [
+        { "id": "h408-01", "fecha": "2026-09-02", "tipo": "trabajo", "cantidad": 6, "nota": "Prep: custom exercises for banking UI patterns", "horaInicio": "09:00" },
+        { "id": "h408-02", "fecha": "2026-09-08", "tipo": "trabajo", "cantidad": 8, "nota": "Workshop Day 1: React fundamentals + hooks deep dive", "horaInicio": "09:00" },
+        { "id": "h408-03", "fecha": "2026-09-09", "tipo": "trabajo", "cantidad": 8, "nota": "Workshop Day 2: State management + form patterns", "horaInicio": "09:00" },
+        { "id": "h408-04", "fecha": "2026-09-22", "tipo": "trabajo", "cantidad": 8, "nota": "Workshop Day 3: Testing + security best practices", "horaInicio": "09:00" },
+        { "id": "h408-05", "fecha": "2026-09-25", "tipo": "trabajo", "cantidad": 4, "nota": "Workshop Day 4: Architecture review + Q&A final", "horaInicio": "09:00" }
+      ],
+      "notas": "First engagement with CaixaBank Tech. 20 developers, enfocado en patterns para banca digital."
+    },
+    {
+      "id": "p409-a3a3-b3b3", "nombre": "Bootcamp Otoño — Barcelona Activa", "clienteId": "c403-ee55-ff66", "color": "MediumSeaGreen",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2026-10-05", "finEstimada": "2026-11-20", "finReal": "2026-11-18" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 1800, "total": 0, "precioHora": 0,
+        "iva": 0, "irpf": 15, "importeIva": 0, "importeIrpf": 270,
+        "totalFactura": 1530, "netoRecibido": 1530, "ivaExcepcion": "Formación exenta de IVA (art. 20.1.9 LIVA)",
+        "pagado": true, "fechaPago": "2026-12-08", "gastos": 0,
+        "cobros": [
+          { "id": "cb409-01", "fecha": "2026-12-08", "cantidad": 1530 }
+        ],
+        "facturaNum": 7, "facturaFecha": "2026-11-19",
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h409-01", "fecha": "2026-10-05", "tipo": "trabajo", "cantidad": 4, "nota": "Prep: updated curriculum with TypeScript intro", "horaInicio": "09:00" },
+        { "id": "h409-02", "fecha": "2026-10-12", "tipo": "trabajo", "cantidad": 5, "nota": "Session 1: HTML/CSS/JS fundamentals", "horaInicio": "10:00" },
+        { "id": "h409-03", "fecha": "2026-10-19", "tipo": "trabajo", "cantidad": 5, "nota": "Session 2: JavaScript moderno + DOM", "horaInicio": "10:00" },
+        { "id": "h409-04", "fecha": "2026-10-26", "tipo": "trabajo", "cantidad": 5, "nota": "Session 3: React basics + components", "horaInicio": "10:00" },
+        { "id": "h409-05", "fecha": "2026-11-09", "tipo": "trabajo", "cantidad": 5, "nota": "Session 4: React state + APIs", "horaInicio": "10:00" },
+        { "id": "h409-06", "fecha": "2026-11-16", "tipo": "trabajo", "cantidad": 5, "nota": "Session 5: Proyecto final + presentaciones", "horaInicio": "10:00" },
+        { "id": "h409-07", "fecha": "2026-11-18", "tipo": "trabajo", "cantidad": 2, "nota": "Grading + informes finales", "horaInicio": "15:00" }
+      ],
+      "notas": "Fall bootcamp — expanded to 5 sessions based on spring feedback. IVA exempt."
+    },
+    {
+      "id": "p410-a4a4-b4b4", "nombre": "JSConf Barcelona 2026", "clienteId": null, "color": "Crimson",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2026-11-01", "finEstimada": "2026-11-15", "finReal": "2026-11-14" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 800, "total": 0, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 168, "importeIrpf": 120,
+        "totalFactura": 848, "netoRecibido": 848, "ivaExcepcion": "",
+        "pagado": true, "fechaPago": "2026-12-15", "gastos": 0,
+        "cobros": [
+          { "id": "cb410-01", "fecha": "2026-12-15", "cantidad": 848 }
+        ],
+        "facturaNum": 8, "facturaFecha": "2026-11-15",
+        "idiomaFactura": "en"
+      },
+      "horas": [
+        { "id": "h410-01", "fecha": "2026-11-04", "tipo": "trabajo", "cantidad": 5, "nota": "Prepare talk: 'Type-Safe State Machines in React'", "horaInicio": "09:00" },
+        { "id": "h410-02", "fecha": "2026-11-14", "tipo": "trabajo", "cantidad": 4, "nota": "Conference day — talk + networking", "horaInicio": "09:00" }
+      ],
+      "notas": "JSConf Barcelona — 30 min talk. Great for visibility in local community."
+    },
+    {
+      "id": "p411-a5a5-b5b5", "nombre": "Quarterly Training — CaixaBank Tech", "clienteId": "c405-jj99-kk00", "color": "Teal",
+      "estado": "activo", "interno": false, "recurrente": true,
+      "fechas": { "inicio": "2027-01-10", "finEstimada": null, "finReal": null },
+      "facturacion": {
+        "modo": "por_hora", "baseImponible": 0, "total": 0, "precioHora": 90,
+        "iva": 21, "irpf": 15, "importeIva": 0, "importeIrpf": 0,
+        "totalFactura": 0, "netoRecibido": 0, "ivaExcepcion": "",
+        "pagado": false, "fechaPago": null, "gastos": 0,
+        "cobros": [
+          { "id": "cb411-01", "fecha": "2027-04-15", "cantidad": 2180 },
+          { "id": "cb411-02", "fecha": "2027-07-18", "cantidad": 2050 },
+          { "id": "cb411-03", "fecha": "2027-10-20", "cantidad": 2180 },
+          { "id": "cb411-04", "fecha": "2028-01-15", "cantidad": 2050 },
+          { "id": "cb411-05", "fecha": "2028-04-18", "cantidad": 2610 },
+          { "id": "cb411-06", "fecha": "2028-07-22", "cantidad": 2440 },
+          { "id": "cb411-07", "fecha": "2028-10-19", "cantidad": 2610 },
+          { "id": "cb411-08", "fecha": "2029-01-16", "cantidad": 2440 },
+          { "id": "cb411-09", "fecha": "2029-04-17", "cantidad": 2610 },
+          { "id": "cb411-10", "fecha": "2029-07-21", "cantidad": 2610 },
+          { "id": "cb411-11", "fecha": "2029-10-18", "cantidad": 2610 },
+          { "id": "cb411-12", "fecha": "2030-01-20", "cantidad": 2610 },
+          { "id": "cb411-13", "fecha": "2030-04-17", "cantidad": 2610 }
+        ],
+        "facturaNum": 35, "facturaFecha": "2030-03-31",
+        "idiomaFactura": "en"
+      },
+      "horas": [
+        { "id": "h411-01", "fecha": "2027-01-13", "tipo": "trabajo", "cantidad": 5, "nota": "Q1 prep: Next.js architecture patterns", "horaInicio": "09:00" },
+        { "id": "h411-02", "fecha": "2027-01-20", "tipo": "trabajo", "cantidad": 8, "nota": "Q1 Workshop Day 1: Next.js fundamentals", "horaInicio": "09:00", "monto": 720 },
+        { "id": "h411-03", "fecha": "2027-01-21", "tipo": "trabajo", "cantidad": 8, "nota": "Q1 Workshop Day 2: Server components + data", "horaInicio": "09:00", "monto": 720 },
+        { "id": "h411-04", "fecha": "2027-02-03", "tipo": "reunion", "cantidad": 1.5, "nota": "Q1 review + planning Q2 topics", "horaInicio": "10:00" },
+        { "id": "h411-05", "fecha": "2027-04-07", "tipo": "trabajo", "cantidad": 5, "nota": "Q2 prep: Testing strategies", "horaInicio": "09:00" },
+        { "id": "h411-06", "fecha": "2027-04-14", "tipo": "trabajo", "cantidad": 8, "nota": "Q2 Workshop Day 1: Unit + integration testing", "horaInicio": "09:00", "monto": 720 },
+        { "id": "h411-07", "fecha": "2027-04-15", "tipo": "trabajo", "cantidad": 8, "nota": "Q2 Workshop Day 2: E2E + performance testing", "horaInicio": "09:00", "monto": 720 },
+        { "id": "h411-08", "fecha": "2027-07-07", "tipo": "trabajo", "cantidad": 4, "nota": "Q3 prep: Microservices frontend", "horaInicio": "09:00" },
+        { "id": "h411-09", "fecha": "2027-07-14", "tipo": "trabajo", "cantidad": 8, "nota": "Q3 Workshop Day 1: Module federation", "horaInicio": "09:00", "monto": 720 },
+        { "id": "h411-10", "fecha": "2027-07-15", "tipo": "trabajo", "cantidad": 8, "nota": "Q3 Workshop Day 2: Micro-frontends in practice", "horaInicio": "09:00", "monto": 720 },
+        { "id": "h411-11", "fecha": "2027-10-06", "tipo": "trabajo", "cantidad": 5, "nota": "Q4 prep: Security + auth patterns", "horaInicio": "09:00" },
+        { "id": "h411-12", "fecha": "2027-10-13", "tipo": "trabajo", "cantidad": 8, "nota": "Q4 Workshop Day 1: OAuth2, JWT, RBAC", "horaInicio": "09:00", "monto": 720 },
+        { "id": "h411-13", "fecha": "2027-10-14", "tipo": "trabajo", "cantidad": 8, "nota": "Q4 Workshop Day 2: Security auditing workshop", "horaInicio": "09:00", "monto": 720 },
+        { "id": "h411-14", "fecha": "2028-01-14", "tipo": "trabajo", "cantidad": 5, "nota": "Q1'28 prep: React 19 advanced patterns", "horaInicio": "09:00" },
+        { "id": "h411-15", "fecha": "2028-01-21", "tipo": "trabajo", "cantidad": 8, "nota": "Q1'28 Day 1: Concurrent features + Suspense", "horaInicio": "09:00", "monto": 800 },
+        { "id": "h411-16", "fecha": "2028-01-22", "tipo": "trabajo", "cantidad": 8, "nota": "Q1'28 Day 2: Server actions + streaming SSR", "horaInicio": "09:00", "monto": 800 },
+        { "id": "h411-17", "fecha": "2028-04-08", "tipo": "trabajo", "cantidad": 6, "nota": "Q2'28 prep: Design system workshop", "horaInicio": "09:00" },
+        { "id": "h411-18", "fecha": "2028-04-15", "tipo": "trabajo", "cantidad": 8, "nota": "Q2'28 Day 1: Component library + Storybook", "horaInicio": "09:00", "monto": 800 },
+        { "id": "h411-19", "fecha": "2028-04-16", "tipo": "trabajo", "cantidad": 8, "nota": "Q2'28 Day 2: Tokens, themes, accessibility", "horaInicio": "09:00", "monto": 800 },
+        { "id": "h411-20", "fecha": "2028-07-08", "tipo": "trabajo", "cantidad": 5, "nota": "Q3'28 prep: Performance optimization", "horaInicio": "09:00" },
+        { "id": "h411-21", "fecha": "2028-07-15", "tipo": "trabajo", "cantidad": 8, "nota": "Q3'28 Day 1: Profiling + bundle analysis", "horaInicio": "09:00", "monto": 800 },
+        { "id": "h411-22", "fecha": "2028-07-16", "tipo": "trabajo", "cantidad": 8, "nota": "Q3'28 Day 2: Code splitting + lazy loading", "horaInicio": "09:00", "monto": 800 },
+        { "id": "h411-23", "fecha": "2028-10-07", "tipo": "trabajo", "cantidad": 6, "nota": "Q4'28 prep: Monorepo + CI/CD for frontend", "horaInicio": "09:00" },
+        { "id": "h411-24", "fecha": "2028-10-14", "tipo": "trabajo", "cantidad": 8, "nota": "Q4'28 Day 1: Turborepo + Nx workshop", "horaInicio": "09:00", "monto": 800 },
+        { "id": "h411-25", "fecha": "2028-10-15", "tipo": "trabajo", "cantidad": 8, "nota": "Q4'28 Day 2: CI pipelines + deploy strategies", "horaInicio": "09:00", "monto": 800 },
+        { "id": "h411-26", "fecha": "2029-01-13", "tipo": "trabajo", "cantidad": 5, "nota": "Q1'29 prep: AI-assisted development", "horaInicio": "09:00" },
+        { "id": "h411-27", "fecha": "2029-01-20", "tipo": "trabajo", "cantidad": 8, "nota": "Q1'29 Day 1: Copilot, AI code review, testing", "horaInicio": "09:00", "monto": 800 },
+        { "id": "h411-28", "fecha": "2029-01-21", "tipo": "trabajo", "cantidad": 8, "nota": "Q1'29 Day 2: LLM integrations in banking apps", "horaInicio": "09:00", "monto": 800 },
+        { "id": "h411-29", "fecha": "2029-04-07", "tipo": "trabajo", "cantidad": 6, "nota": "Q2'29 prep: Fullstack patterns", "horaInicio": "09:00" },
+        { "id": "h411-30", "fecha": "2029-04-14", "tipo": "trabajo", "cantidad": 8, "nota": "Q2'29 Day 1: tRPC + type-safe APIs", "horaInicio": "09:00", "monto": 800 },
+        { "id": "h411-31", "fecha": "2029-04-15", "tipo": "trabajo", "cantidad": 8, "nota": "Q2'29 Day 2: Realtime + WebSockets", "horaInicio": "09:00", "monto": 800 },
+        { "id": "h411-32", "fecha": "2029-07-07", "tipo": "trabajo", "cantidad": 5, "nota": "Q3'29 prep: Advanced TypeScript", "horaInicio": "09:00" },
+        { "id": "h411-33", "fecha": "2029-07-14", "tipo": "trabajo", "cantidad": 8, "nota": "Q3'29 Day 1: Type-level programming", "horaInicio": "09:00", "monto": 800 },
+        { "id": "h411-34", "fecha": "2029-07-15", "tipo": "trabajo", "cantidad": 8, "nota": "Q3'29 Day 2: Branded types, effect-ts, zod", "horaInicio": "09:00", "monto": 800 },
+        { "id": "h411-35", "fecha": "2029-10-06", "tipo": "trabajo", "cantidad": 6, "nota": "Q4'29 prep: Platform engineering", "horaInicio": "09:00" },
+        { "id": "h411-36", "fecha": "2029-10-13", "tipo": "trabajo", "cantidad": 8, "nota": "Q4'29 Day 1: Internal developer platforms", "horaInicio": "09:00", "monto": 800 },
+        { "id": "h411-37", "fecha": "2029-10-14", "tipo": "trabajo", "cantidad": 8, "nota": "Q4'29 Day 2: Backstage + golden paths", "horaInicio": "09:00", "monto": 800 },
+        { "id": "h411-38", "fecha": "2030-01-13", "tipo": "trabajo", "cantidad": 6, "nota": "Q1'30 prep: Edge computing + React", "horaInicio": "09:00" },
+        { "id": "h411-39", "fecha": "2030-01-20", "tipo": "trabajo", "cantidad": 8, "nota": "Q1'30 Day 1: Edge runtimes + Cloudflare Workers", "horaInicio": "09:00", "monto": 800 },
+        { "id": "h411-40", "fecha": "2030-01-21", "tipo": "trabajo", "cantidad": 8, "nota": "Q1'30 Day 2: Edge databases + streaming", "horaInicio": "09:00", "monto": 800 },
+        { "id": "h411-41", "fecha": "2030-04-07", "tipo": "trabajo", "cantidad": 5, "nota": "Q2'30 prep: Web Components interop", "horaInicio": "09:00" },
+        { "id": "h411-42", "fecha": "2030-04-14", "tipo": "trabajo", "cantidad": 8, "nota": "Q2'30 Day 1: Custom elements + shadow DOM", "horaInicio": "09:00", "monto": 800 },
+        { "id": "h411-43", "fecha": "2030-04-15", "tipo": "trabajo", "cantidad": 8, "nota": "Q2'30 Day 2: React ↔ Web Components bridges", "horaInicio": "09:00", "monto": 800 }
+      ],
+      "notas": "Ongoing quarterly training contract. CaixaBank's biggest frontend investment. Rate increased to 100€/h from 2028."
+    },
+    {
+      "id": "p412-a6a6-b6b6", "nombre": "DevOps Training — Vueling", "clienteId": "c406-ll11-mm22", "color": "Gold",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2027-05-01", "finEstimada": "2027-10-31", "finReal": "2027-10-25" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 6000, "total": 0, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 1260, "importeIrpf": 900,
+        "totalFactura": 6360, "netoRecibido": 6360, "ivaExcepcion": "",
+        "pagado": true, "fechaPago": "2027-11-20", "gastos": 0,
+        "cobros": [
+          { "id": "cb412-01", "fecha": "2027-07-15", "cantidad": 3180 },
+          { "id": "cb412-02", "fecha": "2027-11-20", "cantidad": 3180 }
+        ],
+        "facturaNum": 11, "facturaFecha": "2027-10-26",
+        "idiomaFactura": "en"
+      },
+      "horas": [
+        { "id": "h412-01", "fecha": "2027-05-05", "tipo": "trabajo", "cantidad": 6, "nota": "Prep: assess Vueling's current CI/CD maturity", "horaInicio": "09:00" },
+        { "id": "h412-02", "fecha": "2027-05-19", "tipo": "trabajo", "cantidad": 7, "nota": "Session 1: Docker fundamentals + containerization", "horaInicio": "09:00" },
+        { "id": "h412-03", "fecha": "2027-06-02", "tipo": "trabajo", "cantidad": 7, "nota": "Session 2: Kubernetes basics + deployment", "horaInicio": "09:00" },
+        { "id": "h412-04", "fecha": "2027-06-23", "tipo": "trabajo", "cantidad": 7, "nota": "Session 3: CI/CD with GitHub Actions", "horaInicio": "09:00" },
+        { "id": "h412-05", "fecha": "2027-07-14", "tipo": "trabajo", "cantidad": 7, "nota": "Session 4: Monitoring + observability (Grafana)", "horaInicio": "09:00" },
+        { "id": "h412-06", "fecha": "2027-08-25", "tipo": "trabajo", "cantidad": 7, "nota": "Session 5: Infrastructure as Code (Terraform)", "horaInicio": "09:00" },
+        { "id": "h412-07", "fecha": "2027-09-15", "tipo": "trabajo", "cantidad": 7, "nota": "Session 6: Security scanning + compliance", "horaInicio": "09:00" },
+        { "id": "h412-08", "fecha": "2027-10-13", "tipo": "trabajo", "cantidad": 7, "nota": "Session 7: Capstone — deploy real microservice", "horaInicio": "09:00" },
+        { "id": "h412-09", "fecha": "2027-10-25", "tipo": "reunion", "cantidad": 2, "nota": "Final review + roadmap for Vueling DevOps adoption", "horaInicio": "10:00" }
+      ],
+      "notas": "6-month DevOps bootcamp for Vueling engineering team. 12 engineers, hands-on labs cada sesión."
+    },
+    {
+      "id": "p413-a7a7-b7b7", "nombre": "Summer Intensive — UPC", "clienteId": "c404-gg77-hh88", "color": "DarkSlateBlue",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2027-06-15", "finEstimada": "2027-06-30", "finReal": "2027-06-27" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 600, "total": 0, "precioHora": 0,
+        "iva": 0, "irpf": 15, "importeIva": 0, "importeIrpf": 90,
+        "totalFactura": 510, "netoRecibido": 510, "ivaExcepcion": "Formación exenta de IVA (art. 20.1.9 LIVA)",
+        "pagado": true, "fechaPago": "2027-07-18", "gastos": 0,
+        "cobros": [
+          { "id": "cb413-01", "fecha": "2027-07-18", "cantidad": 510 }
+        ],
+        "facturaNum": 10, "facturaFecha": "2027-06-28",
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h413-01", "fecha": "2027-06-16", "tipo": "trabajo", "cantidad": 3, "nota": "Prep: update slides for TypeScript workshop", "horaInicio": "14:00" },
+        { "id": "h413-02", "fecha": "2027-06-20", "tipo": "trabajo", "cantidad": 6, "nota": "Day 1: TypeScript + React workshop intensivo", "horaInicio": "09:00" },
+        { "id": "h413-03", "fecha": "2027-06-27", "tipo": "trabajo", "cantidad": 6, "nota": "Day 2: Full-stack project + deploy", "horaInicio": "09:00" }
+      ],
+      "notas": "UPC summer intensive — 2-day program for master's students. IVA exempt."
+    },
+    {
+      "id": "p414-a8a8-b8b8", "nombre": "Bootcamp Primavera — Barcelona Activa", "clienteId": "c403-ee55-ff66", "color": "MediumSeaGreen",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2027-03-01", "finEstimada": "2027-04-15", "finReal": "2027-04-10" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 1800, "total": 0, "precioHora": 0,
+        "iva": 0, "irpf": 15, "importeIva": 0, "importeIrpf": 270,
+        "totalFactura": 1530, "netoRecibido": 1530, "ivaExcepcion": "Formación exenta de IVA (art. 20.1.9 LIVA)",
+        "pagado": true, "fechaPago": "2027-05-05", "gastos": 0,
+        "cobros": [
+          { "id": "cb414-01", "fecha": "2027-05-05", "cantidad": 1530 }
+        ],
+        "facturaNum": 9, "facturaFecha": "2027-04-11",
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h414-01", "fecha": "2027-03-03", "tipo": "trabajo", "cantidad": 4, "nota": "Prep: new curriculum with TypeScript basics", "horaInicio": "09:00" },
+        { "id": "h414-02", "fecha": "2027-03-10", "tipo": "trabajo", "cantidad": 5, "nota": "Session 1: HTML/CSS/JS + dev tools", "horaInicio": "10:00" },
+        { "id": "h414-03", "fecha": "2027-03-17", "tipo": "trabajo", "cantidad": 5, "nota": "Session 2: JavaScript moderno + TypeScript intro", "horaInicio": "10:00" },
+        { "id": "h414-04", "fecha": "2027-03-24", "tipo": "trabajo", "cantidad": 5, "nota": "Session 3: React basics + hooks", "horaInicio": "10:00" },
+        { "id": "h414-05", "fecha": "2027-03-31", "tipo": "trabajo", "cantidad": 5, "nota": "Session 4: State management + API calls", "horaInicio": "10:00" },
+        { "id": "h414-06", "fecha": "2027-04-07", "tipo": "trabajo", "cantidad": 5, "nota": "Session 5: Proyecto final + deploy", "horaInicio": "10:00" },
+        { "id": "h414-07", "fecha": "2027-04-10", "tipo": "trabajo", "cantidad": 2, "nota": "Grading + certificates", "horaInicio": "15:00" }
+      ],
+      "notas": "Spring bootcamp 2027. Mismo formato que otoño pero con TypeScript."
+    },
+    {
+      "id": "p415-a9a9-b9b9", "nombre": "JSConf Barcelona 2027", "clienteId": null, "color": "Crimson",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2027-11-01", "finEstimada": "2027-11-12", "finReal": "2027-11-11" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 1000, "total": 0, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 210, "importeIrpf": 150,
+        "totalFactura": 1060, "netoRecibido": 1060, "ivaExcepcion": "",
+        "pagado": true, "fechaPago": "2027-12-10", "gastos": 0,
+        "cobros": [
+          { "id": "cb415-01", "fecha": "2027-12-10", "cantidad": 1060 }
+        ],
+        "facturaNum": 12, "facturaFecha": "2027-11-12",
+        "idiomaFactura": "en"
+      },
+      "horas": [
+        { "id": "h415-01", "fecha": "2027-11-03", "tipo": "trabajo", "cantidad": 6, "nota": "Prepare talk: 'Building Resilient UIs with Error Boundaries'", "horaInicio": "09:00" },
+        { "id": "h415-02", "fecha": "2027-11-11", "tipo": "trabajo", "cantidad": 5, "nota": "Conference day — talk + panel on training culture", "horaInicio": "09:00" }
+      ],
+      "notas": "JSConf 2027 — invited speaker. Higher fee this year, 45 min slot."
+    },
+    {
+      "id": "p416-b1b1-c1c1", "nombre": "Tech Podcast — El Frontend", "clienteId": null, "color": "MediumPurple",
+      "estado": "activo", "interno": true, "recurrente": true,
+      "fechas": { "inicio": "2027-09-01", "finEstimada": null, "finReal": null },
+      "facturacion": {
+        "modo": "gratis", "baseImponible": 0, "total": 0, "precioHora": 0,
+        "iva": 0, "irpf": 0, "importeIva": 0, "importeIrpf": 0,
+        "totalFactura": 0, "netoRecibido": 0, "ivaExcepcion": "",
+        "pagado": false, "fechaPago": null, "gastos": 0,
+        "cobros": [],
+        "facturaNum": null, "facturaFecha": null,
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h416-01", "fecha": "2027-09-05", "tipo": "trabajo", "cantidad": 4, "nota": "Setup podcast: branding, Buzzsprout, intro music", "horaInicio": "09:00" },
+        { "id": "h416-02", "fecha": "2027-09-15", "tipo": "trabajo", "cantidad": 3, "nota": "Ep 1: '¿Por qué TypeScript en 2027?'", "horaInicio": "10:00" },
+        { "id": "h416-03", "fecha": "2027-10-01", "tipo": "trabajo", "cantidad": 3, "nota": "Ep 2: 'React Server Components explicado'", "horaInicio": "10:00" },
+        { "id": "h416-04", "fecha": "2027-11-15", "tipo": "trabajo", "cantidad": 3, "nota": "Ep 3: Interview with guest — CTO Factorial", "horaInicio": "10:00" },
+        { "id": "h416-05", "fecha": "2027-12-10", "tipo": "trabajo", "cantidad": 3, "nota": "Ep 4: 'Mi experiencia como formador tech'", "horaInicio": "10:00" },
+        { "id": "h416-06", "fecha": "2028-01-20", "tipo": "trabajo", "cantidad": 3, "nota": "Ep 5: 'Tendencias frontend 2028'", "horaInicio": "10:00" },
+        { "id": "h416-07", "fecha": "2028-03-15", "tipo": "trabajo", "cantidad": 3, "nota": "Ep 6: Interview — devrel at Vercel", "horaInicio": "10:00" },
+        { "id": "h416-08", "fecha": "2028-05-10", "tipo": "trabajo", "cantidad": 3, "nota": "Ep 7: 'Cómo montar tu carrera en tech training'", "horaInicio": "10:00" },
+        { "id": "h416-09", "fecha": "2028-07-20", "tipo": "trabajo", "cantidad": 3, "nota": "Ep 8: 'AI tools para developers'", "horaInicio": "10:00" },
+        { "id": "h416-10", "fecha": "2028-10-05", "tipo": "trabajo", "cantidad": 3, "nota": "Ep 9: Interview — engineering manager at N26", "horaInicio": "10:00" },
+        { "id": "h416-11", "fecha": "2029-01-18", "tipo": "trabajo", "cantidad": 3, "nota": "Ep 10: 'El futuro del frontend en 2029'", "horaInicio": "10:00" },
+        { "id": "h416-12", "fecha": "2029-04-12", "tipo": "trabajo", "cantidad": 3, "nota": "Ep 11: 'De bootcamp a senior — career paths'", "horaInicio": "10:00" },
+        { "id": "h416-13", "fecha": "2029-07-20", "tipo": "trabajo", "cantidad": 3, "nota": "Ep 12: Interview — Vueling tech lead", "horaInicio": "10:00" },
+        { "id": "h416-14", "fecha": "2029-10-15", "tipo": "trabajo", "cantidad": 3, "nota": "Ep 13: 'Open source en España'", "horaInicio": "10:00" },
+        { "id": "h416-15", "fecha": "2030-01-20", "tipo": "trabajo", "cantidad": 3, "nota": "Ep 14: '3 años de podcast — lo que he aprendido'", "horaInicio": "10:00" },
+        { "id": "h416-16", "fecha": "2030-04-10", "tipo": "trabajo", "cantidad": 3, "nota": "Ep 15: 'Web platform 2030 — qué ha cambiado'", "horaInicio": "10:00" }
+      ],
+      "notas": "\"El Frontend\" — tech podcast in Spanish. Bimonthly episodes. Monetization TBD, currently for brand building."
+    },
+    {
+      "id": "p417-b2b2-c2c2", "nombre": "Vueling Consulting", "clienteId": "c406-ll11-mm22", "color": "Gold",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2028-02-01", "finEstimada": "2028-07-31", "finReal": "2028-07-25" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 8000, "total": 0, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 1680, "importeIrpf": 1200,
+        "totalFactura": 8480, "netoRecibido": 8480, "ivaExcepcion": "",
+        "pagado": true, "fechaPago": "2028-08-22", "gastos": 0,
+        "cobros": [
+          { "id": "cb417-01", "fecha": "2028-04-15", "cantidad": 4240 },
+          { "id": "cb417-02", "fecha": "2028-08-22", "cantidad": 4240 }
+        ],
+        "facturaNum": 16, "facturaFecha": "2028-07-26",
+        "idiomaFactura": "en"
+      },
+      "horas": [
+        { "id": "h417-01", "fecha": "2028-02-05", "tipo": "trabajo", "cantidad": 8, "nota": "Architecture audit — current frontend stack", "horaInicio": "09:00" },
+        { "id": "h417-02", "fecha": "2028-02-19", "tipo": "trabajo", "cantidad": 7, "nota": "Design system review + recommendations", "horaInicio": "09:00" },
+        { "id": "h417-03", "fecha": "2028-03-11", "tipo": "trabajo", "cantidad": 7, "nota": "Migration plan: legacy jQuery → React", "horaInicio": "09:00" },
+        { "id": "h417-04", "fecha": "2028-03-25", "tipo": "reunion", "cantidad": 2, "nota": "Present migration roadmap to CTO", "horaInicio": "10:00" },
+        { "id": "h417-05", "fecha": "2028-04-15", "tipo": "trabajo", "cantidad": 8, "nota": "Hands-on: pilot migration of booking flow", "horaInicio": "09:00" },
+        { "id": "h417-06", "fecha": "2028-05-13", "tipo": "trabajo", "cantidad": 7, "nota": "Code review + pair programming con equipo", "horaInicio": "09:00" },
+        { "id": "h417-07", "fecha": "2028-06-10", "tipo": "trabajo", "cantidad": 7, "nota": "Testing strategy + CI/CD for new stack", "horaInicio": "09:00" },
+        { "id": "h417-08", "fecha": "2028-07-08", "tipo": "trabajo", "cantidad": 7, "nota": "Performance benchmarks + optimization", "horaInicio": "09:00" },
+        { "id": "h417-09", "fecha": "2028-07-25", "tipo": "reunion", "cantidad": 2, "nota": "Final delivery — documentation + handoff", "horaInicio": "10:00" }
+      ],
+      "notas": "Strategic consulting: help Vueling migrate booking frontend to React. 6-month engagement."
+    },
+    {
+      "id": "p418-b3b3-c3c3", "nombre": "Remote Training — N26", "clienteId": "c407-nn33-pp44", "color": "Turquoise",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2028-03-01", "finEstimada": "2028-08-31", "finReal": "2028-08-22" },
+      "facturacion": {
+        "modo": "por_hora", "baseImponible": 0, "total": 0, "precioHora": 100,
+        "iva": 0, "irpf": 0, "importeIva": 0, "importeIrpf": 0,
+        "totalFactura": 0, "netoRecibido": 0, "ivaExcepcion": "Intracomunitaria — inversión sujeto pasivo (art. 84.1.2 LIVA)",
+        "pagado": true, "fechaPago": "2028-09-15", "gastos": 0,
+        "cobros": [
+          { "id": "cb418-01", "fecha": "2028-06-15", "cantidad": 3500 },
+          { "id": "cb418-02", "fecha": "2028-09-15", "cantidad": 3200 }
+        ],
+        "facturaNum": 17, "facturaFecha": "2028-08-23",
+        "idiomaFactura": "en"
+      },
+      "horas": [
+        { "id": "h418-01", "fecha": "2028-03-07", "tipo": "trabajo", "cantidad": 5, "nota": "Prep: N26 tech stack assessment + curriculum", "horaInicio": "09:00" },
+        { "id": "h418-02", "fecha": "2028-03-18", "tipo": "trabajo", "cantidad": 7, "nota": "Session 1: React patterns for fintech (remote)", "horaInicio": "10:00", "monto": 700 },
+        { "id": "h418-03", "fecha": "2028-04-08", "tipo": "trabajo", "cantidad": 7, "nota": "Session 2: State machines + XState for banking flows", "horaInicio": "10:00", "monto": 700 },
+        { "id": "h418-04", "fecha": "2028-05-06", "tipo": "trabajo", "cantidad": 7, "nota": "Session 3: Security patterns — CSP, XSS prevention", "horaInicio": "10:00", "monto": 700 },
+        { "id": "h418-05", "fecha": "2028-06-03", "tipo": "trabajo", "cantidad": 7, "nota": "Session 4: Performance + bundle optimization", "horaInicio": "10:00", "monto": 700 },
+        { "id": "h418-06", "fecha": "2028-07-01", "tipo": "trabajo", "cantidad": 7, "nota": "Session 5: Testing strategies for financial apps", "horaInicio": "10:00", "monto": 700 },
+        { "id": "h418-07", "fecha": "2028-08-05", "tipo": "trabajo", "cantidad": 7, "nota": "Session 6: Architecture review + capstone", "horaInicio": "10:00", "monto": 700 },
+        { "id": "h418-08", "fecha": "2028-08-22", "tipo": "reunion", "cantidad": 1.5, "nota": "Wrap-up + feedback session with VP Eng", "horaInicio": "14:00" }
+      ],
+      "notas": "Remote training for N26 Barcelona team. All sessions via Zoom. IVA reverse charge (intracomunitaria)."
+    },
+    {
+      "id": "p419-b4b4-c4c4", "nombre": "Annual Bootcamp Contract — Barcelona Activa 2028", "clienteId": "c403-ee55-ff66", "color": "MediumSeaGreen",
+      "estado": "completado", "interno": false, "recurrente": true,
+      "fechas": { "inicio": "2028-02-01", "finEstimada": "2028-12-15", "finReal": "2028-12-10" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 5400, "total": 0, "precioHora": 0,
+        "iva": 0, "irpf": 15, "importeIva": 0, "importeIrpf": 810,
+        "totalFactura": 4590, "netoRecibido": 4590, "ivaExcepcion": "Formación exenta de IVA (art. 20.1.9 LIVA)",
+        "pagado": true, "fechaPago": "2029-01-10", "gastos": 0,
+        "cobros": [
+          { "id": "cb419-01", "fecha": "2028-05-10", "cantidad": 1530 },
+          { "id": "cb419-02", "fecha": "2028-08-12", "cantidad": 1530 },
+          { "id": "cb419-03", "fecha": "2029-01-10", "cantidad": 1530 }
+        ],
+        "facturaNum": 20, "facturaFecha": "2028-12-11",
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h419-01", "fecha": "2028-02-15", "tipo": "trabajo", "cantidad": 4, "nota": "Bootcamp 1 prep: curriculum update for 2028", "horaInicio": "09:00" },
+        { "id": "h419-02", "fecha": "2028-02-22", "tipo": "trabajo", "cantidad": 5, "nota": "Bootcamp 1 Session 1: Web fundamentals", "horaInicio": "10:00" },
+        { "id": "h419-03", "fecha": "2028-03-01", "tipo": "trabajo", "cantidad": 5, "nota": "Bootcamp 1 Session 2: JS + TS", "horaInicio": "10:00" },
+        { "id": "h419-04", "fecha": "2028-03-08", "tipo": "trabajo", "cantidad": 5, "nota": "Bootcamp 1 Session 3: React", "horaInicio": "10:00" },
+        { "id": "h419-05", "fecha": "2028-03-15", "tipo": "trabajo", "cantidad": 5, "nota": "Bootcamp 1 Session 4: Proyecto final", "horaInicio": "10:00" },
+        { "id": "h419-06", "fecha": "2028-06-05", "tipo": "trabajo", "cantidad": 4, "nota": "Bootcamp 2 prep: summer edition tweaks", "horaInicio": "09:00" },
+        { "id": "h419-07", "fecha": "2028-06-12", "tipo": "trabajo", "cantidad": 5, "nota": "Bootcamp 2 Session 1", "horaInicio": "10:00" },
+        { "id": "h419-08", "fecha": "2028-06-19", "tipo": "trabajo", "cantidad": 5, "nota": "Bootcamp 2 Session 2", "horaInicio": "10:00" },
+        { "id": "h419-09", "fecha": "2028-06-26", "tipo": "trabajo", "cantidad": 5, "nota": "Bootcamp 2 Session 3", "horaInicio": "10:00" },
+        { "id": "h419-10", "fecha": "2028-07-03", "tipo": "trabajo", "cantidad": 5, "nota": "Bootcamp 2 Session 4 + presentations", "horaInicio": "10:00" },
+        { "id": "h419-11", "fecha": "2028-10-10", "tipo": "trabajo", "cantidad": 4, "nota": "Bootcamp 3 prep: add AI basics module", "horaInicio": "09:00" },
+        { "id": "h419-12", "fecha": "2028-10-17", "tipo": "trabajo", "cantidad": 5, "nota": "Bootcamp 3 Session 1", "horaInicio": "10:00" },
+        { "id": "h419-13", "fecha": "2028-10-24", "tipo": "trabajo", "cantidad": 5, "nota": "Bootcamp 3 Session 2", "horaInicio": "10:00" },
+        { "id": "h419-14", "fecha": "2028-10-31", "tipo": "trabajo", "cantidad": 5, "nota": "Bootcamp 3 Session 3", "horaInicio": "10:00" },
+        { "id": "h419-15", "fecha": "2028-11-07", "tipo": "trabajo", "cantidad": 5, "nota": "Bootcamp 3 Session 4 + proyecto final", "horaInicio": "10:00" },
+        { "id": "h419-16", "fecha": "2028-12-10", "tipo": "trabajo", "cantidad": 3, "nota": "Annual report + grading all 3 bootcamps", "horaInicio": "14:00" }
+      ],
+      "notas": "Annual contract — 3 bootcamps (spring, summer, fall). 1800€ each. IVA exempt."
+    },
+    {
+      "id": "p420-b5b5-c5c5", "nombre": "TypeScript Masterclass (Udemy)", "clienteId": null, "color": "Goldenrod",
+      "estado": "activo", "interno": true, "recurrente": true,
+      "fechas": { "inicio": "2028-04-01", "finEstimada": null, "finReal": null },
+      "facturacion": {
+        "modo": "gratis", "baseImponible": 0, "total": 0, "precioHora": 0,
+        "iva": 0, "irpf": 0, "importeIva": 0, "importeIrpf": 0,
+        "totalFactura": 0, "netoRecibido": 0, "ivaExcepcion": "",
+        "pagado": false, "fechaPago": null, "gastos": 0,
+        "cobros": [],
+        "facturaNum": null, "facturaFecha": null,
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h420-01", "fecha": "2028-04-05", "tipo": "trabajo", "cantidad": 6, "nota": "Course outline + Udemy listing", "horaInicio": "09:00" },
+        { "id": "h420-02", "fecha": "2028-04-20", "tipo": "trabajo", "cantidad": 7, "nota": "Record sections 1-2: TS basics + type system", "horaInicio": "09:00" },
+        { "id": "h420-03", "fecha": "2028-05-15", "tipo": "trabajo", "cantidad": 7, "nota": "Record sections 3-4: Generics + utility types", "horaInicio": "09:00" },
+        { "id": "h420-04", "fecha": "2028-06-10", "tipo": "trabajo", "cantidad": 5, "nota": "Edit + subtítulos sections 1-4", "horaInicio": "10:00" },
+        { "id": "h420-05", "fecha": "2028-07-08", "tipo": "trabajo", "cantidad": 7, "nota": "Record sections 5-6: Decorators + advanced patterns", "horaInicio": "09:00" },
+        { "id": "h420-06", "fecha": "2028-08-12", "tipo": "trabajo", "cantidad": 7, "nota": "Record sections 7-8: TS + React + Node", "horaInicio": "09:00" },
+        { "id": "h420-07", "fecha": "2028-09-05", "tipo": "trabajo", "cantidad": 5, "nota": "Final edit + launch on Udemy!", "horaInicio": "09:00" },
+        { "id": "h420-08", "fecha": "2029-03-10", "tipo": "trabajo", "cantidad": 4, "nota": "Update for TS 5.5 changes", "horaInicio": "09:00" },
+        { "id": "h420-09", "fecha": "2029-10-20", "tipo": "trabajo", "cantidad": 3, "nota": "New bonus section: Type-safe APIs with tRPC", "horaInicio": "09:00" },
+        { "id": "h420-10", "fecha": "2030-04-08", "tipo": "trabajo", "cantidad": 4, "nota": "Major update for TS 6.0", "horaInicio": "09:00" }
+      ],
+      "notas": "\"TypeScript Masterclass: From Zero to Advanced\" — second Udemy course. Revenue tracked outside Trackr."
+    },
+    {
+      "id": "p421-b6b6-c6c6", "nombre": "1-on-1 Mentoring", "clienteId": null, "color": "HotPink",
+      "estado": "activo", "interno": false, "recurrente": true,
+      "fechas": { "inicio": "2028-11-01", "finEstimada": null, "finReal": null },
+      "facturacion": {
+        "modo": "por_hora", "baseImponible": 0, "total": 0, "precioHora": 120,
+        "iva": 21, "irpf": 15, "importeIva": 0, "importeIrpf": 0,
+        "totalFactura": 0, "netoRecibido": 0, "ivaExcepcion": "",
+        "pagado": false, "fechaPago": null, "gastos": 0,
+        "cobros": [
+          { "id": "cb421-01", "fecha": "2029-01-10", "cantidad": 580 },
+          { "id": "cb421-02", "fecha": "2029-04-12", "cantidad": 870 },
+          { "id": "cb421-03", "fecha": "2029-07-15", "cantidad": 870 },
+          { "id": "cb421-04", "fecha": "2029-10-14", "cantidad": 1020 },
+          { "id": "cb421-05", "fecha": "2030-01-13", "cantidad": 1020 },
+          { "id": "cb421-06", "fecha": "2030-04-14", "cantidad": 1020 }
+        ],
+        "facturaNum": 34, "facturaFecha": "2030-03-31",
+        "idiomaFactura": "en"
+      },
+      "horas": [
+        { "id": "h421-01", "fecha": "2028-11-05", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 1 (Laura): career planning session", "horaInicio": "18:00", "monto": 120 },
+        { "id": "h421-02", "fecha": "2028-11-19", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 1 (Laura): React portfolio review", "horaInicio": "18:00", "monto": 120 },
+        { "id": "h421-03", "fecha": "2028-12-03", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 2 (Marc): TS fundamentals coaching", "horaInicio": "19:00", "monto": 120 },
+        { "id": "h421-04", "fecha": "2028-12-17", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 1 (Laura): interview prep", "horaInicio": "18:00", "monto": 120 },
+        { "id": "h421-05", "fecha": "2029-01-14", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 2 (Marc): advanced patterns session", "horaInicio": "19:00", "monto": 120 },
+        { "id": "h421-06", "fecha": "2029-01-28", "tipo": "trabajo", "cantidad": 1.5, "nota": "Mentee 3 (Aina): onboarding + goals", "horaInicio": "18:00", "monto": 180 },
+        { "id": "h421-07", "fecha": "2029-02-11", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 1 (Laura): new job check-in", "horaInicio": "18:00", "monto": 120 },
+        { "id": "h421-08", "fecha": "2029-02-25", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 2 (Marc): side project review", "horaInicio": "19:00", "monto": 120 },
+        { "id": "h421-09", "fecha": "2029-03-11", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 3 (Aina): React hooks deep dive", "horaInicio": "18:00", "monto": 120 },
+        { "id": "h421-10", "fecha": "2029-03-25", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 2 (Marc): open source contribution plan", "horaInicio": "19:00", "monto": 120 },
+        { "id": "h421-11", "fecha": "2029-04-08", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 1 (Laura): leadership skills", "horaInicio": "18:00", "monto": 120 },
+        { "id": "h421-12", "fecha": "2029-04-22", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 3 (Aina): fullstack project guidance", "horaInicio": "18:00", "monto": 120 },
+        { "id": "h421-13", "fecha": "2029-05-13", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 2 (Marc): job search strategy", "horaInicio": "19:00", "monto": 120 },
+        { "id": "h421-14", "fecha": "2029-05-27", "tipo": "trabajo", "cantidad": 1.5, "nota": "Mentee 4 (Pol): onboarding — career pivot to frontend", "horaInicio": "18:00", "monto": 180 },
+        { "id": "h421-15", "fecha": "2029-06-10", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 3 (Aina): TypeScript patterns", "horaInicio": "18:00", "monto": 120 },
+        { "id": "h421-16", "fecha": "2029-06-24", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 4 (Pol): HTML/CSS/JS foundations", "horaInicio": "18:00", "monto": 120 },
+        { "id": "h421-17", "fecha": "2029-07-08", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 1 (Laura): senior dev skills", "horaInicio": "18:00", "monto": 120 },
+        { "id": "h421-18", "fecha": "2029-07-22", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 4 (Pol): React basics review", "horaInicio": "18:00", "monto": 120 },
+        { "id": "h421-19", "fecha": "2029-08-12", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 3 (Aina): testing strategies", "horaInicio": "18:00", "monto": 120 },
+        { "id": "h421-20", "fecha": "2029-09-09", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 2 (Marc): new role onboarding tips", "horaInicio": "19:00", "monto": 120 },
+        { "id": "h421-21", "fecha": "2029-09-23", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 4 (Pol): portfolio building", "horaInicio": "18:00", "monto": 120 },
+        { "id": "h421-22", "fecha": "2029-10-07", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 3 (Aina): career next steps", "horaInicio": "18:00", "monto": 120 },
+        { "id": "h421-23", "fecha": "2029-10-28", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 4 (Pol): interview preparation", "horaInicio": "18:00", "monto": 120 },
+        { "id": "h421-24", "fecha": "2029-11-11", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 1 (Laura): tech lead transition", "horaInicio": "18:00", "monto": 120 },
+        { "id": "h421-25", "fecha": "2029-12-09", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 4 (Pol): primeros pasos como junior", "horaInicio": "18:00", "monto": 120 },
+        { "id": "h421-26", "fecha": "2030-01-13", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 3 (Aina): 2030 goals planning", "horaInicio": "18:00", "monto": 120 },
+        { "id": "h421-27", "fecha": "2030-01-27", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 4 (Pol): code review practices", "horaInicio": "18:00", "monto": 120 },
+        { "id": "h421-28", "fecha": "2030-02-10", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 1 (Laura): managing a team", "horaInicio": "18:00", "monto": 120 },
+        { "id": "h421-29", "fecha": "2030-03-10", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 3 (Aina): advanced React patterns", "horaInicio": "18:00", "monto": 120 },
+        { "id": "h421-30", "fecha": "2030-03-24", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 4 (Pol): mid-junior check-in", "horaInicio": "18:00", "monto": 120 },
+        { "id": "h421-31", "fecha": "2030-04-14", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 1 (Laura): engineering strategy session", "horaInicio": "18:00", "monto": 120 },
+        { "id": "h421-32", "fecha": "2030-04-28", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 3 (Aina): system design review", "horaInicio": "18:00", "monto": 120 },
+        { "id": "h421-33", "fecha": "2030-05-12", "tipo": "trabajo", "cantidad": 1, "nota": "Mentee 4 (Pol): promotion preparation", "horaInicio": "18:00", "monto": 120 }
+      ],
+      "notas": "1-on-1 mentoring sessions. Started with 2 mentees, grew to 4 by mid-2029. Biweekly cadence per mentee."
+    },
+    {
+      "id": "p422-b7b7-c7c7", "nombre": "ReactConf EU Berlin 2029", "clienteId": null, "color": "Crimson",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2029-05-01", "finEstimada": "2029-05-17", "finReal": "2029-05-16" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 1500, "total": 0, "precioHora": 0,
+        "iva": 0, "irpf": 0, "importeIva": 0, "importeIrpf": 0,
+        "totalFactura": 1500, "netoRecibido": 1500, "ivaExcepcion": "Intracomunitaria — inversión sujeto pasivo (art. 84.1.2 LIVA)",
+        "pagado": true, "fechaPago": "2029-06-10", "gastos": 450,
+        "cobros": [
+          { "id": "cb422-01", "fecha": "2029-06-10", "cantidad": 1500 }
+        ],
+        "facturaNum": 26, "facturaFecha": "2029-05-17",
+        "idiomaFactura": "en"
+      },
+      "horas": [
+        { "id": "h422-01", "fecha": "2029-05-05", "tipo": "trabajo", "cantidad": 6, "nota": "Prepare talk: 'Training 1000 Developers — What I Learned'", "horaInicio": "09:00" },
+        { "id": "h422-02", "fecha": "2029-05-12", "tipo": "trabajo", "cantidad": 4, "nota": "Rehearsal + slide polish", "horaInicio": "14:00" },
+        { "id": "h422-03", "fecha": "2029-05-15", "tipo": "trabajo", "cantidad": 3, "nota": "Travel to Berlin + conference prep", "horaInicio": "09:00" },
+        { "id": "h422-04", "fecha": "2029-05-16", "tipo": "trabajo", "cantidad": 6, "nota": "ReactConf EU — talk + workshops + networking", "horaInicio": "09:00" }
+      ],
+      "notas": "ReactConf EU Berlin — 45 min talk. Travel expenses: flights + 2 nights hotel ~450€."
+    },
+    {
+      "id": "p423-b8b8-c8c8", "nombre": "N26 Berlin Team Training", "clienteId": "c407-nn33-pp44", "color": "Turquoise",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2029-06-01", "finEstimada": "2029-11-30", "finReal": "2029-11-20" },
+      "facturacion": {
+        "modo": "por_hora", "baseImponible": 0, "total": 0, "precioHora": 100,
+        "iva": 0, "irpf": 0, "importeIva": 0, "importeIrpf": 0,
+        "totalFactura": 0, "netoRecibido": 0, "ivaExcepcion": "Intracomunitaria — inversión sujeto pasivo (art. 84.1.2 LIVA)",
+        "pagado": true, "fechaPago": "2029-12-15", "gastos": 0,
+        "cobros": [
+          { "id": "cb423-01", "fecha": "2029-09-10", "cantidad": 3400 },
+          { "id": "cb423-02", "fecha": "2029-12-15", "cantidad": 3200 }
+        ],
+        "facturaNum": 29, "facturaFecha": "2029-11-21",
+        "idiomaFactura": "en"
+      },
+      "horas": [
+        { "id": "h423-01", "fecha": "2029-06-09", "tipo": "trabajo", "cantidad": 5, "nota": "Prep: Berlin team assessment + curriculum", "horaInicio": "09:00" },
+        { "id": "h423-02", "fecha": "2029-06-23", "tipo": "trabajo", "cantidad": 7, "nota": "Session 1: React advanced patterns (remote)", "horaInicio": "10:00", "monto": 700 },
+        { "id": "h423-03", "fecha": "2029-07-14", "tipo": "trabajo", "cantidad": 7, "nota": "Session 2: Micro-frontends architecture", "horaInicio": "10:00", "monto": 700 },
+        { "id": "h423-04", "fecha": "2029-08-11", "tipo": "trabajo", "cantidad": 7, "nota": "Session 3: Real-time features + WebSockets", "horaInicio": "10:00", "monto": 700 },
+        { "id": "h423-05", "fecha": "2029-09-08", "tipo": "trabajo", "cantidad": 7, "nota": "Session 4: Performance profiling + Core Web Vitals", "horaInicio": "10:00", "monto": 700 },
+        { "id": "h423-06", "fecha": "2029-10-06", "tipo": "trabajo", "cantidad": 7, "nota": "Session 5: AI-assisted development workflows", "horaInicio": "10:00", "monto": 700 },
+        { "id": "h423-07", "fecha": "2029-11-03", "tipo": "trabajo", "cantidad": 7, "nota": "Session 6: Capstone — rebuild payments UI", "horaInicio": "10:00", "monto": 700 },
+        { "id": "h423-08", "fecha": "2029-11-20", "tipo": "reunion", "cantidad": 1.5, "nota": "Final review with Berlin VP Engineering", "horaInicio": "14:00" }
+      ],
+      "notas": "Extended N26 engagement — Berlin-based team. Same format as BCN training. All remote."
+    },
+    {
+      "id": "p424-b9b9-c9c9", "nombre": "Vueling Frontend Coaching 2029", "clienteId": "c406-ll11-mm22", "color": "Gold",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2029-03-01", "finEstimada": "2029-08-31", "finReal": "2029-08-20" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 6000, "total": 0, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 1260, "importeIrpf": 900,
+        "totalFactura": 6360, "netoRecibido": 6360, "ivaExcepcion": "",
+        "pagado": true, "fechaPago": "2029-09-18", "gastos": 0,
+        "cobros": [
+          { "id": "cb424-01", "fecha": "2029-06-10", "cantidad": 3180 },
+          { "id": "cb424-02", "fecha": "2029-09-18", "cantidad": 3180 }
+        ],
+        "facturaNum": 27, "facturaFecha": "2029-08-21",
+        "idiomaFactura": "en"
+      },
+      "horas": [
+        { "id": "h424-01", "fecha": "2029-03-10", "tipo": "trabajo", "cantidad": 6, "nota": "Assess post-migration frontend health", "horaInicio": "09:00" },
+        { "id": "h424-02", "fecha": "2029-03-24", "tipo": "trabajo", "cantidad": 7, "nota": "Session 1: React best practices review", "horaInicio": "09:00" },
+        { "id": "h424-03", "fecha": "2029-04-21", "tipo": "trabajo", "cantidad": 7, "nota": "Session 2: Advanced state management", "horaInicio": "09:00" },
+        { "id": "h424-04", "fecha": "2029-05-19", "tipo": "trabajo", "cantidad": 7, "nota": "Session 3: Accessibility + i18n patterns", "horaInicio": "09:00" },
+        { "id": "h424-05", "fecha": "2029-06-16", "tipo": "trabajo", "cantidad": 7, "nota": "Session 4: Design system evolution", "horaInicio": "09:00" },
+        { "id": "h424-06", "fecha": "2029-07-14", "tipo": "trabajo", "cantidad": 7, "nota": "Session 5: Performance monitoring setup", "horaInicio": "09:00" },
+        { "id": "h424-07", "fecha": "2029-08-18", "tipo": "trabajo", "cantidad": 7, "nota": "Session 6: Team autonomy + coding standards", "horaInicio": "09:00" },
+        { "id": "h424-08", "fecha": "2029-08-20", "tipo": "reunion", "cantidad": 2, "nota": "Final report delivery to CTO", "horaInicio": "10:00" }
+      ],
+      "notas": "Second Vueling engagement — post-migration coaching. Focus on team upskilling."
+    },
+    {
+      "id": "p425-c1c1-d1d1", "nombre": "Annual Bootcamp Contract — Barcelona Activa 2029", "clienteId": "c403-ee55-ff66", "color": "MediumSeaGreen",
+      "estado": "completado", "interno": false, "recurrente": true,
+      "fechas": { "inicio": "2029-02-01", "finEstimada": "2029-12-15", "finReal": "2029-12-05" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 5400, "total": 0, "precioHora": 0,
+        "iva": 0, "irpf": 15, "importeIva": 0, "importeIrpf": 810,
+        "totalFactura": 4590, "netoRecibido": 4590, "ivaExcepcion": "Formación exenta de IVA (art. 20.1.9 LIVA)",
+        "pagado": true, "fechaPago": "2030-01-08", "gastos": 0,
+        "cobros": [
+          { "id": "cb425-01", "fecha": "2029-05-10", "cantidad": 1530 },
+          { "id": "cb425-02", "fecha": "2029-08-15", "cantidad": 1530 },
+          { "id": "cb425-03", "fecha": "2030-01-08", "cantidad": 1530 }
+        ],
+        "facturaNum": 31, "facturaFecha": "2029-12-06",
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h425-01", "fecha": "2029-02-10", "tipo": "trabajo", "cantidad": 4, "nota": "Bootcamp 1 prep: AI module expansion", "horaInicio": "09:00" },
+        { "id": "h425-02", "fecha": "2029-02-17", "tipo": "trabajo", "cantidad": 5, "nota": "Bootcamp 1 S1: Web fundamentals", "horaInicio": "10:00" },
+        { "id": "h425-03", "fecha": "2029-02-24", "tipo": "trabajo", "cantidad": 5, "nota": "Bootcamp 1 S2: JS + TS", "horaInicio": "10:00" },
+        { "id": "h425-04", "fecha": "2029-03-03", "tipo": "trabajo", "cantidad": 5, "nota": "Bootcamp 1 S3: React", "horaInicio": "10:00" },
+        { "id": "h425-05", "fecha": "2029-03-10", "tipo": "trabajo", "cantidad": 5, "nota": "Bootcamp 1 S4: Proyecto final", "horaInicio": "10:00" },
+        { "id": "h425-06", "fecha": "2029-06-02", "tipo": "trabajo", "cantidad": 4, "nota": "Bootcamp 2 prep: summer edition", "horaInicio": "09:00" },
+        { "id": "h425-07", "fecha": "2029-06-09", "tipo": "trabajo", "cantidad": 5, "nota": "Bootcamp 2 S1", "horaInicio": "10:00" },
+        { "id": "h425-08", "fecha": "2029-06-16", "tipo": "trabajo", "cantidad": 5, "nota": "Bootcamp 2 S2", "horaInicio": "10:00" },
+        { "id": "h425-09", "fecha": "2029-06-23", "tipo": "trabajo", "cantidad": 5, "nota": "Bootcamp 2 S3", "horaInicio": "10:00" },
+        { "id": "h425-10", "fecha": "2029-06-30", "tipo": "trabajo", "cantidad": 5, "nota": "Bootcamp 2 S4 + presentations", "horaInicio": "10:00" },
+        { "id": "h425-11", "fecha": "2029-10-07", "tipo": "trabajo", "cantidad": 4, "nota": "Bootcamp 3 prep: fall edition", "horaInicio": "09:00" },
+        { "id": "h425-12", "fecha": "2029-10-14", "tipo": "trabajo", "cantidad": 5, "nota": "Bootcamp 3 S1", "horaInicio": "10:00" },
+        { "id": "h425-13", "fecha": "2029-10-21", "tipo": "trabajo", "cantidad": 5, "nota": "Bootcamp 3 S2", "horaInicio": "10:00" },
+        { "id": "h425-14", "fecha": "2029-10-28", "tipo": "trabajo", "cantidad": 5, "nota": "Bootcamp 3 S3", "horaInicio": "10:00" },
+        { "id": "h425-15", "fecha": "2029-11-04", "tipo": "trabajo", "cantidad": 5, "nota": "Bootcamp 3 S4 + proyecto final", "horaInicio": "10:00" },
+        { "id": "h425-16", "fecha": "2029-12-05", "tipo": "trabajo", "cantidad": 3, "nota": "Annual report + informe para el ayuntamiento", "horaInicio": "14:00" }
+      ],
+      "notas": "Barcelona Activa 2029 — 3 bootcamps. Added AI basics to curriculum this year."
+    },
+    {
+      "id": "p426-c2c2-d2d2", "nombre": "Digital Transformation — Seat/Cupra", "clienteId": "c408-qq55-rr66", "color": "Crimson",
+      "estado": "activo", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2030-01-15", "finEstimada": "2030-07-31", "finReal": null },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 12000, "total": 0, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 2520, "importeIrpf": 1800,
+        "totalFactura": 12720, "netoRecibido": 0, "ivaExcepcion": "",
+        "pagado": false, "fechaPago": null, "gastos": 0,
+        "cobros": [
+          { "id": "cb426-01", "fecha": "2030-02-15", "cantidad": 4240 }
+        ],
+        "facturaNum": 33, "facturaFecha": "2030-01-31",
+        "idiomaFactura": "en"
+      },
+      "horas": [
+        { "id": "h426-01", "fecha": "2030-01-20", "tipo": "trabajo", "cantidad": 8, "nota": "Assessment: current tech stack + team capabilities", "horaInicio": "09:00" },
+        { "id": "h426-02", "fecha": "2030-01-27", "tipo": "trabajo", "cantidad": 7, "nota": "Architecture proposal: React + micro-frontends for dealer portal", "horaInicio": "09:00" },
+        { "id": "h426-03", "fecha": "2030-02-10", "tipo": "trabajo", "cantidad": 8, "nota": "Workshop Day 1: React fundamentals for automotive team", "horaInicio": "09:00" },
+        { "id": "h426-04", "fecha": "2030-02-11", "tipo": "trabajo", "cantidad": 8, "nota": "Workshop Day 2: Component patterns + design system", "horaInicio": "09:00" },
+        { "id": "h426-05", "fecha": "2030-02-24", "tipo": "reunion", "cantidad": 2, "nota": "Progress review with Cupra digital director", "horaInicio": "10:00" },
+        { "id": "h426-06", "fecha": "2030-03-10", "tipo": "trabajo", "cantidad": 8, "nota": "Workshop Day 3: State management + API integration", "horaInicio": "09:00" },
+        { "id": "h426-07", "fecha": "2030-03-11", "tipo": "trabajo", "cantidad": 8, "nota": "Workshop Day 4: Testing + CI/CD setup", "horaInicio": "09:00" },
+        { "id": "h426-08", "fecha": "2030-03-24", "tipo": "trabajo", "cantidad": 7, "nota": "Hands-on: pilot feature build con el equipo", "horaInicio": "09:00" },
+        { "id": "h426-09", "fecha": "2030-04-14", "tipo": "trabajo", "cantidad": 8, "nota": "Workshop Day 5: Performance + monitoring", "horaInicio": "09:00" },
+        { "id": "h426-10", "fecha": "2030-04-28", "tipo": "trabajo", "cantidad": 7, "nota": "Code review marathon — 3 team PRs", "horaInicio": "09:00" },
+        { "id": "h426-11", "fecha": "2030-05-12", "tipo": "trabajo", "cantidad": 8, "nota": "Workshop Day 6: Advanced patterns + architecture review", "horaInicio": "09:00" }
+      ],
+      "notas": "Biggest project to date. Seat/Cupra digital transformation — training 25 engineers on modern frontend. 6-month engagement."
+    },
+    {
+      "id": "p427-c3c3-d3d3", "nombre": "ReactConf EU 2030 — Keynote", "clienteId": null, "color": "Crimson",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2030-04-20", "finEstimada": "2030-05-10", "finReal": "2030-05-09" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 2000, "total": 0, "precioHora": 0,
+        "iva": 0, "irpf": 0, "importeIva": 0, "importeIrpf": 0,
+        "totalFactura": 2000, "netoRecibido": 2000, "ivaExcepcion": "Intracomunitaria — inversión sujeto pasivo (art. 84.1.2 LIVA)",
+        "pagado": true, "fechaPago": "2030-06-05", "gastos": 520,
+        "cobros": [
+          { "id": "cb427-01", "fecha": "2030-06-05", "cantidad": 2000 }
+        ],
+        "facturaNum": 36, "facturaFecha": "2030-05-10",
+        "idiomaFactura": "en"
+      },
+      "horas": [
+        { "id": "h427-01", "fecha": "2030-04-21", "tipo": "trabajo", "cantidad": 7, "nota": "Prepare keynote: 'The Next Wave of Frontend Training'", "horaInicio": "09:00" },
+        { "id": "h427-02", "fecha": "2030-04-28", "tipo": "trabajo", "cantidad": 5, "nota": "Keynote rehearsal + slide design", "horaInicio": "09:00" },
+        { "id": "h427-03", "fecha": "2030-05-08", "tipo": "trabajo", "cantidad": 3, "nota": "Travel to Berlin + final prep", "horaInicio": "09:00" },
+        { "id": "h427-04", "fecha": "2030-05-09", "tipo": "trabajo", "cantidad": 7, "nota": "ReactConf EU — keynote + Q&A + workshops", "horaInicio": "09:00" }
+      ],
+      "notas": "ReactConf EU 2030 — KEYNOTE speaker! Major career milestone. Travel: flights + 2 nights ~520€."
+    },
+    {
+      "id": "p428-c4c4-d4d4", "nombre": "Bootcamp Primavera — Barcelona Activa 2030", "clienteId": "c403-ee55-ff66", "color": "MediumSeaGreen",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2030-02-10", "finEstimada": "2030-03-28", "finReal": "2030-03-25" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 1800, "total": 0, "precioHora": 0,
+        "iva": 0, "irpf": 15, "importeIva": 0, "importeIrpf": 270,
+        "totalFactura": 1530, "netoRecibido": 1530, "ivaExcepcion": "Formación exenta de IVA (art. 20.1.9 LIVA)",
+        "pagado": true, "fechaPago": "2030-04-15", "gastos": 0,
+        "cobros": [
+          { "id": "cb428-01", "fecha": "2030-04-15", "cantidad": 1530 }
+        ],
+        "facturaNum": 32, "facturaFecha": "2030-03-26",
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h428-01", "fecha": "2030-02-10", "tipo": "trabajo", "cantidad": 4, "nota": "Prep: 2030 curriculum with AI-first approach", "horaInicio": "09:00" },
+        { "id": "h428-02", "fecha": "2030-02-17", "tipo": "trabajo", "cantidad": 5, "nota": "Session 1: Web fundamentals + AI dev tools", "horaInicio": "10:00" },
+        { "id": "h428-03", "fecha": "2030-02-24", "tipo": "trabajo", "cantidad": 5, "nota": "Session 2: JS + TypeScript essentials", "horaInicio": "10:00" },
+        { "id": "h428-04", "fecha": "2030-03-03", "tipo": "trabajo", "cantidad": 5, "nota": "Session 3: React + modern tooling", "horaInicio": "10:00" },
+        { "id": "h428-05", "fecha": "2030-03-17", "tipo": "trabajo", "cantidad": 5, "nota": "Session 4: Final project + demo day", "horaInicio": "10:00" },
+        { "id": "h428-06", "fecha": "2030-03-25", "tipo": "trabajo", "cantidad": 2, "nota": "Grading + feedback reports", "horaInicio": "15:00" }
+      ],
+      "notas": "Barcelona Activa spring bootcamp 2030. New AI-first curriculum approach."
     }
   ],
   "gastos": [
     { "id": "g401-aa01", "nombre": "Notion", "entradas": [
       { "fecha": "2026-01-01", "cantidad": 8, "nota": "Monthly" },
       { "fecha": "2026-02-01", "cantidad": 8, "nota": "Monthly" },
-      { "fecha": "2026-03-01", "cantidad": 8, "nota": "Monthly" }
+      { "fecha": "2026-03-01", "cantidad": 8, "nota": "Monthly" },
+      { "fecha": "2026-04-01", "cantidad": 8, "nota": "" },
+      { "fecha": "2026-05-01", "cantidad": 8, "nota": "" },
+      { "fecha": "2026-06-01", "cantidad": 8, "nota": "" },
+      { "fecha": "2026-07-01", "cantidad": 8, "nota": "" },
+      { "fecha": "2026-08-01", "cantidad": 8, "nota": "" },
+      { "fecha": "2026-09-01", "cantidad": 8, "nota": "" },
+      { "fecha": "2026-10-01", "cantidad": 8, "nota": "" },
+      { "fecha": "2026-11-01", "cantidad": 8, "nota": "" },
+      { "fecha": "2026-12-01", "cantidad": 8, "nota": "" },
+      { "fecha": "2027-01-01", "cantidad": 8, "nota": "" },
+      { "fecha": "2027-02-01", "cantidad": 8, "nota": "" },
+      { "fecha": "2027-03-01", "cantidad": 8, "nota": "" },
+      { "fecha": "2027-04-01", "cantidad": 8, "nota": "" },
+      { "fecha": "2027-05-01", "cantidad": 8, "nota": "" },
+      { "fecha": "2027-06-01", "cantidad": 8, "nota": "" },
+      { "fecha": "2027-07-01", "cantidad": 8, "nota": "" },
+      { "fecha": "2027-08-01", "cantidad": 8, "nota": "" },
+      { "fecha": "2027-09-01", "cantidad": 8, "nota": "" },
+      { "fecha": "2027-10-01", "cantidad": 8, "nota": "" },
+      { "fecha": "2027-11-01", "cantidad": 8, "nota": "" },
+      { "fecha": "2027-12-01", "cantidad": 8, "nota": "" },
+      { "fecha": "2028-01-01", "cantidad": 10, "nota": "Price increase" },
+      { "fecha": "2028-02-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2028-03-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2028-04-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2028-05-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2028-06-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2028-07-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2028-08-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2028-09-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2028-10-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2028-11-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2028-12-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2029-01-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2029-02-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2029-03-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2029-04-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2029-05-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2029-06-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2029-07-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2029-08-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2029-09-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2029-10-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2029-11-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2029-12-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2030-01-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2030-02-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2030-03-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2030-04-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2030-05-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2030-06-01", "cantidad": 10, "nota": "" }
     ], "color": "DimGray", "categoria": "herramientas", "periodicidad": "mensual", "desgravable": true },
     { "id": "g402-bb02", "nombre": "Loom Pro", "entradas": [
       { "fecha": "2026-01-01", "cantidad": 12.50, "nota": "" },
       { "fecha": "2026-02-01", "cantidad": 12.50, "nota": "" },
-      { "fecha": "2026-03-01", "cantidad": 12.50, "nota": "" }
+      { "fecha": "2026-03-01", "cantidad": 12.50, "nota": "" },
+      { "fecha": "2026-04-01", "cantidad": 12.50, "nota": "" },
+      { "fecha": "2026-05-01", "cantidad": 12.50, "nota": "" },
+      { "fecha": "2026-06-01", "cantidad": 12.50, "nota": "" },
+      { "fecha": "2026-07-01", "cantidad": 12.50, "nota": "" },
+      { "fecha": "2026-08-01", "cantidad": 12.50, "nota": "" },
+      { "fecha": "2026-09-01", "cantidad": 12.50, "nota": "" },
+      { "fecha": "2026-10-01", "cantidad": 12.50, "nota": "" },
+      { "fecha": "2026-11-01", "cantidad": 12.50, "nota": "" },
+      { "fecha": "2026-12-01", "cantidad": 12.50, "nota": "" },
+      { "fecha": "2027-01-01", "cantidad": 12.50, "nota": "" },
+      { "fecha": "2027-02-01", "cantidad": 12.50, "nota": "" },
+      { "fecha": "2027-03-01", "cantidad": 12.50, "nota": "" },
+      { "fecha": "2027-04-01", "cantidad": 12.50, "nota": "" },
+      { "fecha": "2027-05-01", "cantidad": 12.50, "nota": "" },
+      { "fecha": "2027-06-01", "cantidad": 12.50, "nota": "" },
+      { "fecha": "2027-07-01", "cantidad": 12.50, "nota": "" },
+      { "fecha": "2027-08-01", "cantidad": 12.50, "nota": "" },
+      { "fecha": "2027-09-01", "cantidad": 12.50, "nota": "" },
+      { "fecha": "2027-10-01", "cantidad": 12.50, "nota": "" },
+      { "fecha": "2027-11-01", "cantidad": 12.50, "nota": "" },
+      { "fecha": "2027-12-01", "cantidad": 12.50, "nota": "" },
+      { "fecha": "2028-01-01", "cantidad": 15, "nota": "Price increase" },
+      { "fecha": "2028-02-01", "cantidad": 15, "nota": "" },
+      { "fecha": "2028-03-01", "cantidad": 15, "nota": "" },
+      { "fecha": "2028-04-01", "cantidad": 15, "nota": "" },
+      { "fecha": "2028-05-01", "cantidad": 15, "nota": "" },
+      { "fecha": "2028-06-01", "cantidad": 15, "nota": "" },
+      { "fecha": "2028-07-01", "cantidad": 15, "nota": "" },
+      { "fecha": "2028-08-01", "cantidad": 15, "nota": "" },
+      { "fecha": "2028-09-01", "cantidad": 15, "nota": "" },
+      { "fecha": "2028-10-01", "cantidad": 15, "nota": "" },
+      { "fecha": "2028-11-01", "cantidad": 15, "nota": "" },
+      { "fecha": "2028-12-01", "cantidad": 15, "nota": "" },
+      { "fecha": "2029-01-01", "cantidad": 15, "nota": "" },
+      { "fecha": "2029-02-01", "cantidad": 15, "nota": "" },
+      { "fecha": "2029-03-01", "cantidad": 15, "nota": "" },
+      { "fecha": "2029-04-01", "cantidad": 15, "nota": "" },
+      { "fecha": "2029-05-01", "cantidad": 15, "nota": "" },
+      { "fecha": "2029-06-01", "cantidad": 15, "nota": "" },
+      { "fecha": "2029-07-01", "cantidad": 15, "nota": "" },
+      { "fecha": "2029-08-01", "cantidad": 15, "nota": "" },
+      { "fecha": "2029-09-01", "cantidad": 15, "nota": "" },
+      { "fecha": "2029-10-01", "cantidad": 15, "nota": "" },
+      { "fecha": "2029-11-01", "cantidad": 15, "nota": "" },
+      { "fecha": "2029-12-01", "cantidad": 15, "nota": "" },
+      { "fecha": "2030-01-01", "cantidad": 15, "nota": "" },
+      { "fecha": "2030-02-01", "cantidad": 15, "nota": "" },
+      { "fecha": "2030-03-01", "cantidad": 15, "nota": "" },
+      { "fecha": "2030-04-01", "cantidad": 15, "nota": "" },
+      { "fecha": "2030-05-01", "cantidad": 15, "nota": "" },
+      { "fecha": "2030-06-01", "cantidad": 15, "nota": "" }
     ], "color": "MediumOrchid", "categoria": "herramientas", "periodicidad": "mensual", "desgravable": true },
     { "id": "g403-cc03", "nombre": "Autonomos", "entradas": [
       { "fecha": "2025-12-01", "cantidad": 230, "nota": "" },
       { "fecha": "2026-01-01", "cantidad": 230, "nota": "" },
       { "fecha": "2026-02-01", "cantidad": 230, "nota": "" },
-      { "fecha": "2026-03-01", "cantidad": 230, "nota": "" }
+      { "fecha": "2026-03-01", "cantidad": 230, "nota": "" },
+      { "fecha": "2026-04-01", "cantidad": 230, "nota": "" },
+      { "fecha": "2026-05-01", "cantidad": 230, "nota": "" },
+      { "fecha": "2026-06-01", "cantidad": 230, "nota": "" },
+      { "fecha": "2026-07-01", "cantidad": 230, "nota": "" },
+      { "fecha": "2026-08-01", "cantidad": 230, "nota": "" },
+      { "fecha": "2026-09-01", "cantidad": 230, "nota": "" },
+      { "fecha": "2026-10-01", "cantidad": 230, "nota": "" },
+      { "fecha": "2026-11-01", "cantidad": 230, "nota": "" },
+      { "fecha": "2026-12-01", "cantidad": 230, "nota": "" },
+      { "fecha": "2027-01-01", "cantidad": 294, "nota": "Subida cuota" },
+      { "fecha": "2027-02-01", "cantidad": 294, "nota": "" },
+      { "fecha": "2027-03-01", "cantidad": 294, "nota": "" },
+      { "fecha": "2027-04-01", "cantidad": 294, "nota": "" },
+      { "fecha": "2027-05-01", "cantidad": 294, "nota": "" },
+      { "fecha": "2027-06-01", "cantidad": 294, "nota": "" },
+      { "fecha": "2027-07-01", "cantidad": 294, "nota": "" },
+      { "fecha": "2027-08-01", "cantidad": 294, "nota": "" },
+      { "fecha": "2027-09-01", "cantidad": 294, "nota": "" },
+      { "fecha": "2027-10-01", "cantidad": 294, "nota": "" },
+      { "fecha": "2027-11-01", "cantidad": 294, "nota": "" },
+      { "fecha": "2027-12-01", "cantidad": 294, "nota": "" },
+      { "fecha": "2028-01-01", "cantidad": 350, "nota": "Subida por ingresos" },
+      { "fecha": "2028-02-01", "cantidad": 350, "nota": "" },
+      { "fecha": "2028-03-01", "cantidad": 350, "nota": "" },
+      { "fecha": "2028-04-01", "cantidad": 350, "nota": "" },
+      { "fecha": "2028-05-01", "cantidad": 350, "nota": "" },
+      { "fecha": "2028-06-01", "cantidad": 350, "nota": "" },
+      { "fecha": "2028-07-01", "cantidad": 350, "nota": "" },
+      { "fecha": "2028-08-01", "cantidad": 350, "nota": "" },
+      { "fecha": "2028-09-01", "cantidad": 350, "nota": "" },
+      { "fecha": "2028-10-01", "cantidad": 350, "nota": "" },
+      { "fecha": "2028-11-01", "cantidad": 350, "nota": "" },
+      { "fecha": "2028-12-01", "cantidad": 350, "nota": "" },
+      { "fecha": "2029-01-01", "cantidad": 390, "nota": "Ajuste anual" },
+      { "fecha": "2029-02-01", "cantidad": 390, "nota": "" },
+      { "fecha": "2029-03-01", "cantidad": 390, "nota": "" },
+      { "fecha": "2029-04-01", "cantidad": 390, "nota": "" },
+      { "fecha": "2029-05-01", "cantidad": 390, "nota": "" },
+      { "fecha": "2029-06-01", "cantidad": 390, "nota": "" },
+      { "fecha": "2029-07-01", "cantidad": 390, "nota": "" },
+      { "fecha": "2029-08-01", "cantidad": 390, "nota": "" },
+      { "fecha": "2029-09-01", "cantidad": 390, "nota": "" },
+      { "fecha": "2029-10-01", "cantidad": 390, "nota": "" },
+      { "fecha": "2029-11-01", "cantidad": 390, "nota": "" },
+      { "fecha": "2029-12-01", "cantidad": 390, "nota": "" },
+      { "fecha": "2030-01-01", "cantidad": 420, "nota": "Nuevo tramo" },
+      { "fecha": "2030-02-01", "cantidad": 420, "nota": "" },
+      { "fecha": "2030-03-01", "cantidad": 420, "nota": "" },
+      { "fecha": "2030-04-01", "cantidad": 420, "nota": "" },
+      { "fecha": "2030-05-01", "cantidad": 420, "nota": "" },
+      { "fecha": "2030-06-01", "cantidad": 420, "nota": "" }
     ], "color": "DarkGray", "categoria": "autonomos", "periodicidad": "mensual", "desgravable": true },
     { "id": "g404-dd04", "nombre": "Coworking (MOB)", "entradas": [
       { "fecha": "2026-01-01", "cantidad": 180, "nota": "Desk + meeting room" },
       { "fecha": "2026-02-01", "cantidad": 180, "nota": "" },
-      { "fecha": "2026-03-01", "cantidad": 180, "nota": "" }
+      { "fecha": "2026-03-01", "cantidad": 180, "nota": "" },
+      { "fecha": "2026-04-01", "cantidad": 180, "nota": "" },
+      { "fecha": "2026-05-01", "cantidad": 180, "nota": "" },
+      { "fecha": "2026-06-01", "cantidad": 180, "nota": "" },
+      { "fecha": "2026-07-01", "cantidad": 180, "nota": "" },
+      { "fecha": "2026-08-01", "cantidad": 180, "nota": "" },
+      { "fecha": "2026-09-01", "cantidad": 180, "nota": "" },
+      { "fecha": "2026-10-01", "cantidad": 180, "nota": "" },
+      { "fecha": "2026-11-01", "cantidad": 180, "nota": "" },
+      { "fecha": "2026-12-01", "cantidad": 180, "nota": "" },
+      { "fecha": "2027-01-01", "cantidad": 180, "nota": "" },
+      { "fecha": "2027-02-01", "cantidad": 180, "nota": "" },
+      { "fecha": "2027-03-01", "cantidad": 180, "nota": "" },
+      { "fecha": "2027-04-01", "cantidad": 180, "nota": "" },
+      { "fecha": "2027-05-01", "cantidad": 180, "nota": "" },
+      { "fecha": "2027-06-01", "cantidad": 180, "nota": "" },
+      { "fecha": "2027-07-01", "cantidad": 180, "nota": "" },
+      { "fecha": "2027-08-01", "cantidad": 180, "nota": "" },
+      { "fecha": "2027-09-01", "cantidad": 180, "nota": "" },
+      { "fecha": "2027-10-01", "cantidad": 180, "nota": "" },
+      { "fecha": "2027-11-01", "cantidad": 180, "nota": "" },
+      { "fecha": "2027-12-01", "cantidad": 180, "nota": "" },
+      { "fecha": "2028-01-01", "cantidad": 220, "nota": "Upgrade to private office" },
+      { "fecha": "2028-02-01", "cantidad": 220, "nota": "" },
+      { "fecha": "2028-03-01", "cantidad": 220, "nota": "" },
+      { "fecha": "2028-04-01", "cantidad": 220, "nota": "" },
+      { "fecha": "2028-05-01", "cantidad": 220, "nota": "" },
+      { "fecha": "2028-06-01", "cantidad": 220, "nota": "" },
+      { "fecha": "2028-07-01", "cantidad": 220, "nota": "" },
+      { "fecha": "2028-08-01", "cantidad": 220, "nota": "" },
+      { "fecha": "2028-09-01", "cantidad": 220, "nota": "" },
+      { "fecha": "2028-10-01", "cantidad": 220, "nota": "" },
+      { "fecha": "2028-11-01", "cantidad": 220, "nota": "" },
+      { "fecha": "2028-12-01", "cantidad": 220, "nota": "" },
+      { "fecha": "2029-01-01", "cantidad": 220, "nota": "" },
+      { "fecha": "2029-02-01", "cantidad": 220, "nota": "" },
+      { "fecha": "2029-03-01", "cantidad": 220, "nota": "" },
+      { "fecha": "2029-04-01", "cantidad": 220, "nota": "" },
+      { "fecha": "2029-05-01", "cantidad": 220, "nota": "" },
+      { "fecha": "2029-06-01", "cantidad": 220, "nota": "" },
+      { "fecha": "2029-07-01", "cantidad": 220, "nota": "" },
+      { "fecha": "2029-08-01", "cantidad": 220, "nota": "" },
+      { "fecha": "2029-09-01", "cantidad": 220, "nota": "" },
+      { "fecha": "2029-10-01", "cantidad": 220, "nota": "" },
+      { "fecha": "2029-11-01", "cantidad": 220, "nota": "" },
+      { "fecha": "2029-12-01", "cantidad": 220, "nota": "" },
+      { "fecha": "2030-01-01", "cantidad": 250, "nota": "Larger office" },
+      { "fecha": "2030-02-01", "cantidad": 250, "nota": "" },
+      { "fecha": "2030-03-01", "cantidad": 250, "nota": "" },
+      { "fecha": "2030-04-01", "cantidad": 250, "nota": "" },
+      { "fecha": "2030-05-01", "cantidad": 250, "nota": "" },
+      { "fecha": "2030-06-01", "cantidad": 250, "nota": "" }
     ], "color": "Sienna", "categoria": "alquiler_oficina", "periodicidad": "mensual", "desgravable": true },
     { "id": "g405-ee05", "nombre": "Screenflow license", "entradas": [
       { "fecha": "2025-09-15", "cantidad": 149, "nota": "Screen recording for courses" }
-    ], "color": "SteelBlue", "categoria": "software", "periodicidad": null, "desgravable": true }
+    ], "color": "SteelBlue", "categoria": "software", "periodicidad": null, "desgravable": true },
+    { "id": "g406-ff06", "nombre": "Buzzsprout (podcast hosting)", "entradas": [
+      { "fecha": "2027-09-01", "cantidad": 12, "nota": "Podcast launch" },
+      { "fecha": "2027-10-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2027-11-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2027-12-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2028-01-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2028-02-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2028-03-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2028-04-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2028-05-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2028-06-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2028-07-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2028-08-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2028-09-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2028-10-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2028-11-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2028-12-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2029-01-01", "cantidad": 18, "nota": "Upgraded plan" },
+      { "fecha": "2029-02-01", "cantidad": 18, "nota": "" },
+      { "fecha": "2029-03-01", "cantidad": 18, "nota": "" },
+      { "fecha": "2029-04-01", "cantidad": 18, "nota": "" },
+      { "fecha": "2029-05-01", "cantidad": 18, "nota": "" },
+      { "fecha": "2029-06-01", "cantidad": 18, "nota": "" },
+      { "fecha": "2029-07-01", "cantidad": 18, "nota": "" },
+      { "fecha": "2029-08-01", "cantidad": 18, "nota": "" },
+      { "fecha": "2029-09-01", "cantidad": 18, "nota": "" },
+      { "fecha": "2029-10-01", "cantidad": 18, "nota": "" },
+      { "fecha": "2029-11-01", "cantidad": 18, "nota": "" },
+      { "fecha": "2029-12-01", "cantidad": 18, "nota": "" },
+      { "fecha": "2030-01-01", "cantidad": 18, "nota": "" },
+      { "fecha": "2030-02-01", "cantidad": 18, "nota": "" },
+      { "fecha": "2030-03-01", "cantidad": 18, "nota": "" },
+      { "fecha": "2030-04-01", "cantidad": 18, "nota": "" },
+      { "fecha": "2030-05-01", "cantidad": 18, "nota": "" },
+      { "fecha": "2030-06-01", "cantidad": 18, "nota": "" }
+    ], "color": "OrangeRed", "categoria": "herramientas", "periodicidad": "mensual", "desgravable": true },
+    { "id": "g407-gg07", "nombre": "Rode PodMic USB", "entradas": [
+      { "fecha": "2027-08-15", "cantidad": 169, "nota": "Podcast mic — Rode PodMic USB" }
+    ], "color": "DarkRed", "categoria": "equipo", "periodicidad": null, "desgravable": true },
+    { "id": "g408-hh08", "nombre": "MacBook Pro 14\" M3 Pro", "entradas": [
+      { "fecha": "2028-01-10", "cantidad": 2499, "nota": "New laptop — MacBook Pro 14\" M3 Pro" }
+    ], "color": "Silver", "categoria": "equipo", "periodicidad": null, "desgravable": true },
+    { "id": "g409-ii09", "nombre": "Conference Travel", "entradas": [
+      { "fecha": "2026-11-13", "cantidad": 25, "nota": "JSConf BCN — metro + lunch" },
+      { "fecha": "2027-11-10", "cantidad": 30, "nota": "JSConf BCN 2027 — local transport" },
+      { "fecha": "2029-05-14", "cantidad": 450, "nota": "ReactConf EU Berlin — flights + 2 nights hotel" },
+      { "fecha": "2030-05-07", "cantidad": 520, "nota": "ReactConf EU Berlin 2030 — flights + 2 nights hotel" }
+    ], "color": "RoyalBlue", "categoria": "viaje", "periodicidad": null, "desgravable": true },
+    { "id": "g410-jj10", "nombre": "Figma Pro", "entradas": [
+      { "fecha": "2028-03-01", "cantidad": 12, "nota": "For workshop slide design" },
+      { "fecha": "2028-04-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2028-05-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2028-06-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2028-07-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2028-08-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2028-09-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2028-10-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2028-11-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2028-12-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2029-01-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2029-02-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2029-03-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2029-04-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2029-05-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2029-06-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2029-07-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2029-08-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2029-09-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2029-10-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2029-11-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2029-12-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2030-01-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2030-02-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2030-03-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2030-04-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2030-05-01", "cantidad": 12, "nota": "" },
+      { "fecha": "2030-06-01", "cantidad": 12, "nota": "" }
+    ], "color": "DeepPink", "categoria": "herramientas", "periodicidad": "mensual", "desgravable": true },
+    { "id": "g411-kk11", "nombre": "Calendly Pro", "entradas": [
+      { "fecha": "2028-11-01", "cantidad": 10, "nota": "For mentoring scheduling" },
+      { "fecha": "2028-12-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2029-01-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2029-02-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2029-03-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2029-04-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2029-05-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2029-06-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2029-07-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2029-08-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2029-09-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2029-10-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2029-11-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2029-12-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2030-01-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2030-02-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2030-03-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2030-04-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2030-05-01", "cantidad": 10, "nota": "" },
+      { "fecha": "2030-06-01", "cantidad": 10, "nota": "" }
+    ], "color": "DodgerBlue", "categoria": "herramientas", "periodicidad": "mensual", "desgravable": true }
   ],
   "settings": {
     "lang": "en",
@@ -170,9 +1179,9 @@
     "defaultIva": 21,
     "defaultIrpf": 15,
     "targets": {
-      "horasSemana": 30,
-      "horasMes": 120,
-      "ingresosMes": 4000
+      "horasSemana": 35,
+      "horasMes": 140,
+      "ingresosMes": 7000
     },
     "nombre": "Dani Ortega",
     "nombreCompleto": "Daniel Ortega Martín",

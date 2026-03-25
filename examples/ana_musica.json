@@ -4,41 +4,48 @@
     { "id": "c301-aa11-bb22", "nombre": "Samantha Vega", "nombreCompleto": "Samantha Vega Producciones", "direccion1": "Carrer del Rec 42", "direccion2": "08003 Barcelona", "nif": "47123456B", "color": "MediumPurple" },
     { "id": "c302-cc33-dd44", "nombre": "Sala Apolo", "nombreCompleto": "Sala Apolo S.L.", "direccion1": "Carrer Nou de la Rambla 113", "direccion2": "08004 Barcelona", "nif": "B59876543", "color": "Crimson" },
     { "id": "c303-ee55-ff66", "nombre": "Ajuntament de Girona", "nombreCompleto": "Ajuntament de Girona — Cultura", "direccion1": "Plaça del Vi 1", "direccion2": "17004 Girona", "nif": "P1707900B", "color": "Gold" },
-    { "id": "c304-gg77-hh88", "nombre": "Festival Cruïlla", "nombreCompleto": "Festival Cruïlla S.L.", "direccion1": "Parc del Fòrum", "direccion2": "08019 Barcelona", "nif": "B66112233", "color": "OrangeRed" }
+    { "id": "c304-gg77-hh88", "nombre": "Festival Cruïlla", "nombreCompleto": "Festival Cruïlla S.L.", "direccion1": "Parc del Fòrum", "direccion2": "08019 Barcelona", "nif": "B66112233", "color": "OrangeRed" },
+    { "id": "c305-ii99-jj00", "nombre": "Marc Puig", "nombreCompleto": "Marc Puig Música", "direccion1": "Carrer de Blai 33, 1r", "direccion2": "08004 Barcelona", "nif": "38765432M", "color": "CadetBlue" },
+    { "id": "c306-kk11-ll22", "nombre": "Discogràfica Llum", "nombreCompleto": "Llum Records S.L.", "direccion1": "Carrer de la Cera 18", "direccion2": "08001 Barcelona", "nif": "B08667788", "color": "Goldenrod" },
+    { "id": "c307-mm33-nn44", "nombre": "Netflix Spain", "nombreCompleto": "Netflix Servicios de Streaming España S.L.", "direccion1": "Paseo de la Castellana 77", "direccion2": "28046 Madrid", "nif": "B87990011", "color": "IndianRed" },
+    { "id": "c308-oo55-pp66", "nombre": "Primavera Sound", "nombreCompleto": "Primavera Sound S.L.", "direccion1": "Carrer de Zamora 78-80", "direccion2": "08005 Barcelona", "nif": "B61234567", "color": "DeepPink" },
+    { "id": "c309-qq77-rr88", "nombre": "Taller de Músics", "nombreCompleto": "Fundació Taller de Músics", "direccion1": "Carrer del Comerç 36", "direccion2": "08003 Barcelona", "nif": "G58901234", "color": "DarkCyan" }
   ],
   "projects": [
     {
-      "id": "p301-m1m1-n1n1", "nombre": "Producción EP Samantha", "clienteId": "c301-aa11-bb22", "color": "MediumPurple",
-      "estado": "activo", "interno": false, "recurrente": false,
-      "fechas": { "inicio": "2026-01-15", "finEstimada": "2026-04-30", "finReal": null },
+      "id": "p301-m1m1-n1n1", "nombre": "Producció EP Samantha", "clienteId": "c301-aa11-bb22", "color": "MediumPurple",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2026-01-15", "finEstimada": "2026-04-30", "finReal": "2026-04-15" },
       "facturacion": {
         "modo": "desde_base", "baseImponible": 3500, "total": 0, "precioHora": 0,
         "iva": 21, "irpf": 15, "importeIva": 735, "importeIrpf": 525,
         "totalFactura": 3710, "netoRecibido": 2975, "ivaExcepcion": "",
-        "pagado": false, "fechaPago": null, "gastos": 0,
+        "pagado": true, "fechaPago": "2026-05-01", "gastos": 0,
         "cobros": [
           { "id": "cb301-01", "fecha": "2026-02-01", "cantidad": 1500 },
-          { "id": "cb301-02", "fecha": "2026-03-12", "cantidad": 1000 }
+          { "id": "cb301-02", "fecha": "2026-05-01", "cantidad": 1475 }
         ],
         "facturaNum": 3, "facturaFecha": "2026-01-20",
         "idiomaFactura": null
       },
       "horas": [
-        { "id": "h301-01", "fecha": "2026-01-15", "tipo": "reunion", "cantidad": 2, "nota": "Preproducción: selección temas + estilo", "horaInicio": "11:00" },
-        { "id": "h301-02", "fecha": "2026-01-20", "tipo": "trabajo", "cantidad": 5, "nota": "Grabación bases track 1", "horaInicio": "10:00" },
-        { "id": "h301-03", "fecha": "2026-01-22", "tipo": "trabajo", "cantidad": 6, "nota": "Grabación bases track 2 + 3", "horaInicio": "09:00" },
-        { "id": "h301-04", "fecha": "2026-01-28", "tipo": "trabajo", "cantidad": 4, "nota": "Sesión voces track 1", "horaInicio": "15:00" },
-        { "id": "h301-05", "fecha": "2026-02-03", "tipo": "trabajo", "cantidad": 5, "nota": "Sesión voces tracks 2 y 3", "horaInicio": "10:00" },
-        { "id": "h301-06", "fecha": "2026-02-10", "tipo": "trabajo", "cantidad": 7, "nota": "Mezcla track 1 + 2", "horaInicio": "09:00" },
-        { "id": "h301-07", "fecha": "2026-02-17", "tipo": "trabajo", "cantidad": 6, "nota": "Mezcla track 3 + master previo", "horaInicio": "09:00" },
-        { "id": "h301-08", "fecha": "2026-02-24", "tipo": "reunion", "cantidad": 1.5, "nota": "Escucha con Samantha + feedback", "horaInicio": "18:00" },
-        { "id": "h301-09", "fecha": "2026-03-03", "tipo": "trabajo", "cantidad": 4, "nota": "Correcciones mezcla + stems", "horaInicio": "10:00" },
-        { "id": "h301-10", "fecha": "2026-03-10", "tipo": "trabajo", "cantidad": 3, "nota": "Master final", "horaInicio": "10:00" }
+        { "id": "h301-01", "fecha": "2026-01-15", "tipo": "reunion", "cantidad": 2, "nota": "Preproducció: selecció temes + estil", "horaInicio": "11:00" },
+        { "id": "h301-02", "fecha": "2026-01-20", "tipo": "trabajo", "cantidad": 5, "nota": "Gravació bases track 1", "horaInicio": "10:00" },
+        { "id": "h301-03", "fecha": "2026-01-22", "tipo": "trabajo", "cantidad": 6, "nota": "Gravació bases track 2 + 3", "horaInicio": "09:00" },
+        { "id": "h301-04", "fecha": "2026-01-28", "tipo": "trabajo", "cantidad": 4, "nota": "Sessió veus track 1", "horaInicio": "15:00" },
+        { "id": "h301-05", "fecha": "2026-02-03", "tipo": "trabajo", "cantidad": 5, "nota": "Sessió veus tracks 2 i 3", "horaInicio": "10:00" },
+        { "id": "h301-06", "fecha": "2026-02-10", "tipo": "trabajo", "cantidad": 7, "nota": "Mescla track 1 + 2", "horaInicio": "09:00" },
+        { "id": "h301-07", "fecha": "2026-02-17", "tipo": "trabajo", "cantidad": 6, "nota": "Mescla track 3 + master previ", "horaInicio": "09:00" },
+        { "id": "h301-08", "fecha": "2026-02-24", "tipo": "reunion", "cantidad": 1.5, "nota": "Escolta amb Samantha + feedback", "horaInicio": "18:00" },
+        { "id": "h301-09", "fecha": "2026-03-03", "tipo": "trabajo", "cantidad": 4, "nota": "Correccions mescla + stems", "horaInicio": "10:00" },
+        { "id": "h301-10", "fecha": "2026-03-10", "tipo": "trabajo", "cantidad": 3, "nota": "Master final", "horaInicio": "10:00" },
+        { "id": "h301-11", "fecha": "2026-04-05", "tipo": "trabajo", "cantidad": 2, "nota": "Retocs últim minut + entrega Spotify", "horaInicio": "14:00" },
+        { "id": "h301-12", "fecha": "2026-04-15", "tipo": "reunion", "cantidad": 1, "nota": "Entrega final + celebració!", "horaInicio": "19:00" }
       ],
-      "notas": "EP de 3 tracks: pop electrónico. Cobro parcial: 50% al empezar, 50% al entregar master."
+      "notas": "EP de 3 tracks: pop electrònic. Cobro parcial: 50% al començar, 50% al entregar master. Gran èxit!"
     },
     {
-      "id": "p302-m2m2-n2n2", "nombre": "Concierto Apolo (marzo)", "clienteId": "c302-cc33-dd44", "color": "Crimson",
+      "id": "p302-m2m2-n2n2", "nombre": "Concert Apolo (març)", "clienteId": "c302-cc33-dd44", "color": "Crimson",
       "estado": "completado", "interno": false, "recurrente": false,
       "fechas": { "inicio": "2026-03-01", "finEstimada": "2026-03-15", "finReal": "2026-03-15" },
       "facturacion": {
@@ -46,39 +53,41 @@
         "iva": 10, "irpf": 15, "importeIva": 80, "importeIrpf": 120,
         "totalFactura": 760, "netoRecibido": 680, "ivaExcepcion": "",
         "pagado": true, "fechaPago": "2026-03-20", "gastos": 0,
-        "cobros": [
-          { "id": "cb302-01", "fecha": "2026-03-20", "cantidad": 680 }
-        ],
+        "cobros": [{ "id": "cb302-01", "fecha": "2026-03-20", "cantidad": 680 }],
         "facturaNum": 4, "facturaFecha": "2026-03-16",
         "idiomaFactura": null
       },
       "horas": [
-        { "id": "h302-01", "fecha": "2026-03-01", "tipo": "trabajo", "cantidad": 2, "nota": "Preparación set + repertorio", "horaInicio": "11:00" },
-        { "id": "h302-02", "fecha": "2026-03-10", "tipo": "trabajo", "cantidad": 3, "nota": "Ensayo general con banda", "horaInicio": "17:00" },
-        { "id": "h302-03", "fecha": "2026-03-14", "tipo": "trabajo", "cantidad": 2, "nota": "Prueba de sonido Apolo", "horaInicio": "16:00" },
-        { "id": "h302-04", "fecha": "2026-03-15", "tipo": "trabajo", "cantidad": 4, "nota": "Concierto en vivo", "horaInicio": "20:00" }
+        { "id": "h302-01", "fecha": "2026-03-01", "tipo": "trabajo", "cantidad": 2, "nota": "Preparació set + repertori", "horaInicio": "11:00" },
+        { "id": "h302-02", "fecha": "2026-03-10", "tipo": "trabajo", "cantidad": 3, "nota": "Assaig general amb banda", "horaInicio": "17:00" },
+        { "id": "h302-03", "fecha": "2026-03-14", "tipo": "trabajo", "cantidad": 2, "nota": "Prova de so Apolo", "horaInicio": "16:00" },
+        { "id": "h302-04", "fecha": "2026-03-15", "tipo": "trabajo", "cantidad": 4, "nota": "Concert en viu", "horaInicio": "20:00" }
       ],
-      "notas": "Concierto acústico + banda. IVA reducido 10% (espectáculos en vivo)."
+      "notas": "Concert acústic + banda. IVA reduït 10% (espectacles en viu)."
     },
     {
       "id": "p303-m3m3-n3n3", "nombre": "Festival Cruïlla 2026", "clienteId": "c304-gg77-hh88", "color": "OrangeRed",
-      "estado": "activo", "interno": false, "recurrente": false,
-      "fechas": { "inicio": "2026-02-01", "finEstimada": "2026-07-12", "finReal": null },
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2026-02-01", "finEstimada": "2026-07-12", "finReal": "2026-07-12" },
       "facturacion": {
         "modo": "desde_base", "baseImponible": 2000, "total": 0, "precioHora": 0,
         "iva": 10, "irpf": 15, "importeIva": 200, "importeIrpf": 300,
         "totalFactura": 1900, "netoRecibido": 1700, "ivaExcepcion": "",
-        "pagado": false, "fechaPago": null, "gastos": 0,
-        "cobros": [],
-        "facturaNum": null, "facturaFecha": null,
+        "pagado": true, "fechaPago": "2026-08-12", "gastos": 0,
+        "cobros": [{ "id": "cb303-01", "fecha": "2026-08-12", "cantidad": 1700 }],
+        "facturaNum": 5, "facturaFecha": "2026-07-13",
         "idiomaFactura": null
       },
       "horas": [
-        { "id": "h303-01", "fecha": "2026-02-05", "tipo": "reunion", "cantidad": 1, "nota": "Briefing artístico + rider técnico", "horaInicio": "12:00" },
-        { "id": "h303-02", "fecha": "2026-03-12", "tipo": "trabajo", "cantidad": 3, "nota": "Composición set festival", "horaInicio": "10:00" },
-        { "id": "h303-03", "fecha": "2026-03-18", "tipo": "trabajo", "cantidad": 2, "nota": "Ensayo repertorio festival", "horaInicio": "17:00" }
+        { "id": "h303-01", "fecha": "2026-02-05", "tipo": "reunion", "cantidad": 1, "nota": "Briefing artístic + rider tècnic", "horaInicio": "12:00" },
+        { "id": "h303-02", "fecha": "2026-03-12", "tipo": "trabajo", "cantidad": 3, "nota": "Composició set festival", "horaInicio": "10:00" },
+        { "id": "h303-03", "fecha": "2026-03-18", "tipo": "trabajo", "cantidad": 2, "nota": "Assaig repertori festival", "horaInicio": "17:00" },
+        { "id": "h303-04", "fecha": "2026-05-15", "tipo": "trabajo", "cantidad": 3, "nota": "Producció peces exclusives per set", "horaInicio": "10:00" },
+        { "id": "h303-05", "fecha": "2026-06-20", "tipo": "trabajo", "cantidad": 2, "nota": "Assaig final amb equip complet", "horaInicio": "15:00" },
+        { "id": "h303-06", "fecha": "2026-07-11", "tipo": "trabajo", "cantidad": 2, "nota": "Soundcheck Fòrum", "horaInicio": "14:00" },
+        { "id": "h303-07", "fecha": "2026-07-12", "tipo": "trabajo", "cantidad": 4, "nota": "Actuació Cruïlla 2026!", "horaInicio": "21:00" }
       ],
-      "notas": "Actuación en festival de verano. IVA 10%. Pago a 30 días después del evento."
+      "notas": "Actuació festival estiu. IVA 10%. Pagament a 30 dies post-event."
     },
     {
       "id": "p304-m4m4-n4n4", "nombre": "Jornades Música Girona", "clienteId": "c303-ee55-ff66", "color": "Gold",
@@ -89,23 +98,21 @@
         "iva": 10, "irpf": 15, "importeIva": 60, "importeIrpf": 90,
         "totalFactura": 570, "netoRecibido": 510, "ivaExcepcion": "",
         "pagado": true, "fechaPago": "2025-12-15", "gastos": 0,
-        "cobros": [
-          { "id": "cb304-01", "fecha": "2025-12-15", "cantidad": 510 }
-        ],
+        "cobros": [{ "id": "cb304-01", "fecha": "2025-12-15", "cantidad": 510 }],
         "facturaNum": 2, "facturaFecha": "2025-11-19",
         "idiomaFactura": null
       },
       "horas": [
-        { "id": "h304-01", "fecha": "2025-11-05", "tipo": "trabajo", "cantidad": 2, "nota": "Preparación repertorio jornades", "horaInicio": "10:00" },
-        { "id": "h304-02", "fecha": "2025-11-15", "tipo": "trabajo", "cantidad": 1.5, "nota": "Ensayo + prueba sonido", "horaInicio": "16:00" },
-        { "id": "h304-03", "fecha": "2025-11-18", "tipo": "trabajo", "cantidad": 3, "nota": "Actuación + masterclass", "horaInicio": "18:00" }
+        { "id": "h304-01", "fecha": "2025-11-05", "tipo": "trabajo", "cantidad": 2, "nota": "Preparació repertori jornades", "horaInicio": "10:00" },
+        { "id": "h304-02", "fecha": "2025-11-15", "tipo": "trabajo", "cantidad": 1.5, "nota": "Assaig + prova so", "horaInicio": "16:00" },
+        { "id": "h304-03", "fecha": "2025-11-18", "tipo": "trabajo", "cantidad": 3, "nota": "Actuació + masterclass", "horaInicio": "18:00" }
       ],
-      "notas": "Concierto + masterclass de producción musical para jóvenes."
+      "notas": "Concert + masterclass de producció musical per joves."
     },
     {
-      "id": "p305-m5m5-n5n5", "nombre": "Producción beats (Beatstars)", "clienteId": null, "color": "SlateGray",
-      "estado": "activo", "interno": true, "recurrente": true,
-      "fechas": { "inicio": "2025-06-01", "finEstimada": null, "finReal": null },
+      "id": "p305-m5m5-n5n5", "nombre": "Producció beats (Beatstars)", "clienteId": null, "color": "SlateGray",
+      "estado": "completado", "interno": true, "recurrente": true,
+      "fechas": { "inicio": "2025-06-01", "finEstimada": null, "finReal": "2028-06-30" },
       "facturacion": {
         "modo": "gratis", "baseImponible": 0, "total": 0, "precioHora": 0,
         "iva": 0, "irpf": 0, "importeIva": 0, "importeIrpf": 0,
@@ -116,20 +123,32 @@
         "idiomaFactura": null
       },
       "horas": [
-        { "id": "h305-01", "fecha": "2026-01-08", "tipo": "trabajo", "cantidad": 3, "nota": "Beat trap melódico #14", "horaInicio": "22:00" },
+        { "id": "h305-01", "fecha": "2026-01-08", "tipo": "trabajo", "cantidad": 3, "nota": "Beat trap melòdic #14", "horaInicio": "22:00" },
         { "id": "h305-02", "fecha": "2026-01-18", "tipo": "trabajo", "cantidad": 4, "nota": "Beat afrobeat #15", "horaInicio": "21:00" },
         { "id": "h305-03", "fecha": "2026-02-08", "tipo": "trabajo", "cantidad": 3.5, "nota": "Beat lo-fi #16", "horaInicio": "23:00" },
         { "id": "h305-04", "fecha": "2026-03-05", "tipo": "trabajo", "cantidad": 2.5, "nota": "Beat reggaeton #17", "horaInicio": "22:00" },
-        { "id": "h305-05", "fecha": "2026-03-19", "tipo": "trabajo", "cantidad": 3, "nota": "Beat pop urbano #18", "horaInicio": "21:00" }
+        { "id": "h305-05", "fecha": "2026-03-19", "tipo": "trabajo", "cantidad": 3, "nota": "Beat pop urbà #18", "horaInicio": "21:00" },
+        { "id": "h305-06", "fecha": "2026-04-25", "tipo": "trabajo", "cantidad": 3, "nota": "Beat dembow #19", "horaInicio": "22:00" },
+        { "id": "h305-07", "fecha": "2026-05-15", "tipo": "trabajo", "cantidad": 3.5, "nota": "Beat R&B #20", "horaInicio": "21:00" },
+        { "id": "h305-08", "fecha": "2026-06-10", "tipo": "trabajo", "cantidad": 3, "nota": "Beat house #21", "horaInicio": "22:00" },
+        { "id": "h305-09", "fecha": "2026-08-05", "tipo": "trabajo", "cantidad": 4, "nota": "Beat trap #22", "horaInicio": "22:00" },
+        { "id": "h305-10", "fecha": "2026-10-12", "tipo": "trabajo", "cantidad": 3, "nota": "Beat afrobeats #23", "horaInicio": "21:00" },
+        { "id": "h305-11", "fecha": "2026-12-20", "tipo": "trabajo", "cantidad": 3.5, "nota": "Beat pop electrònic #24", "horaInicio": "22:00" },
+        { "id": "h305-12", "fecha": "2027-02-08", "tipo": "trabajo", "cantidad": 3, "nota": "Beat latin #25", "horaInicio": "22:00" },
+        { "id": "h305-13", "fecha": "2027-04-15", "tipo": "trabajo", "cantidad": 3, "nota": "Beat drill #26", "horaInicio": "21:00" },
+        { "id": "h305-14", "fecha": "2027-06-20", "tipo": "trabajo", "cantidad": 3.5, "nota": "Beat amapiano #27", "horaInicio": "22:00" },
+        { "id": "h305-15", "fecha": "2027-09-10", "tipo": "trabajo", "cantidad": 3, "nota": "Beat lo-fi jazz #28", "horaInicio": "23:00" },
+        { "id": "h305-16", "fecha": "2027-12-01", "tipo": "trabajo", "cantidad": 3, "nota": "Beat chill #29", "horaInicio": "22:00" },
+        { "id": "h305-17", "fecha": "2028-03-15", "tipo": "trabajo", "cantidad": 3.5, "nota": "Beat neo-soul #30 — últim beat, massa feina clients", "horaInicio": "22:00" }
       ],
-      "notas": "Catálogo propio de beats para venta online. Sin facturación directa."
+      "notas": "Catàleg propi de beats. Tancat juny 2028 — massa feina de clients. Ingressos passius via Beatstars."
     },
     {
-      "id": "p306-m6m6-n6n6", "nombre": "Clases producción (privadas)", "clienteId": null, "color": "LightSeaGreen",
+      "id": "p306-m6m6-n6n6", "nombre": "Classes producció (privades)", "clienteId": null, "color": "LightSeaGreen",
       "estado": "activo", "interno": false, "recurrente": true,
       "fechas": { "inicio": "2025-10-01", "finEstimada": null, "finReal": null },
       "facturacion": {
-        "modo": "por_hora", "baseImponible": 0, "total": 0, "precioHora": 35,
+        "modo": "por_hora", "baseImponible": 0, "total": 0, "precioHora": 40,
         "iva": 21, "irpf": 15, "importeIva": 0, "importeIrpf": 0,
         "totalFactura": 0, "netoRecibido": 0, "ivaExcepcion": "",
         "pagado": false, "fechaPago": null, "gastos": 0,
@@ -138,44 +157,520 @@
         "idiomaFactura": null
       },
       "horas": [
-        { "id": "h306-01", "fecha": "2025-10-07", "tipo": "trabajo", "cantidad": 1.5, "nota": "Clase Ableton basics", "horaInicio": "18:00", "monto": 52.5 },
-        { "id": "h306-02", "fecha": "2025-10-21", "tipo": "trabajo", "cantidad": 1.5, "nota": "Clase síntesis + sampling", "horaInicio": "18:00", "monto": 52.5 },
-        { "id": "h306-03", "fecha": "2025-11-04", "tipo": "trabajo", "cantidad": 1.5, "nota": "Clase mezcla básica", "horaInicio": "18:00", "monto": 52.5 },
-        { "id": "h306-04", "fecha": "2025-11-18", "tipo": "trabajo", "cantidad": 1.5, "nota": "Clase mastering intro", "horaInicio": "18:00", "monto": 52.5 },
-        { "id": "h306-05", "fecha": "2025-12-02", "tipo": "trabajo", "cantidad": 1.5, "nota": "Clase sound design", "horaInicio": "18:00", "monto": 52.5 },
-        { "id": "h306-06", "fecha": "2026-01-13", "tipo": "trabajo", "cantidad": 1.5, "nota": "Clase composición electrónica", "horaInicio": "18:00", "monto": 52.5 },
-        { "id": "h306-07", "fecha": "2026-02-10", "tipo": "trabajo", "cantidad": 1.5, "nota": "Clase producción vocal", "horaInicio": "18:00", "monto": 52.5 },
-        { "id": "h306-08", "fecha": "2026-03-10", "tipo": "trabajo", "cantidad": 1.5, "nota": "Clase mezcla avanzada", "horaInicio": "18:00", "monto": 52.5 }
+        { "id": "h306-01", "fecha": "2025-10-07", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe Ableton basics (Pau)", "horaInicio": "18:00", "monto": 52.5 },
+        { "id": "h306-02", "fecha": "2025-10-21", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe síntesi + sampling (Pau)", "horaInicio": "18:00", "monto": 52.5 },
+        { "id": "h306-03", "fecha": "2025-11-04", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe mescla bàsica (Pau)", "horaInicio": "18:00", "monto": 52.5 },
+        { "id": "h306-04", "fecha": "2025-11-18", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe mastering intro (Pau)", "horaInicio": "18:00", "monto": 52.5 },
+        { "id": "h306-05", "fecha": "2025-12-02", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe sound design (Pau)", "horaInicio": "18:00", "monto": 52.5 },
+        { "id": "h306-06", "fecha": "2026-01-13", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe composició electrònica (Pau)", "horaInicio": "18:00", "monto": 52.5 },
+        { "id": "h306-07", "fecha": "2026-02-10", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe producció vocal (Pau)", "horaInicio": "18:00", "monto": 52.5 },
+        { "id": "h306-08", "fecha": "2026-03-10", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe mescla avançada (Pau)", "horaInicio": "18:00", "monto": 52.5 },
+        { "id": "h306-09", "fecha": "2026-04-14", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe Ableton workflow (Pau)", "horaInicio": "18:00", "monto": 52.5 },
+        { "id": "h306-10", "fecha": "2026-05-12", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe producció hip-hop (Pau)", "horaInicio": "18:00", "monto": 52.5 },
+        { "id": "h306-11", "fecha": "2026-06-09", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe Max for Live (Pau)", "horaInicio": "18:00", "monto": 52.5 },
+        { "id": "h306-12", "fecha": "2026-09-08", "tipo": "trabajo", "cantidad": 1.5, "nota": "Nova alumna: Classe Ableton basics (Marta)", "horaInicio": "16:30", "monto": 60 },
+        { "id": "h306-13", "fecha": "2026-09-22", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe síntesi (Marta)", "horaInicio": "16:30", "monto": 60 },
+        { "id": "h306-14", "fecha": "2026-10-06", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe mescla (Pau)", "horaInicio": "18:00", "monto": 60 },
+        { "id": "h306-15", "fecha": "2026-10-20", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe sampling creatiu (Marta)", "horaInicio": "16:30", "monto": 60 },
+        { "id": "h306-16", "fecha": "2026-11-10", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe sound design avançat (Pau)", "horaInicio": "18:00", "monto": 60 },
+        { "id": "h306-17", "fecha": "2026-11-24", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe producció electrònica (Marta)", "horaInicio": "16:30", "monto": 60 },
+        { "id": "h306-18", "fecha": "2026-12-15", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe mastering (Pau + Marta junts)", "horaInicio": "17:00", "monto": 60 },
+        { "id": "h306-19", "fecha": "2027-01-14", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe producció vocal (Marta)", "horaInicio": "16:30", "monto": 60 },
+        { "id": "h306-20", "fecha": "2027-02-11", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe mescla avançada (Pau)", "horaInicio": "18:00", "monto": 60 },
+        { "id": "h306-21", "fecha": "2027-03-11", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe Ableton performance (Marta)", "horaInicio": "16:30", "monto": 60 },
+        { "id": "h306-22", "fecha": "2027-04-08", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe producció per cine (Pau)", "horaInicio": "18:00", "monto": 60 },
+        { "id": "h306-23", "fecha": "2027-05-13", "tipo": "trabajo", "cantidad": 1.5, "nota": "Nou alumne: Classe basics (Joel)", "horaInicio": "11:00", "monto": 60 },
+        { "id": "h306-24", "fecha": "2027-06-10", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe síntesi (Joel)", "horaInicio": "11:00", "monto": 60 },
+        { "id": "h306-25", "fecha": "2027-09-09", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe producció (Joel)", "horaInicio": "11:00", "monto": 60 },
+        { "id": "h306-26", "fecha": "2027-10-14", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe mescla (Joel + Marta)", "horaInicio": "16:30", "monto": 60 },
+        { "id": "h306-27", "fecha": "2027-11-11", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe mastering (Joel)", "horaInicio": "11:00", "monto": 60 },
+        { "id": "h306-28", "fecha": "2028-01-09", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe composició (Joel)", "horaInicio": "11:00", "monto": 60 },
+        { "id": "h306-29", "fecha": "2028-03-12", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe mescla avançada (Joel + Marta)", "horaInicio": "16:30", "monto": 60 },
+        { "id": "h306-30", "fecha": "2028-05-14", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe sound design cinema (Joel)", "horaInicio": "11:00", "monto": 60 },
+        { "id": "h306-31", "fecha": "2028-09-10", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe producció (nous alumnes: grup 2)", "horaInicio": "18:00", "monto": 60 },
+        { "id": "h306-32", "fecha": "2028-11-12", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe mescla (grup 2)", "horaInicio": "18:00", "monto": 60 },
+        { "id": "h306-33", "fecha": "2029-01-14", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe mastering (grup 2)", "horaInicio": "18:00", "monto": 60 },
+        { "id": "h306-34", "fecha": "2029-03-11", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe sound design (grup 2)", "horaInicio": "18:00", "monto": 60 },
+        { "id": "h306-35", "fecha": "2029-05-13", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe producció avançada (grup 2)", "horaInicio": "18:00", "monto": 60 },
+        { "id": "h306-36", "fecha": "2029-09-09", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe (nous alumnes Q4)", "horaInicio": "18:00", "monto": 60 },
+        { "id": "h306-37", "fecha": "2029-11-11", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe mescla (Q4)", "horaInicio": "18:00", "monto": 60 },
+        { "id": "h306-38", "fecha": "2030-01-13", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe producció 2030", "horaInicio": "18:00", "monto": 60 },
+        { "id": "h306-39", "fecha": "2030-03-10", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe mescla 2030", "horaInicio": "18:00", "monto": 60 },
+        { "id": "h306-40", "fecha": "2030-05-12", "tipo": "trabajo", "cantidad": 1.5, "nota": "Classe mastering 2030", "horaInicio": "18:00", "monto": 60 }
       ],
-      "notas": "Clases particulares quincenales de producción musical. 35€/h."
+      "notas": "Classes particulars de producció musical. Tarifa puja a 40€/h des de set 2026. Fins a 3 alumnes simultanis."
+    },
+    {
+      "id": "p307-m7m7-n7n7", "nombre": "Àlbum Marc Puig", "clienteId": "c305-ii99-jj00", "color": "CadetBlue",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2026-06-01", "finEstimada": "2027-01-31", "finReal": "2027-03-10" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 5000, "total": 0, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 1050, "importeIrpf": 750,
+        "totalFactura": 5300, "netoRecibido": 4250, "ivaExcepcion": "",
+        "pagado": true, "fechaPago": "2027-04-15", "gastos": 0,
+        "cobros": [
+          { "id": "cb307-01", "fecha": "2026-06-15", "cantidad": 2125 },
+          { "id": "cb307-02", "fecha": "2027-04-15", "cantidad": 2125 }
+        ],
+        "facturaNum": 7, "facturaFecha": "2027-03-10",
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h307-01", "fecha": "2026-06-05", "tipo": "reunion", "cantidad": 2, "nota": "Preproducció àlbum — 10 temes, estil cantautor electrònic", "horaInicio": "11:00" },
+        { "id": "h307-02", "fecha": "2026-06-15", "tipo": "trabajo", "cantidad": 6, "nota": "Gravació bases temes 1-3", "horaInicio": "10:00" },
+        { "id": "h307-03", "fecha": "2026-06-25", "tipo": "trabajo", "cantidad": 6, "nota": "Gravació bases temes 4-6", "horaInicio": "10:00" },
+        { "id": "h307-04", "fecha": "2026-07-08", "tipo": "trabajo", "cantidad": 7, "nota": "Gravació bases temes 7-10", "horaInicio": "09:00" },
+        { "id": "h307-05", "fecha": "2026-07-20", "tipo": "trabajo", "cantidad": 5, "nota": "Sessions veus temes 1-5", "horaInicio": "10:00" },
+        { "id": "h307-06", "fecha": "2026-08-05", "tipo": "trabajo", "cantidad": 5, "nota": "Sessions veus temes 6-10", "horaInicio": "10:00" },
+        { "id": "h307-07", "fecha": "2026-08-20", "tipo": "trabajo", "cantidad": 4, "nota": "Overdubs guitarra acústica + coristes", "horaInicio": "11:00" },
+        { "id": "h307-08", "fecha": "2026-09-10", "tipo": "trabajo", "cantidad": 7, "nota": "Mescla temes 1-4", "horaInicio": "09:00" },
+        { "id": "h307-09", "fecha": "2026-09-25", "tipo": "trabajo", "cantidad": 7, "nota": "Mescla temes 5-8", "horaInicio": "09:00" },
+        { "id": "h307-10", "fecha": "2026-10-10", "tipo": "trabajo", "cantidad": 5, "nota": "Mescla temes 9-10 + revisió global", "horaInicio": "09:00" },
+        { "id": "h307-11", "fecha": "2026-10-25", "tipo": "reunion", "cantidad": 2, "nota": "Escolta completa amb Marc — feedback", "horaInicio": "18:00" },
+        { "id": "h307-12", "fecha": "2026-11-10", "tipo": "trabajo", "cantidad": 4, "nota": "Correccions mescla post-feedback", "horaInicio": "10:00" },
+        { "id": "h307-13", "fecha": "2026-12-05", "tipo": "trabajo", "cantidad": 5, "nota": "Pre-mastering + stems per master extern", "horaInicio": "09:00" },
+        { "id": "h307-14", "fecha": "2027-01-15", "tipo": "trabajo", "cantidad": 3, "nota": "Revisió mastering retornat + ajustos", "horaInicio": "10:00" },
+        { "id": "h307-15", "fecha": "2027-02-20", "tipo": "trabajo", "cantidad": 2, "nota": "Retocs finals + versions instrumentals", "horaInicio": "14:00" },
+        { "id": "h307-16", "fecha": "2027-03-10", "tipo": "reunion", "cantidad": 1, "nota": "Entrega final àlbum — 10 tracks!", "horaInicio": "19:00" }
+      ],
+      "notas": "Àlbum complet 10 tracks. Cantautor electrònic. Recomanat per Samantha Vega. Gran producció."
+    },
+    {
+      "id": "p308-m8m8-n8n8", "nombre": "Residència DJ Apolo", "clienteId": "c302-cc33-dd44", "color": "Crimson",
+      "estado": "completado", "interno": false, "recurrente": true,
+      "fechas": { "inicio": "2026-09-01", "finEstimada": "2029-06-30", "finReal": "2029-06-30" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 600, "total": 0, "precioHora": 0,
+        "iva": 10, "irpf": 15, "importeIva": 60, "importeIrpf": 90,
+        "totalFactura": 570, "netoRecibido": 510, "ivaExcepcion": "",
+        "pagado": true, "fechaPago": "2029-07-15", "gastos": 0,
+        "cobros": [],
+        "facturaNum": 20, "facturaFecha": "2029-07-01",
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h308-01", "fecha": "2026-09-12", "tipo": "trabajo", "cantidad": 4, "nota": "Primer DJ set residència Apolo", "horaInicio": "23:00" },
+        { "id": "h308-02", "fecha": "2026-10-10", "tipo": "trabajo", "cantidad": 4, "nota": "DJ set octubre", "horaInicio": "23:00" },
+        { "id": "h308-03", "fecha": "2026-11-14", "tipo": "trabajo", "cantidad": 4, "nota": "DJ set novembre", "horaInicio": "23:00" },
+        { "id": "h308-04", "fecha": "2026-12-12", "tipo": "trabajo", "cantidad": 4, "nota": "DJ set desembre — nit especial", "horaInicio": "23:00" },
+        { "id": "h308-05", "fecha": "2027-01-09", "tipo": "trabajo", "cantidad": 4, "nota": "DJ set gener", "horaInicio": "23:00" },
+        { "id": "h308-06", "fecha": "2027-02-13", "tipo": "trabajo", "cantidad": 4, "nota": "DJ set febrer", "horaInicio": "23:00" },
+        { "id": "h308-07", "fecha": "2027-03-13", "tipo": "trabajo", "cantidad": 4, "nota": "DJ set març", "horaInicio": "23:00" },
+        { "id": "h308-08", "fecha": "2027-04-10", "tipo": "trabajo", "cantidad": 4, "nota": "DJ set abril", "horaInicio": "23:00" },
+        { "id": "h308-09", "fecha": "2027-05-08", "tipo": "trabajo", "cantidad": 4, "nota": "DJ set maig", "horaInicio": "23:00" },
+        { "id": "h308-10", "fecha": "2027-06-12", "tipo": "trabajo", "cantidad": 4, "nota": "DJ set juny", "horaInicio": "23:00" },
+        { "id": "h308-11", "fecha": "2027-09-09", "tipo": "trabajo", "cantidad": 4, "nota": "DJ set setembre", "horaInicio": "23:00" },
+        { "id": "h308-12", "fecha": "2027-10-14", "tipo": "trabajo", "cantidad": 4, "nota": "DJ set octubre", "horaInicio": "23:00" },
+        { "id": "h308-13", "fecha": "2027-11-11", "tipo": "trabajo", "cantidad": 4, "nota": "DJ set novembre", "horaInicio": "23:00" },
+        { "id": "h308-14", "fecha": "2027-12-09", "tipo": "trabajo", "cantidad": 5, "nota": "DJ set desembre — nit Cap d'Any!", "horaInicio": "23:00" },
+        { "id": "h308-15", "fecha": "2028-01-13", "tipo": "trabajo", "cantidad": 4, "nota": "DJ set gener", "horaInicio": "23:00" },
+        { "id": "h308-16", "fecha": "2028-02-10", "tipo": "trabajo", "cantidad": 4, "nota": "DJ set febrer", "horaInicio": "23:00" },
+        { "id": "h308-17", "fecha": "2028-03-09", "tipo": "trabajo", "cantidad": 4, "nota": "DJ set març", "horaInicio": "23:00" },
+        { "id": "h308-18", "fecha": "2028-04-13", "tipo": "trabajo", "cantidad": 4, "nota": "DJ set abril", "horaInicio": "23:00" },
+        { "id": "h308-19", "fecha": "2028-05-11", "tipo": "trabajo", "cantidad": 4, "nota": "DJ set maig", "horaInicio": "23:00" },
+        { "id": "h308-20", "fecha": "2028-06-08", "tipo": "trabajo", "cantidad": 4, "nota": "DJ set juny", "horaInicio": "23:00" },
+        { "id": "h308-21", "fecha": "2028-09-14", "tipo": "trabajo", "cantidad": 4, "nota": "DJ set setembre (puja a 600€)", "horaInicio": "23:00" },
+        { "id": "h308-22", "fecha": "2028-10-12", "tipo": "trabajo", "cantidad": 4, "nota": "DJ set octubre", "horaInicio": "23:00" },
+        { "id": "h308-23", "fecha": "2028-11-09", "tipo": "trabajo", "cantidad": 4, "nota": "DJ set novembre", "horaInicio": "23:00" },
+        { "id": "h308-24", "fecha": "2028-12-14", "tipo": "trabajo", "cantidad": 5, "nota": "DJ set desembre — aniversari residència", "horaInicio": "23:00" },
+        { "id": "h308-25", "fecha": "2029-01-11", "tipo": "trabajo", "cantidad": 4, "nota": "DJ set gener", "horaInicio": "23:00" },
+        { "id": "h308-26", "fecha": "2029-02-08", "tipo": "trabajo", "cantidad": 4, "nota": "DJ set febrer", "horaInicio": "23:00" },
+        { "id": "h308-27", "fecha": "2029-03-08", "tipo": "trabajo", "cantidad": 4, "nota": "DJ set març", "horaInicio": "23:00" },
+        { "id": "h308-28", "fecha": "2029-04-12", "tipo": "trabajo", "cantidad": 4, "nota": "DJ set abril", "horaInicio": "23:00" },
+        { "id": "h308-29", "fecha": "2029-05-10", "tipo": "trabajo", "cantidad": 4, "nota": "DJ set maig", "horaInicio": "23:00" },
+        { "id": "h308-30", "fecha": "2029-06-14", "tipo": "trabajo", "cantidad": 5, "nota": "Últim DJ set — comiat residència (massa feina estudi)", "horaInicio": "23:00" }
+      ],
+      "notas": "Residència mensual Sala Apolo. 500€/mes → 600€/mes des de set 2028. Finalitza juny 2029 per excés de feina."
+    },
+    {
+      "id": "p309-m9m9-n9n9", "nombre": "Festival Cruïlla 2027", "clienteId": "c304-gg77-hh88", "color": "OrangeRed",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2027-03-01", "finEstimada": "2027-07-10", "finReal": "2027-07-10" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 2500, "total": 0, "precioHora": 0,
+        "iva": 10, "irpf": 15, "importeIva": 250, "importeIrpf": 375,
+        "totalFactura": 2375, "netoRecibido": 2125, "ivaExcepcion": "",
+        "pagado": true, "fechaPago": "2027-08-10", "gastos": 0,
+        "cobros": [{ "id": "cb309-01", "fecha": "2027-08-10", "cantidad": 2125 }],
+        "facturaNum": 8, "facturaFecha": "2027-07-11",
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h309-01", "fecha": "2027-03-10", "tipo": "reunion", "cantidad": 1, "nota": "Briefing Cruïlla 2027 — escenari més gran!", "horaInicio": "12:00" },
+        { "id": "h309-02", "fecha": "2027-04-20", "tipo": "trabajo", "cantidad": 4, "nota": "Composició set festival 2027", "horaInicio": "10:00" },
+        { "id": "h309-03", "fecha": "2027-06-05", "tipo": "trabajo", "cantidad": 3, "nota": "Assaig amb visuals sincronitzats", "horaInicio": "15:00" },
+        { "id": "h309-04", "fecha": "2027-07-09", "tipo": "trabajo", "cantidad": 2, "nota": "Soundcheck Fòrum", "horaInicio": "14:00" },
+        { "id": "h309-05", "fecha": "2027-07-10", "tipo": "trabajo", "cantidad": 4, "nota": "Actuació Cruïlla 2027 — slot més llarg!", "horaInicio": "21:00" }
+      ],
+      "notas": "Segon any al Cruïlla. Escenari més gran, slot de 90 min. 2500€."
+    },
+    {
+      "id": "p310-m10m-n10n", "nombre": "Taller música joves Girona", "clienteId": "c303-ee55-ff66", "color": "Gold",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2027-06-15", "finEstimada": "2027-08-15", "finReal": "2027-08-10" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 1200, "total": 0, "precioHora": 0,
+        "iva": 0, "irpf": 15, "importeIva": 0, "importeIrpf": 180,
+        "totalFactura": 1020, "netoRecibido": 1020, "ivaExcepcion": "Formació exenta d'IVA (art. 20.1.9 LIVA)",
+        "pagado": true, "fechaPago": "2027-09-15", "gastos": 0,
+        "cobros": [{ "id": "cb310-01", "fecha": "2027-09-15", "cantidad": 1020 }],
+        "facturaNum": 9, "facturaFecha": "2027-08-11",
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h310-01", "fecha": "2027-06-20", "tipo": "trabajo", "cantidad": 3, "nota": "Preparació material taller estiu", "horaInicio": "10:00" },
+        { "id": "h310-02", "fecha": "2027-07-05", "tipo": "trabajo", "cantidad": 4, "nota": "Sessió 1: Introducció producció", "horaInicio": "10:00" },
+        { "id": "h310-03", "fecha": "2027-07-12", "tipo": "trabajo", "cantidad": 4, "nota": "Sessió 2: Beats i ritmes", "horaInicio": "10:00" },
+        { "id": "h310-04", "fecha": "2027-07-19", "tipo": "trabajo", "cantidad": 4, "nota": "Sessió 3: Melodies i síntesi", "horaInicio": "10:00" },
+        { "id": "h310-05", "fecha": "2027-07-26", "tipo": "trabajo", "cantidad": 4, "nota": "Sessió 4: Mescla bàsica", "horaInicio": "10:00" },
+        { "id": "h310-06", "fecha": "2027-08-02", "tipo": "trabajo", "cantidad": 4, "nota": "Sessió 5: Projecte final alumnes", "horaInicio": "10:00" },
+        { "id": "h310-07", "fecha": "2027-08-10", "tipo": "trabajo", "cantidad": 3, "nota": "Presentació projectes + entrega diplomes", "horaInicio": "11:00" }
+      ],
+      "notas": "Taller producció musical per joves (14-18 anys). 6 sessions estiu. Subvenció Ajuntament Girona."
+    },
+    {
+      "id": "p311-m11m-n11n", "nombre": "Producció Llum — Àlbum Noa Serra", "clienteId": "c306-kk11-ll22", "color": "Goldenrod",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2027-04-01", "finEstimada": "2027-10-31", "finReal": "2027-11-15" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 4000, "total": 0, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 840, "importeIrpf": 600,
+        "totalFactura": 4240, "netoRecibido": 3400, "ivaExcepcion": "",
+        "pagado": true, "fechaPago": "2027-12-15", "gastos": 0,
+        "cobros": [
+          { "id": "cb311-01", "fecha": "2027-04-15", "cantidad": 1700 },
+          { "id": "cb311-02", "fecha": "2027-12-15", "cantidad": 1700 }
+        ],
+        "facturaNum": 10, "facturaFecha": "2027-11-15",
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h311-01", "fecha": "2027-04-05", "tipo": "reunion", "cantidad": 2, "nota": "Briefing amb Llum + Noa Serra — pop indie", "horaInicio": "11:00" },
+        { "id": "h311-02", "fecha": "2027-04-20", "tipo": "trabajo", "cantidad": 6, "nota": "Gravació bases 4 primers temes", "horaInicio": "10:00" },
+        { "id": "h311-03", "fecha": "2027-05-10", "tipo": "trabajo", "cantidad": 6, "nota": "Gravació bases 4 últims temes", "horaInicio": "10:00" },
+        { "id": "h311-04", "fecha": "2027-05-25", "tipo": "trabajo", "cantidad": 5, "nota": "Sessions veus (lot 1)", "horaInicio": "10:00" },
+        { "id": "h311-05", "fecha": "2027-06-15", "tipo": "trabajo", "cantidad": 5, "nota": "Sessions veus (lot 2)", "horaInicio": "10:00" },
+        { "id": "h311-06", "fecha": "2027-07-10", "tipo": "trabajo", "cantidad": 7, "nota": "Mescla temes 1-4", "horaInicio": "09:00" },
+        { "id": "h311-07", "fecha": "2027-08-05", "tipo": "trabajo", "cantidad": 7, "nota": "Mescla temes 5-8", "horaInicio": "09:00" },
+        { "id": "h311-08", "fecha": "2027-09-10", "tipo": "reunion", "cantidad": 2, "nota": "Escolta amb Noa + direcció artística Llum", "horaInicio": "18:00" },
+        { "id": "h311-09", "fecha": "2027-10-05", "tipo": "trabajo", "cantidad": 4, "nota": "Correccions post-feedback", "horaInicio": "10:00" },
+        { "id": "h311-10", "fecha": "2027-11-05", "tipo": "trabajo", "cantidad": 5, "nota": "Master final 8 tracks", "horaInicio": "09:00" },
+        { "id": "h311-11", "fecha": "2027-11-15", "tipo": "reunion", "cantidad": 1, "nota": "Entrega àlbum a Llum", "horaInicio": "12:00" }
+      ],
+      "notas": "Primer àlbum per Llum Records. Artista: Noa Serra. Pop indie, 8 tracks."
+    },
+    {
+      "id": "p312-m12m-n12n", "nombre": "Festival Cruïlla 2028", "clienteId": "c304-gg77-hh88", "color": "OrangeRed",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2028-03-01", "finEstimada": "2028-07-12", "finReal": "2028-07-12" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 3000, "total": 0, "precioHora": 0,
+        "iva": 10, "irpf": 15, "importeIva": 300, "importeIrpf": 450,
+        "totalFactura": 2850, "netoRecibido": 2550, "ivaExcepcion": "",
+        "pagado": true, "fechaPago": "2028-08-12", "gastos": 0,
+        "cobros": [{ "id": "cb312-01", "fecha": "2028-08-12", "cantidad": 2550 }],
+        "facturaNum": 12, "facturaFecha": "2028-07-13",
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h312-01", "fecha": "2028-03-15", "tipo": "reunion", "cantidad": 1.5, "nota": "Briefing Cruïlla 2028 — actuació + disseny so escenari", "horaInicio": "12:00" },
+        { "id": "h312-02", "fecha": "2028-05-10", "tipo": "trabajo", "cantidad": 5, "nota": "Composició set + peces exclusives", "horaInicio": "10:00" },
+        { "id": "h312-03", "fecha": "2028-06-15", "tipo": "trabajo", "cantidad": 4, "nota": "Disseny sonor escenari electrònic", "horaInicio": "10:00" },
+        { "id": "h312-04", "fecha": "2028-07-01", "tipo": "trabajo", "cantidad": 3, "nota": "Assaig final amb visuals", "horaInicio": "15:00" },
+        { "id": "h312-05", "fecha": "2028-07-11", "tipo": "trabajo", "cantidad": 2, "nota": "Soundcheck", "horaInicio": "14:00" },
+        { "id": "h312-06", "fecha": "2028-07-12", "tipo": "trabajo", "cantidad": 5, "nota": "Actuació Cruïlla 2028 + sound design escenari!", "horaInicio": "20:00" }
+      ],
+      "notas": "Tercer Cruïlla. Doble funció: actuació + sound design escenari electrònic. 3000€."
+    },
+    {
+      "id": "p313-m13m-n13n", "nombre": "Soundtrack Netflix — curt documental", "clienteId": "c307-mm33-nn44", "color": "IndianRed",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2028-10-01", "finEstimada": "2029-01-31", "finReal": "2029-01-20" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 8000, "total": 0, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 1680, "importeIrpf": 1200,
+        "totalFactura": 8480, "netoRecibido": 6800, "ivaExcepcion": "",
+        "pagado": true, "fechaPago": "2029-02-28", "gastos": 0,
+        "cobros": [
+          { "id": "cb313-01", "fecha": "2028-10-15", "cantidad": 3400 },
+          { "id": "cb313-02", "fecha": "2029-02-28", "cantidad": 3400 }
+        ],
+        "facturaNum": 14, "facturaFecha": "2029-01-20",
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h313-01", "fecha": "2028-10-05", "tipo": "reunion", "cantidad": 2, "nota": "Briefing amb directora — spotting documental 40 min", "horaInicio": "10:00" },
+        { "id": "h313-02", "fecha": "2028-10-15", "tipo": "trabajo", "cantidad": 5, "nota": "Composició tema principal + paleta sonora", "horaInicio": "09:00" },
+        { "id": "h313-03", "fecha": "2028-10-28", "tipo": "trabajo", "cantidad": 6, "nota": "Producció cues acte 1", "horaInicio": "09:00" },
+        { "id": "h313-04", "fecha": "2028-11-10", "tipo": "trabajo", "cantidad": 7, "nota": "Producció cues acte 2", "horaInicio": "09:00" },
+        { "id": "h313-05", "fecha": "2028-11-25", "tipo": "trabajo", "cantidad": 6, "nota": "Producció cues acte 3 + tancament", "horaInicio": "09:00" },
+        { "id": "h313-06", "fecha": "2028-12-10", "tipo": "reunion", "cantidad": 2, "nota": "Revisió primer tall amb directora", "horaInicio": "10:00" },
+        { "id": "h313-07", "fecha": "2028-12-20", "tipo": "trabajo", "cantidad": 5, "nota": "Correccions + nous cues demanats", "horaInicio": "09:00" },
+        { "id": "h313-08", "fecha": "2029-01-08", "tipo": "trabajo", "cantidad": 6, "nota": "Mescla final stems + mastering", "horaInicio": "09:00" },
+        { "id": "h313-09", "fecha": "2029-01-20", "tipo": "reunion", "cantidad": 1, "nota": "Entrega final a Netflix", "horaInicio": "11:00" }
+      ],
+      "notas": "Primer encàrrec Netflix — via contacte Llum Records. Soundtrack curt documental sobre música urbana BCN. 8000€!"
+    },
+    {
+      "id": "p314-m14m-n14n", "nombre": "Producció Llum — Singles 2028", "clienteId": "c306-kk11-ll22", "color": "Goldenrod",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2028-02-01", "finEstimada": "2028-09-30", "finReal": "2028-09-20" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 3500, "total": 0, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 735, "importeIrpf": 525,
+        "totalFactura": 3710, "netoRecibido": 2975, "ivaExcepcion": "",
+        "pagado": true, "fechaPago": "2028-10-15", "gastos": 0,
+        "cobros": [
+          { "id": "cb314-01", "fecha": "2028-02-15", "cantidad": 1487.5 },
+          { "id": "cb314-02", "fecha": "2028-10-15", "cantidad": 1487.5 }
+        ],
+        "facturaNum": 11, "facturaFecha": "2028-09-20",
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h314-01", "fecha": "2028-02-10", "tipo": "trabajo", "cantidad": 5, "nota": "Producció single DJ Kova — 'Nit Eterna'", "horaInicio": "10:00" },
+        { "id": "h314-02", "fecha": "2028-02-25", "tipo": "trabajo", "cantidad": 4, "nota": "Mescla + master 'Nit Eterna'", "horaInicio": "09:00" },
+        { "id": "h314-03", "fecha": "2028-04-15", "tipo": "trabajo", "cantidad": 5, "nota": "Producció single Noa Serra — 'Llum de Mar'", "horaInicio": "10:00" },
+        { "id": "h314-04", "fecha": "2028-05-05", "tipo": "trabajo", "cantidad": 4, "nota": "Mescla + master 'Llum de Mar'", "horaInicio": "09:00" },
+        { "id": "h314-05", "fecha": "2028-07-10", "tipo": "trabajo", "cantidad": 5, "nota": "Producció single nou artista — 'Despertar'", "horaInicio": "10:00" },
+        { "id": "h314-06", "fecha": "2028-07-25", "tipo": "trabajo", "cantidad": 4, "nota": "Mescla + master 'Despertar'", "horaInicio": "09:00" },
+        { "id": "h314-07", "fecha": "2028-09-10", "tipo": "trabajo", "cantidad": 3, "nota": "Remix 'Nit Eterna' — versió festival", "horaInicio": "20:00" }
+      ],
+      "notas": "Lot de singles per artistes Llum 2028. 3 singles + 1 remix."
+    },
+    {
+      "id": "p315-m15m-n15n", "nombre": "Masterclass Taller de Músics", "clienteId": "c309-qq77-rr88", "color": "DarkCyan",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2029-03-01", "finEstimada": "2029-03-15", "finReal": "2029-03-12" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 500, "total": 0, "precioHora": 0,
+        "iva": 0, "irpf": 15, "importeIva": 0, "importeIrpf": 75,
+        "totalFactura": 425, "netoRecibido": 425, "ivaExcepcion": "Formació exenta d'IVA (art. 20.1.9 LIVA)",
+        "pagado": true, "fechaPago": "2029-04-15", "gastos": 0,
+        "cobros": [{ "id": "cb315-01", "fecha": "2029-04-15", "cantidad": 425 }],
+        "facturaNum": 16, "facturaFecha": "2029-03-13",
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h315-01", "fecha": "2029-03-05", "tipo": "trabajo", "cantidad": 3, "nota": "Preparació masterclass: producció electrònica per músics", "horaInicio": "10:00" },
+        { "id": "h315-02", "fecha": "2029-03-12", "tipo": "trabajo", "cantidad": 3, "nota": "Masterclass al Taller de Músics", "horaInicio": "17:00" }
+      ],
+      "notas": "Masterclass sobre producció electrònica. IVA exempt per formació."
+    },
+    {
+      "id": "p316-m16m-n16n", "nombre": "Primavera Sound 2029", "clienteId": "c308-oo55-pp66", "color": "DeepPink",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2029-03-01", "finEstimada": "2029-06-07", "finReal": "2029-06-07" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 3000, "total": 0, "precioHora": 0,
+        "iva": 10, "irpf": 15, "importeIva": 300, "importeIrpf": 450,
+        "totalFactura": 2850, "netoRecibido": 2550, "ivaExcepcion": "",
+        "pagado": true, "fechaPago": "2029-07-07", "gastos": 0,
+        "cobros": [{ "id": "cb316-01", "fecha": "2029-07-07", "cantidad": 2550 }],
+        "facturaNum": 17, "facturaFecha": "2029-06-08",
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h316-01", "fecha": "2029-03-20", "tipo": "reunion", "cantidad": 1.5, "nota": "Briefing Primavera Sound — escenari Bits!", "horaInicio": "12:00" },
+        { "id": "h316-02", "fecha": "2029-04-15", "tipo": "trabajo", "cantidad": 5, "nota": "Composició set especial Primavera", "horaInicio": "10:00" },
+        { "id": "h316-03", "fecha": "2029-05-10", "tipo": "trabajo", "cantidad": 3, "nota": "Assaig amb equip visual", "horaInicio": "15:00" },
+        { "id": "h316-04", "fecha": "2029-06-06", "tipo": "trabajo", "cantidad": 2, "nota": "Soundcheck Parc del Fòrum", "horaInicio": "15:00" },
+        { "id": "h316-05", "fecha": "2029-06-07", "tipo": "trabajo", "cantidad": 4, "nota": "Actuació Primavera Sound 2029!", "horaInicio": "22:00" }
+      ],
+      "notas": "Primera actuació al Primavera Sound. Escenari electrònic. 3000€. Gran fita!"
+    },
+    {
+      "id": "p317-m17m-n17n", "nombre": "Soundtrack Netflix — sèrie documental", "clienteId": "c307-mm33-nn44", "color": "IndianRed",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2029-07-01", "finEstimada": "2029-11-30", "finReal": "2029-11-20" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 12000, "total": 0, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 2520, "importeIrpf": 1800,
+        "totalFactura": 12720, "netoRecibido": 10200, "ivaExcepcion": "",
+        "pagado": true, "fechaPago": "2029-12-20", "gastos": 0,
+        "cobros": [
+          { "id": "cb317-01", "fecha": "2029-07-15", "cantidad": 3400 },
+          { "id": "cb317-02", "fecha": "2029-09-15", "cantidad": 3400 },
+          { "id": "cb317-03", "fecha": "2029-12-20", "cantidad": 3400 }
+        ],
+        "facturaNum": 19, "facturaFecha": "2029-11-20",
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h317-01", "fecha": "2029-07-05", "tipo": "reunion", "cantidad": 3, "nota": "Briefing sèrie 4 episodis — spotting complet", "horaInicio": "10:00" },
+        { "id": "h317-02", "fecha": "2029-07-15", "tipo": "trabajo", "cantidad": 6, "nota": "Composició tema principal + paleta sonora sèrie", "horaInicio": "09:00" },
+        { "id": "h317-03", "fecha": "2029-07-28", "tipo": "trabajo", "cantidad": 7, "nota": "Producció cues episodi 1", "horaInicio": "09:00" },
+        { "id": "h317-04", "fecha": "2029-08-10", "tipo": "trabajo", "cantidad": 7, "nota": "Producció cues episodi 2", "horaInicio": "09:00" },
+        { "id": "h317-05", "fecha": "2029-08-25", "tipo": "trabajo", "cantidad": 7, "nota": "Producció cues episodi 3", "horaInicio": "09:00" },
+        { "id": "h317-06", "fecha": "2029-09-08", "tipo": "trabajo", "cantidad": 7, "nota": "Producció cues episodi 4", "horaInicio": "09:00" },
+        { "id": "h317-07", "fecha": "2029-09-22", "tipo": "reunion", "cantidad": 2, "nota": "Revisió amb directora — ajustos episodis 1-2", "horaInicio": "10:00" },
+        { "id": "h317-08", "fecha": "2029-10-05", "tipo": "trabajo", "cantidad": 5, "nota": "Correccions episodis 1-2", "horaInicio": "09:00" },
+        { "id": "h317-09", "fecha": "2029-10-20", "tipo": "trabajo", "cantidad": 5, "nota": "Correccions episodis 3-4", "horaInicio": "09:00" },
+        { "id": "h317-10", "fecha": "2029-11-05", "tipo": "trabajo", "cantidad": 6, "nota": "Mescla final stems 4 episodis", "horaInicio": "09:00" },
+        { "id": "h317-11", "fecha": "2029-11-20", "tipo": "reunion", "cantidad": 1, "nota": "Entrega final a Netflix", "horaInicio": "11:00" }
+      ],
+      "notas": "Segon Netflix — sèrie documental 4 episodis sobre cultura mediterrània. 12.000€. Gran projecte!"
+    },
+    {
+      "id": "p318-m18m-n18n", "nombre": "Festival Cruïlla 2029", "clienteId": "c304-gg77-hh88", "color": "OrangeRed",
+      "estado": "completado", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2029-04-01", "finEstimada": "2029-07-12", "finReal": "2029-07-12" },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 3500, "total": 0, "precioHora": 0,
+        "iva": 10, "irpf": 15, "importeIva": 350, "importeIrpf": 525,
+        "totalFactura": 3325, "netoRecibido": 2975, "ivaExcepcion": "",
+        "pagado": true, "fechaPago": "2029-08-12", "gastos": 0,
+        "cobros": [{ "id": "cb318-01", "fecha": "2029-08-12", "cantidad": 2975 }],
+        "facturaNum": 18, "facturaFecha": "2029-07-13",
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h318-01", "fecha": "2029-04-10", "tipo": "reunion", "cantidad": 1.5, "nota": "Briefing Cruïlla 2029 — headliner escenari Bits!", "horaInicio": "12:00" },
+        { "id": "h318-02", "fecha": "2029-05-08", "tipo": "trabajo", "cantidad": 5, "nota": "Composició set especial headliner", "horaInicio": "10:00" },
+        { "id": "h318-03", "fecha": "2029-06-05", "tipo": "trabajo", "cantidad": 4, "nota": "Producció peces exclusives + visuals", "horaInicio": "11:00" },
+        { "id": "h318-04", "fecha": "2029-06-25", "tipo": "trabajo", "cantidad": 3, "nota": "Assaig final", "horaInicio": "15:00" },
+        { "id": "h318-05", "fecha": "2029-07-11", "tipo": "trabajo", "cantidad": 2, "nota": "Soundcheck Fòrum", "horaInicio": "14:00" },
+        { "id": "h318-06", "fecha": "2029-07-12", "tipo": "trabajo", "cantidad": 5, "nota": "Headliner escenari Bits — Cruïlla 2029!", "horaInicio": "22:00" }
+      ],
+      "notas": "Quart any al Cruïlla. Headliner escenari electrònic! 3500€."
+    },
+    {
+      "id": "p319-m19m-n19n", "nombre": "Producció Llum — Àlbum estrella 2030", "clienteId": "c306-kk11-ll22", "color": "Goldenrod",
+      "estado": "activo", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2030-01-15", "finEstimada": "2030-07-31", "finReal": null },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 6000, "total": 0, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 1260, "importeIrpf": 900,
+        "totalFactura": 6360, "netoRecibido": 0, "ivaExcepcion": "",
+        "pagado": false, "fechaPago": null, "gastos": 0,
+        "cobros": [
+          { "id": "cb319-01", "fecha": "2030-02-01", "cantidad": 2550 }
+        ],
+        "facturaNum": null, "facturaFecha": null,
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h319-01", "fecha": "2030-01-20", "tipo": "reunion", "cantidad": 2, "nota": "Briefing àlbum artista estrella Llum — 12 tracks", "horaInicio": "11:00" },
+        { "id": "h319-02", "fecha": "2030-02-03", "tipo": "trabajo", "cantidad": 6, "nota": "Gravació bases temes 1-4", "horaInicio": "10:00" },
+        { "id": "h319-03", "fecha": "2030-02-17", "tipo": "trabajo", "cantidad": 7, "nota": "Gravació bases temes 5-8", "horaInicio": "09:00" },
+        { "id": "h319-04", "fecha": "2030-03-03", "tipo": "trabajo", "cantidad": 6, "nota": "Gravació bases temes 9-12", "horaInicio": "10:00" },
+        { "id": "h319-05", "fecha": "2030-03-17", "tipo": "trabajo", "cantidad": 5, "nota": "Sessions veus lot 1", "horaInicio": "10:00" },
+        { "id": "h319-06", "fecha": "2030-04-07", "tipo": "trabajo", "cantidad": 5, "nota": "Sessions veus lot 2", "horaInicio": "10:00" },
+        { "id": "h319-07", "fecha": "2030-04-21", "tipo": "trabajo", "cantidad": 7, "nota": "Mescla temes 1-4", "horaInicio": "09:00" },
+        { "id": "h319-08", "fecha": "2030-05-05", "tipo": "trabajo", "cantidad": 7, "nota": "Mescla temes 5-8", "horaInicio": "09:00" },
+        { "id": "h319-09", "fecha": "2030-05-19", "tipo": "trabajo", "cantidad": 6, "nota": "Mescla temes 9-12", "horaInicio": "09:00" }
+      ],
+      "notas": "Gran àlbum per l'artista estrella de Llum Records. 12 tracks. 6000€. La producció més gran fins ara."
+    },
+    {
+      "id": "p320-m20m-n20n", "nombre": "Primavera Sound 2030", "clienteId": "c308-oo55-pp66", "color": "DeepPink",
+      "estado": "activo", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2030-03-01", "finEstimada": "2030-06-06", "finReal": null },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 4000, "total": 0, "precioHora": 0,
+        "iva": 10, "irpf": 15, "importeIva": 400, "importeIrpf": 600,
+        "totalFactura": 3800, "netoRecibido": 0, "ivaExcepcion": "",
+        "pagado": false, "fechaPago": null, "gastos": 0,
+        "cobros": [],
+        "facturaNum": null, "facturaFecha": null,
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h320-01", "fecha": "2030-03-10", "tipo": "reunion", "cantidad": 1.5, "nota": "Briefing Primavera 2030 — escenari més gran!", "horaInicio": "12:00" },
+        { "id": "h320-02", "fecha": "2030-04-10", "tipo": "trabajo", "cantidad": 5, "nota": "Composició set Primavera 2030", "horaInicio": "10:00" },
+        { "id": "h320-03", "fecha": "2030-05-08", "tipo": "trabajo", "cantidad": 3, "nota": "Assaig amb visuals + band", "horaInicio": "15:00" }
+      ],
+      "notas": "Segon Primavera Sound. Escenari més gran. 4000€. Puja de caché!"
+    },
+    {
+      "id": "p321-m21m-n21n", "nombre": "Soundtrack Netflix — llargmetratge", "clienteId": "c307-mm33-nn44", "color": "IndianRed",
+      "estado": "activo", "interno": false, "recurrente": false,
+      "fechas": { "inicio": "2030-03-01", "finEstimada": "2030-08-31", "finReal": null },
+      "facturacion": {
+        "modo": "desde_base", "baseImponible": 15000, "total": 0, "precioHora": 0,
+        "iva": 21, "irpf": 15, "importeIva": 3150, "importeIrpf": 2250,
+        "totalFactura": 15900, "netoRecibido": 0, "ivaExcepcion": "",
+        "pagado": false, "fechaPago": null, "gastos": 0,
+        "cobros": [
+          { "id": "cb321-01", "fecha": "2030-03-15", "cantidad": 4250 }
+        ],
+        "facturaNum": null, "facturaFecha": null,
+        "idiomaFactura": null
+      },
+      "horas": [
+        { "id": "h321-01", "fecha": "2030-03-05", "tipo": "reunion", "cantidad": 3, "nota": "Briefing Netflix — llargmetratge documental 90 min", "horaInicio": "10:00" },
+        { "id": "h321-02", "fecha": "2030-03-20", "tipo": "reunion", "cantidad": 2, "nota": "Spotting complet amb directora", "horaInicio": "10:00" },
+        { "id": "h321-03", "fecha": "2030-04-05", "tipo": "trabajo", "cantidad": 6, "nota": "Composició tema principal + paleta sonora", "horaInicio": "09:00" },
+        { "id": "h321-04", "fecha": "2030-04-18", "tipo": "trabajo", "cantidad": 7, "nota": "Producció cues acte 1", "horaInicio": "09:00" },
+        { "id": "h321-05", "fecha": "2030-05-08", "tipo": "trabajo", "cantidad": 7, "nota": "Producció cues acte 2", "horaInicio": "09:00" },
+        { "id": "h321-06", "fecha": "2030-05-22", "tipo": "trabajo", "cantidad": 6, "nota": "Producció cues acte 3", "horaInicio": "09:00" }
+      ],
+      "notas": "Tercer Netflix — llargmetratge documental. 15.000€. Consolidació com a compositora audiovisual."
     }
   ],
   "gastos": [
     { "id": "g301-aa01", "nombre": "Splice", "entradas": [
       { "fecha": "2025-12-01", "cantidad": 14.99, "nota": "Mensual" },
-      { "fecha": "2026-01-01", "cantidad": 14.99, "nota": "Mensual" },
-      { "fecha": "2026-02-01", "cantidad": 14.99, "nota": "Mensual" },
-      { "fecha": "2026-03-01", "cantidad": 14.99, "nota": "Mensual" }
+      { "fecha": "2026-01-01", "cantidad": 14.99, "nota": "" },{ "fecha": "2026-02-01", "cantidad": 14.99, "nota": "" },{ "fecha": "2026-03-01", "cantidad": 14.99, "nota": "" },{ "fecha": "2026-04-01", "cantidad": 14.99, "nota": "" },{ "fecha": "2026-05-01", "cantidad": 14.99, "nota": "" },{ "fecha": "2026-06-01", "cantidad": 14.99, "nota": "" },{ "fecha": "2026-07-01", "cantidad": 14.99, "nota": "" },{ "fecha": "2026-08-01", "cantidad": 14.99, "nota": "" },{ "fecha": "2026-09-01", "cantidad": 14.99, "nota": "" },{ "fecha": "2026-10-01", "cantidad": 14.99, "nota": "" },{ "fecha": "2026-11-01", "cantidad": 14.99, "nota": "" },{ "fecha": "2026-12-01", "cantidad": 14.99, "nota": "" },
+      { "fecha": "2027-01-01", "cantidad": 14.99, "nota": "" },{ "fecha": "2027-02-01", "cantidad": 14.99, "nota": "" },{ "fecha": "2027-03-01", "cantidad": 14.99, "nota": "" },{ "fecha": "2027-04-01", "cantidad": 14.99, "nota": "" },{ "fecha": "2027-05-01", "cantidad": 14.99, "nota": "" },{ "fecha": "2027-06-01", "cantidad": 14.99, "nota": "" },{ "fecha": "2027-07-01", "cantidad": 14.99, "nota": "" },{ "fecha": "2027-08-01", "cantidad": 14.99, "nota": "" },{ "fecha": "2027-09-01", "cantidad": 14.99, "nota": "" },{ "fecha": "2027-10-01", "cantidad": 14.99, "nota": "" },{ "fecha": "2027-11-01", "cantidad": 14.99, "nota": "" },{ "fecha": "2027-12-01", "cantidad": 14.99, "nota": "" },
+      { "fecha": "2028-01-01", "cantidad": 16.99, "nota": "Puja de preu" },{ "fecha": "2028-02-01", "cantidad": 16.99, "nota": "" },{ "fecha": "2028-03-01", "cantidad": 16.99, "nota": "" },{ "fecha": "2028-04-01", "cantidad": 16.99, "nota": "" },{ "fecha": "2028-05-01", "cantidad": 16.99, "nota": "" },{ "fecha": "2028-06-01", "cantidad": 16.99, "nota": "" },{ "fecha": "2028-07-01", "cantidad": 16.99, "nota": "" },{ "fecha": "2028-08-01", "cantidad": 16.99, "nota": "" },{ "fecha": "2028-09-01", "cantidad": 16.99, "nota": "" },{ "fecha": "2028-10-01", "cantidad": 16.99, "nota": "" },{ "fecha": "2028-11-01", "cantidad": 16.99, "nota": "" },{ "fecha": "2028-12-01", "cantidad": 16.99, "nota": "" },
+      { "fecha": "2029-01-01", "cantidad": 16.99, "nota": "" },{ "fecha": "2029-02-01", "cantidad": 16.99, "nota": "" },{ "fecha": "2029-03-01", "cantidad": 16.99, "nota": "" },{ "fecha": "2029-04-01", "cantidad": 16.99, "nota": "" },{ "fecha": "2029-05-01", "cantidad": 16.99, "nota": "" },{ "fecha": "2029-06-01", "cantidad": 16.99, "nota": "" },{ "fecha": "2029-07-01", "cantidad": 16.99, "nota": "" },{ "fecha": "2029-08-01", "cantidad": 16.99, "nota": "" },{ "fecha": "2029-09-01", "cantidad": 16.99, "nota": "" },{ "fecha": "2029-10-01", "cantidad": 16.99, "nota": "" },{ "fecha": "2029-11-01", "cantidad": 16.99, "nota": "" },{ "fecha": "2029-12-01", "cantidad": 16.99, "nota": "" },
+      { "fecha": "2030-01-01", "cantidad": 16.99, "nota": "" },{ "fecha": "2030-02-01", "cantidad": 16.99, "nota": "" },{ "fecha": "2030-03-01", "cantidad": 16.99, "nota": "" },{ "fecha": "2030-04-01", "cantidad": 16.99, "nota": "" },{ "fecha": "2030-05-01", "cantidad": 16.99, "nota": "" },{ "fecha": "2030-06-01", "cantidad": 16.99, "nota": "" }
     ], "color": "Orchid", "categoria": "herramientas", "periodicidad": "mensual", "desgravable": true },
     { "id": "g302-bb02", "nombre": "Ableton Suite", "entradas": [
-      { "fecha": "2025-09-01", "cantidad": 599, "nota": "Licencia anual" }
+      { "fecha": "2025-09-01", "cantidad": 599, "nota": "Llicència anual" },
+      { "fecha": "2026-09-01", "cantidad": 599, "nota": "Renovació" },
+      { "fecha": "2027-09-01", "cantidad": 599, "nota": "Renovació" },
+      { "fecha": "2028-09-01", "cantidad": 649, "nota": "Renovació + puja" },
+      { "fecha": "2029-09-01", "cantidad": 649, "nota": "Renovació" }
     ], "color": "MediumSlateBlue", "categoria": "software", "periodicidad": null, "desgravable": true },
-    { "id": "g303-cc03", "nombre": "Alquiler estudio", "entradas": [
-      { "fecha": "2025-12-01", "cantidad": 250, "nota": "" },
-      { "fecha": "2026-01-01", "cantidad": 250, "nota": "" },
-      { "fecha": "2026-02-01", "cantidad": 250, "nota": "" },
-      { "fecha": "2026-03-01", "cantidad": 250, "nota": "" }
+    { "id": "g303-cc03", "nombre": "Alquiler estudi", "entradas": [
+      { "fecha": "2025-12-01", "cantidad": 250, "nota": "" },{ "fecha": "2026-01-01", "cantidad": 250, "nota": "" },{ "fecha": "2026-02-01", "cantidad": 250, "nota": "" },{ "fecha": "2026-03-01", "cantidad": 250, "nota": "" },{ "fecha": "2026-04-01", "cantidad": 250, "nota": "" },{ "fecha": "2026-05-01", "cantidad": 250, "nota": "" },{ "fecha": "2026-06-01", "cantidad": 250, "nota": "" },{ "fecha": "2026-07-01", "cantidad": 250, "nota": "" },{ "fecha": "2026-08-01", "cantidad": 250, "nota": "" },{ "fecha": "2026-09-01", "cantidad": 250, "nota": "" },{ "fecha": "2026-10-01", "cantidad": 250, "nota": "" },{ "fecha": "2026-11-01", "cantidad": 250, "nota": "" },{ "fecha": "2026-12-01", "cantidad": 250, "nota": "" },
+      { "fecha": "2027-01-01", "cantidad": 250, "nota": "" },{ "fecha": "2027-02-01", "cantidad": 250, "nota": "" },{ "fecha": "2027-03-01", "cantidad": 250, "nota": "" },{ "fecha": "2027-04-01", "cantidad": 250, "nota": "" },{ "fecha": "2027-05-01", "cantidad": 250, "nota": "" },{ "fecha": "2027-06-01", "cantidad": 250, "nota": "" },{ "fecha": "2027-07-01", "cantidad": 250, "nota": "" },{ "fecha": "2027-08-01", "cantidad": 250, "nota": "" },{ "fecha": "2027-09-01", "cantidad": 250, "nota": "" },{ "fecha": "2027-10-01", "cantidad": 280, "nota": "Puja lloguer" },{ "fecha": "2027-11-01", "cantidad": 280, "nota": "" },{ "fecha": "2027-12-01", "cantidad": 280, "nota": "" },
+      { "fecha": "2028-01-01", "cantidad": 280, "nota": "" },{ "fecha": "2028-02-01", "cantidad": 280, "nota": "" },{ "fecha": "2028-03-01", "cantidad": 280, "nota": "" },{ "fecha": "2028-04-01", "cantidad": 280, "nota": "" },{ "fecha": "2028-05-01", "cantidad": 280, "nota": "" },{ "fecha": "2028-06-01", "cantidad": 280, "nota": "" },{ "fecha": "2028-07-01", "cantidad": 280, "nota": "" },{ "fecha": "2028-08-01", "cantidad": 280, "nota": "" },{ "fecha": "2028-09-01", "cantidad": 280, "nota": "" },{ "fecha": "2028-10-01", "cantidad": 280, "nota": "" },{ "fecha": "2028-11-01", "cantidad": 280, "nota": "" },{ "fecha": "2028-12-01", "cantidad": 280, "nota": "" },
+      { "fecha": "2029-01-01", "cantidad": 320, "nota": "Espai més gran per Netflix" },{ "fecha": "2029-02-01", "cantidad": 320, "nota": "" },{ "fecha": "2029-03-01", "cantidad": 320, "nota": "" },{ "fecha": "2029-04-01", "cantidad": 320, "nota": "" },{ "fecha": "2029-05-01", "cantidad": 320, "nota": "" },{ "fecha": "2029-06-01", "cantidad": 320, "nota": "" },{ "fecha": "2029-07-01", "cantidad": 320, "nota": "" },{ "fecha": "2029-08-01", "cantidad": 320, "nota": "" },{ "fecha": "2029-09-01", "cantidad": 320, "nota": "" },{ "fecha": "2029-10-01", "cantidad": 320, "nota": "" },{ "fecha": "2029-11-01", "cantidad": 320, "nota": "" },{ "fecha": "2029-12-01", "cantidad": 320, "nota": "" },
+      { "fecha": "2030-01-01", "cantidad": 350, "nota": "Puja 2030" },{ "fecha": "2030-02-01", "cantidad": 350, "nota": "" },{ "fecha": "2030-03-01", "cantidad": 350, "nota": "" },{ "fecha": "2030-04-01", "cantidad": 350, "nota": "" },{ "fecha": "2030-05-01", "cantidad": 350, "nota": "" },{ "fecha": "2030-06-01", "cantidad": 350, "nota": "" }
     ], "color": "Peru", "categoria": "alquiler_oficina", "periodicidad": "mensual", "desgravable": true },
-    { "id": "g304-dd04", "nombre": "Autónomos", "entradas": [
-      { "fecha": "2025-12-01", "cantidad": 230, "nota": "" },
-      { "fecha": "2026-01-01", "cantidad": 230, "nota": "" },
-      { "fecha": "2026-02-01", "cantidad": 230, "nota": "" },
-      { "fecha": "2026-03-01", "cantidad": 230, "nota": "" }
+    { "id": "g304-dd04", "nombre": "Autònoms", "entradas": [
+      { "fecha": "2025-12-01", "cantidad": 230, "nota": "" },{ "fecha": "2026-01-01", "cantidad": 230, "nota": "" },{ "fecha": "2026-02-01", "cantidad": 230, "nota": "" },{ "fecha": "2026-03-01", "cantidad": 230, "nota": "" },{ "fecha": "2026-04-01", "cantidad": 230, "nota": "" },{ "fecha": "2026-05-01", "cantidad": 230, "nota": "" },{ "fecha": "2026-06-01", "cantidad": 230, "nota": "" },{ "fecha": "2026-07-01", "cantidad": 230, "nota": "" },{ "fecha": "2026-08-01", "cantidad": 230, "nota": "" },{ "fecha": "2026-09-01", "cantidad": 230, "nota": "" },{ "fecha": "2026-10-01", "cantidad": 230, "nota": "" },{ "fecha": "2026-11-01", "cantidad": 230, "nota": "" },{ "fecha": "2026-12-01", "cantidad": 230, "nota": "" },
+      { "fecha": "2027-01-01", "cantidad": 260, "nota": "Puja" },{ "fecha": "2027-02-01", "cantidad": 260, "nota": "" },{ "fecha": "2027-03-01", "cantidad": 260, "nota": "" },{ "fecha": "2027-04-01", "cantidad": 260, "nota": "" },{ "fecha": "2027-05-01", "cantidad": 260, "nota": "" },{ "fecha": "2027-06-01", "cantidad": 260, "nota": "" },{ "fecha": "2027-07-01", "cantidad": 260, "nota": "" },{ "fecha": "2027-08-01", "cantidad": 260, "nota": "" },{ "fecha": "2027-09-01", "cantidad": 260, "nota": "" },{ "fecha": "2027-10-01", "cantidad": 260, "nota": "" },{ "fecha": "2027-11-01", "cantidad": 260, "nota": "" },{ "fecha": "2027-12-01", "cantidad": 260, "nota": "" },
+      { "fecha": "2028-01-01", "cantidad": 310, "nota": "Tram superior" },{ "fecha": "2028-02-01", "cantidad": 310, "nota": "" },{ "fecha": "2028-03-01", "cantidad": 310, "nota": "" },{ "fecha": "2028-04-01", "cantidad": 310, "nota": "" },{ "fecha": "2028-05-01", "cantidad": 310, "nota": "" },{ "fecha": "2028-06-01", "cantidad": 310, "nota": "" },{ "fecha": "2028-07-01", "cantidad": 310, "nota": "" },{ "fecha": "2028-08-01", "cantidad": 310, "nota": "" },{ "fecha": "2028-09-01", "cantidad": 310, "nota": "" },{ "fecha": "2028-10-01", "cantidad": 310, "nota": "" },{ "fecha": "2028-11-01", "cantidad": 310, "nota": "" },{ "fecha": "2028-12-01", "cantidad": 310, "nota": "" },
+      { "fecha": "2029-01-01", "cantidad": 350, "nota": "Tram alt — Netflix" },{ "fecha": "2029-02-01", "cantidad": 350, "nota": "" },{ "fecha": "2029-03-01", "cantidad": 350, "nota": "" },{ "fecha": "2029-04-01", "cantidad": 350, "nota": "" },{ "fecha": "2029-05-01", "cantidad": 350, "nota": "" },{ "fecha": "2029-06-01", "cantidad": 350, "nota": "" },{ "fecha": "2029-07-01", "cantidad": 350, "nota": "" },{ "fecha": "2029-08-01", "cantidad": 350, "nota": "" },{ "fecha": "2029-09-01", "cantidad": 350, "nota": "" },{ "fecha": "2029-10-01", "cantidad": 350, "nota": "" },{ "fecha": "2029-11-01", "cantidad": 350, "nota": "" },{ "fecha": "2029-12-01", "cantidad": 350, "nota": "" },
+      { "fecha": "2030-01-01", "cantidad": 380, "nota": "Puja 2030" },{ "fecha": "2030-02-01", "cantidad": 380, "nota": "" },{ "fecha": "2030-03-01", "cantidad": 380, "nota": "" },{ "fecha": "2030-04-01", "cantidad": 380, "nota": "" },{ "fecha": "2030-05-01", "cantidad": 380, "nota": "" },{ "fecha": "2030-06-01", "cantidad": 380, "nota": "" }
     ], "color": "DarkGray", "categoria": "autonomos", "periodicidad": "mensual", "desgravable": true },
-    { "id": "g305-ee05", "nombre": "Cuerdas + púas", "entradas": [
-      { "fecha": "2026-01-15", "cantidad": 45, "nota": "Juego cuerdas Elixir + púas" },
-      { "fecha": "2026-03-08", "cantidad": 32, "nota": "Cuerdas acústica" }
-    ], "color": "SandyBrown", "categoria": "material", "periodicidad": null, "desgravable": true }
+    { "id": "g305-ee05", "nombre": "Cordes + púes", "entradas": [
+      { "fecha": "2026-01-15", "cantidad": 45, "nota": "Joc cordes Elixir + púes" },
+      { "fecha": "2026-03-08", "cantidad": 32, "nota": "Cordes acústica" },
+      { "fecha": "2026-06-20", "cantidad": 38, "nota": "Cordes + capo" },
+      { "fecha": "2027-02-15", "cantidad": 32, "nota": "Cordes acústica" },
+      { "fecha": "2027-07-08", "cantidad": 45, "nota": "Cordes + púes" },
+      { "fecha": "2028-04-10", "cantidad": 45, "nota": "Cordes noves" },
+      { "fecha": "2029-03-10", "cantidad": 48, "nota": "Cordes premium" },
+      { "fecha": "2030-01-15", "cantidad": 50, "nota": "Cordes + púes" }
+    ], "color": "SandyBrown", "categoria": "material", "periodicidad": null, "desgravable": true },
+    { "id": "g306-ff06", "nombre": "Monitors Adam Audio T7V", "entradas": [
+      { "fecha": "2027-06-15", "cantidad": 680, "nota": "Parella monitors — upgrade estudi" }
+    ], "color": "DarkSlateGray", "categoria": "equipo", "periodicidad": null, "desgravable": true },
+    { "id": "g307-gg07", "nombre": "Synth Arturia MiniFreak", "entradas": [
+      { "fecha": "2028-03-20", "cantidad": 549, "nota": "Sintetitzador per producció Netflix" }
+    ], "color": "MediumOrchid", "categoria": "equipo", "periodicidad": null, "desgravable": true },
+    { "id": "g308-hh08", "nombre": "Tractament acústic", "entradas": [
+      { "fecha": "2028-05-10", "cantidad": 420, "nota": "Panells absorbents + trampes greus" }
+    ], "color": "RosyBrown", "categoria": "equipo", "periodicidad": null, "desgravable": true },
+    { "id": "g309-ii09", "nombre": "Assistent admin", "entradas": [
+      { "fecha": "2029-06-01", "cantidad": 300, "nota": "Primer mes" },{ "fecha": "2029-07-01", "cantidad": 300, "nota": "" },{ "fecha": "2029-08-01", "cantidad": 300, "nota": "" },{ "fecha": "2029-09-01", "cantidad": 300, "nota": "" },{ "fecha": "2029-10-01", "cantidad": 300, "nota": "" },{ "fecha": "2029-11-01", "cantidad": 300, "nota": "" },{ "fecha": "2029-12-01", "cantidad": 300, "nota": "" },
+      { "fecha": "2030-01-01", "cantidad": 350, "nota": "Puja 2030" },{ "fecha": "2030-02-01", "cantidad": 350, "nota": "" },{ "fecha": "2030-03-01", "cantidad": 350, "nota": "" },{ "fecha": "2030-04-01", "cantidad": 350, "nota": "" },{ "fecha": "2030-05-01", "cantidad": 350, "nota": "" },{ "fecha": "2030-06-01", "cantidad": 350, "nota": "" }
+    ], "color": "CadetBlue", "categoria": "personal", "periodicidad": "mensual", "desgravable": true },
+    { "id": "g310-jj10", "nombre": "iZotope Ozone + RX", "entradas": [
+      { "fecha": "2028-09-15", "cantidad": 399, "nota": "Bundle mastering — necessari per Netflix" }
+    ], "color": "SlateBlue", "categoria": "software", "periodicidad": null, "desgravable": true },
+    { "id": "g311-kk11", "nombre": "Auriculars Sennheiser HD 650", "entradas": [
+      { "fecha": "2029-01-20", "cantidad": 320, "nota": "Referència mescla" }
+    ], "color": "DimGray", "categoria": "equipo", "periodicidad": null, "desgravable": true },
+    { "id": "g312-ll12", "nombre": "Apollo Twin X", "entradas": [
+      { "fecha": "2030-02-10", "cantidad": 899, "nota": "Upgrade interfície àudio" }
+    ], "color": "Sienna", "categoria": "equipo", "periodicidad": null, "desgravable": true }
   ],
   "settings": {
     "lang": "ca",
@@ -183,9 +678,9 @@
     "defaultIva": 21,
     "defaultIrpf": 15,
     "targets": {
-      "horasSemana": 25,
-      "horasMes": 100,
-      "ingresosMes": 2500
+      "horasSemana": 30,
+      "horasMes": 120,
+      "ingresosMes": 4500
     },
     "nombre": "Ana Ríos",
     "nombreCompleto": "Ana Ríos García",
