@@ -61,18 +61,22 @@ Object.assign(App, {
 
     let bruto = 0, ivaTotal = 0, irpfTotal = 0;
     const incomeSegs = [];   /* { nombre, total, color } per project */
-    const projTotals = {};   /* projectId → { nombre, total, color } */
+    const projTotals = {};   /* projectId → { nombre, total, color, firstDate } */
 
     ps.forEach(p => {
       B.calc(p);
       const f = p.facturacion;
       const hex = colorHex(p.color);
       const key = p.id;
+      const touch = (fecha) => {
+        if (!projTotals[key]) projTotals[key] = { nombre: p.nombre, total: 0, color: hex, firstDate: fecha };
+        else if (fecha < projTotals[key].firstDate) projTotals[key].firstDate = fecha;
+      };
       p.horas.forEach(h => {
         if (h.fecha && inPeriod(h.fecha, type, y, m)) {
           if (h.monto) {
             bruto += h.monto;
-            if (!projTotals[key]) projTotals[key] = { nombre: p.nombre, total: 0, color: hex };
+            touch(h.fecha);
             projTotals[key].total += h.monto;
           }
         }
@@ -80,7 +84,7 @@ Object.assign(App, {
       (f.cobros || []).forEach(c => {
         if (c.fecha && inPeriod(c.fecha, type, y, m)) {
           bruto += c.cantidad || 0;
-          if (!projTotals[key]) projTotals[key] = { nombre: p.nombre, total: 0, color: hex };
+          touch(c.fecha);
           projTotals[key].total += c.cantidad || 0;
           const tf = f.totalFactura || 0;
           const ratio = tf > 0 ? (c.cantidad / tf) : 0;
@@ -90,6 +94,7 @@ Object.assign(App, {
       });
     });
     Object.values(projTotals).forEach(s => { if (s.total > 0) incomeSegs.push(s); });
+    incomeSegs.sort((a, b) => (a.firstDate || '').localeCompare(b.firstDate || ''));
 
     /* stacked expense bar: per-gasto segments */
     const gastoSegs = [];
@@ -115,18 +120,12 @@ Object.assign(App, {
     }
     const incBarWidth = (bruto / maxBar * 100).toFixed(1);
 
-    /* gradient color for income amount text */
-    let incAmtStyle = 'color:var(--ok)';
-    if (incomeSegs.length > 1) {
-      const stops = []; let acc = 0;
-      incomeSegs.forEach(seg => {
-        const start = acc;
-        acc += seg.total / bruto * 100;
-        stops.push(`${seg.color} ${start.toFixed(1)}% ${acc.toFixed(1)}%`);
-      });
-      incAmtStyle = `background:linear-gradient(90deg,${stops.join(',')});-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text`;
-    } else if (incomeSegs.length === 1) {
-      incAmtStyle = `color:${incomeSegs[0].color}`;
+    /* OKLAB blended color for income amount text */
+    let incAmtColor = 'var(--ok)';
+    if (incomeSegs.length === 1) {
+      incAmtColor = incomeSegs[0].color;
+    } else if (incomeSegs.length > 1) {
+      incAmtColor = colorBlendOklab(incomeSegs.map(s => ({ color: s.color, weight: s.total })));
     }
 
     /* stacked segments HTML — expenses */
@@ -165,7 +164,7 @@ Object.assign(App, {
       +   `<div class="fin-row">`
       +     `<span class="fin-label">${t('din.gross')}</span>`
       +     `<div class="fin-bar"><div class="pbar"><div class="pbar-fill pbar-stacked" style="width:${incBarWidth}%">${incSegsHtml}</div></div></div>`
-      +     `<span class="fin-value" style="${incAmtStyle}">${fmtMoney(bruto)}</span>`
+      +     `<span class="fin-value" style="color:${incAmtColor}">${fmtMoney(bruto)}</span>`
       +   `</div>`
       + (ivaTotal > 0 ? `<div class="fin-row">`
       +     `<span class="fin-label">${t('din.vatReturn')}</span>`

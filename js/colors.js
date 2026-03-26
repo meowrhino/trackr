@@ -67,3 +67,44 @@ function colorHex(name) {
   if (typeof name === 'string' && /^#[0-9a-fA-F]{3,8}$/.test(name)) return name;
   return '#808080';
 }
+
+/**
+ * Mezcla ponderada de colores en espacio OKLAB (perceptualmente uniforme).
+ * @param {Array<{color:string, weight:number}>} entries — hex + peso
+ * @returns {string} hex resultado
+ */
+function colorBlendOklab(entries) {
+  if (!entries.length) return '#808080';
+  if (entries.length === 1) return entries[0].color;
+  const totalW = entries.reduce((s, e) => s + e.weight, 0);
+  if (totalW === 0) return '#808080';
+
+  /* hex → [r,g,b] 0-255 */
+  const hexToRgb = h => {
+    h = h.replace('#', '');
+    if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+    return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)];
+  };
+  const srgbToLin = c => { c /= 255; return c <= .04045 ? c / 12.92 : Math.pow((c + .055) / 1.055, 2.4); };
+  const linToSrgb = c => Math.max(0, Math.min(255, Math.round((c <= .0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1/2.4) - .055) * 255)));
+
+  const rgbToOk = (r,g,b) => {
+    const lr = srgbToLin(r), lg = srgbToLin(g), lb = srgbToLin(b);
+    const l = Math.cbrt(.4122214708*lr + .5363325363*lg + .0514459929*lb);
+    const m = Math.cbrt(.2119034982*lr + .6806995451*lg + .1073969566*lb);
+    const s = Math.cbrt(.0883024619*lr + .2817188376*lg + .6299787005*lb);
+    return [.2104542553*l+.793617785*m-.0040720468*s, 1.9779984951*l-2.428592205*m+.4505937099*s, .0259040371*l+.7827717662*m-.808675766*s];
+  };
+  const okToRgb = (L,a,b) => {
+    const l_ = L+.3963377774*a+.2158037573*b, m_ = L-.1055613458*a-.0638541728*b, s_ = L-.0894841775*a-1.291485548*b;
+    const l = l_*l_*l_, m = m_*m_*m_, s = s_*s_*s_;
+    return [linToSrgb(4.0767416621*l-3.3077115913*m+.2309699292*s),
+            linToSrgb(-1.2684380046*l+2.6097574011*m-.3413193965*s),
+            linToSrgb(-.0041960863*l-.7034186147*m+1.707614701*s)];
+  };
+
+  const labs = entries.map(e => ({ lab: rgbToOk(...hexToRgb(e.color)), w: e.weight / totalW }));
+  const avg = [0,1,2].map(i => labs.reduce((s,c) => s + c.lab[i] * c.w, 0));
+  const rgb = okToRgb(...avg);
+  return '#' + rgb.map(v => v.toString(16).padStart(2,'0')).join('');
+}

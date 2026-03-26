@@ -209,19 +209,36 @@ Object.assign(App, {
       : `${year}`;
 
     let cobrado = 0;
+    const projTotals = {};
 
     ps.forEach(p => {
       B.calc(p);
       const f = p.facturacion;
+      const hex = colorHex(p.color);
+      const key = p.id;
+      const touch = (fecha) => {
+        if (!projTotals[key]) projTotals[key] = { nombre: p.nombre, total: 0, color: hex, firstDate: fecha };
+        else if (fecha < projTotals[key].firstDate) projTotals[key].firstDate = fecha;
+      };
       p.horas.forEach(h => {
         if (h.fecha && inPeriod(h.fecha, type, year, month)) {
-          if (h.monto) cobrado += h.monto;
+          if (h.monto) {
+            cobrado += h.monto;
+            touch(h.fecha);
+            projTotals[key].total += h.monto;
+          }
         }
       });
       (f.cobros || []).forEach(c => {
-        if (c.fecha && inPeriod(c.fecha, type, year, month)) cobrado += c.cantidad || 0;
+        if (c.fecha && inPeriod(c.fecha, type, year, month)) {
+          cobrado += c.cantidad || 0;
+          touch(c.fecha);
+          projTotals[key].total += c.cantidad || 0;
+        }
       });
     });
+    const incomeSegs = Object.values(projTotals).filter(s => s.total > 0);
+    incomeSegs.sort((a, b) => (a.firstDate || '').localeCompare(b.firstDate || ''));
 
     let gastosTotal = 0;
     D.gs().forEach(g => {
@@ -238,6 +255,21 @@ Object.assign(App, {
 
     const maxBar = Math.max(cobrado, gastosTotal, 1);
 
+    /* stacked income bar segments */
+    let incSegsHtml = '';
+    if (cobrado > 0) {
+      incomeSegs.forEach(seg => {
+        const pct = (seg.total / cobrado * 100).toFixed(1);
+        incSegsHtml += `<div class="pbar-seg" style="width:${pct}%;background:${seg.color}" title="${esc(seg.nombre)}: ${fmtMoney(seg.total)}"></div>`;
+      });
+    }
+    const incBarWidth = (cobrado / maxBar * 100).toFixed(1);
+
+    /* OKLAB blended color */
+    let incAmtColor = 'var(--ok)';
+    if (incomeSegs.length === 1) incAmtColor = incomeSegs[0].color;
+    else if (incomeSegs.length > 1) incAmtColor = colorBlendOklab(incomeSegs.map(s => ({ color: s.color, weight: s.total })));
+
     el.innerHTML =
       `<div class="info-fin">`
       + `<div class="info-fin-header">`
@@ -250,8 +282,8 @@ Object.assign(App, {
       + `</div>`
       + `<div class="fin-row">`
       +   `<span class="fin-label">${t('info.collected')}</span>`
-      +   `<div class="fin-bar"><div class="pbar"><div class="pbar-fill pbar-ok" style="width:${(cobrado / maxBar * 100).toFixed(1)}%"></div></div></div>`
-      +   `<span class="fin-value" style="color:var(--ok)">${fmtMoney(cobrado)}</span>`
+      +   `<div class="fin-bar"><div class="pbar"><div class="pbar-fill pbar-stacked" style="width:${incBarWidth}%">${incSegsHtml}</div></div></div>`
+      +   `<span class="fin-value" style="color:${incAmtColor}">${fmtMoney(cobrado)}</span>`
       + `</div>`
       + (gastosTotal > 0
         ? `<div class="fin-row">`
