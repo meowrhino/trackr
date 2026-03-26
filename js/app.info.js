@@ -208,49 +208,7 @@ Object.assign(App, {
       : type === 'trim' ? `T${Math.floor(month / 3) + 1} ${year}`
       : `${year}`;
 
-    let cobrado = 0;
-    const projTotals = {};
-
-    ps.forEach(p => {
-      B.calc(p);
-      const f = p.facturacion;
-      const hex = colorHex(p.color);
-      const key = p.id;
-      const touch = (fecha) => {
-        if (!projTotals[key]) projTotals[key] = { nombre: p.nombre, total: 0, color: hex, firstDate: fecha };
-        else if (fecha < projTotals[key].firstDate) projTotals[key].firstDate = fecha;
-      };
-      p.horas.forEach(h => {
-        if (h.fecha && inPeriod(h.fecha, type, year, month)) {
-          if (h.monto) {
-            cobrado += h.monto;
-            touch(h.fecha);
-            projTotals[key].total += h.monto;
-          }
-        }
-      });
-      (f.cobros || []).forEach(c => {
-        if (c.fecha && inPeriod(c.fecha, type, year, month)) {
-          cobrado += c.cantidad || 0;
-          touch(c.fecha);
-          projTotals[key].total += c.cantidad || 0;
-        }
-      });
-    });
-    const incomeSegs = Object.values(projTotals).filter(s => s.total > 0);
-    incomeSegs.sort((a, b) => (a.firstDate || '').localeCompare(b.firstDate || ''));
-
-    const gastoSegs = [];
-    D.gs().forEach(g => {
-      let tot = 0;
-      (g.entradas || []).forEach(e => {
-        if (e.fecha && inPeriod(e.fecha, type, year, month)) tot += e.cantidad || 0;
-      });
-      if (tot > 0) gastoSegs.push({ nombre: g.nombre, total: tot, color: colorHex(g.color || 'Salmon') });
-    });
-    const gastosTotal = gastoSegs.reduce((s, seg) => s + seg.total, 0);
-
-    const neto = cobrado - gastosTotal;
+    const { bruto: cobrado, ivaTotal, gastosTotal, neto, incomeSegs, gastoSegs } = B.financialSummary(type, year, month);
     const isEmpty = cobrado === 0 && gastosTotal === 0;
     if (isEmpty) { el.innerHTML = ''; return; }
 

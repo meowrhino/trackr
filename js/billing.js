@@ -81,5 +81,64 @@ const B={
     const h=p.horas.reduce((s,x)=>s+x.cantidad,0);
     if(!h) return null;
     return Math.round((p.facturacion.netoRecibido||0)/h*100)/100;
+  },
+
+  /**
+   * Calcula resumen financiero de un periodo.
+   * Devuelve { bruto, ivaTotal, irpfTotal, gastosTotal, neto,
+   *            incomeSegs[], gastoSegs[] }
+   * Usado por Home y Dineros para no duplicar lógica.
+   */
+  financialSummary(type, y, m) {
+    let bruto = 0, ivaTotal = 0, irpfTotal = 0;
+    const projTotals = {};
+
+    D.ps().forEach(p => {
+      this.calc(p);
+      const f = p.facturacion;
+      const hex = colorHex(p.color);
+      const key = p.id;
+      const touch = (fecha) => {
+        if (!projTotals[key]) projTotals[key] = { nombre: p.nombre, total: 0, color: hex, firstDate: fecha };
+        else if (fecha < projTotals[key].firstDate) projTotals[key].firstDate = fecha;
+      };
+      p.horas.forEach(h => {
+        if (h.fecha && inPeriod(h.fecha, type, y, m)) {
+          if (h.monto) {
+            bruto += h.monto;
+            touch(h.fecha);
+            projTotals[key].total += h.monto;
+          }
+        }
+      });
+      (f.cobros || []).forEach(c => {
+        if (c.fecha && inPeriod(c.fecha, type, y, m)) {
+          bruto += c.cantidad || 0;
+          touch(c.fecha);
+          projTotals[key].total += c.cantidad || 0;
+          const tf = f.totalFactura || 0;
+          const ratio = tf > 0 ? (c.cantidad / tf) : 0;
+          ivaTotal += (f.importeIva || 0) * ratio;
+          irpfTotal += (f.importeIrpf || 0) * ratio;
+        }
+      });
+    });
+
+    const incomeSegs = Object.values(projTotals).filter(s => s.total > 0);
+    incomeSegs.sort((a, b) => (a.firstDate || '').localeCompare(b.firstDate || ''));
+
+    const gastoSegs = [];
+    D.gs().forEach(g => {
+      let tot = 0;
+      (g.entradas || []).forEach(e => {
+        if (e.fecha && inPeriod(e.fecha, type, y, m)) tot += e.cantidad || 0;
+      });
+      if (tot > 0) gastoSegs.push({ nombre: g.nombre, total: tot, color: colorHex(g.color || 'Salmon') });
+    });
+    const gastosTotal = gastoSegs.reduce((s, seg) => s + seg.total, 0);
+
+    const neto = bruto - ivaTotal - gastosTotal;
+
+    return { bruto, ivaTotal, irpfTotal, gastosTotal, neto, incomeSegs, gastoSegs };
   }
 };
