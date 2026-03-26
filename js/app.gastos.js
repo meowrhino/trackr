@@ -60,18 +60,28 @@ Object.assign(App, {
     const type = this.dinPeriod, y = this.dinY, m = this.dinM;
 
     let bruto = 0, ivaTotal = 0, irpfTotal = 0;
+    const incomeSegs = [];   /* { nombre, total, color } per project */
+    const projTotals = {};   /* projectId → { nombre, total, color } */
 
     ps.forEach(p => {
       B.calc(p);
       const f = p.facturacion;
+      const hex = colorHex(p.color);
+      const key = p.id;
       p.horas.forEach(h => {
         if (h.fecha && inPeriod(h.fecha, type, y, m)) {
-          if (h.monto) bruto += h.monto;
+          if (h.monto) {
+            bruto += h.monto;
+            if (!projTotals[key]) projTotals[key] = { nombre: p.nombre, total: 0, color: hex };
+            projTotals[key].total += h.monto;
+          }
         }
       });
       (f.cobros || []).forEach(c => {
         if (c.fecha && inPeriod(c.fecha, type, y, m)) {
           bruto += c.cantidad || 0;
+          if (!projTotals[key]) projTotals[key] = { nombre: p.nombre, total: 0, color: hex };
+          projTotals[key].total += c.cantidad || 0;
           const tf = f.totalFactura || 0;
           const ratio = tf > 0 ? (c.cantidad / tf) : 0;
           ivaTotal += (f.importeIva || 0) * ratio;
@@ -79,6 +89,7 @@ Object.assign(App, {
         }
       });
     });
+    Object.values(projTotals).forEach(s => { if (s.total > 0) incomeSegs.push(s); });
 
     /* stacked expense bar: per-gasto segments */
     const gastoSegs = [];
@@ -94,7 +105,31 @@ Object.assign(App, {
     const neto = bruto - ivaTotal - gastosTotal;
     const maxBar = Math.max(bruto, gastosTotal, 1);
 
-    /* stacked segments HTML */
+    /* stacked segments HTML — income */
+    let incSegsHtml = '';
+    if (bruto > 0) {
+      incomeSegs.forEach(seg => {
+        const pct = (seg.total / bruto * 100).toFixed(1);
+        incSegsHtml += `<div class="pbar-seg" style="width:${pct}%;background:${seg.color}" title="${esc(seg.nombre)}: ${fmtMoney(seg.total)}"></div>`;
+      });
+    }
+    const incBarWidth = (bruto / maxBar * 100).toFixed(1);
+
+    /* gradient color for income amount text */
+    let incAmtStyle = 'color:var(--ok)';
+    if (incomeSegs.length > 1) {
+      const stops = []; let acc = 0;
+      incomeSegs.forEach(seg => {
+        const start = acc;
+        acc += seg.total / bruto * 100;
+        stops.push(`${seg.color} ${start.toFixed(1)}% ${acc.toFixed(1)}%`);
+      });
+      incAmtStyle = `background:linear-gradient(90deg,${stops.join(',')});-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text`;
+    } else if (incomeSegs.length === 1) {
+      incAmtStyle = `color:${incomeSegs[0].color}`;
+    }
+
+    /* stacked segments HTML — expenses */
     let segsHtml = '';
     if (gastosTotal > 0) {
       gastoSegs.forEach(seg => {
@@ -129,12 +164,12 @@ Object.assign(App, {
       + `<div class="din-fin-body">`
       +   `<div class="fin-row">`
       +     `<span class="fin-label">${t('din.gross')}</span>`
-      +     `<div class="fin-bar"><div class="pbar"><div class="pbar-fill pbar-ok" style="width:${(bruto / maxBar * 100).toFixed(1)}%"></div></div></div>`
-      +     `<span class="fin-value" style="color:var(--ok)">${fmtMoney(bruto)}</span>`
+      +     `<div class="fin-bar"><div class="pbar"><div class="pbar-fill pbar-stacked" style="width:${incBarWidth}%">${incSegsHtml}</div></div></div>`
+      +     `<span class="fin-value" style="${incAmtStyle}">${fmtMoney(bruto)}</span>`
       +   `</div>`
       + (ivaTotal > 0 ? `<div class="fin-row">`
       +     `<span class="fin-label">${t('din.vatReturn')}</span>`
-      +     `<div class="fin-bar"></div>`
+      +     `<div class="fin-bar"><div class="pbar"><div class="pbar-fill" style="width:${(ivaTotal / maxBar * 100).toFixed(1)}%;background:var(--t3);opacity:.5"></div></div></div>`
       +     `<span class="fin-value" style="color:var(--t3)">-${fmtMoney(ivaTotal)}</span>`
       +   `</div>` : '')
       +   `<div class="fin-row">`
