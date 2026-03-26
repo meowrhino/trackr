@@ -55,7 +55,7 @@ const B={
     /* ── Sincronizar pagado/fechaPago desde cobros ── */
     const cobros = f.cobros || [];
     const tc = cobros.reduce((s, c) => s + (c.cantidad || 0), 0);
-    f.pagado = f.netoRecibido > 0 && tc >= f.netoRecibido;
+    f.pagado = f.totalFactura > 0 && tc >= f.totalFactura;
     if (cobros.length) {
       const sorted = [...cobros].sort((a, b) => (a.fecha || '').localeCompare(b.fecha || ''));
       f.fechaPago = sorted[sorted.length - 1].fecha || null;
@@ -73,7 +73,7 @@ const B={
 
   /* Cantidad pendiente de cobro */
   pendiente(p) {
-    return Math.max((p.facturacion.netoRecibido || 0) - this.totalCobrado(p), 0);
+    return Math.max((p.facturacion.totalFactura || 0) - this.totalCobrado(p), 0);
   },
 
   /* Calcula €/hora (rentabilidad) */

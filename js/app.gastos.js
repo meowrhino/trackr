@@ -59,18 +59,24 @@ Object.assign(App, {
     const ps = D.ps();
     const type = this.dinPeriod, y = this.dinY, m = this.dinM;
 
-    let cobrado = 0;
+    let bruto = 0, ivaTotal = 0, irpfTotal = 0;
 
     ps.forEach(p => {
       B.calc(p);
       const f = p.facturacion;
       p.horas.forEach(h => {
         if (h.fecha && inPeriod(h.fecha, type, y, m)) {
-          if (h.monto) cobrado += h.monto;
+          if (h.monto) bruto += h.monto;
         }
       });
       (f.cobros || []).forEach(c => {
-        if (c.fecha && inPeriod(c.fecha, type, y, m)) cobrado += c.cantidad || 0;
+        if (c.fecha && inPeriod(c.fecha, type, y, m)) {
+          bruto += c.cantidad || 0;
+          const tf = f.totalFactura || 0;
+          const ratio = tf > 0 ? (c.cantidad / tf) : 0;
+          ivaTotal += (f.importeIva || 0) * ratio;
+          irpfTotal += (f.importeIrpf || 0) * ratio;
+        }
       });
     });
 
@@ -85,8 +91,8 @@ Object.assign(App, {
     });
     const gastosTotal = gastoSegs.reduce((s, seg) => s + seg.total, 0);
 
-    const neto = cobrado - gastosTotal;
-    const maxBar = Math.max(cobrado, gastosTotal, 1);
+    const neto = bruto - ivaTotal - gastosTotal;
+    const maxBar = Math.max(bruto, gastosTotal, 1);
 
     /* stacked segments HTML */
     let segsHtml = '';
@@ -122,10 +128,15 @@ Object.assign(App, {
       + `</div>`
       + `<div class="din-fin-body">`
       +   `<div class="fin-row">`
-      +     `<span class="fin-label">${t('din.income')}</span>`
-      +     `<div class="fin-bar"><div class="pbar"><div class="pbar-fill pbar-ok" style="width:${(cobrado / maxBar * 100).toFixed(1)}%"></div></div></div>`
-      +     `<span class="fin-value" style="color:var(--ok)">${fmtMoney(cobrado)}</span>`
+      +     `<span class="fin-label">${t('din.gross')}</span>`
+      +     `<div class="fin-bar"><div class="pbar"><div class="pbar-fill pbar-ok" style="width:${(bruto / maxBar * 100).toFixed(1)}%"></div></div></div>`
+      +     `<span class="fin-value" style="color:var(--ok)">${fmtMoney(bruto)}</span>`
       +   `</div>`
+      + (ivaTotal > 0 ? `<div class="fin-row">`
+      +     `<span class="fin-label">${t('din.vatReturn')}</span>`
+      +     `<div class="fin-bar"></div>`
+      +     `<span class="fin-value" style="color:var(--t3)">-${fmtMoney(ivaTotal)}</span>`
+      +   `</div>` : '')
       +   `<div class="fin-row">`
       +     `<span class="fin-label">${t('din.expenses')}</span>`
       +     `<div class="fin-bar"><div class="pbar"><div class="pbar-fill pbar-stacked" style="width:${expBarWidth}%">${segsHtml}</div></div></div>`
@@ -155,13 +166,17 @@ Object.assign(App, {
       /* cobros por factura (parciales) */
       (f.cobros || []).forEach(c => {
         if (c.fecha && inPeriod(c.fecha, type, y, m)) {
-          ingresos.push({ fecha: c.fecha, monto: c.cantidad || 0, proyecto: p.nombre, color: hex, tipo: 'factura' });
+          const tf = f.totalFactura || 0;
+          const ratio = tf > 0 ? (c.cantidad / tf) : 0;
+          const ivaP = (f.importeIva || 0) * ratio;
+          const neto = Math.round((c.cantidad - ivaP) * 100) / 100;
+          ingresos.push({ fecha: c.fecha, monto: c.cantidad || 0, neto, proyecto: p.nombre, color: hex, tipo: 'factura' });
         }
       });
       /* cobros por hora */
       p.horas.forEach(h => {
         if (h.monto && h.fecha && inPeriod(h.fecha, type, y, m)) {
-          ingresos.push({ fecha: h.fecha, monto: h.monto, proyecto: p.nombre, color: hex, tipo: 'hora' });
+          ingresos.push({ fecha: h.fecha, monto: h.monto, neto: h.monto, proyecto: p.nombre, color: hex, tipo: 'hora' });
         }
       });
     });
@@ -175,11 +190,13 @@ Object.assign(App, {
     } else {
       html += `<div class="hl">`;
       ingresos.forEach(i => {
+        const showBoth = i.monto !== i.neto;
         html += `<div class="hr" style="border-left-color:${i.color}">`
           + `<span class="hr-d">${fmtDate(i.fecha)}</span>`
           + `<span style="color:var(--t1);font-size:.82rem;flex:1">${esc(i.proyecto)}</span>`
           + `<span class="hr-n" style="font-size:.62rem;text-transform:uppercase">${i.tipo === 'factura' ? t('din.invoice') : t('din.hourly')}</span>`
-          + `<span style="color:var(--ok);font-family:'DM Mono',monospace;font-size:.82rem">${fmtMoney(i.monto)}</span>`
+          + (showBoth ? `<span style="color:var(--t3);font-family:'DM Mono',monospace;font-size:.72rem;text-decoration:line-through;margin-right:.3rem">${fmtMoney(i.monto)}</span>` : '')
+          + `<span style="color:var(--ok);font-family:'DM Mono',monospace;font-size:.82rem">${fmtMoney(showBoth ? i.neto : i.monto)}</span>`
           + `</div>`;
       });
       html += `</div>`;
@@ -259,8 +276,8 @@ Object.assign(App, {
       });
       (f.cobros || []).forEach(c => {
         if (c.fecha && inPeriod(c.fecha, trimType, y, m)) {
-          const nr = f.netoRecibido || 0;
-          const ratio = nr > 0 ? (c.cantidad / nr) : 0;
+          const tf = f.totalFactura || 0;
+          const ratio = tf > 0 ? (c.cantidad / tf) : 0;
           ingresos130 += (f.baseImponible || 0) * ratio;
           ivaRepercutido += (f.importeIva || 0) * ratio;
           retenciones += (f.importeIrpf || 0) * ratio;
@@ -353,8 +370,8 @@ Object.assign(App, {
       });
       (f.cobros || []).forEach(c => {
         if (c.fecha && c.fecha.startsWith(String(y))) {
-          const nr = f.netoRecibido || 0;
-          const ratio = nr > 0 ? (c.cantidad / nr) : 0;
+          const tf = f.totalFactura || 0;
+          const ratio = tf > 0 ? (c.cantidad / tf) : 0;
           ingresosAnual += (f.baseImponible || 0) * ratio;
         }
       });

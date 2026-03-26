@@ -38,7 +38,7 @@ Object.assign(App, {
     if (p.recurrente) flags += ` <span class="pc-flag pc-flag-rec">${t('dash.flagRecurring')}</span>`;
 
     let payBtn = '';
-    if (f.modo !== 'gratis' && f.netoRecibido > 0 && !f.pagado) {
+    if (f.modo !== 'gratis' && f.totalFactura > 0 && !f.pagado) {
       payBtn = `<button class="bt bt-s" onclick="App.cobroModal('${p.id}')" title="${t('billing.addPayment')}">💰 ${t('billing.addPayment')}</button>`;
     }
 
@@ -89,11 +89,11 @@ Object.assign(App, {
 
     /* ── Cobros parciales ── */
     let cobrosHtml = '';
-    if (f.modo !== 'gratis' && f.netoRecibido > 0) {
+    if (f.modo !== 'gratis' && f.totalFactura > 0) {
       const cobros = f.cobros || [];
       const tc = B.totalCobrado(p);
       const pend = B.pendiente(p);
-      const pct = Math.min(tc / f.netoRecibido * 100, 100).toFixed(1);
+      const pct = Math.min(tc / f.totalFactura * 100, 100).toFixed(1);
 
       let listHtml = '';
       if (cobros.length) {
@@ -106,7 +106,7 @@ Object.assign(App, {
       const statusText = f.pagado
         ? t('billing.paid')
         : tc > 0
-          ? t('billing.progress', fmtMoney(tc), fmtMoney(f.netoRecibido))
+          ? t('billing.progress', fmtMoney(tc), fmtMoney(f.totalFactura))
           : t('billing.remaining', fmtMoney(pend));
 
       cobrosHtml = `<div style="margin-top:.75rem">`

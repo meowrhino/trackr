@@ -324,6 +324,8 @@ const LANGS = {
     'cfg.importOldDesc': 'Importa JSONs del generador de facturas anterior',
 
     /* ── Dinero ── */
+    'din.gross': 'Cobrado',
+    'din.vatReturn': 'IVA (a devolver)',
     'din.income': 'Ingresos',
     'din.expenses': 'Gastos',
     'din.net': 'Neto',
@@ -825,6 +827,8 @@ const LANGS = {
     'cfg.importOldDesc': 'Import JSONs from the old invoice generator',
 
     /* ── Dinero ── */
+    'din.gross': 'Received',
+    'din.vatReturn': 'VAT (to return)',
     'din.income': 'Income',
     'din.expenses': 'Expenses',
     'din.net': 'Net',
@@ -1318,6 +1322,8 @@ const LANGS = {
     'cfg.importOldDesc': 'Importa JSONs del generador de factures anterior',
 
     /* ── Diners ── */
+    'din.gross': 'Cobrat',
+    'din.vatReturn': 'IVA (a retornar)',
     'din.income': 'Ingressos',
     'din.expenses': 'Despeses',
     'din.net': 'Net',

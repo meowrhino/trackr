@@ -129,10 +129,23 @@ const D = {
         /* Cobros parciales — migración */
         if (!p.facturacion.cobros) p.facturacion.cobros = [];
         if (p.facturacion.pagado && p.facturacion.cobros.length === 0) {
-          const nr = p.facturacion.netoRecibido || 0;
-          if (nr > 0) {
-            p.facturacion.cobros = [{ id: uid(), fecha: p.facturacion.fechaPago || todayStr(), cantidad: nr }];
+          const tf = p.facturacion.totalFactura || p.facturacion.netoRecibido || 0;
+          if (tf > 0) {
+            p.facturacion.cobros = [{ id: uid(), fecha: p.facturacion.fechaPago || todayStr(), cantidad: tf }];
           }
+        }
+        /* Migración v3: cobros antiguos registrados como neto → escalar a totalFactura */
+        if (!p.facturacion._cobrosV3 && p.facturacion.cobros.length > 0) {
+          const nr = p.facturacion.netoRecibido || 0;
+          const tf = p.facturacion.totalFactura || 0;
+          if (nr > 0 && tf > 0 && tf !== nr) {
+            const tc = p.facturacion.cobros.reduce((s, c) => s + (c.cantidad || 0), 0);
+            if (Math.abs(tc - nr) < 0.02 || (tc > 0 && tc <= nr)) {
+              const ratio = tf / nr;
+              p.facturacion.cobros.forEach(c => { c.cantidad = Math.round(c.cantidad * ratio * 100) / 100; });
+            }
+          }
+          p.facturacion._cobrosV3 = true;
         }
       }
     });
