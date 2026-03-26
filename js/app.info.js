@@ -240,14 +240,15 @@ Object.assign(App, {
     const incomeSegs = Object.values(projTotals).filter(s => s.total > 0);
     incomeSegs.sort((a, b) => (a.firstDate || '').localeCompare(b.firstDate || ''));
 
-    let gastosTotal = 0;
+    const gastoSegs = [];
     D.gs().forEach(g => {
+      let tot = 0;
       (g.entradas || []).forEach(e => {
-        if (e.fecha && inPeriod(e.fecha, type, year, month)) {
-          gastosTotal += e.cantidad || 0;
-        }
+        if (e.fecha && inPeriod(e.fecha, type, year, month)) tot += e.cantidad || 0;
       });
+      if (tot > 0) gastoSegs.push({ nombre: g.nombre, total: tot, color: colorHex(g.color || 'Salmon') });
     });
+    const gastosTotal = gastoSegs.reduce((s, seg) => s + seg.total, 0);
 
     const neto = cobrado - gastosTotal;
     const isEmpty = cobrado === 0 && gastosTotal === 0;
@@ -286,11 +287,19 @@ Object.assign(App, {
       +   `<span class="fin-value" style="color:${incAmtColor}">${fmtMoney(cobrado)}</span>`
       + `</div>`
       + (gastosTotal > 0
-        ? `<div class="fin-row">`
-        +   `<span class="fin-label">${t('info.expensesLabel')}</span>`
-        +   `<div class="fin-bar"><div class="pbar"><div class="pbar-fill pbar-warn" style="width:${(gastosTotal / maxBar * 100).toFixed(1)}%"></div></div></div>`
-        +   `<span class="fin-value" style="color:var(--warn)">${fmtMoney(gastosTotal)}</span>`
-        + `</div>`
+        ? (() => {
+            let gSegsHtml = '';
+            gastoSegs.forEach(seg => {
+              const pct = (seg.total / gastosTotal * 100).toFixed(1);
+              gSegsHtml += `<div class="pbar-seg" style="width:${pct}%;background:${seg.color}" data-tip="${esc(seg.nombre)}: ${fmtMoney(seg.total)}"></div>`;
+            });
+            const expW = (gastosTotal / maxBar * 100).toFixed(1);
+            return `<div class="fin-row">`
+            +   `<span class="fin-label">${t('info.expensesLabel')}</span>`
+            +   `<div class="fin-bar"><div class="pbar"><div class="pbar-fill pbar-stacked" style="width:${expW}%">${gSegsHtml}</div></div></div>`
+            +   `<span class="fin-value" style="color:var(--warn)">${fmtMoney(gastosTotal)}</span>`
+            + `</div>`;
+          })()
         : '')
       + `<div class="fin-sep"></div>`
       + `<div class="fin-row fin-total">`

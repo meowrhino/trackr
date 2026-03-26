@@ -325,7 +325,7 @@ const LANGS = {
 
     /* ── Dinero ── */
     'din.gross': 'Cobrado',
-    'din.vatReturn': 'IVA (a devolver)',
+    'din.vatReturn': 'IVA',
     'din.income': 'Ingresos',
     'din.expenses': 'Gastos',
     'din.net': 'Neto',
@@ -828,7 +828,7 @@ const LANGS = {
 
     /* ── Dinero ── */
     'din.gross': 'Received',
-    'din.vatReturn': 'VAT (to return)',
+    'din.vatReturn': 'VAT',
     'din.income': 'Income',
     'din.expenses': 'Expenses',
     'din.net': 'Net',
@@ -1323,7 +1323,7 @@ const LANGS = {
 
     /* ── Diners ── */
     'din.gross': 'Cobrat',
-    'din.vatReturn': 'IVA (a retornar)',
+    'din.vatReturn': 'IVA',
     'din.income': 'Ingressos',
     'din.expenses': 'Despeses',
     'din.net': 'Net',
