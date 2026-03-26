@@ -488,3 +488,23 @@ const App = {
 
 /* ── Arranque ── */
 document.addEventListener('DOMContentLoaded', () => App.init());
+
+/* ── Tooltip flotante para segmentos de barras ── */
+(function(){
+  const tip = document.createElement('div');
+  tip.id = 'barTip';
+  document.body.appendChild(tip);
+  document.addEventListener('pointerenter', e => {
+    const seg = e.target.closest('.pbar-seg[data-tip]');
+    if (!seg) return;
+    tip.textContent = seg.getAttribute('data-tip');
+    const r = seg.getBoundingClientRect();
+    tip.style.opacity = '1';
+    tip.style.left = (r.left + r.width / 2) + 'px';
+    tip.style.top = (r.top - 8) + 'px';
+    tip.style.transform = 'translate(-50%,-100%)';
+  }, true);
+  document.addEventListener('pointerleave', e => {
+    if (e.target.closest('.pbar-seg[data-tip]')) tip.style.opacity = '0';
+  }, true);
+})();

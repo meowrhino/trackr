@@ -260,7 +260,7 @@ Object.assign(App, {
     if (cobrado > 0) {
       incomeSegs.forEach(seg => {
         const pct = (seg.total / cobrado * 100).toFixed(1);
-        incSegsHtml += `<div class="pbar-seg" style="width:${pct}%;background:${seg.color}" title="${esc(seg.nombre)}: ${fmtMoney(seg.total)}"></div>`;
+        incSegsHtml += `<div class="pbar-seg" style="width:${pct}%;background:${seg.color}" data-tip="${esc(seg.nombre)}: ${fmtMoney(seg.total)}"></div>`;
       });
     }
     const incBarWidth = (cobrado / maxBar * 100).toFixed(1);

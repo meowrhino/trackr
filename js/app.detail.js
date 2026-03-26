@@ -114,7 +114,7 @@ Object.assign(App, {
         +   `<span class="dst" style="border:none;margin:0;padding:0">${t('billing.payments')}</span>`
         +   (!f.pagado ? `<button class="bt bt-add" onclick="App.cobroModal('${p.id}')">${t('billing.addPayment')}</button>` : '')
         + `</div>`
-        + `<div class="pbar" style="margin-bottom:.4rem"><div class="pbar-fill ${f.pagado ? 'pbar-ok' : 'pbar-neutral'}" style="width:${pct}%"></div></div>`
+        + `<div class="pbar" style="margin-bottom:.4rem"><div class="pbar-fill pbar-stacked" style="width:${pct}%"><div class="pbar-seg" style="width:100%;background:${f.pagado ? 'var(--ok)' : 'var(--t2)'}" data-tip="${fmtMoney(tc)} / ${fmtMoney(f.totalFactura)}"></div></div></div>`
         + `<div style="font-size:.78rem;color:${statusColor}">${statusText}</div>`
         + listHtml
         + `</div>`;

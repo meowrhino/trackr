@@ -115,7 +115,7 @@ Object.assign(App, {
     if (bruto > 0) {
       incomeSegs.forEach(seg => {
         const pct = (seg.total / bruto * 100).toFixed(1);
-        incSegsHtml += `<div class="pbar-seg" style="width:${pct}%;background:${seg.color}" title="${esc(seg.nombre)}: ${fmtMoney(seg.total)}"></div>`;
+        incSegsHtml += `<div class="pbar-seg" style="width:${pct}%;background:${seg.color}" data-tip="${esc(seg.nombre)}: ${fmtMoney(seg.total)}"></div>`;
       });
     }
     const incBarWidth = (bruto / maxBar * 100).toFixed(1);
@@ -133,7 +133,7 @@ Object.assign(App, {
     if (gastosTotal > 0) {
       gastoSegs.forEach(seg => {
         const pct = (seg.total / gastosTotal * 100).toFixed(1);
-        segsHtml += `<div class="pbar-seg" style="width:${pct}%;background:${seg.color}" title="${esc(seg.nombre)}: ${fmtMoney(seg.total)}"></div>`;
+        segsHtml += `<div class="pbar-seg" style="width:${pct}%;background:${seg.color}" data-tip="${esc(seg.nombre)}: ${fmtMoney(seg.total)}"></div>`;
       });
     }
     const expBarWidth = (gastosTotal / maxBar * 100).toFixed(1);
