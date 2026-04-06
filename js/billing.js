@@ -128,7 +128,7 @@ const B={
     D.gs().forEach(g => {
       let tot = 0;
       (g.entradas || []).forEach(e => {
-        if (e.fecha && inPeriod(e.fecha, type, y, m)) tot += e.cantidad || 0;
+        if (e.fecha && inPeriod(e.fecha, type, y, m)) tot += e.total || e.cantidad || 0;
       });
       if (tot > 0) gastoSegs.push({ nombre: g.nombre, total: tot, color: colorHex(g.color || 'Salmon') });
     });

@@ -162,6 +162,16 @@ const D = {
       if (!g.color) g.color = 'Salmon';
       if (g.desgravable == null) g.desgravable = false;
       if (g.tipoIva == null) g.tipoIva = 21;
+      /* v4: migrar entradas cantidad → base/iva/total */
+      g.entradas.forEach(e => {
+        if (e.cantidad != null && e.total == null) {
+          const rate = (g.tipoIva || 0) / 100;
+          e.total = e.cantidad;
+          e.iva = roundMoney(e.total * rate / (1 + rate));
+          e.base = roundMoney(e.total - e.iva);
+          e.tipoIva = g.tipoIva || 0;
+        }
+      });
     });
 
     /* Extraer clientes únicos de proyectos legacy (campo string) */
@@ -218,7 +228,7 @@ const D = {
       });
     }
 
-    d.version = 3;
+    d.version = 4;
   },
 
   /** Persiste en localStorage */

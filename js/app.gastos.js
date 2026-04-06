@@ -221,7 +221,7 @@ Object.assign(App, {
       html += '<div class="gas-list">';
       gastos.forEach(g => {
         const entries = (g.entradas || []).filter(e => e.fecha && inPeriod(e.fecha, type, y, m));
-        const total = entries.reduce((s, e) => s + (e.cantidad || 0), 0);
+        const total = entries.reduce((s, e) => s + (e.total || e.cantidad || 0), 0);
         const catLabel = GASTO_CAT[g.categoria] || g.categoria || 'Otro';
         const gHex = colorHex(g.color || 'Salmon');
         const isPuntual = !g.recurrente || g.recurrente === 'no';
@@ -242,7 +242,7 @@ Object.assign(App, {
           const e0 = entries[0];
           html += `<div class="gas-card" style="border-left:3px solid ${gHex}"><div class="gas-header">`
             + `<span class="gas-name">${esc(g.nombre)}</span>${badges}`
-            + `<span class="gas-total m">${fmtMoney(e0?.cantidad || 0)}</span>`
+            + `<span class="gas-total m">${fmtMoney(e0?.total ?? e0?.cantidad ?? 0)}</span>`
             + `<span class="gas-date-info">${fmtDate(e0.fecha)}</span>`
             + `<div class="gas-actions"><button class="cl-btn" onclick="App.gModal('${g.id}')" title="${t('btn.edit')}">&#9998;</button><button class="cl-btn cl-btn-del" onclick="App.delG('${g.id}')" title="${t('btn.delete')}">&times;</button></div>`
             + `</div></div>`;
@@ -255,7 +255,7 @@ Object.assign(App, {
             + `</div><div class="gas-body">`;
           if (entries.length) {
             entries.sort((a, b) => (b.fecha || '').localeCompare(a.fecha || '')).forEach(e => {
-              html += `<div class="gas-entry"><span class="gas-e-date">${fmtDate(e.fecha)}</span><span class="gas-e-amount m">${fmtMoney(e.cantidad || 0)}</span><span class="gas-e-nota">${esc(e.nota || '')}</span><button class="gas-e-edit" onclick="App.geModal('${g.id}','${e.id}')" title="${t('btn.edit')}">&#9998;</button><button class="gas-e-del" onclick="App.delGE('${g.id}','${e.id}')" title="${t('btn.delete')}">&times;</button></div>`;
+              html += `<div class="gas-entry"><span class="gas-e-date">${fmtDate(e.fecha)}</span><span class="gas-e-amount m">${fmtMoney(e.total || e.cantidad || 0)}</span><span class="gas-e-nota">${esc(e.nota || '')}</span><button class="gas-e-edit" onclick="App.geModal('${g.id}','${e.id}')" title="${t('btn.edit')}">&#9998;</button><button class="gas-e-del" onclick="App.delGE('${g.id}','${e.id}')" title="${t('btn.delete')}">&times;</button></div>`;
             });
           }
           html += `<button class="bt bt-add" style="margin-top:.5rem" onclick="App.geModal('${g.id}')">${t('btn.addEntry')}</button></div></div>`;
@@ -301,15 +301,16 @@ Object.assign(App, {
     });
 
     D.gs().forEach(g => {
-      let gastoSum = 0;
+      let baseSum = 0, ivaSum = 0;
       (g.entradas || []).forEach(e => {
-        if (e.fecha && inPeriod(e.fecha, trimType, y, m)) gastoSum += e.cantidad || 0;
+        if (e.fecha && inPeriod(e.fecha, trimType, y, m)) {
+          baseSum += e.base || 0;
+          ivaSum += e.iva || 0;
+        }
       });
-      if (g.desgravable && gastoSum > 0) {
-        const rate = (g.tipoIva || 0) / 100;
-        const ivaGasto = gastoSum * rate / (1 + rate);
-        gastos130 += gastoSum - ivaGasto;
-        ivaSoportado += ivaGasto;
+      if (g.desgravable && (baseSum > 0 || ivaSum > 0)) {
+        gastos130 += baseSum;
+        ivaSoportado += ivaSum;
       }
     });
 
@@ -381,7 +382,7 @@ Object.assign(App, {
     D.gs().forEach(g => {
       if (!g.desgravable) return;
       (g.entradas || []).forEach(e => {
-        if (e.fecha && e.fecha.startsWith(String(y))) gastosAnual += e.cantidad || 0;
+        if (e.fecha && e.fecha.startsWith(String(y))) gastosAnual += e.total || e.cantidad || 0;
       });
     });
 
@@ -451,19 +452,42 @@ Object.assign(App, {
   /* ══════════════════════════════════════
    *  MODALES GASTOS
    * ══════════════════════════════════════ */
+
+  /* Auto-calc base↔total en modales de gasto (prefijos: g = gasto puntual, ge = entrada) */
+  _gCalc(from, prefix = 'g') {
+    const bEl = document.getElementById(prefix + 'EB');
+    const iEl = document.getElementById(prefix + 'EI');
+    const tEl = document.getElementById(prefix + 'EA');
+    const ivaSelEl = document.getElementById(prefix === 'g' ? 'gIva' : 'geIva');
+    const rate = ivaSelEl ? (parseInt(ivaSelEl.value) || 0) / 100 : 0.21;
+    if (from === 'total') {
+      const total = parseFloat(tEl.value) || 0;
+      const iva = roundMoney(total * rate / (1 + rate));
+      bEl.value = roundMoney(total - iva) || '';
+      iEl.value = iva || '';
+    } else {
+      const base = parseFloat(bEl.value) || 0;
+      const iva = roundMoney(base * rate);
+      iEl.value = iva || '';
+      tEl.value = roundMoney(base + iva) || '';
+    }
+  },
   gModal(gid) {
     const isE = !!gid, g = isE ? D.g(gid) : null;
     const gColor = g?.color || 'Salmon';
     const isPuntual = !isE || !g?.recurrente || g.recurrente === 'no';
     const e0 = isPuntual && isE ? (g.entradas || [])[0] : null;
-    const entryFields = `<div class="fr" id="gEntryRow"${isPuntual ? '' : ' style="display:none"'}><div class="fg"><label>${t('field.amountEntry')}</label><input type="number" id="gEA" min="0.01" step="0.01" value="${e0?.cantidad || ''}" placeholder="0,00"></div>`
-      + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="gED" value="${e0?.fecha || todayStr()}"></div></div>`;
+    const entryFields = `<div id="gEntryRow"${isPuntual ? '' : ' style="display:none"'}>`
+      + `<div class="fr"><div class="fg"><label>${t('field.base')}</label><input type="number" id="gEB" min="0" step="0.01" value="${e0?.base ?? ''}" placeholder="0,00" onchange="App._gCalc('base')"></div>`
+      + `<div class="fg"><label>${t('field.ivaAmount')}</label><input type="number" id="gEI" min="0" step="0.01" value="${e0?.iva ?? ''}" placeholder="0,00"></div></div>`
+      + `<div class="fr"><div class="fg"><label>${t('field.totalAmount')}</label><input type="number" id="gEA" min="0.01" step="0.01" value="${e0?.total ?? e0?.cantidad ?? ''}" placeholder="0,00" onchange="App._gCalc('total')"></div>`
+      + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="gED" value="${e0?.fecha || todayStr()}"></div></div></div>`;
     this.om(`<div class="mt">${isE ? t('gas.editExpense') : t('gas.newExpense')}</div>`
       + `<div class="fg"><label>${t('field.name')}</label><input type="text" id="gN" value="${esc(g?.nombre || '')}" placeholder="${t('ph.expenseName')}"></div>`
       + `<div class="fr"><div class="fg"><label>${t('field.category')}</label><select id="gCat">${Object.entries(GASTO_CAT).map(([k, v]) => `<option value="${k}" ${g?.categoria === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
-      + `<div class="fg"><label>${t('field.recurrence')}</label><select id="gRec" onchange="document.getElementById('gEntryRow').style.display=this.value==='no'?'':'none'">${Object.entries(RECURRENCIA).map(([k, v]) => `<option value="${k}" ${g?.recurrente === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div></div>`
-      + `<div class="fr"><div class="fg"><label>${t('field.deductible')}</label><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="gDes" ${g?.desgravable ? 'checked' : ''}> ${t('gas.deductibleBadge')}</label></div>`
-      + `<div class="fg"><label>${t('field.ivaRate')}</label><select id="gIva">${Object.entries(TIPOS_IVA).map(([k, v]) => `<option value="${k}" ${(g?.tipoIva ?? 21) == k ? 'selected' : ''}>${v}</option>`).join('')}</select></div></div>`
+      + `<div class="fg"><label>${t('field.ivaRate')}</label><select id="gIva" onchange="App._gCalc('total')">${Object.entries(TIPOS_IVA).map(([k, v]) => `<option value="${k}" ${(g?.tipoIva ?? 21) == k ? 'selected' : ''}>${v}</option>`).join('')}</select></div></div>`
+      + `<div class="fr"><div class="fg"><label>${t('field.recurrence')}</label><select id="gRec" onchange="document.getElementById('gEntryRow').style.display=this.value==='no'?'':'none'">${Object.entries(RECURRENCIA).map(([k, v]) => `<option value="${k}" ${g?.recurrente === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
+      + `<div class="fg" style="display:flex;align-items:end"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;padding:.45rem 0"><input type="checkbox" id="gDes" ${g?.desgravable ? 'checked' : ''}> ${t('gas.deductibleBadge')}</label></div></div>`
       + entryFields
       + (isE && g?.finHasta ? `<div class="fg"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="gReact"> ${t('gas.reactivate')}</label></div>` : '')
       + `<div class="fg"><label>${t('field.color')}</label>${this.colorSelect(gColor)}</div>`
@@ -480,12 +504,14 @@ Object.assign(App, {
       const g = D.g(gid);
       const wasPuntual = !g?.recurrente || g.recurrente === 'no';
       if (data.recurrente === 'no' && wasPuntual) {
-        const amt = parseFloat(document.getElementById('gEA')?.value) || 0;
+        const total = parseFloat(document.getElementById('gEA')?.value) || 0;
+        const base = parseFloat(document.getElementById('gEB')?.value) || 0;
+        const iva = parseFloat(document.getElementById('gEI')?.value) || 0;
         const fecha = document.getElementById('gED')?.value || todayStr();
         const entradas = g?.entradas ? [...g.entradas] : [];
-        if (amt > 0) {
-          if (entradas[0]) { entradas[0].cantidad = amt; entradas[0].fecha = fecha; }
-          else entradas.push({ id: uid(), fecha, cantidad: amt, nota: '' });
+        if (total > 0) {
+          if (entradas[0]) { Object.assign(entradas[0], { base, iva, total, cantidad: total, tipoIva: data.tipoIva, fecha }); }
+          else entradas.push({ id: uid(), fecha, base, iva, total, cantidad: total, tipoIva: data.tipoIva, nota: '' });
         }
         data.entradas = entradas;
       }
@@ -493,8 +519,12 @@ Object.assign(App, {
       D.upG(gid, data);
     } else {
       data.id = uid(); data.entradas = [];
-      const initAmt = parseFloat(document.getElementById('gEA')?.value) || 0;
-      if (initAmt > 0) data.entradas.push({ id: uid(), fecha: document.getElementById('gED')?.value || todayStr(), cantidad: initAmt, nota: '' });
+      const initTotal = parseFloat(document.getElementById('gEA')?.value) || 0;
+      if (initTotal > 0) {
+        const initBase = parseFloat(document.getElementById('gEB')?.value) || 0;
+        const initIva = parseFloat(document.getElementById('gEI')?.value) || 0;
+        data.entradas.push({ id: uid(), fecha: document.getElementById('gED')?.value || todayStr(), base: initBase, iva: initIva, total: initTotal, cantidad: initTotal, tipoIva: data.tipoIva, nota: '' });
+      }
       D.addG(data);
     }
     this.cm(); this.rGas();
@@ -507,8 +537,12 @@ Object.assign(App, {
     const e = isE ? (D.g(gid)?.entradas || []).find(x => x.id === eid) : null;
     const gasto = D.g(gid);
     const isRecurrente = gasto && gasto.recurrente && gasto.recurrente !== 'no';
+    const tipoIva = gasto?.tipoIva ?? 21;
     this.om(`<div class="mt">${isE ? t('gas.editEntry') : t('gas.addEntry')}</div>`
-      + `<div class="fr"><div class="fg"><label>${t('field.amountEntry')}</label><input type="number" id="geA" min="0.01" step="0.01" value="${e?.cantidad || ''}" placeholder="0,00"></div>`
+      + `<div class="fr"><div class="fg"><label>${t('field.base')}</label><input type="number" id="geEB" min="0" step="0.01" value="${e?.base ?? ''}" placeholder="0,00" onchange="App._gCalc('base','ge')"></div>`
+      + `<div class="fg"><label>${t('field.ivaAmount')}</label><input type="number" id="geEI" min="0" step="0.01" value="${e?.iva ?? ''}" placeholder="0,00"></div></div>`
+      + `<input type="hidden" id="geIva" value="${tipoIva}">`
+      + `<div class="fr"><div class="fg"><label>${t('field.totalAmount')}</label><input type="number" id="geEA" min="0.01" step="0.01" value="${e?.total ?? e?.cantidad ?? ''}" placeholder="0,00" onchange="App._gCalc('total','ge')"></div>`
       + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="geD" value="${e?.fecha || todayStr()}"></div></div>`
       + `<div class="fg"><label>${t('field.note')}</label><input type="text" id="geN" value="${esc(e?.nota || '')}" placeholder="${t('ph.detail')}"></div>`
       + (isRecurrente && !isE ? `<div class="fg"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="geUlt"> ${t('gas.lastMonth')}</label></div>` : '')
@@ -516,17 +550,20 @@ Object.assign(App, {
   },
 
   saveGE(gid, eid) {
-    const cant = parseFloat(document.getElementById('geA').value) || 0;
-    if (cant <= 0) return;
+    const total = parseFloat(document.getElementById('geEA').value) || 0;
+    if (total <= 0) return;
     const g = D.g(gid); if (!g) return;
     if (!g.entradas) g.entradas = [];
+    const base = parseFloat(document.getElementById('geEB').value) || 0;
+    const iva = parseFloat(document.getElementById('geEI').value) || 0;
     const fecha = document.getElementById('geD').value || todayStr();
     const nota = document.getElementById('geN').value.trim();
+    const tipoIva = g.tipoIva || 0;
     if (eid) {
       const e = g.entradas.find(x => x.id === eid);
-      if (e) { e.fecha = fecha; e.cantidad = cant; e.nota = nota; }
+      if (e) { Object.assign(e, { fecha, base, iva, total, cantidad: total, tipoIva, nota }); }
     } else {
-      g.entradas.push({ id: uid(), fecha, cantidad: cant, nota });
+      g.entradas.push({ id: uid(), fecha, base, iva, total, cantidad: total, tipoIva, nota });
     }
     const update = { entradas: g.entradas };
     const ultCheck = document.getElementById('geUlt');
