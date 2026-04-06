@@ -37,39 +37,40 @@ Nuevo apartado dentro de Dineros (o botón en el resumen fiscal existente) que g
 - Opcionalmente: botón "Copiar" para pegar en la sede electrónica
 - Indicador visual si hay facturas sin `facturaFecha` (para avisar que falta dato)
 
-### 6. Gastos: guardar total e IVA reales (sin cálculos inversos)
-**Principio clave: trackr no calcula IVAs ni bases. Todos los números son reales, sacados de la factura.**
+### 6. Gastos: guardar los 3 campos reales como en una factura
+**Principio clave: trackr no calcula nada. Todos los números son reales, sacados directamente de la factura. Como en una factura normal: base, IVA y total.**
 
-Actualmente cada entrada guarda solo `cantidad` (el total con IVA) y trackr intenta calcular la base diviendo por 1,21. Esto falla con facturas en divisas (ChatGPT en USD, Manus en USD) donde el IVA en EUR lo calcula Stripe al tipo de cambio del día.
+Actualmente cada entrada guarda solo `cantidad` (el total con IVA) y trackr intenta calcular la base dividiendo por 1,21. Esto falla con facturas en divisas (ChatGPT en USD, Manus en USD) donde el IVA en EUR lo calcula Stripe al tipo de cambio del día.
 
 **Nuevo schema:**
 ```json
 "entradas": [
-  { "id": "x", "fecha": "2026-01-03", "cantidad": 21.48, "iva": 3.58, "nota": "" }
+  { "id": "x", "fecha": "2026-01-03", "base": 17.90, "iva": 3.58, "total": 21.48, "tipoIva": 21, "nota": "" }
 ]
 ```
-- `cantidad`: lo que pagaste (total factura) — el usuario lo pone
-- `iva`: el IVA real de la factura — el usuario lo pone
-- La base la calcula trackr como `cantidad - iva` (esto sí es una resta exacta, no una aproximación)
+- `base`: subtotal / base imponible — lo que pone la factura
+- `iva`: importe del IVA — lo que pone la factura
+- `total`: lo que has pagado — lo que pone la factura
+- `tipoIva`: tipo de IVA (21%, 10%, 4%, 0%) — lo que pone la factura
+- Trackr NO calcula ninguno de estos campos. Los 3 son datos reales del usuario.
 
 **UI del modal de entrada de gasto:**
-- Campo "Total (€)": lo que has pagado (obligatorio)
-- Campo "IVA (€)": el IVA de la factura (opcional, default 0)
-- Se muestra debajo en gris: "Base: X,XX €" calculado como total - IVA
-- NO hay auto-cálculo del IVA desde el tipo %. El usuario pone el número real
-- Para gastos exentos (autónomos) simplemente se deja IVA en 0
+- Campo "Base imponible (€)": subtotal sin IVA
+- Campo "IVA (€)" + selector tipo (21%, 10%, 4%, 0%)
+- Campo "Total (€)": lo que has pagado
+- Los 3 campos son editables e independientes
+- Para gastos exentos (autónomos): base = total, IVA = 0
 
-**¿Por qué total + IVA y no base + IVA?**
-- El total es lo que ves en el banco / lo que pagas — es el número más natural
-- El IVA aparece claro en todas las facturas
-- La base es el número que menos gente tiene a mano
-
-**Migración:** Las entradas existentes que solo tienen `cantidad` se migran con `iva = cantidad * rate / (1 + rate)`. No es exacto para divisas pero es el mejor fallback. El usuario puede corregirlo editando la entrada.
+**Migración:** Las entradas existentes que solo tienen `cantidad` se migran con:
+- `total` = cantidad existente
+- `iva` = cantidad * rate / (1 + rate) (aproximación)
+- `base` = total - iva
+- No es exacto para divisas pero es el mejor fallback. El usuario puede corregirlo editando.
 
 ## Datos necesarios
 - `facturaFecha` en cada proyecto — ya existe pero no siempre se rellena
 - Validación/aviso si un proyecto facturado no tiene fecha de factura
-- Campo `iva` real en entradas de gastos (base = cantidad - iva)
+- Campos `base`, `iva`, `total` y `tipoIva` reales en entradas de gastos (sin cálculos)
 
 ## Prioridad
 Alta — se usa 4 veces al año y ahorra mucho tiempo + reduce errores
