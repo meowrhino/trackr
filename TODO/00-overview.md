@@ -14,4 +14,5 @@ Orden de implementación. Cada archivo tiene el detalle.
 | 8 | Resumen en calendario | `08-resumen-calendario.md` | pendiente |
 | 9 | Generación de facturas | `09-facturas.md` | pendiente |
 | 10 | Migración de datos (versioning) | `10-migracion.md` | pendiente |
+| 12 | Gastos recurrentes avanzados | `12-gastos-recurrentes.md` | pendiente |
 | — | Analytics (tracking) | `11-analytics.md` | aparcado |
