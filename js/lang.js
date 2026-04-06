@@ -366,6 +366,7 @@ const LANGS = {
     'gas.newExpense': 'Nuevo gasto',
     'gas.deleteConfirm': '¿Eliminar gasto "{0}"?',
     'gas.addEntry': 'Añadir entrada',
+    'gas.editEntry': 'Editar entrada',
     'gas.deductibleBadge': 'desgravable',
 
     /* ── Campos desgravable ── */
@@ -869,6 +870,7 @@ const LANGS = {
     'gas.newExpense': 'New expense',
     'gas.deleteConfirm': 'Delete expense "{0}"?',
     'gas.addEntry': 'Add entry',
+    'gas.editEntry': 'Edit entry',
     'gas.deductibleBadge': 'deductible',
 
     /* ── Campos desgravable ── */
@@ -1364,6 +1366,7 @@ const LANGS = {
     'gas.newExpense': 'Nova despesa',
     'gas.deleteConfirm': 'Eliminar despesa "{0}"?',
     'gas.addEntry': 'Afegir entrada',
+    'gas.editEntry': 'Editar entrada',
     'gas.deductibleBadge': 'desgravable',
 
     /* ── Camps desgravable ── */

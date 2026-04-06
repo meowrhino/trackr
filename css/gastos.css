@@ -154,7 +154,8 @@
 .gas-e-date{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--t3);min-width:75px}
 .gas-e-amount{font-family:'DM Mono',monospace;font-weight:500;min-width:65px}
 .gas-e-nota{flex:1;color:var(--t3);font-size:.78rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.gas-e-del{color:var(--t3);cursor:pointer;opacity:.4;transition:all var(--tr);background:none;border:none;font-size:.85rem}
+.gas-e-edit,.gas-e-del{color:var(--t3);cursor:pointer;opacity:.4;transition:all var(--tr);background:none;border:none;font-size:.85rem}
+.gas-e-edit:hover{color:var(--t1);opacity:1}
 .gas-e-del:hover{color:var(--bad);opacity:1}
 
 /* ── Recurrencia badge ── */

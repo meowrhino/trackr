@@ -223,7 +223,7 @@ Object.assign(App, {
           + `</div><div class="gas-body">`;
         if (entries.length) {
           entries.sort((a, b) => (b.fecha || '').localeCompare(a.fecha || '')).forEach(e => {
-            html += `<div class="gas-entry"><span class="gas-e-date">${fmtDate(e.fecha)}</span><span class="gas-e-amount m">${fmtMoney(e.cantidad || 0)}</span><span class="gas-e-nota">${esc(e.nota || '')}</span><button class="gas-e-del" onclick="App.delGE('${g.id}','${e.id}')" title="${t('btn.delete')}">&times;</button></div>`;
+            html += `<div class="gas-entry"><span class="gas-e-date">${fmtDate(e.fecha)}</span><span class="gas-e-amount m">${fmtMoney(e.cantidad || 0)}</span><span class="gas-e-nota">${esc(e.nota || '')}</span><button class="gas-e-edit" onclick="App.geModal('${g.id}','${e.id}')" title="${t('btn.edit')}">&#9998;</button><button class="gas-e-del" onclick="App.delGE('${g.id}','${e.id}')" title="${t('btn.delete')}">&times;</button></div>`;
           });
         }
         html += `<button class="bt bt-add" style="margin-top:.5rem" onclick="App.geModal('${g.id}')">${t('btn.addEntry')}</button></div></div>`;
@@ -463,6 +463,8 @@ Object.assign(App, {
       + `<div class="fg"><label>${t('field.recurrence')}</label><select id="gRec">${Object.entries(RECURRENCIA).map(([k, v]) => `<option value="${k}" ${g?.recurrente === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div></div>`
       + `<div class="fr"><div class="fg"><label>${t('field.deductible')}</label><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="gDes" ${g?.desgravable ? 'checked' : ''}> ${t('gas.deductibleBadge')}</label></div>`
       + `<div class="fg"><label>${t('field.ivaRate')}</label><select id="gIva">${Object.entries(TIPOS_IVA).map(([k, v]) => `<option value="${k}" ${(g?.tipoIva ?? 21) == k ? 'selected' : ''}>${v}</option>`).join('')}</select></div></div>`
+      + (!isE ? `<div class="fr"><div class="fg"><label>${t('field.amountEntry')}</label><input type="number" id="gEA" min="0.01" step="0.01" value="" placeholder="0,00"></div>`
+      + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="gED" value="${todayStr()}"></div></div>` : '')
       + `<div class="fg"><label>${t('field.color')}</label>${this.colorSelect(gColor)}</div>`
       + `<div class="fg"><label>${t('field.notes')}</label><textarea id="gNo" placeholder="${t('ph.notes')}">${esc(g?.notas || '')}</textarea></div>`
       + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveG('${gid || ''}')">${isE ? t('btn.save') : t('btn.create')}</button></div>`);
@@ -473,27 +475,40 @@ Object.assign(App, {
     if (!nombre) { Toast.warn(t('msg.nameRequired')); return; }
     const color = document.getElementById('mpColor')?.value || 'Salmon';
     const data = { nombre, categoria: document.getElementById('gCat').value, recurrente: document.getElementById('gRec').value, color, notas: document.getElementById('gNo').value.trim(), desgravable: document.getElementById('gDes').checked, tipoIva: parseInt(document.getElementById('gIva').value) || 21 };
-    if (gid) D.upG(gid, data); else { data.id = uid(); data.entradas = []; D.addG(data); }
+    if (gid) D.upG(gid, data); else {
+      data.id = uid(); data.entradas = [];
+      const initAmt = parseFloat(document.getElementById('gEA')?.value) || 0;
+      if (initAmt > 0) data.entradas.push({ id: uid(), fecha: document.getElementById('gED')?.value || todayStr(), cantidad: initAmt, nota: '' });
+      D.addG(data);
+    }
     this.cm(); this.rGas();
   },
 
   delG(gid) { const g = D.g(gid); if (!g) return; if (!confirm(t('gas.deleteConfirm', g.nombre))) return; D.delG(gid); this.rGas(); },
 
-  geModal(gid) {
-    this.om(`<div class="mt">${t('gas.addEntry')}</div>`
-      + `<div class="fr"><div class="fg"><label>${t('field.amountEntry')}</label><input type="number" id="geA" min="0.01" step="0.01" value="" placeholder="0,00"></div>`
-      + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="geD" value="${todayStr()}"></div></div>`
-      + `<div class="fg"><label>${t('field.note')}</label><input type="text" id="geN" placeholder="${t('ph.detail')}"></div>`
-      + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveGE('${gid}')">${t('btn.add')}</button></div>`);
+  geModal(gid, eid) {
+    const isE = !!eid;
+    const e = isE ? (D.g(gid)?.entradas || []).find(x => x.id === eid) : null;
+    this.om(`<div class="mt">${isE ? t('gas.editEntry') : t('gas.addEntry')}</div>`
+      + `<div class="fr"><div class="fg"><label>${t('field.amountEntry')}</label><input type="number" id="geA" min="0.01" step="0.01" value="${e?.cantidad || ''}" placeholder="0,00"></div>`
+      + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="geD" value="${e?.fecha || todayStr()}"></div></div>`
+      + `<div class="fg"><label>${t('field.note')}</label><input type="text" id="geN" value="${esc(e?.nota || '')}" placeholder="${t('ph.detail')}"></div>`
+      + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveGE('${gid}','${eid || ''}')">${isE ? t('btn.save') : t('btn.add')}</button></div>`);
   },
 
-  saveGE(gid) {
+  saveGE(gid, eid) {
     const cant = parseFloat(document.getElementById('geA').value) || 0;
     if (cant <= 0) return;
     const g = D.g(gid); if (!g) return;
     if (!g.entradas) g.entradas = [];
     const fecha = document.getElementById('geD').value || todayStr();
-    g.entradas.push({ id: uid(), fecha, cantidad: cant, nota: document.getElementById('geN').value.trim() });
+    const nota = document.getElementById('geN').value.trim();
+    if (eid) {
+      const e = g.entradas.find(x => x.id === eid);
+      if (e) { e.fecha = fecha; e.cantidad = cant; e.nota = nota; }
+    } else {
+      g.entradas.push({ id: uid(), fecha, cantidad: cant, nota });
+    }
     D.upG(gid, { entradas: g.entradas }); this.cm(); this.rGas();
   },
 
