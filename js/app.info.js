@@ -214,14 +214,7 @@ Object.assign(App, {
 
     const maxBar = Math.max(cobrado, gastosTotal, 1);
 
-    /* stacked income bar segments */
-    let incSegsHtml = '';
-    if (cobrado > 0) {
-      incomeSegs.forEach(seg => {
-        const pct = (seg.total / cobrado * 100).toFixed(1);
-        incSegsHtml += `<div class="pbar-seg" style="width:${pct}%;background:${seg.color}" data-tip="${esc(seg.nombre)}: ${fmtMoney(seg.total)}"></div>`;
-      });
-    }
+    const incSegsHtml = this._buildBarSegments(incomeSegs, cobrado);
     const incBarWidth = (cobrado / maxBar * 100).toFixed(1);
 
     /* OKLAB blended color */
@@ -245,19 +238,11 @@ Object.assign(App, {
       +   `<span class="fin-value" style="color:${incAmtColor}">${fmtMoney(cobrado)}</span>`
       + `</div>`
       + (gastosTotal > 0
-        ? (() => {
-            let gSegsHtml = '';
-            gastoSegs.forEach(seg => {
-              const pct = (seg.total / gastosTotal * 100).toFixed(1);
-              gSegsHtml += `<div class="pbar-seg" style="width:${pct}%;background:${seg.color}" data-tip="${esc(seg.nombre)}: ${fmtMoney(seg.total)}"></div>`;
-            });
-            const expW = (gastosTotal / maxBar * 100).toFixed(1);
-            return `<div class="fin-row">`
-            +   `<span class="fin-label">${t('info.expensesLabel')}</span>`
-            +   `<div class="fin-bar"><div class="pbar"><div class="pbar-fill pbar-stacked" style="width:${expW}%">${gSegsHtml}</div></div></div>`
-            +   `<span class="fin-value" style="color:var(--warn)">${fmtMoney(gastosTotal)}</span>`
-            + `</div>`;
-          })()
+        ? `<div class="fin-row">`
+          +   `<span class="fin-label">${t('info.expensesLabel')}</span>`
+          +   `<div class="fin-bar"><div class="pbar"><div class="pbar-fill pbar-stacked" style="width:${(gastosTotal / maxBar * 100).toFixed(1)}%">${this._buildBarSegments(gastoSegs, gastosTotal)}</div></div></div>`
+          +   `<span class="fin-value" style="color:var(--warn)">${fmtMoney(gastosTotal)}</span>`
+          + `</div>`
         : '')
       + `<div class="fin-sep"></div>`
       + `<div class="fin-row fin-total">`

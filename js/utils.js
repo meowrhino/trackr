@@ -82,6 +82,9 @@ let DIAS_SEM = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
  *  GENERADORES Y ESCAPE
  * ══════════════════════════════════════════════ */
 
+/** Redondea a 2 decimales (céntimos) */
+function roundMoney(v) { return Math.round(v * 100) / 100; }
+
 /** Genera un ID único tipo xxxx-xxxx-xxxx */
 function uid() {
   return 'xxxx-xxxx-xxxx'.replace(/x/g, () =>

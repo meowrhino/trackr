@@ -11,6 +11,32 @@ Object.assign(App, {
   dinM: new Date().getMonth(),
   dinPeriod: 'mes',
 
+  _buildBarSegments(segs, total) {
+    if (total <= 0) return '';
+    return segs.map(seg => {
+      const pct = (seg.total / total * 100).toFixed(1);
+      return `<div class="pbar-seg" style="width:${pct}%;background:${seg.color}" data-tip="${esc(seg.nombre)}: ${fmtMoney(seg.total)}"></div>`;
+    }).join('');
+  },
+
+  _renderDedList(deds) {
+    if (!deds.length) return '';
+    let html = `<div class="din-ded-list" style="margin-top:.5rem">`;
+    deds.forEach(d => {
+      const catLabel = DEDUCIBLE_CAT[d.categoria] || d.categoria || 'Otro';
+      html += `<div class="din-ded-item">`
+        + `<span class="din-ded-cat">${catLabel}</span>`
+        + `<span class="gas-e-date">${fmtDate(d.fecha)}</span>`
+        + `<span class="din-ded-desc">${esc(d.descripcion || '')}</span>`
+        + `<span class="din-ded-amount m">${fmtMoney(d.cantidad || 0)}</span>`
+        + `<div class="gas-actions">`
+        +   `<button class="cl-btn" onclick="App.dedModal('${d.id}')" title="${t('btn.edit')}">&#9998;</button>`
+        +   `<button class="cl-btn cl-btn-del" onclick="App.delDed('${d.id}')" title="${t('btn.delete')}">&times;</button>`
+        + `</div></div>`;
+    });
+    return html + `</div>`;
+  },
+
   rGas() {
     this._rDinFin();
     this._rDinIngresos();
@@ -61,14 +87,7 @@ Object.assign(App, {
     const { bruto, ivaTotal, gastosTotal, neto, incomeSegs, gastoSegs } = B.financialSummary(type, y, m);
     const maxBar = Math.max(bruto, gastosTotal, 1);
 
-    /* stacked segments HTML — income */
-    let incSegsHtml = '';
-    if (bruto > 0) {
-      incomeSegs.forEach(seg => {
-        const pct = (seg.total / bruto * 100).toFixed(1);
-        incSegsHtml += `<div class="pbar-seg" style="width:${pct}%;background:${seg.color}" data-tip="${esc(seg.nombre)}: ${fmtMoney(seg.total)}"></div>`;
-      });
-    }
+    const incSegsHtml = this._buildBarSegments(incomeSegs, bruto);
     const incBarWidth = (bruto / maxBar * 100).toFixed(1);
 
     /* OKLAB blended color for income amount text */
@@ -79,14 +98,7 @@ Object.assign(App, {
       incAmtColor = colorBlendOklab(incomeSegs.map(s => ({ color: s.color, weight: s.total })));
     }
 
-    /* stacked segments HTML — expenses */
-    let segsHtml = '';
-    if (gastosTotal > 0) {
-      gastoSegs.forEach(seg => {
-        const pct = (seg.total / gastosTotal * 100).toFixed(1);
-        segsHtml += `<div class="pbar-seg" style="width:${pct}%;background:${seg.color}" data-tip="${esc(seg.nombre)}: ${fmtMoney(seg.total)}"></div>`;
-      });
-    }
+    const segsHtml = this._buildBarSegments(gastoSegs, gastosTotal);
     const expBarWidth = (gastosTotal / maxBar * 100).toFixed(1);
 
     /* nav */
@@ -102,13 +114,13 @@ Object.assign(App, {
       + `<div class="din-fin-header">`
       +   `<span class="din-fin-period">${this._dinPeriodLabel()}</span>`
       +   `<div class="din-fin-nav">`
-      +     (hasPrev ? `<button class="bt bt-s" onclick="App._dinPrev()">&larr;</button>` : '')
+      +     `<button class="bt bt-s" onclick="App._dinPrev()" ${hasPrev ? '' : 'disabled'}>&larr;</button>`
       +     `<div class="info-fin-toggle">`
       +       `<button class="info-fin-tb${type === 'mes' ? ' on' : ''}" onclick="App._dinType('mes')">${t('info.month')}</button>`
       +       `<button class="info-fin-tb${type === 'trim' ? ' on' : ''}" onclick="App._dinType('trim')">${t('info.quarter')}</button>`
       +       `<button class="info-fin-tb${type === 'año' ? ' on' : ''}" onclick="App._dinType('año')">${t('info.year')}</button>`
       +     `</div>`
-      +     (hasNext ? `<button class="bt bt-s" onclick="App._dinNext()">&rarr;</button>` : '')
+      +     `<button class="bt bt-s" onclick="App._dinNext()" ${hasNext ? '' : 'disabled'}>&rarr;</button>`
       +   `</div>`
       + `</div>`
       + `<div class="din-fin-body">`
@@ -154,7 +166,7 @@ Object.assign(App, {
           const tf = f.totalFactura || 0;
           const ratio = tf > 0 ? (c.cantidad / tf) : 0;
           const ivaP = (f.importeIva || 0) * ratio;
-          const neto = Math.round((c.cantidad - ivaP) * 100) / 100;
+          const neto = roundMoney(c.cantidad - ivaP);
           ingresos.push({ fecha: c.fecha, monto: c.cantidad || 0, neto, proyecto: p.nombre, color: hex, tipo: 'factura' });
         }
       });
@@ -179,7 +191,6 @@ Object.assign(App, {
         html += `<div class="hr" style="border-left-color:${i.color}">`
           + `<span class="hr-d">${fmtDate(i.fecha)}</span>`
           + `<span style="color:var(--t1);font-size:.82rem;flex:1">${esc(i.proyecto)}</span>`
-          + `<span class="hr-n" style="font-size:.62rem;text-transform:uppercase">${i.tipo === 'factura' ? t('din.invoice') : t('din.hourly')}</span>`
           + (showBoth ? `<span style="color:var(--t3);font-family:'DM Mono',monospace;font-size:.72rem;text-decoration:line-through;margin-right:.3rem">${fmtMoney(i.monto)}</span>` : '')
           + `<span style="color:var(--ok);font-family:'DM Mono',monospace;font-size:.82rem">${fmtMoney(showBoth ? i.neto : i.monto)}</span>`
           + `</div>`;
@@ -211,22 +222,44 @@ Object.assign(App, {
       gastos.forEach(g => {
         const entries = (g.entradas || []).filter(e => e.fecha && inPeriod(e.fecha, type, y, m));
         const total = entries.reduce((s, e) => s + (e.cantidad || 0), 0);
-        const count = entries.length;
         const catLabel = GASTO_CAT[g.categoria] || g.categoria || 'Otro';
         const gHex = colorHex(g.color || 'Salmon');
-        html += `<div class="gas-card" style="border-left:3px solid ${gHex}"><div class="gas-header" onclick="this.nextElementSibling.classList.toggle('open')">`
-          + `<span class="gas-name">${esc(g.nombre)}</span><span class="gas-cat">${catLabel}</span>`
-          + `${g.recurrente && g.recurrente !== 'no' ? `<span class="gas-rec">${RECURRENCIA[g.recurrente]}</span>` : ''}`
-          + `${g.desgravable ? `<span class="gas-ded">${t('gas.deductibleBadge')}</span>` : ''}`
-          + `<span class="gas-total m">${fmtMoney(total)}</span><span class="gas-count">${count} ${t('gas.entries')}</span>`
-          + `<div class="gas-actions"><button class="cl-btn" onclick="event.stopPropagation();App.gModal('${g.id}')" title="${t('btn.edit')}">&#9998;</button><button class="cl-btn cl-btn-del" onclick="event.stopPropagation();App.delG('${g.id}')" title="${t('btn.delete')}">&times;</button></div>`
-          + `</div><div class="gas-body">`;
-        if (entries.length) {
-          entries.sort((a, b) => (b.fecha || '').localeCompare(a.fecha || '')).forEach(e => {
-            html += `<div class="gas-entry"><span class="gas-e-date">${fmtDate(e.fecha)}</span><span class="gas-e-amount m">${fmtMoney(e.cantidad || 0)}</span><span class="gas-e-nota">${esc(e.nota || '')}</span><button class="gas-e-edit" onclick="App.geModal('${g.id}','${e.id}')" title="${t('btn.edit')}">&#9998;</button><button class="gas-e-del" onclick="App.delGE('${g.id}','${e.id}')" title="${t('btn.delete')}">&times;</button></div>`;
-          });
+        const isPuntual = !g.recurrente || g.recurrente === 'no';
+        /* Ocultar puntuales sin entradas en este periodo */
+        if (isPuntual && !entries.length) return;
+        /* Ocultar recurrentes finalizados en periodos posteriores */
+        if (g.finHasta && !isPuntual && !entries.length) {
+          const [fy, fm] = g.finHasta.split('-').map(Number);
+          const periodStart = type === 'mes' ? (y * 12 + m) : type === 'trim' ? (y * 12 + Math.floor(m / 3) * 3) : (y * 12);
+          const finMonth = (fy * 12 + (fm - 1));
+          if (periodStart > finMonth) return;
         }
-        html += `<button class="bt bt-add" style="margin-top:.5rem" onclick="App.geModal('${g.id}')">${t('btn.addEntry')}</button></div></div>`;
+        const badges = `<div class="gas-badges"><span class="gas-cat">${catLabel}</span>`
+          + (isPuntual ? '' : `<span class="gas-rec">${RECURRENCIA[g.recurrente]}</span>`)
+          + `${g.desgravable ? `<span class="gas-ded">${t('gas.deductibleBadge')}</span>` : ''}`
+          + `${g.finHasta ? `<span class="gas-fin">FIN ${g.finHasta.substring(5)}/${g.finHasta.substring(0, 4)}</span>` : ''}</div>`;
+        if (isPuntual) {
+          const e0 = entries[0];
+          html += `<div class="gas-card" style="border-left:3px solid ${gHex}"><div class="gas-header">`
+            + `<span class="gas-name">${esc(g.nombre)}</span>${badges}`
+            + `<span class="gas-total m">${fmtMoney(e0?.cantidad || 0)}</span>`
+            + `<span class="gas-date-info">${fmtDate(e0.fecha)}</span>`
+            + `<div class="gas-actions"><button class="cl-btn" onclick="App.gModal('${g.id}')" title="${t('btn.edit')}">&#9998;</button><button class="cl-btn cl-btn-del" onclick="App.delG('${g.id}')" title="${t('btn.delete')}">&times;</button></div>`
+            + `</div></div>`;
+        } else {
+          const count = entries.length;
+          html += `<div class="gas-card" style="border-left:3px solid ${gHex}"><div class="gas-header gas-expandable" onclick="this.classList.toggle('expanded');this.nextElementSibling.classList.toggle('open')">`
+            + `<span class="gas-chevron">&#9656;</span><span class="gas-name">${esc(g.nombre)}</span>${badges}`
+            + `<span class="gas-total m">${fmtMoney(total)}</span><span class="gas-count">${count} ${t('gas.entries')}</span>`
+            + `<div class="gas-actions"><button class="cl-btn" onclick="event.stopPropagation();App.gModal('${g.id}')" title="${t('btn.edit')}">&#9998;</button><button class="cl-btn cl-btn-del" onclick="event.stopPropagation();App.delG('${g.id}')" title="${t('btn.delete')}">&times;</button></div>`
+            + `</div><div class="gas-body">`;
+          if (entries.length) {
+            entries.sort((a, b) => (b.fecha || '').localeCompare(a.fecha || '')).forEach(e => {
+              html += `<div class="gas-entry"><span class="gas-e-date">${fmtDate(e.fecha)}</span><span class="gas-e-amount m">${fmtMoney(e.cantidad || 0)}</span><span class="gas-e-nota">${esc(e.nota || '')}</span><button class="gas-e-edit" onclick="App.geModal('${g.id}','${e.id}')" title="${t('btn.edit')}">&#9998;</button><button class="gas-e-del" onclick="App.delGE('${g.id}','${e.id}')" title="${t('btn.delete')}">&times;</button></div>`;
+            });
+          }
+          html += `<button class="bt bt-add" style="margin-top:.5rem" onclick="App.geModal('${g.id}')">${t('btn.addEntry')}</button></div></div>`;
+        }
       });
       html += '</div>';
     }
@@ -293,24 +326,7 @@ Object.assign(App, {
 
     const qLabel = trimType === 'trim' ? `T${Math.floor(m / 3) + 1} ${y}` : `${y}`;
 
-    /* Deductions list HTML */
-    let dedsHtml = '';
-    if (trimDeds.length) {
-      dedsHtml = `<div class="din-ded-list" style="margin-top:.5rem">`;
-      trimDeds.forEach(d => {
-        const catLabel = DEDUCIBLE_CAT[d.categoria] || d.categoria || 'Otro';
-        dedsHtml += `<div class="din-ded-item">`
-          + `<span class="din-ded-cat">${catLabel}</span>`
-          + `<span class="gas-e-date">${fmtDate(d.fecha)}</span>`
-          + `<span class="din-ded-desc">${esc(d.descripcion || '')}</span>`
-          + `<span class="din-ded-amount m">${fmtMoney(d.cantidad || 0)}</span>`
-          + `<div class="gas-actions">`
-          +   `<button class="cl-btn" onclick="App.dedModal('${d.id}')" title="${t('btn.edit')}">&#9998;</button>`
-          +   `<button class="cl-btn cl-btn-del" onclick="App.delDed('${d.id}')" title="${t('btn.delete')}">&times;</button>`
-          + `</div></div>`;
-      });
-      dedsHtml += `</div>`;
-    }
+    const dedsHtml = this._renderDedList(trimDeds);
 
     el.innerHTML =
       `<div class="info-section">`
@@ -390,25 +406,8 @@ Object.assign(App, {
       +   `<div class="din-tax-row din-tax-total"><span>${t('renta.activityProfit')}</span><span class="m">${fmtMoney(rendimiento)}</span></div>`
       + `</div>`;
 
-    /* Deductions list */
-    if (deds.length) {
-      html += `<div class="din-ded-list">`;
-      deds.forEach(d => {
-        const catLabel = DEDUCIBLE_CAT[d.categoria] || d.categoria || 'Otro';
-        html += `<div class="din-ded-item">`
-          + `<span class="din-ded-cat">${catLabel}</span>`
-          + `<span class="gas-e-date">${fmtDate(d.fecha)}</span>`
-          + `<span class="din-ded-desc">${esc(d.descripcion || '')}</span>`
-          + `<span class="din-ded-amount m">${fmtMoney(d.cantidad || 0)}</span>`
-          + `<div class="gas-actions">`
-          +   `<button class="cl-btn" onclick="App.dedModal('${d.id}')" title="${t('btn.edit')}">&#9998;</button>`
-          +   `<button class="cl-btn cl-btn-del" onclick="App.delDed('${d.id}')" title="${t('btn.delete')}">&times;</button>`
-          + `</div></div>`;
-      });
-      html += `</div>`;
-    } else {
-      html += `<div class="din-empty" style="margin-top:.5rem">${t('renta.noDeductions')}</div>`;
-    }
+    const dedListHtml = this._renderDedList(deds);
+    html += dedListHtml || `<div class="din-empty" style="margin-top:.5rem">${t('renta.noDeductions')}</div>`;
 
     html += `<div class="din-trim-card" style="margin-top:.75rem">`
       + `<div class="din-tax-row"><span>${t('renta.totalDeductions')}</span><span class="m">${fmtMoney(totalDeds)}</span></div>`
@@ -457,14 +456,18 @@ Object.assign(App, {
   gModal(gid) {
     const isE = !!gid, g = isE ? D.g(gid) : null;
     const gColor = g?.color || 'Salmon';
+    const isPuntual = !isE || !g?.recurrente || g.recurrente === 'no';
+    const e0 = isPuntual && isE ? (g.entradas || [])[0] : null;
+    const entryFields = `<div class="fr" id="gEntryRow"${isPuntual ? '' : ' style="display:none"'}><div class="fg"><label>${t('field.amountEntry')}</label><input type="number" id="gEA" min="0.01" step="0.01" value="${e0?.cantidad || ''}" placeholder="0,00"></div>`
+      + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="gED" value="${e0?.fecha || todayStr()}"></div></div>`;
     this.om(`<div class="mt">${isE ? t('gas.editExpense') : t('gas.newExpense')}</div>`
       + `<div class="fg"><label>${t('field.name')}</label><input type="text" id="gN" value="${esc(g?.nombre || '')}" placeholder="${t('ph.expenseName')}"></div>`
       + `<div class="fr"><div class="fg"><label>${t('field.category')}</label><select id="gCat">${Object.entries(GASTO_CAT).map(([k, v]) => `<option value="${k}" ${g?.categoria === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
-      + `<div class="fg"><label>${t('field.recurrence')}</label><select id="gRec">${Object.entries(RECURRENCIA).map(([k, v]) => `<option value="${k}" ${g?.recurrente === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div></div>`
+      + `<div class="fg"><label>${t('field.recurrence')}</label><select id="gRec" onchange="document.getElementById('gEntryRow').style.display=this.value==='no'?'':'none'">${Object.entries(RECURRENCIA).map(([k, v]) => `<option value="${k}" ${g?.recurrente === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div></div>`
       + `<div class="fr"><div class="fg"><label>${t('field.deductible')}</label><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="gDes" ${g?.desgravable ? 'checked' : ''}> ${t('gas.deductibleBadge')}</label></div>`
       + `<div class="fg"><label>${t('field.ivaRate')}</label><select id="gIva">${Object.entries(TIPOS_IVA).map(([k, v]) => `<option value="${k}" ${(g?.tipoIva ?? 21) == k ? 'selected' : ''}>${v}</option>`).join('')}</select></div></div>`
-      + (!isE ? `<div class="fr"><div class="fg"><label>${t('field.amountEntry')}</label><input type="number" id="gEA" min="0.01" step="0.01" value="" placeholder="0,00"></div>`
-      + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="gED" value="${todayStr()}"></div></div>` : '')
+      + entryFields
+      + (isE && g?.finHasta ? `<div class="fg"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="gReact"> ${t('gas.reactivate')}</label></div>` : '')
       + `<div class="fg"><label>${t('field.color')}</label>${this.colorSelect(gColor)}</div>`
       + `<div class="fg"><label>${t('field.notes')}</label><textarea id="gNo" placeholder="${t('ph.notes')}">${esc(g?.notas || '')}</textarea></div>`
       + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveG('${gid || ''}')">${isE ? t('btn.save') : t('btn.create')}</button></div>`);
@@ -474,8 +477,23 @@ Object.assign(App, {
     const nombre = document.getElementById('gN').value.trim();
     if (!nombre) { Toast.warn(t('msg.nameRequired')); return; }
     const color = document.getElementById('mpColor')?.value || 'Salmon';
-    const data = { nombre, categoria: document.getElementById('gCat').value, recurrente: document.getElementById('gRec').value, color, notas: document.getElementById('gNo').value.trim(), desgravable: document.getElementById('gDes').checked, tipoIva: parseInt(document.getElementById('gIva').value) || 21 };
-    if (gid) D.upG(gid, data); else {
+    const data = { nombre, categoria: document.getElementById('gCat').value, recurrente: document.getElementById('gRec').value, color, notas: document.getElementById('gNo').value.trim(), desgravable: document.getElementById('gDes').checked, tipoIva: ((v) => isNaN(v) ? 21 : v)(parseInt(document.getElementById('gIva').value)) };
+    if (gid) {
+      const g = D.g(gid);
+      const wasPuntual = !g?.recurrente || g.recurrente === 'no';
+      if (data.recurrente === 'no' && wasPuntual) {
+        const amt = parseFloat(document.getElementById('gEA')?.value) || 0;
+        const fecha = document.getElementById('gED')?.value || todayStr();
+        const entradas = g?.entradas ? [...g.entradas] : [];
+        if (amt > 0) {
+          if (entradas[0]) { entradas[0].cantidad = amt; entradas[0].fecha = fecha; }
+          else entradas.push({ id: uid(), fecha, cantidad: amt, nota: '' });
+        }
+        data.entradas = entradas;
+      }
+      if (document.getElementById('gReact')?.checked) data.finHasta = null;
+      D.upG(gid, data);
+    } else {
       data.id = uid(); data.entradas = [];
       const initAmt = parseFloat(document.getElementById('gEA')?.value) || 0;
       if (initAmt > 0) data.entradas.push({ id: uid(), fecha: document.getElementById('gED')?.value || todayStr(), cantidad: initAmt, nota: '' });
@@ -489,10 +507,13 @@ Object.assign(App, {
   geModal(gid, eid) {
     const isE = !!eid;
     const e = isE ? (D.g(gid)?.entradas || []).find(x => x.id === eid) : null;
+    const gasto = D.g(gid);
+    const isRecurrente = gasto && gasto.recurrente && gasto.recurrente !== 'no';
     this.om(`<div class="mt">${isE ? t('gas.editEntry') : t('gas.addEntry')}</div>`
       + `<div class="fr"><div class="fg"><label>${t('field.amountEntry')}</label><input type="number" id="geA" min="0.01" step="0.01" value="${e?.cantidad || ''}" placeholder="0,00"></div>`
       + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="geD" value="${e?.fecha || todayStr()}"></div></div>`
       + `<div class="fg"><label>${t('field.note')}</label><input type="text" id="geN" value="${esc(e?.nota || '')}" placeholder="${t('ph.detail')}"></div>`
+      + (isRecurrente && !isE ? `<div class="fg"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="geUlt"> ${t('gas.lastMonth')}</label></div>` : '')
       + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveGE('${gid}','${eid || ''}')">${isE ? t('btn.save') : t('btn.add')}</button></div>`);
   },
 
@@ -509,7 +530,10 @@ Object.assign(App, {
     } else {
       g.entradas.push({ id: uid(), fecha, cantidad: cant, nota });
     }
-    D.upG(gid, { entradas: g.entradas }); this.cm(); this.rGas();
+    const update = { entradas: g.entradas };
+    const ultCheck = document.getElementById('geUlt');
+    if (ultCheck?.checked) update.finHasta = fecha.substring(0, 7);
+    D.upG(gid, update); this.cm(); this.rGas();
   },
 
   delGE(gid, eid) {

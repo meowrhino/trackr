@@ -367,6 +367,8 @@ const LANGS = {
     'gas.deleteConfirm': '¿Eliminar gasto "{0}"?',
     'gas.addEntry': 'Añadir entrada',
     'gas.editEntry': 'Editar entrada',
+    'gas.lastMonth': 'Último mes (finalizar gasto)',
+    'gas.reactivate': 'Reactivar (quitar finalización)',
     'gas.deductibleBadge': 'desgravable',
 
     /* ── Campos desgravable ── */
@@ -871,6 +873,8 @@ const LANGS = {
     'gas.deleteConfirm': 'Delete expense "{0}"?',
     'gas.addEntry': 'Add entry',
     'gas.editEntry': 'Edit entry',
+    'gas.lastMonth': 'Last month (finalize expense)',
+    'gas.reactivate': 'Reactivate (remove finalization)',
     'gas.deductibleBadge': 'deductible',
 
     /* ── Campos desgravable ── */
@@ -1367,6 +1371,8 @@ const LANGS = {
     'gas.deleteConfirm': 'Eliminar despesa "{0}"?',
     'gas.addEntry': 'Afegir entrada',
     'gas.editEntry': 'Editar entrada',
+    'gas.lastMonth': 'Últim mes (finalitzar despesa)',
+    'gas.reactivate': 'Reactivar (treure finalització)',
     'gas.deductibleBadge': 'desgravable',
 
     /* ── Camps desgravable ── */

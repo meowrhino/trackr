@@ -198,10 +198,7 @@ Object.assign(App, {
         const base = data.calculos.base || 0;
         const ivaRate = data.calculos.ivaEnabled ? (data.calculos.ivaRate || 0) : 0;
         const irpfRate = data.calculos.irpfEnabled ? (data.calculos.irpfRate || 0) : 0;
-        const importeIva = Math.round(base * ivaRate / 100 * 100) / 100;
-        const importeIrpf = Math.round(base * irpfRate / 100 * 100) / 100;
-        const totalFactura = Math.round((base + importeIva - importeIrpf) * 100) / 100;
-        const netoRecibido = Math.round((base - importeIrpf) * 100) / 100;
+        const { importeIva, importeIrpf, totalFactura, netoRecibido } = B.calcTax(base, ivaRate, irpfRate);
 
         /* Parse invoice number */
         const numStr = data.factura.numero || '0001';

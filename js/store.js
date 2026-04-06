@@ -142,7 +142,7 @@ const D = {
             const tc = p.facturacion.cobros.reduce((s, c) => s + (c.cantidad || 0), 0);
             if (Math.abs(tc - nr) < 0.02 || (tc > 0 && tc <= nr)) {
               const ratio = tf / nr;
-              p.facturacion.cobros.forEach(c => { c.cantidad = Math.round(c.cantidad * ratio * 100) / 100; });
+              p.facturacion.cobros.forEach(c => { c.cantidad = roundMoney(c.cantidad * ratio); });
             }
           }
           p.facturacion._cobrosV3 = true;
@@ -209,10 +209,10 @@ const D = {
         if (changed) {
           /* Recalcular importes inline (B no disponible aún) */
           const b = f.baseImponible || 0, iv = f.iva || 0, ir = f.irpf || 0;
-          f.importeIva = Math.round(b * iv / 100 * 100) / 100;
-          f.importeIrpf = Math.round(b * ir / 100 * 100) / 100;
-          f.totalFactura = Math.round((b + f.importeIva - f.importeIrpf) * 100) / 100;
-          f.netoRecibido = Math.round((b - f.importeIrpf) * 100) / 100;
+          f.importeIva = roundMoney(b * iv / 100);
+          f.importeIrpf = roundMoney(b * ir / 100);
+          f.totalFactura = roundMoney(b + f.importeIva - f.importeIrpf);
+          f.netoRecibido = roundMoney(b - f.importeIrpf);
           f.total = f.totalFactura;
         }
       });

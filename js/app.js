@@ -40,9 +40,13 @@ const App = {
     applyTheme(D.d.settings.theme || D.d.settings.tema || 'oscuro');
     setLang(D.d.settings.lang || D.d.settings.idioma || 'es');
 
-    /* Cerrar modal con Escape */
+    /* Cerrar modal con Escape / Enter para submit */
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') this.cm();
+      if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && document.getElementById('mO').classList.contains('on')) {
+        e.preventDefault();
+        document.getElementById('mC').querySelector('.bt-p')?.click();
+      }
     });
 
     /* Cerrar modal solo con click limpio en backdrop (no drag) */
@@ -240,20 +244,21 @@ const App = {
     if (m === 'por_hora') {
       const ph = parseFloat(document.getElementById('mpPH')?.value) || 0;
       const th = p ? p.horas.reduce((s, h) => s + h.cantidad, 0) : 0;
-      base = Math.round(th * ph * 100) / 100;
+      base = roundMoney(th * ph);
     } else if (m === 'desde_base') {
       base = parseFloat(document.getElementById('mpBa')?.value) || 0;
     } else {
       const t2 = parseFloat(document.getElementById('mpTo')?.value) || 0;
       const fac = 1 + ivR / 100 - irR / 100;
-      base = fac ? Math.round(t2 / fac * 100) / 100 : 0;
+      base = fac ? roundMoney(t2 / fac) : 0;
       totalF = t2;
     }
 
-    importeIva = Math.round(base * ivR / 100 * 100) / 100;
-    importeIrpf = Math.round(base * irR / 100 * 100) / 100;
-    if (m !== 'desde_total') totalF = Math.round((base + importeIva - importeIrpf) * 100) / 100;
-    neto = Math.round((base - importeIrpf) * 100) / 100;
+    const tax = B.calcTax(base, ivR, irR);
+    importeIva = tax.importeIva;
+    importeIrpf = tax.importeIrpf;
+    if (m !== 'desde_total') totalF = tax.totalFactura;
+    neto = tax.netoRecibido;
 
     let phInfo = '';
     if (m === 'por_hora') {
@@ -389,7 +394,7 @@ const App = {
     if (cant <= 0) return;
     const p = D.p(pid); if (!p) return;
     if (!p.facturacion.cobros) p.facturacion.cobros = [];
-    p.facturacion.cobros.push({ id: uid(), fecha, cantidad: Math.round(cant * 100) / 100 });
+    p.facturacion.cobros.push({ id: uid(), fecha, cantidad: roundMoney(cant) });
     B.calc(p);
     D.up(pid, { facturacion: p.facturacion });
     Toast.ok(t('billing.addPayment') + ' ✓');

@@ -131,6 +131,9 @@
   text-align:right;
 }
 
+/* ── Tipo de ingreso (factura/por hora) ── */
+.din-tipo{font-size:.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:.03em;min-width:65px;text-align:right;flex-shrink:0}
+
 /* ── Lista de gastos (existing) ── */
 .gas-list{display:flex;flex-direction:column;gap:.5rem}
 
@@ -139,10 +142,16 @@
 .gas-header{display:flex;align-items:center;gap:.75rem;padding:.85rem 1rem;cursor:pointer;transition:background var(--tr)}
 .gas-header:hover{background:var(--bg3)}
 .gas-name{flex:1;font-weight:500;font-size:.9rem}
+.gas-badges{display:flex;gap:.35rem;align-items:center;flex-shrink:0;justify-content:flex-end}
 .gas-cat{font-size:.68rem;padding:.15rem .5rem;border:1px solid var(--b2);border-radius:var(--r);color:var(--t2);text-transform:uppercase;letter-spacing:.03em;white-space:nowrap}
-.gas-total{font-family:'DM Mono',monospace;font-size:.88rem;font-weight:500;min-width:80px;text-align:right}
-.gas-count{font-size:.72rem;color:var(--t3);min-width:55px;text-align:right}
-.gas-actions{display:flex;gap:.25rem}
+.gas-total{font-family:'DM Mono',monospace;font-size:.88rem;font-weight:500;min-width:85px;text-align:right;flex-shrink:0}
+.gas-date-info{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--t3);min-width:80px;text-align:right;flex-shrink:0}
+.gas-count{font-size:.72rem;color:var(--t3);min-width:50px;text-align:right;flex-shrink:0}
+.gas-actions{display:flex;gap:.25rem;flex-shrink:0}
+
+/* ── Chevron expandible ── */
+.gas-chevron{font-size:.7rem;color:var(--t3);transition:transform .15s ease;display:inline-block}
+.gas-header.expanded .gas-chevron{transform:rotate(90deg)}
 
 /* ── Cuerpo expandible (entradas) ── */
 .gas-body{display:none;border-top:1px solid var(--b1);padding:.75rem 1rem}
@@ -163,3 +172,6 @@
 
 /* ── Desgravable badge ── */
 .gas-ded{font-size:.62rem;padding:.1rem .35rem;border-radius:var(--r);background:color-mix(in srgb,var(--ok) 15%,transparent);color:var(--ok);text-transform:uppercase;letter-spacing:.02em}
+
+/* ── Finalizado badge ── */
+.gas-fin{font-size:.62rem;padding:.1rem .35rem;border-radius:var(--r);background:color-mix(in srgb,var(--t3) 15%,transparent);color:var(--t3);text-transform:uppercase;letter-spacing:.02em;white-space:nowrap}
