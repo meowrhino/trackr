@@ -292,15 +292,12 @@ Object.assign(App, {
           if (h.monto) ingresos130 += h.monto;
         }
       });
-      (f.cobros || []).forEach(c => {
-        if (c.fecha && inPeriod(c.fecha, trimType, y, m)) {
-          const tf = f.totalFactura || 0;
-          const ratio = tf > 0 ? (c.cantidad / tf) : 0;
-          ingresos130 += (f.baseImponible || 0) * ratio;
-          ivaRepercutido += (f.importeIva || 0) * ratio;
-          retenciones += (f.importeIrpf || 0) * ratio;
-        }
-      });
+      /* Devengo: usar fecha de factura, no fecha de cobro */
+      if (f.facturaFecha && inPeriod(f.facturaFecha, trimType, y, m) && f.baseImponible) {
+        ingresos130 += f.baseImponible || 0;
+        ivaRepercutido += f.importeIva || 0;
+        retenciones += f.importeIrpf || 0;
+      }
     });
 
     D.gs().forEach(g => {
@@ -309,9 +306,10 @@ Object.assign(App, {
         if (e.fecha && inPeriod(e.fecha, trimType, y, m)) gastoSum += e.cantidad || 0;
       });
       if (g.desgravable && gastoSum > 0) {
-        gastos130 += gastoSum;
         const rate = (g.tipoIva || 0) / 100;
-        ivaSoportado += gastoSum * rate / (1 + rate);
+        const ivaGasto = gastoSum * rate / (1 + rate);
+        gastos130 += gastoSum - ivaGasto;
+        ivaSoportado += ivaGasto;
       }
     });
 
