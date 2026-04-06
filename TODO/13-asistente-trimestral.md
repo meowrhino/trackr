@@ -37,9 +37,27 @@ Nuevo apartado dentro de Dineros (o botón en el resumen fiscal existente) que g
 - Opcionalmente: botón "Copiar" para pegar en la sede electrónica
 - Indicador visual si hay facturas sin `facturaFecha` (para avisar que falta dato)
 
+### 6. Gastos: guardar base e IVA por separado
+**Cambio importante en el schema de gastos.** Actualmente cada entrada guarda solo `cantidad` (el total con IVA). Para que el cálculo trimestral sea exacto hay que guardar base e IVA por separado:
+```json
+"entradas": [
+  { "id": "x", "fecha": "2026-01-03", "base": 17.90, "iva": 3.58, "nota": "" }
+]
+```
+- `base`: importe sin IVA (lo que va a casilla 28 del 303 y casilla 02 del 130)
+- `iva`: importe del IVA (lo que va a casilla 29 del 303)
+- `cantidad` se puede mantener como campo calculado (base + iva) para compatibilidad
+
+**¿Por qué?** Facturas en dólares (ChatGPT, Manus) calculan el IVA en euros al tipo de cambio del día. Dividir el total entre 1,21 da un resultado distinto al IVA real de la factura. La diferencia es pequeña (~0,15 € por factura) pero se acumula y no es correcto fiscalmente.
+
+**UI del modal de gasto:** Dos campos (base + IVA) en vez de uno (cantidad). El IVA se puede auto-calcular al escribir la base (base × tipoIva%), pero debe ser editable para poder poner el IVA real de la factura.
+
+**Migración:** Las entradas existentes que solo tienen `cantidad` se migran calculando base = cantidad / (1 + rate) e iva = cantidad - base. No es exacto para las de divisa extranjera, pero es el mejor fallback.
+
 ## Datos necesarios
 - `facturaFecha` en cada proyecto — ya existe pero no siempre se rellena
 - Validación/aviso si un proyecto facturado no tiene fecha de factura
+- Campos `base` e `iva` separados en entradas de gastos
 
 ## Prioridad
 Alta — se usa 4 veces al año y ahorra mucho tiempo + reduce errores
