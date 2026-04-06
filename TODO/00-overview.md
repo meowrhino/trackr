@@ -15,4 +15,5 @@ Orden de implementación. Cada archivo tiene el detalle.
 | 9 | Generación de facturas | `09-facturas.md` | pendiente |
 | 10 | Migración de datos (versioning) | `10-migracion.md` | pendiente |
 | 12 | Gastos recurrentes avanzados | `12-gastos-recurrentes.md` | pendiente |
+| 13 | Asistente trimestral (303+130) | `13-asistente-trimestral.md` | pendiente |
 | — | Analytics (tracking) | `11-analytics.md` | aparcado |
