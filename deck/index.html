@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRACKR - Deck</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#111;--bg2:#191919;--bg3:#222;--bg4:#2a2a2a;
+  --b1:#262626;--b2:#333;--b3:#444;
+  --t1:#ccc;--t2:#888;--t3:#555;
+  --ok:#5a9;--warn:#c93;--bad:#c55;
+  --ac:#5a9;--r:3px;
+}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--t1);overflow:hidden;height:100vh}
+::selection{background:color-mix(in srgb,var(--ac) 30%,transparent);color:var(--t1)}
+
+/* Slides */
+.deck{position:relative;height:100vh;width:100vw}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:6vh 8vw;opacity:0;pointer-events:none;transition:opacity .4s ease}
+.slide.on{opacity:1;pointer-events:auto}
+
+/* Nav */
+.nav{position:fixed;bottom:2rem;right:3rem;display:flex;gap:.5rem;z-index:100;align-items:center}
+.nav button{background:var(--bg3);border:1px solid var(--b1);color:var(--t2);width:36px;height:36px;border-radius:var(--r);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.nav button:hover{background:var(--bg4);color:var(--t1)}
+.nav .cnt{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--t3);min-width:3rem;text-align:center}
+
+/* Progress bar */
+.progress{position:fixed;top:0;left:0;height:2px;background:var(--ac);transition:width .4s ease;z-index:100}
+
+/* Typography */
+.logo{font-family:'DM Mono',monospace;font-weight:500;letter-spacing:.35em;color:var(--t1)}
+h1{font-size:2.8rem;font-weight:600;letter-spacing:-.02em;line-height:1.15;margin-bottom:1rem}
+h2{font-size:1.8rem;font-weight:500;letter-spacing:-.01em;margin-bottom:1.5rem;color:var(--t1)}
+h3{font-size:1.1rem;font-weight:500;margin-bottom:.75rem;color:var(--ac)}
+p{font-size:1rem;color:var(--t2);line-height:1.6;max-width:55ch}
+.sub{font-size:1.15rem;color:var(--t2);margin-bottom:.5rem;line-height:1.5}
+.accent{color:var(--ac)}
+.warn{color:var(--warn)}
+.bad{color:var(--bad)}
+.mono{font-family:'DM Mono',monospace}
+.small{font-size:.85rem;color:var(--t3)}
+.tag{display:inline-block;padding:.15rem .55rem;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);font-size:.75rem;color:var(--t2);font-family:'DM Mono',monospace}
+.tag.green{border-color:color-mix(in srgb,var(--ok) 40%,transparent);color:var(--ok)}
+
+/* Lists */
+ul{list-style:none;display:flex;flex-direction:column;gap:.6rem}
+ul li{font-size:.95rem;color:var(--t2);padding-left:1.2rem;position:relative;line-height:1.5}
+ul li::before{content:'';position:absolute;left:0;top:.55rem;width:5px;height:5px;background:var(--ac);border-radius:50%}
+
+/* Grid layouts */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:3rem;margin-top:1rem}
+.cols-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;margin-top:1rem}
+
+/* Cards */
+.card{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:1.25rem 1.5rem}
+.card h3{margin-bottom:.5rem}
+
+/* Feature grid */
+.feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:1rem}
+.feat{display:flex;align-items:flex-start;gap:.75rem;background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:.75rem 1rem}
+.feat .ic{font-size:1.3rem;min-width:1.8rem;text-align:center;line-height:1.6}
+.feat .ft{font-size:.85rem;font-weight:500;color:var(--t1)}
+.feat .fd{font-size:.75rem;color:var(--t3);margin-top:.15rem}
+
+/* Table */
+table{width:100%;border-collapse:collapse;font-size:.78rem;margin-top:1rem}
+th{font-family:'DM Mono',monospace;font-weight:500;text-align:left;padding:.5rem .75rem;border-bottom:1px solid var(--b2);color:var(--t3);font-size:.7rem;letter-spacing:.05em;text-transform:uppercase}
+td{padding:.45rem .75rem;border-bottom:1px solid var(--b1);color:var(--t2)}
+tr td:first-child{color:var(--t1);font-weight:500}
+.yes{color:var(--ok)}
+.no{color:var(--t3)}
+.partial{color:var(--warn)}
+
+/* Pillar */
+.pillar{text-align:left}
+.pillar h3{font-size:1rem;margin-bottom:.4rem}
+.pillar p{font-size:.85rem;max-width:none}
+
+/* Timeline */
+.timeline{display:flex;flex-direction:column;gap:1.25rem;margin-top:1rem}
+.tl-item{display:flex;gap:1rem;align-items:flex-start}
+.tl-dot{width:8px;height:8px;border-radius:50%;background:var(--ac);margin-top:.45rem;flex-shrink:0}
+.tl-dot.warn{background:var(--warn)}
+.tl-dot.dim{background:var(--t3)}
+
+/* Portada center */
+.center{text-align:center;align-items:center}
+.center p{max-width:none}
+
+/* Stat */
+.stat{text-align:center}
+.stat .num{font-family:'DM Mono',monospace;font-size:2.2rem;font-weight:500;color:var(--ac)}
+.stat .lbl{font-size:.8rem;color:var(--t3);margin-top:.25rem}
+
+/* CTA */
+.cta{display:inline-flex;align-items:center;gap:.5rem;padding:.6rem 1.25rem;background:color-mix(in srgb,var(--ac) 15%,transparent);border:1px solid color-mix(in srgb,var(--ac) 30%,transparent);border-radius:var(--r);color:var(--ac);font-family:'DM Mono',monospace;font-size:.85rem;margin-top:1.5rem}
+</style>
+</head>
+<body>
+
+<div class="progress" id="prog"></div>
+
+<div class="deck" id="deck">
+
+  <!-- SLIDE 1: Portada -->
+  <div class="slide center on">
+    <div class="logo" style="font-size:3.5rem;margin-bottom:.5rem">TRACKR</div>
+    <p class="sub" style="font-size:1.3rem;margin-bottom:2rem">Tu gestor freelance en el navegador</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <span class="tag">Proyectos</span>
+      <span class="tag">Horas</span>
+      <span class="tag">Facturas</span>
+      <span class="tag">Gastos</span>
+      <span class="tag">Impuestos</span>
+    </div>
+    <div style="margin-top:3rem;display:flex;gap:2.5rem;justify-content:center">
+      <div class="stat"><div class="num">0&euro;</div><div class="lbl">Para siempre</div></div>
+      <div class="stat"><div class="num" style="color:var(--t1)">0</div><div class="lbl">Cuentas necesarias</div></div>
+      <div class="stat"><div class="num" style="color:var(--warn)">0</div><div class="lbl">Datos en la nube</div></div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: El problema -->
+  <div class="slide">
+    <h2>Ser autonomo en Espana es un <span class="bad">infierno fiscal</span></h2>
+    <div class="cols">
+      <ul>
+        <li><strong>4 declaraciones trimestrales</strong> &mdash; Modelo 303 (IVA) + 130 (IRPF), con plazos estrictos y multas por retraso</li>
+        <li><strong>Facturacion compleja</strong> &mdash; Base imponible, IVA al 21/10/4%, IRPF al 15/7%, exenciones, numeros correlativos...</li>
+        <li><strong>Gastos deducibles</strong> &mdash; Hay que registrar base, IVA y total reales de cada factura de gasto</li>
+        <li><strong>Cuota fija mensual</strong> &mdash; 230-530 &euro;/mes aunque no factures nada</li>
+      </ul>
+      <div>
+        <h3>Y las herramientas?</h3>
+        <ul>
+          <li>Las buenas cuestan <span class="warn">18-29 &euro;/mes</span></li>
+          <li>Tus datos viven en <span class="bad">su cloud</span></li>
+          <li>Estan pensadas para gestores, no para freelancers</li>
+          <li>Overkill: CRM, inventario, RRHH... que no necesitas</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: La solucion -->
+  <div class="slide">
+    <h2>Trackr: <span class="accent">todo en tu navegador</span></h2>
+    <div class="cols">
+      <div>
+        <h3>Que es</h3>
+        <ul>
+          <li>App web que corre <strong>100% en tu navegador</strong></li>
+          <li>Datos en localStorage + export a <span class="mono">JSON</span></li>
+          <li>Abres <span class="mono">index.html</span> y funciona</li>
+          <li>Pensada para autonomos espanoles</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Filosofia</h3>
+        <ul>
+          <li><span class="accent">Tus datos son tuyos</span> &mdash; JSON portable, versionable con git</li>
+          <li><span class="accent">Gratis siempre</span> &mdash; Sin trucos, sin tier premium</li>
+          <li><span class="accent">Sin cuenta</span> &mdash; Sin login, sin cloud, sin tracking</li>
+          <li><span class="accent">Vanilla JS</span> &mdash; ~6000 lineas, sin frameworks, sin build step</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: Features -->
+  <div class="slide">
+    <h2>Que puedes hacer con Trackr</h2>
+    <div class="feat-grid">
+      <div class="feat"><div class="ic">&#128209;</div><div><div class="ft">Proyectos + Clientes</div><div class="fd">Estados, fechas, notas. Clientes con NIF y datos fiscales</div></div></div>
+      <div class="feat"><div class="ic">&#9201;</div><div><div class="ft">Control de horas</div><div class="fd">Trabajo vs reuniones, con fecha y notas</div></div></div>
+      <div class="feat"><div class="ic">&#128176;</div><div><div class="ft">Facturacion inteligente</div><div class="fd">4 modos: desde base, desde total, por hora, gratis. IVA + IRPF auto</div></div></div>
+      <div class="feat"><div class="ic">&#128179;</div><div><div class="ft">Cobros parciales</div><div class="fd">Trackea pagos con barra de progreso por proyecto</div></div></div>
+      <div class="feat"><div class="ic">&#128200;</div><div><div class="ft">Dashboard financiero</div><div class="fd">Facturado vs cobrado vs gastos vs neto. &euro;/hora real</div></div></div>
+      <div class="feat"><div class="ic">&#128197;</div><div><div class="ft">Calendario</div><div class="fd">Vista mes/semana con horas, gastos y objetivos</div></div></div>
+      <div class="feat"><div class="ic">&#128196;</div><div><div class="ft">Facturas PDF</div><div class="fd">Genera facturas profesionales con un click</div></div></div>
+      <div class="feat"><div class="ic">&#127991;</div><div><div class="ft">Gastos y recurrentes</div><div class="fd">Base + IVA + total reales. Puntuales y recurrentes</div></div></div>
+      <div class="feat"><div class="ic">&#128202;</div><div><div class="ft">Asistente fiscal</div><div class="fd">Modelo 303, 130 y datos para la Renta</div></div></div>
+      <div class="feat"><div class="ic">&#127912;</div><div><div class="ft">Temas + idiomas</div><div class="fd">8 temas visuales. ES, EN, CA</div></div></div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: Competencia -->
+  <div class="slide">
+    <h2>El mercado actual</h2>
+    <table>
+      <tr><th></th><th style="color:var(--ac)">Trackr</th><th>Quipu</th><th>Holded</th><th>Billin</th><th>Invoice Ninja</th></tr>
+      <tr><td>Precio</td><td class="yes">0 &euro;</td><td class="partial">18 &euro;/mes</td><td class="partial">29 &euro;/mes</td><td class="partial">10 &euro;/mes</td><td class="yes">0 &euro; (self-host)</td></tr>
+      <tr><td>Necesita servidor</td><td class="yes">No</td><td class="no">SaaS</td><td class="no">SaaS</td><td class="no">SaaS</td><td class="no">Si (PHP+MySQL)</td></tr>
+      <tr><td>Funciona offline</td><td class="yes">Si</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="partial">Parcial</td></tr>
+      <tr><td>Datos portables</td><td class="yes">JSON</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="partial">API</td></tr>
+      <tr><td>Sin crear cuenta</td><td class="yes">Si</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
+      <tr><td>IVA/IRPF nativo</td><td class="yes">Si</td><td class="yes">Si</td><td class="yes">Si</td><td class="yes">Si</td><td class="no">Manual</td></tr>
+      <tr><td>Modelo 303/130</td><td class="yes">Si</td><td class="yes">Si</td><td class="partial">Parcial</td><td class="no">No</td><td class="no">No</td></tr>
+      <tr><td>Proyectos + horas</td><td class="yes">Si</td><td class="no">No</td><td class="yes">Si</td><td class="no">No</td><td class="yes">Si</td></tr>
+      <tr><td>&euro;/hora real</td><td class="yes">Si</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
+      <tr><td>Calendario financiero</td><td class="yes">Si</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
+    </table>
+    <p class="small" style="margin-top:1rem">Trackr no compite en features con ERPs. Compite en <span class="accent">filosofia</span>: privacidad, control y coste cero.</p>
+  </div>
+
+  <!-- SLIDE 6: Diferenciacion -->
+  <div class="slide">
+    <h2>Por que Trackr es <span class="accent">diferente</span></h2>
+    <div class="cols-3">
+      <div class="card pillar">
+        <h3>Privacidad por diseno</h3>
+        <p>Tus datos nunca salen de tu maquina. Export JSON: un archivo que puedes leer, versionar con git, o meter en un USB. Sin tracking, sin cookies.</p>
+      </div>
+      <div class="card pillar">
+        <h3>Pensado para Espana</h3>
+        <p>IVA (21/10/4/0%), IRPF, exenciones. Modelo 303 y 130 integrados. Clientes con NIF, facturacion con numero correlativo.</p>
+      </div>
+      <div class="card pillar">
+        <h3>Simple sin ser basico</h3>
+        <p>No es un ERP: no tiene inventario, nominas ni CRM. Tiene todo lo que un freelancer necesita y nada mas. 6000 lineas de vanilla JS.</p>
+      </div>
+    </div>
+    <div style="margin-top:2.5rem;text-align:center">
+      <p class="small">Quipu y Holded: <em>"nosotros gestionamos tu contabilidad en la nube"</em></p>
+      <p class="small">Trackr: <em>"<span class="accent">tu gestionas tus finanzas en tu navegador, con tus datos</span>"</em></p>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: Modelo -->
+  <div class="slide">
+    <h2>Modelo: <span class="accent">gratis de verdad</span></h2>
+    <div class="cols">
+      <div>
+        <h3>Ahora</h3>
+        <div class="card" style="margin-bottom:1.5rem">
+          <div style="display:flex;align-items:baseline;gap:.5rem;margin-bottom:.5rem">
+            <span class="mono" style="font-size:1.8rem;color:var(--ac)">0 &euro;</span>
+            <span class="small">/ para siempre</span>
+          </div>
+          <ul>
+            <li>Todas las funciones, sin limites</li>
+            <li>Uso local con JSON</li>
+            <li>Sin cuenta, sin cloud</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <h3>Futuro posible</h3>
+        <div class="card">
+          <div style="display:flex;align-items:baseline;gap:.5rem;margin-bottom:.5rem">
+            <span class="mono" style="font-size:1.8rem;color:var(--warn)">? &euro;</span>
+            <span class="small">/ mes (solo hosting)</span>
+          </div>
+          <ul>
+            <li>Hosting y sync de tus datos</li>
+            <li>Gestion de cuenta y backup automatico</li>
+            <li>El core sigue siendo gratis</li>
+          </ul>
+        </div>
+        <p class="small" style="margin-top:1rem">Si no guardas datos en nuestro servidor, no pagas. No es freemium: es pagar por infraestructura.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: Next steps -->
+  <div class="slide">
+    <h2>Roadmap</h2>
+    <div class="cols">
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div>
+            <h3>Q2 2026</h3>
+            <ul>
+              <li>Asistente fiscal trimestral completo (303 + 130)</li>
+              <li>Gastos recurrentes avanzados (pausa, base, indicadores)</li>
+            </ul>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot warn"></div>
+          <div>
+            <h3>Q3 2026</h3>
+            <ul>
+              <li>Resolver feedback de beta testers (6 issues)</li>
+              <li>Quick UX: boton "marcar pagado", entrada rapida de gastos</li>
+            </ul>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot dim"></div>
+          <div>
+            <h3>Futuro</h3>
+            <ul>
+              <li>VeriFactu (obligatorio julio 2026 para autonomos)</li>
+              <li>PWA / version movil</li>
+              <li>Tier de hosting con sync</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">
+        <div class="logo" style="font-size:2rem;margin-bottom:1rem">TRACKR</div>
+        <p style="margin-bottom:1.5rem">En beta, funciona, y lo uso cada dia.</p>
+        <div class="cta">open index.html</div>
+        <p class="small" style="margin-top:2rem">Gracias!</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Navigation -->
+<div class="nav">
+  <button id="prev">&#8592;</button>
+  <span class="cnt" id="cnt">1 / 8</span>
+  <button id="next">&#8594;</button>
+</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+let cur = 0;
+
+function go(n) {
+  if (n < 0 || n >= total) return;
+  slides[cur].classList.remove('on');
+  cur = n;
+  slides[cur].classList.add('on');
+  document.getElementById('cnt').textContent = (cur + 1) + ' / ' + total;
+  document.getElementById('prog').style.width = ((cur + 1) / total * 100) + '%';
+}
+
+document.getElementById('prev').onclick = () => go(cur - 1);
+document.getElementById('next').onclick = () => go(cur + 1);
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(cur + 1); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); go(cur - 1); }
+  if (e.key === 'Home') go(0);
+  if (e.key === 'End') go(total - 1);
+});
+
+// Init
+go(0);
+</script>
+</body>
+</html>
