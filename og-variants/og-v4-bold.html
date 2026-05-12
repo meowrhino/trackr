@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1200px;height:630px;overflow:hidden}
+body{background:#00c8a0;color:#0a0a0c;font-family:'Outfit',system-ui,sans-serif;display:flex;align-items:center;justify-content:center;position:relative}
+.bg-pattern{position:absolute;inset:0;background-image:linear-gradient(rgba(10,10,12,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(10,10,12,.04) 1px,transparent 1px);background-size:40px 40px}
+.wrap{position:relative;width:100%;height:100%;display:grid;grid-template-columns:auto 1fr;padding:60px 90px;gap:80px;align-items:center}
+.left{display:flex;flex-direction:column;justify-content:space-between;height:100%}
+.logo{font-family:'DM Mono',monospace;font-size:2.4rem;letter-spacing:.45em;color:#0a0a0c;font-weight:500}
+.right{display:flex;flex-direction:column;justify-content:center;gap:.5rem}
+.kicker{font-family:'DM Mono',monospace;font-size:.95rem;letter-spacing:.18em;color:rgba(10,10,12,.6);text-transform:uppercase;margin-bottom:1rem}
+h1{font-size:5.2rem;font-weight:700;line-height:.98;letter-spacing:-.035em;color:#0a0a0c}
+h1 .line2{font-weight:300}
+.tags{margin-top:1.5rem;display:flex;flex-wrap:wrap;gap:.6rem}
+.tag{padding:.35rem .85rem;background:#0a0a0c;color:#00c8a0;border-radius:4px;font-family:'DM Mono',monospace;font-size:.78rem;letter-spacing:.05em}
+.foot-l{display:flex;flex-direction:column}
+.url{font-family:'DM Mono',monospace;font-size:1.4rem;font-weight:500;color:#0a0a0c;letter-spacing:.04em}
+.by{font-family:'DM Mono',monospace;font-size:.85rem;color:rgba(10,10,12,.55);margin-top:.3rem;letter-spacing:.03em}
+@font-face{font-family:'DM Mono';font-style:normal;font-weight:400;src:url(/Users/manu/Documents/GitHub/trackr/og-fonts/aFTU7PB1QTsUX8KYhh0.ttf) format('truetype')}
+@font-face{font-family:'DM Mono';font-style:normal;font-weight:500;src:url(/Users/manu/Documents/GitHub/trackr/og-fonts/aFTR7PB1QTsUX8KYvumzIYQ.ttf) format('truetype')}
+@font-face{font-family:'Outfit';font-style:normal;font-weight:300;src:url(/Users/manu/Documents/GitHub/trackr/og-fonts/QGYyz_MVcBeNP4NjuGObqx1XmO1I4TC1C4E.ttf) format('truetype')}
+@font-face{font-family:'Outfit';font-style:normal;font-weight:700;src:url(/Users/manu/Documents/GitHub/trackr/og-fonts/QGYyz_MVcBeNP4NjuGObqx1XmO1I4deyC4E.ttf) format('truetype')}
+</style>
+</head>
+<body>
+<div class="bg-pattern"></div>
+<div class="wrap">
+  <div class="left">
+    <div class="logo">T<br>R<br>A<br>C<br>K<br>R</div>
+    <div class="foot-l">
+      <span class="url">tr4ckr.com</span>
+      <span class="by">by meowrhino.studio</span>
+    </div>
+  </div>
+  <div class="right">
+    <div class="kicker">para autónomos · estimación directa</div>
+    <h1>Tu facturación.<br><span class="line2">Tu navegador.</span><br><span class="line2">Tus datos.</span></h1>
+    <div class="tags">
+      <span class="tag">Gratis</span>
+      <span class="tag">Sin cuenta</span>
+      <span class="tag">Sin cloud</span>
+      <span class="tag">Modelo 303 · 130</span>
+      <span class="tag">ES · EN · CA</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>
