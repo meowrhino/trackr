@@ -248,10 +248,21 @@ Object.assign(App, {
             + `</div></div>`;
         } else {
           const count = entries.length;
-          html += `<div class="gas-card" style="border-left:3px solid ${gHex}"><div class="gas-header gas-expandable" onclick="this.classList.toggle('expanded');this.nextElementSibling.classList.toggle('open')">`
-            + `<span class="gas-chevron">&#9656;</span><span class="gas-name">${esc(g.nombre)}</span>${badges}`
+          /* Detectar si falta entrada en el mes actual (solo para recurrente mensual, periodo mes, mes actual) */
+          const now = new Date();
+          const isMonthly = g.recurrente === 'mensual';
+          const isCurrentMonth = type === 'mes' && y === now.getFullYear() && m === now.getMonth();
+          const isPaused = g.finHasta && (() => { const [fy, fm] = g.finHasta.split('-').map(Number); return (y * 12 + m) >= (fy * 12 + (fm - 1)); })();
+          const needsThisMonth = isMonthly && isCurrentMonth && !isPaused && !entries.length;
+          const cardCls = needsThisMonth ? 'gas-card gas-card-pending' : 'gas-card';
+          const pendBadge = needsThisMonth ? ` <span class="gas-pend" title="${t('gas.missingThisMonth')}">&#9888;</span>` : '';
+          const quickBtn = needsThisMonth
+            ? `<button class="cl-btn gas-quick" onclick="event.stopPropagation();App.quickAddRecurring('${g.id}')" title="${t('gas.thisMonth')}">+ ${t('gas.thisMonthShort')}</button>`
+            : '';
+          html += `<div class="${cardCls}" style="border-left:3px solid ${gHex}"><div class="gas-header gas-expandable" onclick="this.classList.toggle('expanded');this.nextElementSibling.classList.toggle('open')">`
+            + `<span class="gas-chevron">&#9656;</span><span class="gas-name">${esc(g.nombre)}${pendBadge}</span>${badges}`
             + `<span class="gas-total m">${fmtMoney(total)}</span><span class="gas-count">${count} ${t('gas.entries')}</span>`
-            + `<div class="gas-actions"><button class="cl-btn" onclick="event.stopPropagation();App.gModal('${g.id}')" title="${t('btn.edit')}">&#9998;</button><button class="cl-btn cl-btn-del" onclick="event.stopPropagation();App.delG('${g.id}')" title="${t('btn.delete')}">&times;</button></div>`
+            + `<div class="gas-actions">${quickBtn}<button class="cl-btn" onclick="event.stopPropagation();App.gModal('${g.id}')" title="${t('btn.edit')}">&#9998;</button><button class="cl-btn cl-btn-del" onclick="event.stopPropagation();App.delG('${g.id}')" title="${t('btn.delete')}">&times;</button></div>`
             + `</div><div class="gas-body">`;
           if (entries.length) {
             entries.sort((a, b) => (b.fecha || '').localeCompare(a.fecha || '')).forEach(e => {
@@ -279,10 +290,14 @@ Object.assign(App, {
     const trimType = type === 'mes' ? 'trim' : type;
     const ps = D.ps();
 
-    /* 303: IVA */
-    let ivaRepercutido = 0, ivaSoportado = 0;
+    /* 303: IVA repercutido agrupado por tipo {21: {base, cuota}, 10: ..., 4: ...} */
+    const ivaRep = {};
+    /* 303: IVA soportado agrupado por tipo */
+    const ivaSop = {};
     /* 130: IRPF */
     let ingresos130 = 0, gastos130 = 0, retenciones = 0;
+    /* Para warning: proyectos con facturación pero sin facturaFecha */
+    const sinFecha = [];
 
     ps.forEach(p => {
       B.calc(p);
@@ -294,13 +309,21 @@ Object.assign(App, {
       });
       /* Devengo: usar fecha de factura, no fecha de cobro */
       if (f.facturaFecha && inPeriod(f.facturaFecha, trimType, y, m) && f.baseImponible) {
+        const tipo = f.iva || 0;
+        if (!ivaRep[tipo]) ivaRep[tipo] = { base: 0, cuota: 0 };
+        ivaRep[tipo].base += f.baseImponible || 0;
+        ivaRep[tipo].cuota += f.importeIva || 0;
         ingresos130 += f.baseImponible || 0;
-        ivaRepercutido += f.importeIva || 0;
         retenciones += f.importeIrpf || 0;
+      }
+      /* Detectar facturas potencialmente del trimestre que no tienen facturaFecha */
+      if (!f.facturaFecha && (f.baseImponible || 0) > 0 && f.modo !== 'gratis' && p.estado !== 'potencial') {
+        sinFecha.push(p.nombre);
       }
     });
 
     D.gs().forEach(g => {
+      const tipo = g.tipoIva || 21;
       let baseSum = 0, ivaSum = 0;
       (g.entradas || []).forEach(e => {
         if (e.fecha && inPeriod(e.fecha, trimType, y, m)) {
@@ -309,8 +332,10 @@ Object.assign(App, {
         }
       });
       if (g.desgravable && (baseSum > 0 || ivaSum > 0)) {
+        if (!ivaSop[tipo]) ivaSop[tipo] = { base: 0, cuota: 0 };
+        ivaSop[tipo].base += baseSum;
+        ivaSop[tipo].cuota += ivaSum;
         gastos130 += baseSum;
-        ivaSoportado += ivaSum;
       }
     });
 
@@ -319,13 +344,71 @@ Object.assign(App, {
     const totalTrimDeds = trimDeds.reduce((s, d) => s + (d.cantidad || 0), 0);
     gastos130 += totalTrimDeds;
 
+    const totRepCuota = Object.values(ivaRep).reduce((s, x) => s + x.cuota, 0);
+    const totSopCuota = Object.values(ivaSop).reduce((s, x) => s + x.cuota, 0);
+    const iva303 = totRepCuota - totSopCuota;
+
     const rNeto130 = ingresos130 - gastos130;
     const pago130 = Math.max(rNeto130 * 0.20, 0);
-    const iva303 = ivaRepercutido - ivaSoportado;
+    const irpf130 = pago130 - retenciones;
 
     const qLabel = trimType === 'trim' ? `T${Math.floor(m / 3) + 1} ${y}` : `${y}`;
 
     const dedsHtml = this._renderDedList(trimDeds);
+
+    /* Stash datos para botones copiar */
+    this._lastTrimData = {
+      label: qLabel, ivaRep, ivaSop, iva303,
+      ingresos130, gastos130, rNeto130, pago130, retenciones, irpf130
+    };
+
+    /* Render casillas 303 */
+    const tiposRep = Object.keys(ivaRep).map(Number).sort((a, b) => b - a);
+    let html303 = '';
+    if (!tiposRep.length) {
+      html303 = `<div style="font-size:.78rem;color:var(--t3);padding:.5rem 0">${t('din.noInvoicesThisPeriod')}</div>`;
+    } else {
+      /* Casillas 01-03 (21%), 04-06 (10%), 07-09 (4%) — IVA repercutido */
+      const codes = { 21: ['01','02','03'], 10: ['04','05','06'], 4: ['07','08','09'], 0: ['—','—','—'] };
+      tiposRep.forEach(tipo => {
+        const c = codes[tipo] || ['—','—','—'];
+        const d = ivaRep[tipo];
+        html303 += `<div class="casilla-row"><span class="casilla-num">${c[0]}</span><span class="casilla-label">${t('din.taxBase')} ${tipo}%</span><span class="casilla-val">${fmtMoney(d.base)}</span></div>`;
+        html303 += `<div class="casilla-row"><span class="casilla-num">${c[1]}</span><span class="casilla-label">${t('din.vatRate')}</span><span class="casilla-val">${tipo} %</span></div>`;
+        html303 += `<div class="casilla-row"><span class="casilla-num">${c[2]}</span><span class="casilla-label">${t('din.vatChargedAmt')}</span><span class="casilla-val">${fmtMoney(d.cuota)}</span></div>`;
+      });
+      /* Casillas 28-30 — IVA soportado deducible (resumido) */
+      const baseSopTot = Object.values(ivaSop).reduce((s, x) => s + x.base, 0);
+      if (baseSopTot > 0) {
+        html303 += `<div class="casilla-row casilla-sep"><span class="casilla-num">28</span><span class="casilla-label">${t('din.inputBase')}</span><span class="casilla-val">${fmtMoney(baseSopTot)}</span></div>`;
+        html303 += `<div class="casilla-row"><span class="casilla-num">30</span><span class="casilla-label">${t('din.inputVat')}</span><span class="casilla-val">${fmtMoney(totSopCuota)}</span></div>`;
+      }
+      /* Resultado 46/71 */
+      const codigo = iva303 >= 0 ? '46' : '71';
+      const label = iva303 >= 0 ? t('din.toPay') : t('din.toRefund');
+      const color = iva303 > 0 ? 'var(--warn)' : 'var(--ok)';
+      html303 += `<div class="casilla-row casilla-result"><span class="casilla-num">${codigo}</span><span class="casilla-label">${label}</span><span class="casilla-val" style="color:${color}">${fmtMoney(Math.abs(iva303))}</span></div>`;
+    }
+
+    /* Render casillas 130 */
+    let html130 = '';
+    if (ingresos130 === 0 && gastos130 === 0) {
+      html130 = `<div style="font-size:.78rem;color:var(--t3);padding:.5rem 0">${t('din.noInvoicesThisPeriod')}</div>`;
+    } else {
+      html130 += `<div class="casilla-row"><span class="casilla-num">01</span><span class="casilla-label">${t('din.income')}</span><span class="casilla-val">${fmtMoney(ingresos130)}</span></div>`;
+      html130 += `<div class="casilla-row"><span class="casilla-num">02</span><span class="casilla-label">${t('din.deductibleExp')}</span><span class="casilla-val">${fmtMoney(gastos130)}</span></div>`;
+      html130 += `<div class="casilla-row"><span class="casilla-num">03</span><span class="casilla-label">${t('din.netProfit')}</span><span class="casilla-val">${fmtMoney(rNeto130)}</span></div>`;
+      html130 += `<div class="casilla-row"><span class="casilla-num">04</span><span class="casilla-label">${t('din.twentyPercent')}</span><span class="casilla-val">${fmtMoney(pago130)}</span></div>`;
+      html130 += `<div class="casilla-row"><span class="casilla-num">06</span><span class="casilla-label">${t('din.withholdings')}</span><span class="casilla-val">${fmtMoney(retenciones)}</span></div>`;
+      const codigo = irpf130 >= 0 ? '07' : '14';
+      const label = irpf130 >= 0 ? t('din.toPay') : t('din.toRefund');
+      const color = irpf130 > 0 ? 'var(--warn)' : 'var(--ok)';
+      html130 += `<div class="casilla-row casilla-result"><span class="casilla-num">${codigo}</span><span class="casilla-label">${label}</span><span class="casilla-val" style="color:${color}">${fmtMoney(Math.abs(irpf130))}</span></div>`;
+    }
+
+    const warnHtml = sinFecha.length
+      ? `<div class="din-trim-warn">&#9888; ${t('din.missingDateWarn', sinFecha.length)} <span class="small" style="color:var(--t3);margin-left:.3rem">${sinFecha.slice(0, 3).map(esc).join(', ')}${sinFecha.length > 3 ? '…' : ''}</span></div>`
+      : '';
 
     el.innerHTML =
       `<div class="info-section">`
@@ -333,24 +416,76 @@ Object.assign(App, {
       +   `<span class="info-section-title" style="margin-bottom:0">${t('din.taxSummary')} — ${qLabel}</span>`
       +   `<button class="bt bt-s" onclick="App.dedModal()">+ ${t('renta.addDeduction')}</button>`
       + `</div>`
+      + warnHtml
       + `<div class="din-trim-grid">`
       +   `<div class="din-trim-card">`
       +     `<div class="din-trim-title">${t('din.model303')}</div>`
-      +     `<div class="din-tax-row"><span>${t('din.vatCharged')}</span><span class="m">${fmtMoney(ivaRepercutido)}</span></div>`
-      +     `<div class="din-tax-row"><span>${t('din.vatDeductible')}</span><span class="m">${fmtMoney(ivaSoportado)}</span></div>`
-      +     `<div class="din-tax-row din-tax-total"><span>${t('din.toPay')}</span><span class="m" style="color:${iva303 > 0 ? 'var(--warn)' : 'var(--ok)'}">${fmtMoney(Math.max(iva303, 0))}</span></div>`
+      +     html303
+      +     `<div class="din-trim-actions"><button class="bt bt-s" onclick="App.copyTrim303()" title="${t('din.copyBoxes')}">&#128203; ${t('din.copyBoxes')}</button></div>`
       +   `</div>`
       +   `<div class="din-trim-card">`
       +     `<div class="din-trim-title">${t('din.model130')}</div>`
-      +     `<div class="din-tax-row"><span>${t('din.income')}</span><span class="m">${fmtMoney(ingresos130)}</span></div>`
-      +     `<div class="din-tax-row"><span>${t('din.deductibleExp')}</span><span class="m">${fmtMoney(gastos130)}</span></div>`
-      +     `<div class="din-tax-row"><span>${t('din.netProfit')}</span><span class="m">${fmtMoney(rNeto130)}</span></div>`
-      +     `<div class="din-tax-row"><span>${t('din.withholdings')}</span><span class="m">${fmtMoney(retenciones)}</span></div>`
-      +     `<div class="din-tax-row din-tax-total"><span>${t('din.toPay')} (20%)</span><span class="m" style="color:${pago130 - retenciones > 0 ? 'var(--warn)' : 'var(--ok)'}">${fmtMoney(Math.max(pago130 - retenciones, 0))}</span></div>`
+      +     html130
+      +     `<div class="din-trim-actions"><button class="bt bt-s" onclick="App.copyTrim130()" title="${t('din.copyBoxes')}">&#128203; ${t('din.copyBoxes')}</button></div>`
       +   `</div>`
       + `</div>`
       + dedsHtml
       + `</div>`;
+  },
+
+  /** Copia las casillas del 303 al portapapeles en formato leíble */
+  copyTrim303() {
+    const d = this._lastTrimData;
+    if (!d) return;
+    const lines = [`Modelo 303 — ${d.label}`];
+    const codes = { 21: ['01','02','03'], 10: ['04','05','06'], 4: ['07','08','09'], 0: ['—','—','—'] };
+    const tipos = Object.keys(d.ivaRep).map(Number).sort((a,b)=>b-a);
+    tipos.forEach(tipo => {
+      const c = codes[tipo] || ['—','—','—'];
+      const r = d.ivaRep[tipo];
+      lines.push(`${c[0]}  Base ${tipo}%: ${fmtMoney(r.base)}`);
+      lines.push(`${c[1]}  Tipo: ${tipo} %`);
+      lines.push(`${c[2]}  Cuota: ${fmtMoney(r.cuota)}`);
+    });
+    const baseSop = Object.values(d.ivaSop).reduce((s,x)=>s+x.base,0);
+    const cuoSop = Object.values(d.ivaSop).reduce((s,x)=>s+x.cuota,0);
+    if (baseSop > 0) {
+      lines.push(`28  Base IVA soportado: ${fmtMoney(baseSop)}`);
+      lines.push(`30  Cuota IVA soportado: ${fmtMoney(cuoSop)}`);
+    }
+    const codigo = d.iva303 >= 0 ? '46' : '71';
+    lines.push(`${codigo}  ${d.iva303 >= 0 ? 'A ingresar' : 'A devolver'}: ${fmtMoney(Math.abs(d.iva303))}`);
+    this._copyToClipboard(lines.join('\n'));
+  },
+
+  /** Copia las casillas del 130 al portapapeles */
+  copyTrim130() {
+    const d = this._lastTrimData;
+    if (!d) return;
+    const lines = [`Modelo 130 — ${d.label}`,
+      `01  Ingresos: ${fmtMoney(d.ingresos130)}`,
+      `02  Gastos deducibles: ${fmtMoney(d.gastos130)}`,
+      `03  Rendimiento neto: ${fmtMoney(d.rNeto130)}`,
+      `04  20%: ${fmtMoney(d.pago130)}`,
+      `06  Retenciones: ${fmtMoney(d.retenciones)}`
+    ];
+    const codigo = d.irpf130 >= 0 ? '07' : '14';
+    lines.push(`${codigo}  ${d.irpf130 >= 0 ? 'A ingresar' : 'A devolver'}: ${fmtMoney(Math.abs(d.irpf130))}`);
+    this._copyToClipboard(lines.join('\n'));
+  },
+
+  /** Helper de portapapeles con fallback */
+  _copyToClipboard(text) {
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(text).then(() => Toast.ok(t('din.copied')));
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); Toast.ok(t('din.copied')); } catch { Toast.warn('Copy failed'); }
+      document.body.removeChild(ta);
+    }
   },
 
   /* ══════════════════════════════════════
@@ -482,12 +617,17 @@ Object.assign(App, {
       + `<div class="fg"><label>${t('field.ivaAmount')}</label><input type="number" id="gEI" min="0" step="0.01" value="${e0?.iva ?? ''}" placeholder="0,00"></div></div>`
       + `<div class="fr"><div class="fg"><label>${t('field.totalAmount')}</label><input type="number" id="gEA" min="0.01" step="0.01" value="${e0?.total ?? e0?.cantidad ?? ''}" placeholder="0,00" onchange="App._gCalc('total')"></div>`
       + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="gED" value="${e0?.fecha || todayStr()}"></div></div></div>`;
+    const recurringFields = `<div id="gRecFields"${isPuntual ? ' style="display:none"' : ''}>`
+      + `<div class="fr"><div class="fg"><label>${t('gas.baseAmount')}</label><input type="number" id="gIB" min="0" step="0.01" value="${g?.importeBase ?? ''}" placeholder="0,00"></div>`
+      + `<div class="fg"><label>${t('gas.recurringDay')}</label><input type="number" id="gDR" min="1" max="31" value="${g?.diaRecurrente ?? ''}" placeholder="1-31"></div></div>`
+      + `<p class="small" style="margin-top:-.4rem;color:var(--t3)">${t('gas.baseAmountHelp')}</p></div>`;
     this.om(`<div class="mt">${isE ? t('gas.editExpense') : t('gas.newExpense')}</div>`
       + `<div class="fg"><label>${t('field.name')}</label><input type="text" id="gN" value="${esc(g?.nombre || '')}" placeholder="${t('ph.expenseName')}"></div>`
       + `<div class="fr"><div class="fg"><label>${t('field.category')}</label><select id="gCat">${Object.entries(GASTO_CAT).map(([k, v]) => `<option value="${k}" ${g?.categoria === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
       + `<div class="fg"><label>${t('field.ivaRate')}</label><select id="gIva" onchange="App._gCalc('total')">${Object.entries(TIPOS_IVA).map(([k, v]) => `<option value="${k}" ${(g?.tipoIva ?? 21) == k ? 'selected' : ''}>${v}</option>`).join('')}</select></div></div>`
-      + `<div class="fr"><div class="fg"><label>${t('field.recurrence')}</label><select id="gRec" onchange="document.getElementById('gEntryRow').style.display=this.value==='no'?'':'none'">${Object.entries(RECURRENCIA).map(([k, v]) => `<option value="${k}" ${g?.recurrente === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
+      + `<div class="fr"><div class="fg"><label>${t('field.recurrence')}</label><select id="gRec" onchange="App._toggleGasRec(this.value)">${Object.entries(RECURRENCIA).map(([k, v]) => `<option value="${k}" ${g?.recurrente === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
       + `<div class="fg" style="display:flex;align-items:end"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;padding:.45rem 0"><input type="checkbox" id="gDes" ${g?.desgravable ? 'checked' : ''}> ${t('gas.deductibleBadge')}</label></div></div>`
+      + recurringFields
       + entryFields
       + (isE && g?.finHasta ? `<div class="fg"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="gReact"> ${t('gas.reactivate')}</label></div>` : '')
       + `<div class="fg"><label>${t('field.color')}</label>${this.colorSelect(gColor)}</div>`
@@ -495,11 +635,29 @@ Object.assign(App, {
       + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveG('${gid || ''}')">${isE ? t('btn.save') : t('btn.create')}</button></div>`);
   },
 
+  /** Toggle de campos recurrentes/puntuales en gModal según el select de recurrencia */
+  _toggleGasRec(val) {
+    const isPunt = val === 'no';
+    const recF = document.getElementById('gRecFields');
+    const entF = document.getElementById('gEntryRow');
+    if (recF) recF.style.display = isPunt ? 'none' : '';
+    if (entF) entF.style.display = isPunt ? '' : 'none';
+  },
+
   saveG(gid) {
     const nombre = document.getElementById('gN').value.trim();
     if (!nombre) { Toast.warn(t('msg.nameRequired')); return; }
     const color = document.getElementById('mpColor')?.value || 'Salmon';
-    const data = { nombre, categoria: document.getElementById('gCat').value, recurrente: document.getElementById('gRec').value, color, notas: document.getElementById('gNo').value.trim(), desgravable: document.getElementById('gDes').checked, tipoIva: ((v) => isNaN(v) ? 21 : v)(parseInt(document.getElementById('gIva').value)) };
+    const recurrente = document.getElementById('gRec').value;
+    const importeBase = parseFloat(document.getElementById('gIB')?.value);
+    const diaRecurrente = parseInt(document.getElementById('gDR')?.value);
+    const data = { nombre, categoria: document.getElementById('gCat').value, recurrente, color, notas: document.getElementById('gNo').value.trim(), desgravable: document.getElementById('gDes').checked, tipoIva: ((v) => isNaN(v) ? 21 : v)(parseInt(document.getElementById('gIva').value)) };
+    if (recurrente !== 'no') {
+      if (!isNaN(importeBase) && importeBase > 0) data.importeBase = roundMoney(importeBase);
+      else data.importeBase = null;
+      if (!isNaN(diaRecurrente) && diaRecurrente >= 1 && diaRecurrente <= 31) data.diaRecurrente = diaRecurrente;
+      else data.diaRecurrente = null;
+    }
     if (gid) {
       const g = D.g(gid);
       const wasPuntual = !g?.recurrente || g.recurrente === 'no';
@@ -538,11 +696,22 @@ Object.assign(App, {
     const gasto = D.g(gid);
     const isRecurrente = gasto && gasto.recurrente && gasto.recurrente !== 'no';
     const tipoIva = gasto?.tipoIva ?? 21;
+    /* Pre-rellenar con importeBase si es entrada nueva en gasto recurrente */
+    let prefillBase = '', prefillIva = '', prefillTotal = '';
+    if (!isE && isRecurrente && gasto.importeBase) {
+      const rate = (tipoIva || 0) / 100;
+      prefillTotal = roundMoney(gasto.importeBase);
+      prefillIva = rate > 0 ? roundMoney(prefillTotal * rate / (1 + rate)) : 0;
+      prefillBase = roundMoney(prefillTotal - prefillIva);
+    }
+    const valBase = e?.base ?? prefillBase;
+    const valIva = e?.iva ?? prefillIva;
+    const valTotal = e?.total ?? e?.cantidad ?? prefillTotal;
     this.om(`<div class="mt">${isE ? t('gas.editEntry') : t('gas.addEntry')}</div>`
-      + `<div class="fr"><div class="fg"><label>${t('field.base')}</label><input type="number" id="geEB" min="0" step="0.01" value="${e?.base ?? ''}" placeholder="0,00" onchange="App._gCalc('base','ge')"></div>`
-      + `<div class="fg"><label>${t('field.ivaAmount')}</label><input type="number" id="geEI" min="0" step="0.01" value="${e?.iva ?? ''}" placeholder="0,00"></div></div>`
+      + `<div class="fr"><div class="fg"><label>${t('field.base')}</label><input type="number" id="geEB" min="0" step="0.01" value="${valBase}" placeholder="0,00" onchange="App._gCalc('base','ge')"></div>`
+      + `<div class="fg"><label>${t('field.ivaAmount')}</label><input type="number" id="geEI" min="0" step="0.01" value="${valIva}" placeholder="0,00"></div></div>`
       + `<input type="hidden" id="geIva" value="${tipoIva}">`
-      + `<div class="fr"><div class="fg"><label>${t('field.totalAmount')}</label><input type="number" id="geEA" min="0.01" step="0.01" value="${e?.total ?? e?.cantidad ?? ''}" placeholder="0,00" onchange="App._gCalc('total','ge')"></div>`
+      + `<div class="fr"><div class="fg"><label>${t('field.totalAmount')}</label><input type="number" id="geEA" min="0.01" step="0.01" value="${valTotal}" placeholder="0,00" onchange="App._gCalc('total','ge')"></div>`
       + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="geD" value="${e?.fecha || todayStr()}"></div></div>`
       + `<div class="fg"><label>${t('field.note')}</label><input type="text" id="geN" value="${esc(e?.nota || '')}" placeholder="${t('ph.detail')}"></div>`
       + (isRecurrente && !isE ? `<div class="fg"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="geUlt"> ${t('gas.lastMonth')}</label></div>` : '')
@@ -575,6 +744,27 @@ Object.assign(App, {
     const g = D.g(gid); if (!g) return;
     g.entradas = (g.entradas || []).filter(e => e.id !== eid);
     D.upG(gid, { entradas: g.entradas }); this.rGas();
+  },
+
+  /** Añade una entrada del mes actual a un gasto recurrente usando importeBase como semilla */
+  quickAddRecurring(gid) {
+    const g = D.g(gid); if (!g) return;
+    if (!g.importeBase || g.importeBase <= 0) {
+      /* Si no hay importeBase configurado, abrir geModal normal */
+      this.geModal(gid);
+      return;
+    }
+    const tipoIva = g.tipoIva || 0;
+    const rate = tipoIva / 100;
+    const total = roundMoney(g.importeBase);
+    const iva = rate > 0 ? roundMoney(total * rate / (1 + rate)) : 0;
+    const base = roundMoney(total - iva);
+    const fecha = todayStr();
+    if (!g.entradas) g.entradas = [];
+    g.entradas.push({ id: uid(), fecha, base, iva, total, cantidad: total, tipoIva, nota: '' });
+    D.upG(gid, { entradas: g.entradas });
+    Toast.ok(t('gas.entryAdded'));
+    this.rGas();
   }
 
 });
