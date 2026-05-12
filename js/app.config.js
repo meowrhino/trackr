@@ -135,14 +135,15 @@ Object.assign(App, {
     let savedId;
     if (cid) { D.upCl(cid, data); savedId = cid; }
     else { data.id = uid(); D.addCl(data); savedId = data.id; }
-    /* Si venimos del flujo facModal, asignar cliente al proyecto si no tenía y volver a facModal */
+    /* Si venimos de facModal/pModal, no rCfg — cm() retorna al modal de origen */
     const fromFac = !!this._facReturn;
+    const fromProj = !!this._projReturn;
     if (fromFac) {
       const p = D.p(this._facReturn.pid);
       if (p && !p.clienteId) D.up(this._facReturn.pid, { clienteId: savedId });
     }
     this.cm();
-    if (!fromFac) this.rCfg();
+    if (!fromFac && !fromProj) this.rCfg();
   },
 
   delCl(cid) {

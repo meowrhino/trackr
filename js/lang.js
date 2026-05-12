@@ -249,7 +249,6 @@ const LANGS = {
     'welcome.bullet1': 'Proyectos, horas, gastos y facturas en un solo sitio.',
     'welcome.bullet2': 'Modelos 303 y 130 calculados a partir de tus datos.',
     'welcome.bullet3': 'Tus datos viven en tu navegador. Exporta JSON cuando quieras.',
-    'welcome.madeBy': 'Hecho con cariño por meowrhino.studio',
     'welcome.start': 'Empezar',
     'welcome.seeGuide': 'Ver guía',
 
@@ -773,7 +772,6 @@ const LANGS = {
     'welcome.bullet1': 'Projects, hours, expenses and invoices in one place.',
     'welcome.bullet2': 'Spanish tax forms 303 and 130 calculated from your data.',
     'welcome.bullet3': 'Your data lives in your browser. Export JSON whenever you want.',
-    'welcome.madeBy': 'Made with care by meowrhino.studio',
     'welcome.start': 'Get started',
     'welcome.seeGuide': 'See guide',
 
@@ -1289,7 +1287,6 @@ const LANGS = {
     'welcome.bullet1': 'Projectes, hores, despeses i factures en un sol lloc.',
     'welcome.bullet2': 'Models 303 i 130 calculats a partir de les teves dades.',
     'welcome.bullet3': 'Les teves dades viuen al teu navegador. Exporta el JSON quan vulguis.',
-    'welcome.madeBy': 'Fet amb cura per meowrhino.studio',
     'welcome.start': 'Començar',
     'welcome.seeGuide': 'Veure la guia',
 
@@ -1666,20 +1663,21 @@ function setLang(code) {
 function _updateNav() {
   const map = {
     info: 'nav.info', dash: 'nav.projects', cal: 'nav.calendar',
-    gas: 'nav.expenses', cfg: 'nav.config'
+    gas: 'nav.expenses', cfg: 'nav.config', guide: 'nav.guide'
   };
   document.querySelectorAll('.ni[data-v]').forEach(el => {
     const v = el.dataset.v;
     if (map[v]) el.querySelector('.nt').textContent = t(map[v]);
   });
 
-  /* Nav items sin data-v (export/import) */
-  const navItems = document.querySelectorAll('.ni:not([data-v])');
-  navItems.forEach(el => {
+  /* Nav items sin data-v: export (⤓), import (⤒), logout (#navLogout) */
+  document.querySelectorAll('.ni:not([data-v])').forEach(el => {
     const nt = el.querySelector('.nt');
     if (!nt) return;
-    if (el.querySelector('.ic')?.textContent === '↓') nt.textContent = t('nav.export');
-    else if (el.querySelector('.ic')?.textContent === '↑') nt.textContent = t('nav.import');
+    if (el.id === 'navLogout') { nt.textContent = t('btn.logout'); return; }
+    const ic = el.querySelector('.ic')?.textContent;
+    if (ic === '⤓') nt.textContent = t('nav.export');
+    else if (ic === '⤒') nt.textContent = t('nav.import');
   });
 
   /* Títulos de vistas en HTML */
@@ -1701,7 +1699,4 @@ function _updateNav() {
 
   const footMade = document.getElementById('footMade');
   if (footMade) footMade.textContent = t('footer.madeWith');
-
-  const footFeedback = document.getElementById('footFeedback');
-  if (footFeedback) footFeedback.textContent = t('footer.feedback');
 }

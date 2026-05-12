@@ -56,12 +56,10 @@
       <div class="ni" onclick="App.exp()"><span class="ic">⤓</span><span class="nt">Exportar</span></div>
       <div class="ni" onclick="document.getElementById('impA').click()"><span class="ic">⤒</span><span class="nt">Importar</span></div>
       <input type="file" id="impA" class="fh" accept=".json" onchange="App.imp(event)">
+      <div class="sep"></div>
+      <div class="ni" id="navLogout" onclick="App.logoutModal()"><span class="ic">↺</span><span class="nt">Cerrar sesión</span></div>
     </div>
     <div class="sb-foot">
-      <a href="mailto:manuellatourf@gmail.com?subject=Feedback%20TRACKR"
-         data-track="feedback-beta"
-         onclick="T.ev('action','feedback_click','footer')"
-         id="footFeedback"></a>
       <a href="https://meowrhino.studio" target="_blank" rel="noopener"
          data-track="meowrhino-out"
          onclick="T.ev('outbound','click','meowrhino-out')"

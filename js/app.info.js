@@ -182,13 +182,7 @@ Object.assign(App, {
       dlHtml += `</div></div>`;
     }
 
-    /* ── Acciones rápidas ── */
-    const quickHtml = `<div class="info-quick">`
-      + `<button class="bt" onclick="App.logoutModal()">${t('btn.logout')}</button>`
-      + `</div>`
-      + `<div style="text-align:center;margin-top:1.5rem;font-size:.72rem"><a href="https://meowrhino.studio" target="_blank" style="color:var(--t3);text-decoration:none">meowrhino.studio</a></div>`;
-
-    mainEl.innerHTML = actHtml + dlHtml + quickHtml;
+    mainEl.innerHTML = actHtml + dlHtml;
 
     /* ── Resumen financiero (reutilizamos el existente) ── */
     this._rInfoFinancial();

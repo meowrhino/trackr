@@ -75,9 +75,6 @@ const App = {
       +   `<li style="margin-bottom:.35rem">${t('welcome.bullet2')}</li>`
       +   `<li>${t('welcome.bullet3')}</li>`
       + `</ul>`
-      + `<p style="text-align:center;font-size:.78rem;color:var(--t3);margin:1rem 0 .25rem">`
-      +   `<a href="https://meowrhino.studio" target="_blank" rel="noopener" data-track="meowrhino-out" onclick="T.ev('outbound','click','welcome')" style="color:var(--t2);text-decoration:none">${t('welcome.madeBy')}</a>`
-      + `</p>`
       + `<div class="ma" style="gap:.5rem">`
       +   `<button class="bt" onclick="App._welcomeGuide()">${t('welcome.seeGuide')}</button>`
       +   `<button class="bt bt-p" onclick="App._welcomeDone()">${t('welcome.start')}</button>`
@@ -140,6 +137,13 @@ const App = {
       this.facModal(r.pid);
       return;
     }
+    /* Si venimos del flujo pModal→clModal, volver a pModal preservando estado */
+    if (this._projReturn) {
+      const r = this._projReturn;
+      this._projReturn = null;
+      this.pModal(r.eid || undefined);
+      return;
+    }
     document.getElementById('mO').classList.remove('on');
     this._editPid = null;
   },
@@ -159,6 +163,8 @@ const App = {
   /** Cuando cambia el cliente en el modal de proyecto, aplica su color por defecto */
   _onClientChange(val) {
     document.getElementById('mpClNew').style.display = val === '_new' ? 'block' : 'none';
+    const editBtn = document.getElementById('mpClEditBtn');
+    if (editBtn) editBtn.style.display = (val && val !== '_new') ? '' : 'none';
     if (val && val !== '_new') {
       const cl = D.cl(val);
       if (cl?.color) {
@@ -166,6 +172,73 @@ const App = {
         if (sw) this._csPick(sw);
       }
     }
+  },
+
+  /** Abre clModal del cliente seleccionado en pModal, preserva estado y retorna */
+  editClFromProj() {
+    const cid = document.getElementById('mpCl')?.value;
+    if (!cid || cid === '_new') return;
+    this._projRestore = { eid: this._editPid || null, state: this._capturePModalState() };
+    this._projReturn = { eid: this._editPid || null };
+    this.clModal(cid);
+  },
+
+  /** Captura todos los campos editables del modal de proyecto */
+  _capturePModalState() {
+    const g = id => document.getElementById(id);
+    return {
+      nombre: g('mpN')?.value || '',
+      clienteId: g('mpCl')?.value || '',
+      clienteNewName: g('mpClNewN')?.value || '',
+      asunto: g('mpAsunto')?.value || '',
+      color: g('mpColor')?.value || '',
+      estado: g('mpSt')?.value || '',
+      interno: !!g('mpInt')?.checked,
+      recurrente: !!g('mpRec')?.checked,
+      inicio: g('mpI')?.value || '',
+      finEst: g('mpFE')?.value || '',
+      finR: g('mpFR')?.value || '',
+      bm: g('mpBM')?.value || '',
+      base: g('mpBa')?.value || '',
+      total: g('mpTo')?.value || '',
+      precioHora: g('mpPH')?.value || '',
+      iva: g('mpIva')?.value || '',
+      irpf: g('mpIrpf')?.value || '',
+      ivaExc: g('mpIvaExc')?.value || '',
+      facLang: g('mpFacLang')?.value || '',
+      notas: g('mpNo')?.value || ''
+    };
+  },
+
+  /** Restaura el estado capturado del modal de proyecto tras volver de clModal */
+  _restorePModalState(s) {
+    if (!s) return;
+    const set = (id, v) => { const el = document.getElementById(id); if (el && v != null) el.value = v; };
+    set('mpN', s.nombre);
+    set('mpCl', s.clienteId);
+    set('mpClNewN', s.clienteNewName);
+    set('mpAsunto', s.asunto);
+    set('mpSt', s.estado);
+    const mpInt = document.getElementById('mpInt'); if (mpInt) mpInt.checked = !!s.interno;
+    const mpRec = document.getElementById('mpRec'); if (mpRec) mpRec.checked = !!s.recurrente;
+    set('mpI', s.inicio);
+    set('mpFE', s.finEst);
+    set('mpFR', s.finR);
+    set('mpBa', s.base);
+    set('mpTo', s.total);
+    set('mpPH', s.precioHora);
+    set('mpIva', s.iva);
+    set('mpIrpf', s.irpf);
+    set('mpIvaExc', s.ivaExc);
+    set('mpFacLang', s.facLang);
+    set('mpNo', s.notas);
+    if (s.color) {
+      const sw = document.querySelector(`.cs-sw[data-name="${s.color}"]`);
+      if (sw) this._csPick(sw);
+    }
+    if (s.bm) this.sBM(s.bm);
+    this._onClientChange(s.clienteId);
+    this.cPrev();
   },
 
 
@@ -196,6 +269,12 @@ const App = {
       + this._pmFooter(eid, isE, df)
     );
     this.cPrev();
+    /* Restaurar estado si venimos de clModal→pModal */
+    if (this._projRestore && this._projRestore.eid === (eid || null)) {
+      const s = this._projRestore.state;
+      this._projRestore = null;
+      this._restorePModalState(s);
+    }
   },
 
   /* ── pModal sub-renderers ── */
@@ -207,8 +286,12 @@ const App = {
   _pmBasicFields(df, cls) {
     const clOpts = cls.map(c => `<option value="${c.id}" ${c.id === df.clienteId ? 'selected' : ''}>${esc(c.nombre)}</option>`).join('');
     const ckStyle = 'display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0';
+    const showEdit = df.clienteId && df.clienteId !== '_new';
     return `<div class="fg"><label>${t('field.name')}</label><input type="text" id="mpN" value="${esc(df.nombre)}" placeholder="${t('ph.projectName')}"></div>`
-      + `<div class="fg"><label>${t('field.client')}</label><select id="mpCl" onchange="App._onClientChange(this.value)"><option value="">${t('field.noClient')}</option>${clOpts}<option value="_new">${t('btn.createNew')}</option></select></div>`
+      + `<div class="fg"><label>${t('field.client')}</label><div style="display:flex;gap:.4rem;align-items:stretch">`
+      +   `<select id="mpCl" onchange="App._onClientChange(this.value)" style="flex:1"><option value="">${t('field.noClient')}</option>${clOpts}<option value="_new">${t('btn.createNew')}</option></select>`
+      +   `<button type="button" class="bt bt-s" id="mpClEditBtn" onclick="App.editClFromProj()" title="${t('btn.edit')}" style="${showEdit ? '' : 'display:none;'}padding:.15rem .55rem;font-size:.85rem">&#9998;</button>`
+      + `</div></div>`
       + `<div id="mpClNew" style="display:none;margin-bottom:.85rem"><input type="text" id="mpClNewN" placeholder="${t('ph.newClient')}"></div>`
       + `<div class="fg"><label>${t('field.subject')}</label><input type="text" id="mpAsunto" value="${esc(df.asuntoFactura)}" placeholder="${esc(df.nombre)}"></div>`
       + `<div class="fg"><label>${t('field.color')}</label>${this.colorSelect(df.color)}</div>`
