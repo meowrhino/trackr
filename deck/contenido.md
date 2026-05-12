@@ -1,6 +1,6 @@
 # TRACKR · Plan de captación y crecimiento
 
-**Versión:** Verano 2026 · 23 slides en 3 actos
+**Versión:** Verano 2026 · 22 slides en 3 actos
 **Fuente renderizada:** `deck/index.html`
 **Investigación de soporte:** `compass_artifact_wf-7723f534-7320-4996-8136-7b3ab59c8274_text_markdown.md`
 
@@ -95,19 +95,32 @@ Evitar a corto plazo: "programa facturación autónomos", "modelo 303 cómo rell
 ### Slide 15: Portada Acto 3
 Cover "03" + título "Plan de captación".
 
-### Slide 16: Objetivos del verano 2026 (asumibles)
-- **20 usuarios beta que vuelvan al menos una vez** tras la primera visita — a 30 sep 2026
-- **100 visitas/mes** a meowrhino.studio vía tr4ckr.com — a 31 oct 2026
-- **3 posts** publicados en meowrhino.studio/blog/ (uno al mes) — a 30 sep 2026
-- **1 microherramienta** pública (calculadora 303) lanzada — a 30 sep 2026
+### Slide 16: Qué vamos a observar
+Sin objetivos número-oráculo. Cloudflare Web Analytics ya está activo — medimos para aprender, no para "cumplir cuota".
 
-Lo que NO nos exigimos aún: top de Google, partnerships cerrados, app móvil, calculadora 130. Si llegan, bonus. Si no, sigue siendo éxito.
+**Métricas duras (ya trackeables):**
+- Visitas únicas/mes a tr4ckr.com (CF Web Analytics)
+- Visitantes nuevos vs recurrentes (CF Web Analytics)
+- De dónde vienen — referrer + país (CF Web Analytics)
+- Tráfico hacia meowrhino.studio vía tr4ckr.com (referrer en CF Web Analytics del estudio)
 
-### Slide 17: Canales — 2, de verdad
-1. **Posts en meowrhino.studio/blog/** — uno al mes (~1 día/mes). Cada post enlaza a tr4ckr.com.
-2. **Presencia útil en 2 comunidades** — r/Autonomos + un canal próximo (Twitter/X autónomos). Leer, responder con utilidad. Mencionar TRACKR cuando encaje. ~30 min/día.
+**Hitos cualitativos (auto-observados):**
+- Cuántos ensayos publicados al mes
+- Cuántos comentarios reales recibidos en Reddit/X
+- Si alguien escribe un email contando que usa TRACKR
+- Si aparece una mención orgánica en algún blog/podcast
 
-NO hacemos: Google Ads, LinkedIn Ads, influencers, ferias, partnerships con asesorías, app móvil. 0€ presupuesto, todo orgánico.
+Revisión fin de cada mes: ~30 min mirando datos. Si un canal aporta → doblar apuesta. Si no aporta tras 2 meses → podarlo.
+
+### Slide 17: Ideas de canales
+Todavía no hay nada en marcha. Estas son las opciones; elegimos sobre la marcha lo que funcione.
+
+- **meowrhino.studio/blog/ — ensayos sobre lo que hago** *(candidato firme)* — Cadencia ~1 al mes. Empezar a escribir sobre el proceso real de hacer TRACKR (y otros proyectos del estudio). Cada ensayo enlaza a tr4ckr.com cuando encaja.
+- **Comunidades de autónomos** *(a probar)* — r/Autonomos, Twitter/X, Bluesky. Presencia útil, sin spam. Posible anuncio honesto en Indie Hackers / HN cuando haya algo que contar.
+- **Asesorías o creadores fiscales cómplices** *(a explorar)* — No partnerships formales, más bien una conversación con alguien con autoridad fiscal que pruebe TRACKR y, si le gusta, lo comparta. 1-2 máximo.
+- **Microherramienta pública** *(idea)* — Calculadora 303 abierta sin login en tr4ckr.com/303 como gancho SEO y branding.
+
+NO haremos: Google Ads, LinkedIn Ads, influencers de pago, ferias. 0€ presupuesto, todo orgánico.
 
 ### Slide 18: 3 posts en 3 meses
 | Mes | Post | Objetivo | Canal |
@@ -118,23 +131,14 @@ NO hacemos: Google Ads, LinkedIn Ads, influencers, ferias, partnerships con ases
 
 Cada post se trocea en hilo en X y comentario en r/Autonomos. Un post = 3 piezas de presencia. **Si publicas 3 posts en 90 días, el plan funciona.**
 
-### Slide 19: Una microherramienta pública
-- **tr4ckr.com/303** — calculadora del Modelo 303 sin cuenta. Esfuerzo: ~1 jornada de desarrollo (reutilizamos lógica que ya tiene TRACKR dentro).
-- La calculadora 130 queda **para 2027** si la 303 funciona.
-- Por qué vale la pena: tráfico recurrente (4 picos/año), enlaces naturales, marca "los que dan herramientas gratis sin cuenta", 800-1.500 búsquedas/mes para "calculadora modelo 303 online gratis".
+### Slide 19: Idea — microherramienta pública
+No es compromiso, es opción. Si TRACKR coge tracción, le damos prioridad. Si no, queda apuntado.
 
-### Slide 20: Métricas
-**Ya activo — Cloudflare Web Analytics:**
-- Pageviews, visitantes únicos, referrers, país, dispositivo, tiempo en página.
-- Sin cookies, sin banner. Coste: 0€.
+- **Hipótesis: tr4ckr.com/303** — calculadora del Modelo 303 sin cuenta. Reutiliza la lógica que ya tiene TRACKR dentro. ~1 jornada de desarrollo.
+- La 130 queda para 2027 si la 303 demuestra que la jugada funciona.
+- Por qué podría funcionar: tráfico recurrente (4 picos/año), enlaces naturales, marca "los que dan herramientas gratis sin cuenta", ~800-1.500 búsquedas/mes para "calculadora modelo 303 online gratis".
 
-**Pendiente — eventos custom (Worker propio implementado):** activar cuando lleguemos a 50+ usuarios.
-
-**KPIs mensuales:** visitantes únicos tr4ckr.com, click-through a meowrhino.studio, conversiones blog → tr4ckr.com, posición SERP de las keywords prioritarias.
-
-Revisión al final de cada mes.
-
-### Slide 21: Riesgos y mitigación
+### Slide 20: Riesgos y mitigación
 | Riesgo | Mitigación |
 |---|---|
 | Verifactu llega antes de la homologación SIF | Sprint técnico Q1 2027 + declaración responsable firmada en URL pública antes del 1 jul 2027 |
@@ -142,13 +146,13 @@ Revisión al final de cada mes.
 | Dependencia narrativa de meowrhino.studio | tr4ckr.com tiene identidad/copy/OG propios |
 | Competidores grandes copan el SERP | Atacar solo long-tail diferencial. Dejar SERPs saturados para 2027+ |
 
-### Slide 22: Roadmap producto alineado al plan
+### Slide 21: Roadmap producto alineado al plan
 **Q2-Q3 2026:** microherramienta /303, cierre del asistente trimestral 303/130, categorías de gasto extra.
 **Q3 2026 — verano:** refinamientos UX con feedback beta, posible PWA, inicio estudio técnico para SIF.
 **Q4 2026 — Q1 2027:** Pivot A opcional (cuentas + backup cifrado client-side, suscripción 3-5€/mes solo hosting).
 **Antes 1 jul 2027:** declaración responsable Verifactu firmada y publicada en URL abierta de tr4ckr.com.
 
-### Slide 23: Cierre / CTA
+### Slide 22: Cierre / CTA
 - TRACKR · Tu gestor freelance en el navegador.
 - **TRACKR no compite por precio — ya está en el suelo. Compite por filosofía y producto integrado.**
 - *Hecho indie. Para los autónomos que entienden que sus datos no son un producto.*
