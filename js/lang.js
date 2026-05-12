@@ -520,7 +520,10 @@ const LANGS = {
     'guide.data.title': 'Tus datos',
     'guide.data.desc': 'Exportar, importar, ejemplos y privacidad',
     'guide.data.intro': '<p>Tu privacidad es sagrada. Trackr no tiene servidor, no tiene cuenta y no guarda nada en la nube. Todo vive en tu archivo de guardado — y tú decides cuándo exportarlo o importarlo.</p>',
-    'guide.data.body': '<ul><li><strong>Exportar</strong> (⤓): descarga tu archivo de guardado .json con todos tus proyectos, horas, gastos y configuración.</li><li><strong>Importar</strong> (⤒): carga un .json para restaurar o mover tus datos a otro navegador.</li><li><strong>Datos de ejemplo</strong>: en la pantalla de bienvenida puedes cargar 3 perfiles de prueba (traductora, música, formador) para explorar Trackr antes de usarlo con tus datos reales.</li></ul><div class="guide-tip">Haz backups regulares exportando tu archivo. Si cambias de navegador o borras datos, necesitarás el .json para recuperar todo.</div>'
+    'guide.data.body': '<ul><li><strong>Exportar</strong> (⤓): descarga tu archivo de guardado .json con todos tus proyectos, horas, gastos y configuración.</li><li><strong>Importar</strong> (⤒): carga un .json para restaurar o mover tus datos a otro navegador.</li><li><strong>Datos de ejemplo</strong>: en la pantalla de bienvenida puedes cargar 3 perfiles de prueba (traductora, música, formador) para explorar Trackr antes de usarlo con tus datos reales.</li></ul><div class="guide-tip">Haz backups regulares exportando tu archivo. Si cambias de navegador o borras datos, necesitarás el .json para recuperar todo.</div>',
+    /* ── Footer ── */
+    'footer.madeWith': 'Hecho con cariño por meowrhino.studio',
+    'footer.feedback': '¿Beta tester? Cuéntame qué mejorarías',
   },
 
   en: {
@@ -1024,7 +1027,10 @@ const LANGS = {
     'guide.data.title': 'Your data',
     'guide.data.desc': 'Export, import, examples and privacy',
     'guide.data.intro': '<p>Your privacy is sacred. Trackr has no server, no account and stores nothing in the cloud. Everything lives in your save file — and you decide when to export or import it.</p>',
-    'guide.data.body': '<ul><li><strong>Export</strong> (⤓): download your .json save file with all your projects, hours, expenses and settings.</li><li><strong>Import</strong> (⤒): load a .json to restore or move your data to another browser.</li><li><strong>Sample data</strong>: on the welcome screen you can load 3 test profiles (translator, musician, trainer) to explore Trackr before using your real data.</li></ul><div class="guide-tip">Make regular backups by exporting your file. If you switch browsers or clear data, you\'ll need the .json to recover everything.</div>'
+    'guide.data.body': '<ul><li><strong>Export</strong> (⤓): download your .json save file with all your projects, hours, expenses and settings.</li><li><strong>Import</strong> (⤒): load a .json to restore or move your data to another browser.</li><li><strong>Sample data</strong>: on the welcome screen you can load 3 test profiles (translator, musician, trainer) to explore Trackr before using your real data.</li></ul><div class="guide-tip">Make regular backups by exporting your file. If you switch browsers or clear data, you\'ll need the .json to recover everything.</div>',
+    /* ── Footer ── */
+    'footer.madeWith': 'Made with love by meowrhino.studio',
+    'footer.feedback': 'Beta tester? Share what you\'d improve',
   },
 
   ca: {
@@ -1528,7 +1534,11 @@ const LANGS = {
     'guide.data.title': 'Les teves dades',
     'guide.data.desc': 'Exportar, importar, exemples i privacitat',
     'guide.data.intro': '<p>La teva privacitat és sagrada. Trackr no té servidor, no té compte i no guarda res al núvol. Tot viu al teu fitxer de guardat — i tu decideixes quan exportar-lo o importar-lo.</p>',
-    'guide.data.body': '<ul><li><strong>Exportar</strong> (⤓): descarrega el teu fitxer de guardat .json amb tots els teus projectes, hores, despeses i configuració.</li><li><strong>Importar</strong> (⤒): carrega un .json per restaurar o moure les teves dades a un altre navegador.</li><li><strong>Dades d\'exemple</strong>: a la pantalla de benvinguda pots carregar 3 perfils de prova (traductora, música, formador) per explorar Trackr abans d\'usar-lo amb les teves dades reals.</li></ul><div class="guide-tip">Fes backups regulars exportant el teu fitxer. Si canvies de navegador o esborres dades, necessitaràs el .json per recuperar-ho tot.</div>'
+    'guide.data.body': '<ul><li><strong>Exportar</strong> (⤓): descarrega el teu fitxer de guardat .json amb tots els teus projectes, hores, despeses i configuració.</li><li><strong>Importar</strong> (⤒): carrega un .json per restaurar o moure les teves dades a un altre navegador.</li><li><strong>Dades d\'exemple</strong>: a la pantalla de benvinguda pots carregar 3 perfils de prova (traductora, música, formador) per explorar Trackr abans d\'usar-lo amb les teves dades reals.</li></ul><div class="guide-tip">Fes backups regulars exportant el teu fitxer. Si canvies de navegador o esborres dades, necessitaràs el .json per recuperar-ho tot.</div>',
+
+    /* ── Footer ── */
+    'footer.madeWith': 'Fet amb estima per meowrhino.studio',
+    'footer.feedback': 'Ets beta tester? Explica\'m millores',
   }
 
 };
@@ -1661,4 +1671,7 @@ function _updateNav() {
 
   const cfgTitle = document.querySelector('#vCfg .pt');
   if (cfgTitle) cfgTitle.textContent = t('nav.config');
+
+  const footMade = document.getElementById('footMade');
+  if (footMade) footMade.textContent = t('footer.madeWith');
 }
