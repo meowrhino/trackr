@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1200">
+<title>OG Image Template — 1200×630</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 1200px;
+    height: 630px;
+    overflow: hidden;
+    background: #0f0f17;
+    font-family: 'Outfit', 'DM Mono', system-ui, sans-serif;
+    color: #f0f0f5;
+  }
+
+  /* Background texture */
+  .bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 75% 50%, rgba(0,200,180,.07) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 20% 80%, rgba(80,60,200,.08) 0%, transparent 70%);
+  }
+
+  .card {
+    position: relative;
+    width: 100%; height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 64px 80px 52px;
+    border: 1px solid rgba(255,255,255,.06);
+  }
+
+  /* Top row: logo + tagline */
+  .top { display: flex; align-items: flex-start; gap: 40px; }
+
+  .logo {
+    font-family: 'DM Mono', monospace;
+    font-size: 2.4rem;
+    font-weight: 500;
+    letter-spacing: .35em;
+    color: #f0f0f5;
+    flex-shrink: 0;
+  }
+
+  .badge {
+    display: inline-block;
+    background: rgba(0,200,160,.15);
+    border: 1px solid rgba(0,200,160,.3);
+    color: #00c8a0;
+    font-size: .85rem;
+    font-weight: 500;
+    padding: .25em .75em;
+    border-radius: 100px;
+    letter-spacing: .04em;
+    margin-top: .6rem;
+  }
+
+  /* Main claim */
+  .claim {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 20px 0;
+  }
+
+  .claim h1 {
+    font-size: 3.6rem;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -.02em;
+    color: #f0f0f5;
+    max-width: 780px;
+  }
+
+  .claim h1 span { color: #00c8a0; }
+
+  .claim p {
+    margin-top: 1rem;
+    font-size: 1.25rem;
+    color: rgba(240,240,245,.55);
+    font-weight: 400;
+    max-width: 600px;
+  }
+
+  /* Bottom row: pills */
+  .bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .pills { display: flex; gap: 12px; }
+
+  .pill {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 100px;
+    padding: .3em .9em;
+    font-size: .9rem;
+    color: rgba(240,240,245,.7);
+    font-weight: 400;
+  }
+
+  .url {
+    font-family: 'DM Mono', monospace;
+    font-size: 1.05rem;
+    color: rgba(240,240,245,.35);
+    letter-spacing: .04em;
+  }
+
+  .by {
+    font-size: .8rem;
+    color: rgba(240,240,245,.25);
+    margin-top: .2rem;
+    text-align: right;
+  }
+
+  .bottom-right { text-align: right; }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="bg"></div>
+<div class="card">
+
+  <div class="top">
+    <div class="logo">TRACKR</div>
+    <div class="badge">Gratis · Sin cuenta · Sin servidor</div>
+  </div>
+
+  <div class="claim">
+    <h1>Facturación para autónomos.<br><span>Gratis. Sin cuenta.</span></h1>
+    <p>Proyectos, horas, gastos, modelo 303 y 130. Todo en tu navegador.</p>
+  </div>
+
+  <div class="bottom">
+    <div class="pills">
+      <span class="pill">📄 Facturas PDF</span>
+      <span class="pill">⏱ Horas</span>
+      <span class="pill">€ Gastos</span>
+      <span class="pill">📊 Modelo 303 · 130</span>
+    </div>
+    <div class="bottom-right">
+      <div class="url">tr4ckr.com</div>
+      <div class="by">by meowrhino.studio</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
+<!--
+  INSTRUCCIONES PARA GENERAR og-image.png:
+  1. Abre este archivo en Chrome
+  2. Abre DevTools → More tools → Rendering → Emulate CSS media → none
+  3. O usa: npx puppeteer-screenshot og-template.html --width=1200 --height=630
+  4. O usa: https://screenshotone.com / https://htmlcsstoimage.com
+  Guarda el resultado como og-image.png en la raíz del proyecto.
+-->
