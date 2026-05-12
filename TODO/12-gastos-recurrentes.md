@@ -63,3 +63,16 @@ Cambios al schema de `gastos`:
 
 ## Prioridad
 Media — mejora calidad de vida para el seguimiento mensual de gastos fijos
+
+## Estado: ✅ HECHO (12 may 2026, commit 587eab2)
+
+Lo implementado:
+- Campo `importeBase` editable en `gModal` (solo cuando recurrencia ≠ "no").
+- Campo `diaRecurrente` (1-31) editable en `gModal`.
+- `geModal` pre-rellena base/iva/total desde `importeBase` + `tipoIva` cuando se añade entrada nueva a un gasto recurrente.
+- Card del gasto recurrente: detecta si falta entrada del mes actual (solo en vista "mes" del mes actual, gasto mensual, no pausado) → marca la card con fondo cálido + ⚠ junto al nombre + botón "+ Este mes".
+- `quickAddRecurring(gid)` añade la entrada con fecha de hoy reutilizando `importeBase` (calcula base/iva desde `tipoIva`). Si no hay `importeBase`, abre `geModal` normal.
+
+Lo pendiente / posible mejora futura:
+- Aviso visual para gastos **anuales** que no tengan entrada en el año actual (hoy solo se detecta el mensual).
+- Historial de cambios de `importeBase` (idea original del brief): no implementado. Por ahora, los `importeBase` antiguos quedan implícitos en los `total` de las entradas históricas — basta para el caso real.

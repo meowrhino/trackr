@@ -74,3 +74,21 @@ Actualmente cada entrada guarda solo `cantidad` (el total con IVA) y trackr inte
 
 ## Prioridad
 Alta — se usa 4 veces al año y ahorra mucho tiempo + reduce errores
+
+## Estado: ✅ HECHO (12 may 2026, commit 587eab2)
+
+Lo implementado:
+- `_rDinTrim` reescrito para mostrar **casillas numeradas AEAT** en lugar de filas genéricas:
+  - **303**: casillas 01/02/03 para IVA 21%, 04-06 para 10%, 07-09 para 4% (solo se renderiza el tipo que realmente aparece en el periodo). Casillas 28 (base IVA soportado) y 30 (cuota IVA soportado). Resultado en casilla **46** (a ingresar) o **71** (a devolver) con color según signo.
+  - **130**: casillas 01 (ingresos), 02 (gastos deducibles), 03 (rendimiento neto), 04 (20%), 06 (retenciones). Resultado en casilla **07** (a ingresar) o **14** (a devolver).
+- **IVA repercutido agrupado por tipo** en lugar de una sola línea — los autónomos con múltiples tipos (intracomunitario 0%, libros 4%, etc.) ven el desglose real.
+- **Criterio de devengo** ya estaba: usa `facturaFecha` para el cálculo, no fecha de cobro.
+- **Warning visual** cuando hay proyectos con `baseImponible > 0` pero sin `facturaFecha` → se listan los nombres y se explica que no entran en el cálculo. Evita errores silenciosos.
+- Botón **"📋 Copiar casillas"** por modelo: copia al portapapeles un texto plano con las casillas formateadas, listo para pegar en la sede electrónica de Hacienda. Usa `navigator.clipboard` con fallback `execCommand`.
+- Toast confirma "Casillas copiadas al portapapeles" en el idioma activo.
+- i18n nuevo en ES/EN/CA: `din.toRefund`, `vatRate`, `vatChargedAmt`, `inputBase`, `inputVat`, `twentyPercent`, `copyBoxes`, `copied`, `noInvoicesThisPeriod`, `missingDateWarn`.
+- Gastos con `base/iva/total` separados ya estaba (TODO #13.6, migrado en abril).
+
+Lo pendiente / posible mejora futura:
+- Exportar a XML para presentación directa (la AEAT acepta XML para 303/390). Hoy el usuario copia las casillas y las pega a mano.
+- Botón "Marcar trimestre como presentado" para historizarlo en el JSON.

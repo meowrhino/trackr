@@ -15,8 +15,8 @@ Orden de implementación. Cada archivo tiene el detalle.
 | 9 | Generación de facturas | `09-facturas.md` | ✅ hecho |
 | 10 | Migración de datos (versioning) | `10-migracion.md` | ✅ hecho |
 | 11 | Analytics anónimo | `11-analytics.md` | ✅ Cloudflare Web Analytics activo · Worker propio en reserva |
-| 12 | Gastos recurrentes avanzados | `12-gastos-recurrentes.md` | 🟡 parcial |
-| 13 | Asistente trimestral (303+130) | `13-asistente-trimestral.md` | 🟡 parcial |
+| 12 | Gastos recurrentes avanzados | `12-gastos-recurrentes.md` | ✅ hecho (12 may 2026) |
+| 13 | Asistente trimestral (303+130) | `13-asistente-trimestral.md` | ✅ hecho (12 may 2026) |
 | 14 | Plan de marketing v1 (deck 25 slides) | `14-marketing-plan.md` | ✅ hecho (12 may 2026) |
 | 15 | Verifactu / homologación SIF | `15-verifactu.md` | ⏳ pendiente — antes 1 jul 2027 |
 | 16 | Microherramientas públicas /303 y /130 | `16-microherramientas.md` | ⏳ pendiente — Q2/Q3 2026 |
