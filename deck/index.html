@@ -109,7 +109,8 @@ tr td:first-child{color:var(--t1);font-weight:500}
   <!-- SLIDE 1: Portada -->
   <div class="slide center on">
     <div class="logo" style="font-size:3.5rem;margin-bottom:.5rem">TRACKR</div>
-    <p class="sub" style="font-size:1.3rem;margin-bottom:2rem">Tu gestor freelance en el navegador</p>
+    <p class="sub" style="font-size:1.15rem;margin-bottom:.3rem;color:var(--t1)">Plan de captaci&oacute;n y crecimiento</p>
+    <p class="sub" style="font-size:.95rem;margin-bottom:1.8rem">Tu gestor freelance en el navegador &middot; Verano 2026</p>
     <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
       <span class="tag">Proyectos</span>
       <span class="tag">Horas</span>
@@ -122,6 +123,7 @@ tr td:first-child{color:var(--t1);font-weight:500}
       <div class="stat"><div class="num" style="color:var(--t1)">0</div><div class="lbl">Cuentas necesarias</div></div>
       <div class="stat"><div class="num" style="color:var(--warn)">0</div><div class="lbl">Datos en la nube</div></div>
     </div>
+    <p class="small" style="margin-top:2.5rem">tr4ckr.com &middot; meowrhino.studio</p>
   </div>
 
   <!-- SLIDE 2: El problema -->
@@ -133,14 +135,16 @@ tr td:first-child{color:var(--t1);font-weight:500}
         <li><strong>Facturacion compleja</strong> &mdash; Base imponible, IVA al 21/10/4%, IRPF al 15/7%, exenciones, numeros correlativos...</li>
         <li><strong>Gastos deducibles</strong> &mdash; Hay que registrar base, IVA y total reales de cada factura de gasto</li>
         <li><strong>Cuota fija mensual</strong> &mdash; 230-530 &euro;/mes aunque no factures nada</li>
+        <li><strong>Verifactu en el horizonte</strong> &mdash; obligatorio desde el <span class="warn">1 jul 2027</span> (RDL 15/2025). Todos los aut&oacute;nomos buscar&aacute;n software adaptado.</li>
       </ul>
       <div>
         <h3>Y las herramientas?</h3>
         <ul>
-          <li>Las buenas cuestan <span class="warn">18-29 &euro;/mes</span></li>
-          <li>Tus datos viven en <span class="bad">su cloud</span></li>
-          <li>Estan pensadas para gestores, no para freelancers</li>
+          <li>Las buenas cuestan <span class="warn">18-29 &euro;/mes</span> (Quipu, Holded)</li>
+          <li>Tus datos viven en <span class="bad">su cloud</span> &mdash; sin export real, atado al SaaS</li>
+          <li>Pensadas para gestores, no para freelancers t&eacute;cnicos</li>
           <li>Overkill: CRM, inventario, RRHH... que no necesitas</li>
+          <li>Quipu, Holded, Contasimple <span class="small">absorbidos por grandes grupos (TeamSystem, Visma, Cegid)</span> &rarr; subidas anuales de precio</li>
         </ul>
       </div>
     </div>
@@ -188,23 +192,24 @@ tr td:first-child{color:var(--t1);font-weight:500}
     </div>
   </div>
 
-  <!-- SLIDE 5: Competencia -->
+  <!-- SLIDE 5: Competencia (vista r&aacute;pida) -->
   <div class="slide">
-    <h2>El mercado actual</h2>
+    <h2>El mercado actual <span class="small" style="font-size:.85rem;color:var(--t3)">&middot; vista r&aacute;pida</span></h2>
     <table>
-      <tr><th></th><th style="color:var(--ac)">Trackr</th><th>Quipu</th><th>Holded</th><th>Billin</th><th>Invoice Ninja</th></tr>
-      <tr><td>Precio</td><td class="yes">0 &euro;</td><td class="partial">18 &euro;/mes</td><td class="partial">29 &euro;/mes</td><td class="partial">10 &euro;/mes</td><td class="yes">0 &euro; (self-host)</td></tr>
-      <tr><td>Necesita servidor</td><td class="yes">No</td><td class="no">SaaS</td><td class="no">SaaS</td><td class="no">SaaS</td><td class="no">Si (PHP+MySQL)</td></tr>
-      <tr><td>Funciona offline</td><td class="yes">Si</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="partial">Parcial</td></tr>
-      <tr><td>Datos portables</td><td class="yes">JSON</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="partial">API</td></tr>
-      <tr><td>Sin crear cuenta</td><td class="yes">Si</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
-      <tr><td>IVA/IRPF nativo</td><td class="yes">Si</td><td class="yes">Si</td><td class="yes">Si</td><td class="yes">Si</td><td class="no">Manual</td></tr>
-      <tr><td>Modelo 303/130</td><td class="yes">Si</td><td class="yes">Si</td><td class="partial">Parcial</td><td class="no">No</td><td class="no">No</td></tr>
-      <tr><td>Proyectos + horas</td><td class="yes">Si</td><td class="no">No</td><td class="yes">Si</td><td class="no">No</td><td class="yes">Si</td></tr>
-      <tr><td>&euro;/hora real</td><td class="yes">Si</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
-      <tr><td>Calendario financiero</td><td class="yes">Si</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
+      <tr><th></th><th style="color:var(--ac)">Trackr</th><th>Quipu</th><th>Holded</th><th>Contasimple</th></tr>
+      <tr><td>Precio entrada</td><td class="yes">0 &euro;</td><td class="partial">17&ndash;20 &euro;/mes</td><td class="partial">14&ndash;29 &euro;/mes</td><td class="partial">0 &euro; (l&iacute;mite 50 fact/a&ntilde;o)</td></tr>
+      <tr><td>Plan gratuito real</td><td class="yes">Si, sin l&iacute;mite</td><td class="no">Trial 15 d&iacute;as</td><td class="no">Trial 14 d&iacute;as</td><td class="partial">Limitado</td></tr>
+      <tr><td>Sin cuenta / cloud</td><td class="yes">Si</td><td class="no">SaaS obligatorio</td><td class="no">SaaS obligatorio</td><td class="no">SaaS obligatorio</td></tr>
+      <tr><td>Datos portables</td><td class="yes">JSON nativo</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
+      <tr><td>Funciona offline</td><td class="yes">Si</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
+      <tr><td>Modelo 303 / 130</td><td class="yes">Si</td><td class="yes">Si</td><td class="partial">Parcial</td><td class="yes">Si</td></tr>
+      <tr><td>Proyectos + horas + &euro;/h</td><td class="yes">Si</td><td class="no">No</td><td class="partial">Parcial</td><td class="no">No</td></tr>
+      <tr><td>Cobros parciales nativos</td><td class="yes">Si</td><td class="partial">B&aacute;sicos</td><td class="partial">B&aacute;sicos</td><td class="no">No</td></tr>
+      <tr><td>Catal&aacute;n nativo</td><td class="yes">Si</td><td class="no">No</td><td class="partial">Limitado</td><td class="no">No</td></tr>
+      <tr><td>Verifactu (SIF)</td><td class="partial">Antes jul 2027</td><td class="yes">29 jul 2025</td><td class="yes">Activo</td><td class="yes">29 jul 2025</td></tr>
+      <tr><td>Due&ntilde;o</td><td class="yes">Indie</td><td class="no">TeamSystem (IT)</td><td class="no">Visma (NO)</td><td class="no">Cegid (FR)</td></tr>
     </table>
-    <p class="small" style="margin-top:1rem">Trackr no compite en features con ERPs. Compite en <span class="accent">filosofia</span>: privacidad, control y coste cero.</p>
+    <p class="small" style="margin-top:1rem">An&aacute;lisis a fondo de los 3 en el <span class="accent">Acto 2</span>. La diferencia clave: <span class="accent">filosof&iacute;a</span> &mdash; privacidad, control, gratis estructural.</p>
   </div>
 
   <!-- SLIDE 6: Diferenciacion -->
@@ -232,84 +237,69 @@ tr td:first-child{color:var(--t1);font-weight:500}
 
   <!-- SLIDE 7: Modelo -->
   <div class="slide">
-    <h2>Modelo: <span class="accent">gratis de verdad</span></h2>
+    <h2>Modelo: <span class="accent">gratis de verdad</span>, sin trampa freemium</h2>
     <div class="cols">
       <div>
-        <h3>Ahora</h3>
-        <div class="card" style="margin-bottom:1.5rem">
+        <h3>Hoy</h3>
+        <div class="card" style="margin-bottom:1rem">
           <div style="display:flex;align-items:baseline;gap:.5rem;margin-bottom:.5rem">
             <span class="mono" style="font-size:1.8rem;color:var(--ac)">0 &euro;</span>
             <span class="small">/ para siempre</span>
           </div>
           <ul>
-            <li>Todas las funciones, sin limites</li>
+            <li>Todas las funciones, sin l&iacute;mites</li>
             <li>Uso local con JSON</li>
-            <li>Sin cuenta, sin cloud</li>
+            <li>Sin cuenta, sin cloud, sin tracking</li>
           </ul>
         </div>
+        <p class="small">Gratis <span class="accent">estructural</span>: no hay backend que mantener &rarr; no hay coste que tapar con suscripciones.</p>
       </div>
       <div>
-        <h3>Futuro posible</h3>
+        <h3>Futuro (Q4 2026 &mdash; Q1 2027)</h3>
         <div class="card">
           <div style="display:flex;align-items:baseline;gap:.5rem;margin-bottom:.5rem">
-            <span class="mono" style="font-size:1.8rem;color:var(--warn)">? &euro;</span>
-            <span class="small">/ mes (solo hosting)</span>
+            <span class="mono" style="font-size:1.4rem;color:var(--warn)">~3&ndash;5 &euro;</span>
+            <span class="small">/ mes opcional</span>
           </div>
           <ul>
-            <li>Hosting y sync de tus datos</li>
-            <li>Gestion de cuenta y backup automatico</li>
-            <li>El core sigue siendo gratis</li>
+            <li><strong>Cuenta opcional</strong> con backup cifrado <em>client-side</em></li>
+            <li>El servidor solo guarda blobs cifrados &mdash; <span class="accent">no podemos leerlos</span></li>
+            <li>Sync entre dispositivos sin renunciar a la privacidad</li>
+            <li>Cloud UE puro (Scaleway / OVH Espa&ntilde;a)</li>
           </ul>
         </div>
-        <p class="small" style="margin-top:1rem">Si no guardas datos en nuestro servidor, no pagas. No es freemium: es pagar por infraestructura.</p>
+        <p class="small" style="margin-top:.75rem">Escenario A (RGPD art. 34.3.a): cifrado robusto = riesgo legal m&iacute;nimo y promesa "tus datos son tuyos" intacta.</p>
       </div>
     </div>
   </div>
 
-  <!-- SLIDE 8: Next steps -->
-  <div class="slide">
-    <h2>Roadmap</h2>
-    <div class="cols">
-      <div class="timeline">
-        <div class="tl-item">
-          <div class="tl-dot"></div>
-          <div>
-            <h3>Q2 2026</h3>
-            <ul>
-              <li>Asistente fiscal trimestral completo (303 + 130)</li>
-              <li>Gastos recurrentes avanzados (pausa, base, indicadores)</li>
-            </ul>
-          </div>
-        </div>
-        <div class="tl-item">
-          <div class="tl-dot warn"></div>
-          <div>
-            <h3>Q3 2026</h3>
-            <ul>
-              <li>Resolver feedback de beta testers (6 issues)</li>
-              <li>Quick UX: boton "marcar pagado", entrada rapida de gastos</li>
-            </ul>
-          </div>
-        </div>
-        <div class="tl-item">
-          <div class="tl-dot dim"></div>
-          <div>
-            <h3>Futuro</h3>
-            <ul>
-              <li>VeriFactu (obligatorio julio 2026 para autonomos)</li>
-              <li>PWA / version movil</li>
-              <li>Tier de hosting con sync</li>
-            </ul>
-          </div>
-        </div>
+  <!-- SLIDE 8: Cierre Acto 1 + transici&oacute;n a Acto 2 -->
+  <div class="slide center">
+    <h2 style="margin-bottom:2rem">Hasta aqu&iacute;, el <span class="accent">qu&eacute; es</span> TRACKR</h2>
+    <div class="cols-3" style="margin-bottom:2rem;max-width:900px">
+      <div class="pillar" style="text-align:center">
+        <div style="font-size:2.4rem;color:var(--ac);margin-bottom:.4rem">&check;</div>
+        <h3>Producto real</h3>
+        <p style="font-size:.82rem">Suite completa funcionando en tr4ckr.com. Lo uso cada d&iacute;a.</p>
       </div>
-      <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">
-        <div class="logo" style="font-size:2rem;margin-bottom:1rem">TRACKR</div>
-        <p style="margin-bottom:1.5rem">En beta, funciona, y lo uso cada dia.</p>
-        <div class="cta">open index.html</div>
-        <p class="small" style="margin-top:2rem">Gracias!</p>
+      <div class="pillar" style="text-align:center">
+        <div style="font-size:2.4rem;color:var(--ac);margin-bottom:.4rem">&check;</div>
+        <h3>Posicionamiento claro</h3>
+        <p style="font-size:.82rem">Indie, local-first, sin cuenta, sin trampa. Un hueco real de mercado.</p>
+      </div>
+      <div class="pillar" style="text-align:center">
+        <div style="font-size:2.4rem;color:var(--warn);margin-bottom:.4rem">?</div>
+        <h3>Pero...</h3>
+        <p style="font-size:.82rem">Nadie lo conoce todav&iacute;a. Cero tracci&oacute;n, cero beta testers activos.</p>
       </div>
     </div>
+    <p style="font-size:1.15rem;color:var(--t1);max-width:680px;text-align:center;margin-bottom:.5rem">
+      La pregunta no es <em>"&iquest;el producto vale?"</em> &mdash; es:
+    </p>
+    <p style="font-size:1.4rem;color:var(--ac);font-weight:500">
+      &iquest;C&oacute;mo encontramos a los <em>autonomos correctos</em> y se lo ponemos delante?
+    </p>
+    <p class="small" style="margin-top:1.5rem;color:var(--t3)">Acto 2: el mercado y la batalla. Acto 3: c&oacute;mo lo movemos.</p>
   </div>
 
 </div>
