@@ -112,7 +112,7 @@ Object.assign(App, {
       cobrosHtml = `<div style="margin-top:.75rem">`
         + `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem">`
         +   `<span class="dst" style="border:none;margin:0;padding:0">${t('billing.payments')}</span>`
-        +   (!f.pagado ? `<button class="bt bt-add" onclick="App.cobroModal('${p.id}')">${t('billing.addPayment')}</button>` : '')
+        +   (!f.pagado ? `<span style="display:flex;gap:.5rem"><button class="bt bt-add" onclick="App.cobroModal('${p.id}')">${t('billing.addPayment')}</button><button class="bt bt-add" onclick="App.quickPay('${p.id}')">${t('dash.markPaid')}</button></span>` : '')
         + `</div>`
         + `<div class="pbar" style="margin-bottom:.4rem"><div class="pbar-fill pbar-stacked" style="width:${pct}%"><div class="pbar-seg" style="width:100%;background:${f.pagado ? 'var(--ok)' : 'var(--t2)'}" data-tip="${fmtMoney(tc)} / ${fmtMoney(f.totalFactura)}"></div></div></div>`
         + `<div style="font-size:.78rem;color:${statusColor}">${statusText}</div>`

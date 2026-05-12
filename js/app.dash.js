@@ -132,6 +132,9 @@ Object.assign(App, {
           ? `<span style="color:${eph >= 30 ? 'var(--ok)' : eph >= 15 ? 'var(--warn)' : 'var(--bad)'}">${eph.toFixed(2)} &euro;/h</span>`
           : ''}
       </div>
+      ${!f.pagado && f.facturaFecha && f.modo !== 'gratis'
+        ? `<div class="pc-qp"><button class="bt bt-add pc-qp-btn" onclick="event.stopPropagation();App.quickPay('${p.id}')">${t('dash.markPaid')}</button></div>`
+        : ''}
     </div>`;
   },
 

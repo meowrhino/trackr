@@ -59,6 +59,8 @@
 .pc-flag-inv{background:color-mix(in srgb,var(--bad) 15%,transparent);color:var(--bad)}
 .pc-flag-partial{background:color-mix(in srgb,var(--warn) 15%,transparent);color:var(--warn)}
 .pc-flag-pay{border:1px solid var(--b2);cursor:pointer;font-size:.7rem;line-height:1;padding:.15rem .3rem}.pc-flag-pay:hover{background:color-mix(in srgb,var(--ok) 20%,transparent);border-color:var(--ok)}
+.pc-qp{margin-top:.5rem;padding-top:.5rem;border-top:1px solid var(--b1)}
+.pc-qp-btn{font-size:.72rem;padding:.2rem .6rem;line-height:1.4}
 
 /* ── Barra de progreso (objetivos, financiero) ── */
 .pbar{height:8px;background:var(--bg3);border-radius:4px;overflow:hidden}
