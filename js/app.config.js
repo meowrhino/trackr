@@ -11,8 +11,7 @@ Object.assign(App, {
     const s = D.d.settings, em = s.emisor, tg = s.targets, cls = D.cls();
 
     document.getElementById('cfgC').innerHTML =
-      `<div class="cfg-section" style="margin-bottom:1.5rem"><a href="mailto:manuellatourf@gmail.com?subject=Feedback%20TRACKR" class="bt bt-add" style="display:inline-block;text-decoration:none" onclick="T.ev('action','feedback_click','config')">${t('footer.feedback')}</a></div>`
-      + `<div class="cfg-section"><div class="cfg-section-title">${t('lang.label')}</div>`
+      `<div class="cfg-section"><div class="cfg-section-title">${t('lang.label')}</div>`
       + `<div class="lang-toggle">${['es', 'en', 'ca'].map(code =>
           `<button class="lang-btn${_lang === code ? ' on' : ''}" onclick="App.setLanguage('${code}')">${t('lang.' + code)}</button>`
         ).join('')}</div></div>`

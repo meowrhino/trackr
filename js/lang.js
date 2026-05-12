@@ -531,7 +531,6 @@ const LANGS = {
     'guide.data.body': '<ul><li><strong>Exportar</strong> (⤓): descarga tu archivo de guardado .json con todos tus proyectos, horas, gastos y configuración.</li><li><strong>Importar</strong> (⤒): carga un .json para restaurar o mover tus datos a otro navegador.</li><li><strong>Datos de ejemplo</strong>: en la pantalla de bienvenida puedes cargar 3 perfiles de prueba (traductora, música, formador) para explorar Trackr antes de usarlo con tus datos reales.</li></ul><div class="guide-tip">Haz backups regulares exportando tu archivo. Si cambias de navegador o borras datos, necesitarás el .json para recuperar todo.</div>',
     /* ── Footer ── */
     'footer.madeWith': 'Hecho con cariño por meowrhino.studio',
-    'footer.feedback': '¿Beta tester? Cuéntame qué mejorarías',
   },
 
   en: {
@@ -1046,7 +1045,6 @@ const LANGS = {
     'guide.data.body': '<ul><li><strong>Export</strong> (⤓): download your .json save file with all your projects, hours, expenses and settings.</li><li><strong>Import</strong> (⤒): load a .json to restore or move your data to another browser.</li><li><strong>Sample data</strong>: on the welcome screen you can load 3 test profiles (translator, musician, trainer) to explore Trackr before using your real data.</li></ul><div class="guide-tip">Make regular backups by exporting your file. If you switch browsers or clear data, you\'ll need the .json to recover everything.</div>',
     /* ── Footer ── */
     'footer.madeWith': 'Made with love by meowrhino.studio',
-    'footer.feedback': 'Beta tester? Share what you\'d improve',
   },
 
   ca: {
@@ -1562,7 +1560,6 @@ const LANGS = {
 
     /* ── Footer ── */
     'footer.madeWith': 'Fet amb estima per meowrhino.studio',
-    'footer.feedback': 'Ets beta tester? Explica\'m millores',
   }
 
 };
