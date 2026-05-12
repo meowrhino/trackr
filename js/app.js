@@ -98,7 +98,17 @@ const App = {
    * ══════════════════════════════════════════════ */
 
   om(h) { document.getElementById('mC').innerHTML = h; document.getElementById('mO').classList.add('on'); },
-  cm() { document.getElementById('mO').classList.remove('on'); this._editPid = null; },
+  cm() {
+    /* Si venimos del flujo facModal→clModal, volver a facModal en lugar de cerrar */
+    if (this._facReturn) {
+      const r = this._facReturn;
+      this._facReturn = null;
+      this.facModal(r.pid);
+      return;
+    }
+    document.getElementById('mO').classList.remove('on');
+    this._editPid = null;
+  },
   selT(el) { el.parentElement.querySelectorAll('.to').forEach(o => o.classList.remove('on')); el.classList.add('on'); },
 
   colorSelect(currentName) {
@@ -333,11 +343,34 @@ const App = {
     const p = D.p(pid); if (!p) return;
     B.calc(p);
     const f = p.facturacion, s = D.d.settings;
-    const num = f.facturaNum || s.nextFacturaNum || 1;
+    const cl = p.clienteId ? D.cl(p.clienteId) : null;
+
+    /* Si venimos de clModal con valores tecleados, restaurarlos */
+    const r = (this._facRestore && this._facRestore.pid === pid) ? this._facRestore : null;
+    this._facRestore = null;
+
+    const num = r?.num || f.facturaNum || s.nextFacturaNum || 1;
+    const date = r?.date || f.facturaFecha || todayStr();
+    const asunto = r?.asunto != null ? r.asunto : defaultAsunto(p);
+
+    const editBtn = `<button class="bt bt-s" style="padding:.15rem .45rem;font-size:.72rem;margin-left:.4rem" title="${t('btn.edit')}" onclick="App.editClFromFac('${pid}')">&#9998;</button>`;
+    const addBtn = `<button class="bt bt-s bt-add" style="padding:.15rem .45rem;font-size:.72rem;margin-left:.4rem" onclick="App.editClFromFac('${pid}')">+ ${t('btn.newClient').replace('+ ','')}</button>`;
+    const clRow = cl
+      ? `<div class="br"><span class="la">${t('fac.client')}</span><span class="va" style="display:flex;align-items:center;justify-content:flex-end;gap:.2rem">${esc(cl.nombre)}${editBtn}</span></div>`
+      : `<div class="br"><span class="la">${t('fac.client')}</span><span class="va" style="display:flex;align-items:center;justify-content:flex-end;gap:.2rem"><span style="color:var(--t3)">${t('fac.noClient')}</span>${addBtn}</span></div>`;
+
+    const missing = [];
+    if (cl) {
+      if (!cl.nif) missing.push(t('fac.missingNif'));
+      if (!cl.direccion1 && !cl.direccion2) missing.push(t('fac.missingAddress'));
+    }
+    const warnRow = missing.length
+      ? `<div style="margin:-.35rem .25rem .5rem;font-size:.72rem;color:var(--warn);text-align:right">&#9888; ${missing.join(' &middot; ')}</div>`
+      : '';
 
     const summary = `<div class="bb" style="margin-top:.75rem">`
       + `<div class="br"><span class="la">${t('fac.issuer')}</span><span class="va">${esc(s.emisor.nombre || t('fac.configure'))}</span></div>`
-      + `<div class="br"><span class="la">${t('fac.client')}</span><span class="va">${esc(clienteName(p))}</span></div>`
+      + clRow
       + `<div class="br"><span class="la">${t('billing.base')}</span><span class="va">${fmtMoney(f.baseImponible || 0)}</span></div>`
       + (f.iva ? `<div class="br"><span class="la">${t('billing.plusIva', f.iva)}</span><span class="va">${fmtMoney(f.importeIva || 0)}</span></div>` : '')
       + (f.irpf ? `<div class="br"><span class="la">${t('billing.minusIrpf', f.irpf)}</span><span class="va">${fmtMoney(f.importeIrpf || 0)}</span></div>` : '')
@@ -345,10 +378,25 @@ const App = {
 
     this.om(`<div class="mt">${t('fac.generate')}</div>`
       + `<div class="fr"><div class="fg"><label>${t('field.invoiceNum')}</label><input type="text" id="facNum" value="${String(num)}" style="font-family:'DM Mono',monospace"></div>`
-      + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="facDate" value="${f.facturaFecha || todayStr()}"></div></div>`
-      + `<div class="fg"><label>${t('field.subject')}</label><input type="text" id="facAsunto" value="${esc(defaultAsunto(p))}"></div>`
+      + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="facDate" value="${date}"></div></div>`
+      + `<div class="fg"><label>${t('field.subject')}</label><input type="text" id="facAsunto" value="${esc(asunto)}"></div>`
       + summary
+      + warnRow
       + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.genFactura('${pid}')">${t('btn.downloadPdf')}</button></div>`);
+  },
+
+  /** Abre clModal del cliente del proyecto desde el flujo de generar factura */
+  editClFromFac(pid) {
+    const p = D.p(pid); if (!p) return;
+    /* Preservar valores tecleados en facModal y marcar para retorno */
+    this._facRestore = {
+      pid,
+      num: document.getElementById('facNum')?.value,
+      date: document.getElementById('facDate')?.value,
+      asunto: document.getElementById('facAsunto')?.value
+    };
+    this._facReturn = { pid };
+    this.clModal(p.clienteId || null);
   },
 
   genFactura(pid) {

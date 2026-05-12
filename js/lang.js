@@ -421,6 +421,8 @@ const LANGS = {
     'fac.issuer': 'Emisor',
     'fac.client': 'Cliente',
     'fac.configure': '(configurar)',
+    'fac.missingNif': 'falta NIF',
+    'fac.missingAddress': 'falta dirección',
 
     /* ── Mensajes ── */
     'msg.nameRequired': 'Nombre obligatorio',
@@ -936,6 +938,8 @@ const LANGS = {
     'fac.issuer': 'Issuer',
     'fac.client': 'Client',
     'fac.configure': '(configure)',
+    'fac.missingNif': 'missing tax ID',
+    'fac.missingAddress': 'missing address',
 
     /* ── Mensajes ── */
     'msg.nameRequired': 'Name is required',
@@ -1443,6 +1447,8 @@ const LANGS = {
     'fac.issuer': 'Emissor',
     'fac.client': 'Client',
     'fac.configure': '(configurar)',
+    'fac.missingNif': 'falta NIF',
+    'fac.missingAddress': 'falta adreça',
 
     /* ── Missatges ── */
     'msg.nameRequired': 'Nom obligatori',

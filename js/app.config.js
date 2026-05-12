@@ -141,8 +141,17 @@ Object.assign(App, {
     const color = document.getElementById('mpColor')?.value || 'CornflowerBlue';
     const nombreCompleto = document.getElementById('clNC').value.trim();
     const data = { nombre, nombreCompleto, direccion1: document.getElementById('clD1').value.trim(), direccion2: document.getElementById('clD2').value.trim(), nif: document.getElementById('clNif').value.trim(), color };
-    if (cid) D.upCl(cid, data); else { data.id = uid(); D.addCl(data); }
-    this.cm(); this.rCfg();
+    let savedId;
+    if (cid) { D.upCl(cid, data); savedId = cid; }
+    else { data.id = uid(); D.addCl(data); savedId = data.id; }
+    /* Si venimos del flujo facModal, asignar cliente al proyecto si no tenía y volver a facModal */
+    const fromFac = !!this._facReturn;
+    if (fromFac) {
+      const p = D.p(this._facReturn.pid);
+      if (p && !p.clienteId) D.up(this._facReturn.pid, { clienteId: savedId });
+    }
+    this.cm();
+    if (!fromFac) this.rCfg();
   },
 
   delCl(cid) {
