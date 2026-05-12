@@ -30,9 +30,8 @@ const App = {
    * ══════════════════════════════════════════════ */
 
   init() {
-    /* Analytics — reemplazar null con la URL del Worker tras `wrangler deploy`:
-       T.init('https://trackr-analytics.SUBDOMAIN.workers.dev/');
-       El opt-out se gestiona en T.ev() via localStorage 'analytics_optout'. */
+    /* Analytics: usamos Cloudflare Web Analytics (sin cookies, sin código aquí).
+       T.init() queda dormido por si en el futuro queremos eventos custom via Worker. */
     T.init(null);
 
     if (!D.init()) D.create();

@@ -335,9 +335,6 @@ const LANGS = {
     'cfg.saved': 'Configuración guardada',
     'cfg.importOldInvoices': 'Importar facturas antiguas',
     'cfg.importOldDesc': 'Importa JSONs del generador de facturas anterior',
-    'cfg.analyticsTitle': 'Privacidad y analítica',
-    'cfg.analyticsNotice': 'Recogemos datos anónimos de uso (sin datos personales) para mejorar la app.',
-    'cfg.analyticsOptOut': 'No participar en analítica anónima',
 
     /* ── Dinero ── */
     'din.gross': 'Cobrado',
@@ -862,9 +859,6 @@ const LANGS = {
     'cfg.saved': 'Settings saved',
     'cfg.importOldInvoices': 'Import old invoices',
     'cfg.importOldDesc': 'Import JSONs from the old invoice generator',
-    'cfg.analyticsTitle': 'Privacy & analytics',
-    'cfg.analyticsNotice': 'We collect anonymous usage data (no personal data) to improve the app.',
-    'cfg.analyticsOptOut': 'Opt out of anonymous analytics',
 
     /* ── Dinero ── */
     'din.gross': 'Received',
@@ -1381,9 +1375,6 @@ const LANGS = {
     'cfg.saved': 'Configuració desada',
     'cfg.importOldInvoices': 'Importar factures antigues',
     'cfg.importOldDesc': 'Importa JSONs del generador de factures anterior',
-    'cfg.analyticsTitle': 'Privadesa i analítica',
-    'cfg.analyticsNotice': 'Recollim dades anònimes d\'ús (sense dades personals) per millorar l\'app.',
-    'cfg.analyticsOptOut': 'No participar en l\'analítica anònima',
 
     /* ── Diners ── */
     'din.gross': 'Cobrat',

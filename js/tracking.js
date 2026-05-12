@@ -26,7 +26,6 @@ const T={
   /* Registra un evento */
   ev(category,action,label){
     if(!this.endpoint)return;
-    if(localStorage.getItem('analytics_optout')==='1')return;
     this.queue.push({c:category,a:action,l:label||null,t:Date.now()});
     /* Flush si hay muchos eventos acumulados */
     if(this.queue.length>=20)this.flush();
