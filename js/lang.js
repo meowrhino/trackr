@@ -1674,4 +1674,7 @@ function _updateNav() {
 
   const footMade = document.getElementById('footMade');
   if (footMade) footMade.textContent = t('footer.madeWith');
+
+  const footFeedback = document.getElementById('footFeedback');
+  if (footFeedback) footFeedback.textContent = t('footer.feedback');
 }
