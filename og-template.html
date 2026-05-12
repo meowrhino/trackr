@@ -7,10 +7,13 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  body {
+  html, body {
     width: 1200px;
     height: 630px;
     overflow: hidden;
+  }
+
+  body {
     background: #0f0f17;
     font-family: 'Outfit', 'DM Mono', system-ui, sans-serif;
     color: #f0f0f5;
@@ -30,7 +33,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 64px 80px 52px;
+    padding: 44px 80px 44px;
     border: 1px solid rgba(255,255,255,.06);
   }
 
@@ -65,13 +68,13 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 20px 0;
+    padding: 0;
   }
 
   .claim h1 {
-    font-size: 3.6rem;
+    font-size: 3.1rem;
     font-weight: 700;
-    line-height: 1.1;
+    line-height: 1.08;
     letter-spacing: -.02em;
     color: #f0f0f5;
     max-width: 780px;
@@ -121,8 +124,21 @@
   }
 
   .bottom-right { text-align: right; }
+
+  /* Self-hosted Google Fonts (offline-safe for headless screenshot) */
+  @font-face { font-family: 'DM Mono'; font-style: normal; font-weight: 400; font-display: block;
+    src: url(og-fonts/aFTU7PB1QTsUX8KYhh0.ttf) format('truetype'); }
+  @font-face { font-family: 'DM Mono'; font-style: normal; font-weight: 500; font-display: block;
+    src: url(og-fonts/aFTR7PB1QTsUX8KYvumzIYQ.ttf) format('truetype'); }
+  @font-face { font-family: 'Outfit'; font-style: normal; font-weight: 400; font-display: block;
+    src: url(og-fonts/QGYyz_MVcBeNP4NjuGObqx1XmO1I4TC1C4E.ttf) format('truetype'); }
+  @font-face { font-family: 'Outfit'; font-style: normal; font-weight: 500; font-display: block;
+    src: url(og-fonts/QGYyz_MVcBeNP4NjuGObqx1XmO1I4QK1C4E.ttf) format('truetype'); }
+  @font-face { font-family: 'Outfit'; font-style: normal; font-weight: 600; font-display: block;
+    src: url(og-fonts/QGYyz_MVcBeNP4NjuGObqx1XmO1I4e6yC4E.ttf) format('truetype'); }
+  @font-face { font-family: 'Outfit'; font-style: normal; font-weight: 700; font-display: block;
+    src: url(og-fonts/QGYyz_MVcBeNP4NjuGObqx1XmO1I4deyC4E.ttf) format('truetype'); }
 </style>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 <div class="bg"></div>
