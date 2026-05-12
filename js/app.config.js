@@ -50,10 +50,20 @@ Object.assign(App, {
       + `<button class="bt bt-add" style="margin-top:.75rem" onclick="App.clModal()">${t('btn.newClient')}</button></div>`
       + `<div class="cfg-section" style="margin-top:2.5rem"><div class="cfg-section-title">${t('cfg.importOldInvoices')}</div>`
       + `<div style="color:var(--t3);font-size:.82rem;margin-bottom:.75rem">${t('cfg.importOldDesc')}</div>`
-      + `<button class="bt bt-add" onclick="App.importOldInvoicesClick()">${t('cfg.importOldInvoices')}</button></div>`;
+      + `<button class="bt bt-add" onclick="App.importOldInvoicesClick()">${t('cfg.importOldInvoices')}</button></div>`
+      + `<div class="cfg-section" style="margin-top:2.5rem"><div class="cfg-section-title">${t('cfg.analyticsTitle')}</div>`
+      + `<p style="color:var(--t3);font-size:.82rem;margin-bottom:.5rem">${t('cfg.analyticsNotice')}</p>`
+      + `<label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.82rem">`
+      + `<input type="checkbox" id="cfgOptOut" ${localStorage.getItem('analytics_optout')==='1'?'checked':''} onchange="App.setAnalyticsOptOut(this.checked)" style="accent-color:var(--ac);width:auto">`
+      + `<span>${t('cfg.analyticsOptOut')}</span></label></div>`;
+  },
+
+  setAnalyticsOptOut(val) {
+    localStorage.setItem('analytics_optout', val ? '1' : '0');
   },
 
   setLanguage(code) {
+    T.ev('action', 'lang_change', code);
     setLang(code);
     D.d.settings.idioma = code;
     D.save();

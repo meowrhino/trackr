@@ -30,8 +30,9 @@ const App = {
    * ══════════════════════════════════════════════ */
 
   init() {
-    /* Analytics desactivado — configurar URL real para activar:
-       T.init('https://trackr-analytics.tu-dominio.workers.dev/event'); */
+    /* Analytics — reemplazar null con la URL del Worker tras `wrangler deploy`:
+       T.init('https://trackr-analytics.SUBDOMAIN.workers.dev/');
+       El opt-out se gestiona en T.ev() via localStorage 'analytics_optout'. */
     T.init(null);
 
     if (!D.init()) D.create();
