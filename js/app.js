@@ -60,9 +60,44 @@ const App = {
     });
 
     this.enter();
+    this._maybeWelcome();
   },
 
   enter() { this.go('info'); },
+
+  /** Muestra modal de bienvenida solo en la primera visita (sin datos previos) */
+  _maybeWelcome() {
+    if (localStorage.getItem('trackr_welcomed') === '1') return;
+    if (D.d.projects.length > 0) { localStorage.setItem('trackr_welcomed', '1'); return; }
+    this.om(`<div class="mt">${t('welcome.title')}</div>`
+      + `<p style="line-height:1.55;color:var(--t1);margin-bottom:.75rem">${t('welcome.claim')}</p>`
+      + `<ul style="line-height:1.55;color:var(--t2);margin:0 0 1rem 1.1rem;padding:0;font-size:.9rem">`
+      +   `<li style="margin-bottom:.35rem">${t('welcome.bullet1')}</li>`
+      +   `<li style="margin-bottom:.35rem">${t('welcome.bullet2')}</li>`
+      +   `<li>${t('welcome.bullet3')}</li>`
+      + `</ul>`
+      + `<p style="text-align:center;font-size:.78rem;color:var(--t3);margin:1rem 0 .25rem">`
+      +   `<a href="https://meowrhino.studio" target="_blank" rel="noopener" data-track="meowrhino-out" onclick="T.ev('outbound','click','welcome')" style="color:var(--t2);text-decoration:none">${t('welcome.madeBy')}</a>`
+      + `</p>`
+      + `<div class="ma" style="gap:.5rem">`
+      +   `<button class="bt" onclick="App._welcomeGuide()">${t('welcome.seeGuide')}</button>`
+      +   `<button class="bt bt-p" onclick="App._welcomeDone()">${t('welcome.start')}</button>`
+      + `</div>`);
+    T.ev('action', 'welcome_show');
+  },
+
+  _welcomeDone() {
+    localStorage.setItem('trackr_welcomed', '1');
+    T.ev('action', 'welcome_dismiss', 'start');
+    this.cm();
+  },
+
+  _welcomeGuide() {
+    localStorage.setItem('trackr_welcomed', '1');
+    T.ev('action', 'welcome_dismiss', 'guide');
+    this.cm();
+    this.go('guide');
+  },
 
   /** Navega a una vista */
   go(v, d) {

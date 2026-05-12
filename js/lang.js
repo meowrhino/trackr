@@ -243,6 +243,16 @@ const LANGS = {
     'examples.ana': 'Música y productora',
     'examples.dani': 'Formador tech',
 
+    /* ── Bienvenida ── */
+    'welcome.title': 'Bienvenido a TRACKR',
+    'welcome.claim': 'Tu gestión y facturación de autónomo, sin cuenta y sin nube. Local-first, simple, gratis.',
+    'welcome.bullet1': 'Proyectos, horas, gastos y facturas en un solo sitio.',
+    'welcome.bullet2': 'Modelos 303 y 130 calculados a partir de tus datos.',
+    'welcome.bullet3': 'Tus datos viven en tu navegador. Exporta JSON cuando quieras.',
+    'welcome.madeBy': 'Hecho con cariño por meowrhino.studio',
+    'welcome.start': 'Empezar',
+    'welcome.seeGuide': 'Ver guía',
+
     /* ── Proyectos (Dash) ── */
     'dash.external': 'Externos',
     'dash.all': 'Todos',
@@ -760,6 +770,16 @@ const LANGS = {
     'examples.ana': 'Musician & producer',
     'examples.dani': 'Tech trainer',
 
+    /* ── Welcome ── */
+    'welcome.title': 'Welcome to TRACKR',
+    'welcome.claim': 'Freelance project & invoice management, no account, no cloud. Local-first, simple, free.',
+    'welcome.bullet1': 'Projects, hours, expenses and invoices in one place.',
+    'welcome.bullet2': 'Spanish tax forms 303 and 130 calculated from your data.',
+    'welcome.bullet3': 'Your data lives in your browser. Export JSON whenever you want.',
+    'welcome.madeBy': 'Made with care by meowrhino.studio',
+    'welcome.start': 'Get started',
+    'welcome.seeGuide': 'See guide',
+
     /* ── Proyectos (Dash) ── */
     'dash.external': 'External',
     'dash.all': 'All',
@@ -1268,6 +1288,16 @@ const LANGS = {
     'examples.marina': 'Traductora freelance',
     'examples.ana': 'Música i productora',
     'examples.dani': 'Formador tech',
+
+    /* ── Benvinguda ── */
+    'welcome.title': 'Benvingut a TRACKR',
+    'welcome.claim': 'La teva gestió i facturació d’autònom, sense compte i sense núvol. Local-first, simple, gratis.',
+    'welcome.bullet1': 'Projectes, hores, despeses i factures en un sol lloc.',
+    'welcome.bullet2': 'Models 303 i 130 calculats a partir de les teves dades.',
+    'welcome.bullet3': 'Les teves dades viuen al teu navegador. Exporta el JSON quan vulguis.',
+    'welcome.madeBy': 'Fet amb cura per meowrhino.studio',
+    'welcome.start': 'Començar',
+    'welcome.seeGuide': 'Veure la guia',
 
     /* ── Projectes (Dash) ── */
     'dash.external': 'Externs',
