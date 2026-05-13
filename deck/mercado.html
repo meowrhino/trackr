@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRACKR · Mercado (Acto 2)</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#111;--bg2:#191919;--bg3:#222;--bg4:#2a2a2a;
+  --b1:#262626;--b2:#333;--b3:#444;
+  --t1:#ccc;--t2:#888;--t3:#555;
+  --ok:#5a9;--warn:#c93;--bad:#c55;
+  --ac:#5a9;--r:3px;
+}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--t1);overflow:hidden;height:100vh}
+::selection{background:color-mix(in srgb,var(--ac) 30%,transparent);color:var(--t1)}
+
+/* Slides */
+.deck{position:relative;height:100vh;width:100vw}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:6vh 8vw;opacity:0;pointer-events:none;transition:opacity .4s ease}
+.slide.on{opacity:1;pointer-events:auto}
+
+/* Nav */
+.nav{position:fixed;bottom:2rem;right:3rem;display:flex;gap:.5rem;z-index:100;align-items:center}
+.nav button{background:var(--bg3);border:1px solid var(--b1);color:var(--t2);width:36px;height:36px;border-radius:var(--r);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.nav button:hover{background:var(--bg4);color:var(--t1)}
+.nav .cnt{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--t3);min-width:3rem;text-align:center}
+
+/* Progress bar */
+.progress{position:fixed;top:0;left:0;height:2px;background:var(--ac);transition:width .4s ease;z-index:100}
+
+/* Typography */
+.logo{font-family:'DM Mono',monospace;font-weight:500;letter-spacing:.35em;color:var(--t1)}
+h1{font-size:2.8rem;font-weight:600;letter-spacing:-.02em;line-height:1.15;margin-bottom:1rem}
+h2{font-size:1.8rem;font-weight:500;letter-spacing:-.01em;margin-bottom:1.5rem;color:var(--t1)}
+h3{font-size:1.1rem;font-weight:500;margin-bottom:.75rem;color:var(--ac)}
+p{font-size:1rem;color:var(--t2);line-height:1.6;max-width:55ch}
+.sub{font-size:1.15rem;color:var(--t2);margin-bottom:.5rem;line-height:1.5}
+.accent{color:var(--ac)}
+.warn{color:var(--warn)}
+.bad{color:var(--bad)}
+.mono{font-family:'DM Mono',monospace}
+.small{font-size:.85rem;color:var(--t3)}
+.tag{display:inline-block;padding:.15rem .55rem;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);font-size:.75rem;color:var(--t2);font-family:'DM Mono',monospace}
+.tag.green{border-color:color-mix(in srgb,var(--ok) 40%,transparent);color:var(--ok)}
+
+/* Lists */
+ul{list-style:none;display:flex;flex-direction:column;gap:.6rem}
+ul li{font-size:.95rem;color:var(--t2);padding-left:1.2rem;position:relative;line-height:1.5}
+ul li::before{content:'';position:absolute;left:0;top:.55rem;width:5px;height:5px;background:var(--ac);border-radius:50%}
+
+/* Grid layouts */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:3rem;margin-top:1rem}
+.cols-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;margin-top:1rem}
+
+/* Cards */
+.card{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:1.25rem 1.5rem}
+.card h3{margin-bottom:.5rem}
+
+/* Feature grid */
+.feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:1rem}
+.feat{display:flex;align-items:flex-start;gap:.75rem;background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:.75rem 1rem}
+.feat .ic{font-size:1.3rem;min-width:1.8rem;text-align:center;line-height:1.6}
+.feat .ft{font-size:.85rem;font-weight:500;color:var(--t1)}
+.feat .fd{font-size:.75rem;color:var(--t3);margin-top:.15rem}
+
+/* Table */
+table{width:100%;border-collapse:collapse;font-size:.78rem;margin-top:1rem}
+th{font-family:'DM Mono',monospace;font-weight:500;text-align:left;padding:.5rem .75rem;border-bottom:1px solid var(--b2);color:var(--t3);font-size:.7rem;letter-spacing:.05em;text-transform:uppercase}
+td{padding:.45rem .75rem;border-bottom:1px solid var(--b1);color:var(--t2)}
+tr td:first-child{color:var(--t1);font-weight:500}
+.yes{color:var(--ok)}
+.no{color:var(--t3)}
+.partial{color:var(--warn)}
+
+/* Pillar */
+.pillar{text-align:left}
+.pillar h3{font-size:1rem;margin-bottom:.4rem}
+.pillar p{font-size:.85rem;max-width:none}
+
+/* Timeline */
+.timeline{display:flex;flex-direction:column;gap:1.25rem;margin-top:1rem}
+.tl-item{display:flex;gap:1rem;align-items:flex-start}
+.tl-dot{width:8px;height:8px;border-radius:50%;background:var(--ac);margin-top:.45rem;flex-shrink:0}
+.tl-dot.warn{background:var(--warn)}
+.tl-dot.dim{background:var(--t3)}
+
+/* Portada center */
+.center{text-align:center;align-items:center}
+.center p{max-width:none}
+
+/* Stat */
+.stat{text-align:center}
+.stat .num{font-family:'DM Mono',monospace;font-size:2.2rem;font-weight:500;color:var(--ac)}
+.stat .lbl{font-size:.8rem;color:var(--t3);margin-top:.25rem}
+
+/* CTA */
+.cta{display:inline-flex;align-items:center;gap:.5rem;padding:.6rem 1.25rem;background:color-mix(in srgb,var(--ac) 15%,transparent);border:1px solid color-mix(in srgb,var(--ac) 30%,transparent);border-radius:var(--r);color:var(--ac);font-family:'DM Mono',monospace;font-size:.85rem;margin-top:1.5rem}
+
+/* Act cover slides */
+.act-cover{align-items:flex-start;justify-content:center}
+.act-num{font-family:'DM Mono',monospace;font-size:9rem;font-weight:300;color:color-mix(in srgb,var(--ac) 40%,transparent);line-height:1;letter-spacing:-.05em;margin-bottom:1rem}
+.act-lbl{font-family:'DM Mono',monospace;font-size:.85rem;letter-spacing:.3em;color:var(--t3);text-transform:uppercase;margin-bottom:.5rem}
+.act-title{font-size:3rem;font-weight:600;letter-spacing:-.02em;line-height:1.1;color:var(--t1);margin-bottom:.75rem}
+.act-sub{font-size:1.05rem;color:var(--t2);max-width:600px}
+
+/* Act tag (corner indicator) */
+.act-tag{position:absolute;top:2rem;right:3rem;font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.2em;color:var(--t3);text-transform:uppercase}
+
+/* Persona card */
+.persona{display:grid;grid-template-columns:auto 1fr;gap:1.25rem;background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:1.25rem 1.5rem;align-items:start}
+.persona-avatar{width:64px;height:64px;border-radius:50%;background:color-mix(in srgb,var(--ac) 18%,transparent);display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0}
+.persona h3{margin-bottom:.15rem}
+.persona .ph{font-size:.78rem;color:var(--t3);margin-bottom:.5rem}
+.persona ul{gap:.3rem;margin-top:.4rem}
+.persona ul li{font-size:.78rem;padding-left:.9rem}
+.persona ul li::before{width:3px;height:3px;top:.5rem}
+.personas-sec{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem}
+.persona-sm{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:.75rem 1rem;font-size:.78rem}
+.persona-sm strong{color:var(--t1)}
+.persona-sm .desc{color:var(--t3);font-size:.72rem;margin-top:.25rem}
+
+/* Competitor deep dive */
+.comp-head{display:flex;align-items:baseline;gap:1rem;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid var(--b1)}
+.comp-name{font-size:1.6rem;font-weight:600;color:var(--t1)}
+.comp-tag{font-size:.72rem;color:var(--t3);font-family:'DM Mono',monospace}
+.comp-tag .price{color:var(--warn)}
+.comp-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;font-size:.8rem}
+.comp-col h3{font-size:.78rem;letter-spacing:.05em;text-transform:uppercase;color:var(--t3);margin-bottom:.5rem}
+.comp-col.win h3{color:var(--ok)}
+.comp-col.lose h3{color:var(--warn)}
+.comp-col.us h3{color:var(--ac)}
+.comp-col ul{gap:.4rem}
+.comp-col ul li{font-size:.78rem;padding-left:.9rem;color:var(--t2)}
+.comp-col ul li::before{width:3px;height:3px;top:.5rem;background:var(--t3)}
+.comp-col.us ul li::before{background:var(--ac)}
+
+/* Keyword priority list */
+.kw-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:.5rem}
+.kw-section h3{display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem;font-size:.9rem}
+.kw-section h3 .kw-section-tag{font-family:'DM Mono',monospace;font-size:.65rem;padding:.1rem .4rem;border-radius:2px;letter-spacing:.05em}
+.kw-row{display:flex;align-items:center;justify-content:space-between;padding:.45rem .65rem;background:var(--bg2);border:1px solid var(--b1);border-radius:2px;margin-bottom:.35rem;font-size:.78rem}
+.kw-row .kw-text{color:var(--t1);font-family:'DM Mono',monospace;font-size:.72rem}
+.kw-row .kw-meta{display:flex;gap:.4rem;font-size:.65rem;color:var(--t3);font-family:'DM Mono',monospace}
+.kw-vol{color:var(--t2)}
+.kw-diff-low{color:var(--ok)}
+.kw-diff-med{color:var(--warn)}
+.kw-diff-high{color:var(--bad)}
+
+/* Channel cards */
+.chan-list{display:flex;flex-direction:column;gap:.75rem;margin-top:.5rem}
+.chan{display:grid;grid-template-columns:auto 1fr auto;gap:1rem;align-items:center;padding:.85rem 1.1rem;background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r)}
+.chan-ic{font-size:1.4rem;width:2.2rem;text-align:center}
+.chan-title{font-size:.95rem;font-weight:500;color:var(--t1);margin-bottom:.15rem}
+.chan-desc{font-size:.78rem;color:var(--t2)}
+.chan-eff{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--t3);text-align:right;min-width:7rem}
+
+/* Content calendar */
+.cc-list{display:flex;flex-direction:column;gap:.5rem;margin-top:.5rem;font-size:.78rem}
+.cc-item{display:grid;grid-template-columns:5rem 1fr auto;gap:1rem;align-items:center;padding:.5rem .85rem;background:var(--bg2);border:1px solid var(--b1);border-radius:2px}
+.cc-date{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--ac);letter-spacing:.05em}
+.cc-title{color:var(--t1);font-weight:500}
+.cc-kw{font-size:.65rem;color:var(--t3);font-family:'DM Mono',monospace;margin-top:.15rem}
+.cc-channel{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--t2);padding:.15rem .45rem;background:var(--bg3);border-radius:2px;letter-spacing:.05em}
+
+/* Goal cards */
+.goals{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:.5rem}
+.goal{padding:.85rem 1rem;background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);display:flex;flex-direction:column;gap:.25rem}
+.goal-num{font-family:'DM Mono',monospace;font-size:1.5rem;color:var(--ac);line-height:1}
+.goal-num small{font-size:.85rem;color:var(--t3)}
+.goal-text{font-size:.78rem;color:var(--t2);line-height:1.4}
+.goal-date{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--t3);letter-spacing:.05em;text-transform:uppercase;margin-top:.15rem}
+
+/* Risk row */
+.risks{display:flex;flex-direction:column;gap:.65rem;margin-top:.5rem}
+.risk{display:grid;grid-template-columns:auto 1fr 1fr;gap:1rem;padding:.65rem 1rem;background:var(--bg2);border:1px solid var(--b1);border-radius:2px;font-size:.78rem;align-items:start}
+.risk-ic{font-size:1.1rem;color:var(--warn)}
+.risk-name{color:var(--t1);font-weight:500;margin-bottom:.15rem}
+.risk-desc{font-size:.72rem;color:var(--t3)}
+.risk-mit{color:var(--t2);font-size:.78rem}
+.risk-mit::before{content:'→ ';color:var(--ac)}
+
+/* Quote line */
+.quote{font-size:1.4rem;color:var(--t1);font-style:italic;line-height:1.4;max-width:700px;margin:1.5rem 0;padding-left:1.5rem;border-left:3px solid var(--ac)}
+.quote .accent{color:var(--ac);font-style:normal;font-weight:600}
+</style>
+</head>
+<body>
+
+<div class="progress" id="prog"></div>
+
+<div class="deck" id="deck">
+
+  <div class="slide act-cover on">
+    <div class="act-num">02</div>
+    <div class="act-lbl">Acto 2</div>
+    <h1 class="act-title">El mercado <span class="accent">y la batalla</span></h1>
+    <p class="act-sub">Verifactu como catalizador &middot; los 3 competidores que importan &middot; keywords atacables &middot; el hueco real de mercado.</p>
+  </div>
+
+  <!-- SLIDE 10: Verifactu como catalizador -->
+  <div class="slide">
+    <span class="act-tag">Acto 2 &middot; El momento</span>
+    <h2>Verifactu: la ventana de oportunidad <span class="accent">2026-2027</span></h2>
+    <div class="cols">
+      <div>
+        <h3>Qu&eacute; cambia</h3>
+        <ul>
+          <li>RDL 15/2025 obliga a Verifactu el <span class="warn">1 jul 2027</span> a aut&oacute;nomos</li>
+          <li>Todos van a tener que migrar o actualizar herramienta</li>
+          <li>Sanciones de hasta <span class="bad">50.000 &euro;/ejercicio</span> por software no homologado</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Estado de los grandes</h3>
+        <ul>
+          <li><strong>Quipu</strong>, <strong>Contasimple</strong>, <strong>Holded</strong> ya tienen declaraci&oacute;n responsable firmada</li>
+          <li><strong>TRACKR</strong>: homologaci&oacute;n SIF antes del 1 jul 2027 (compromiso roadmap)</li>
+        </ul>
+      </div>
+    </div>
+    <p class="quote" style="font-size:1.15rem;margin-top:1.5rem">Ventana de <span class="accent">14&ndash;18 meses</span> con pico sostenido de b&uacute;squedas &laquo;verifactu aut&oacute;nomos&raquo;.<br><span style="font-style:normal;color:var(--ac)">Es el momento.</span></p>
+  </div>
+
+  <!-- SLIDE 11: Buyer persona (sint&eacute;tica) -->
+  <div class="slide">
+    <span class="act-tag">Acto 2 &middot; A qui&eacute;n hablamos</span>
+    <h2>A qui&eacute;n le hablamos</h2>
+    <p class="sub" style="font-size:1rem;margin-bottom:2rem">Aut&oacute;nomo espa&ntilde;ol en estimaci&oacute;n directa, sin equipo, que ya factura pero todav&iacute;a no tiene una herramienta que le funcione.</p>
+    <div class="cols">
+      <div>
+        <h3 style="color:var(--warn);font-size:.85rem;letter-spacing:.05em;text-transform:uppercase">Hoy le duele</h3>
+        <ul>
+          <li>Por miedo a &laquo;liarla&raquo; con Hacienda, paga <strong>gestor&iacute;a por defecto</strong> (40&ndash;100 &euro;/mes) aunque facture poco. Patr&oacute;n com&uacute;n en <strong>artistas y oficios creativos</strong> sin formaci&oacute;n fiscal.</li>
+          <li>Lleva facturas y gastos en Excel + memoria</li>
+          <li>Las herramientas conocidas cuestan <strong>18&ndash;29 &euro;/mes</strong> para uso puntual</li>
+          <li>No quiere sus datos fiscales en la nube de nadie</li>
+          <li>Le agobian los modelos 303 y 130 cada trimestre</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="color:var(--ac);font-size:.85rem;letter-spacing:.05em;text-transform:uppercase">Le motivar&iacute;a</h3>
+        <ul>
+          <li>Una app <strong>sin cuenta</strong> y gratis de verdad</li>
+          <li>Que entienda IVA real (21/10/4/0) e intracomunitario</li>
+          <li>Que calcule 303 y 130 <strong>sin pasar por gestor</strong></li>
+          <li>Una factura PDF bonita que pueda enviar tal cual</li>
+        </ul>
+      </div>
+    </div>
+    <p class="small" style="margin-top:1.5rem;text-align:center;color:var(--t3)">D&oacute;nde le encontramos: Reddit &middot; X/Bluesky &middot; b&uacute;squedas Google &middot; referidos de freelancers.</p>
+  </div>
+
+  <!-- SLIDE 12: Los 3 competidores que importan (s&iacute;ntesis) -->
+  <div class="slide">
+    <span class="act-tag">Acto 2 &middot; BENCHMARK</span>
+    <h2>Los 3 competidores que <span class="accent">importan</span></h2>
+    <p class="small" style="margin-top:-.5rem;margin-bottom:.75rem">Cada uno cubre un arquetipo distinto. Ninguno tapa el hueco donde est&aacute; TRACKR.</p>
+    <table style="font-size:.78rem">
+      <tr><th style="width:11%">Competidor</th><th style="width:14%">Precio</th><th style="width:22%">Para qui&eacute;n</th><th style="width:23%">Mayor debilidad</th><th style="width:30%;color:var(--ac)">D&oacute;nde TRACKR gana</th></tr>
+      <tr>
+        <td><strong>Quipu</strong><br><span class="small">TeamSystem (IT)</span></td>
+        <td class="partial">17&ndash;20 &euro;/mes</td>
+        <td>Aut&oacute;nomo que <em>ya tiene</em> gestor&iacute;a y quiere panel propio</td>
+        <td>Sin plan gratuito desde 2024. Sin time-tracking. Catal&aacute;n limitado.</td>
+        <td>Gratis &middot; sin cuenta &middot; time-tracking + &euro;/h &middot; catal&aacute;n nativo</td>
+      </tr>
+      <tr>
+        <td><strong>Holded</strong><br><span class="small">Visma (NO)</span></td>
+        <td class="partial">14,50&ndash;149 &euro;/mes</td>
+        <td>PYME que necesita CRM + inventario + RRHH</td>
+        <td>Sobredimensionado para el aut&oacute;nomo solo. Curva alta.</td>
+        <td>Dr&aacute;sticamente m&aacute;s simple &middot; cero curva &middot; dise&ntilde;o indie</td>
+      </tr>
+      <tr>
+        <td><strong>Contasimple</strong><br><span class="small">Cegid (FR)</span></td>
+        <td class="partial">0 &euro; (50 fact/a&ntilde;o)<br>hasta ~22 &euro;/mes</td>
+        <td>Aut&oacute;nomo de volumen bajo que solo quiere &laquo;cumplir&raquo;</td>
+        <td>UI anticuada. Sin time-tracking. Subidas anuales.</td>
+        <td>Dise&ntilde;o moderno &middot; sin l&iacute;mite &middot; tracking + fiscal en uno</td>
+      </tr>
+    </table>
+    <h3 style="margin-top:1.25rem;margin-bottom:.4rem;font-size:.82rem;letter-spacing:.05em;text-transform:uppercase;color:var(--ac)">Eje pol&iacute;tico &amp; ecol&oacute;gico</h3>
+    <table style="font-size:.76rem">
+      <tr><th style="width:22%">Dimensi&oacute;n</th><th style="width:39%">Quipu / Holded / Contasimple</th><th style="width:39%;color:var(--ac)">TRACKR</th></tr>
+      <tr>
+        <td><strong>Propiedad &amp; datos</strong></td>
+        <td class="partial">Capital extranjero &middot; tus datos en su cloud privada</td>
+        <td>Indie espa&ntilde;ol &middot; tus datos en tu navegador, sin servidor</td>
+      </tr>
+      <tr>
+        <td><strong>Modelo econ&oacute;mico</strong></td>
+        <td class="partial">Suscripci&oacute;n mensual creciente &middot; extracci&oacute;n</td>
+        <td><strong>Gratis para siempre</strong> &middot; p&uacute;blico y abierto</td>
+      </tr>
+      <tr>
+        <td><strong>Huella</strong></td>
+        <td class="partial">Servidores 24/7 procesando tus datos</td>
+        <td>Ejecuci&oacute;n en cliente &middot; sin backend permanente</td>
+      </tr>
+    </table>
+    <p class="small" style="margin-top:.9rem;text-align:center"><span class="accent">El hueco para algo gratis-de-verdad, indie y p&uacute;blico es real.</span></p>
+  </div>
+
+  <!-- SLIDE 15: Keywords -->
+  <div class="slide">
+    <span class="act-tag">Acto 2 &middot; SEO &middot; Posicionament</span>
+    <h2>SEO &mdash; d&oacute;nde podemos <span class="accent">aparecer en Google</span></h2>
+    <p class="small" style="margin-top:-.5rem;margin-bottom:1rem">Long-tail donde nadie compite. SERPs saturados (&laquo;programa facturaci&oacute;n aut&oacute;nomos&raquo;, DA 70+) los dejamos para 2027+.</p>
+    <div class="kw-grid">
+      <div class="kw-section">
+        <h3 style="color:var(--ok)">3 prioritarias <span class="kw-section-tag" style="background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)">atacables ya</span></h3>
+        <div class="kw-row"><span class="kw-text">facturaci&oacute;n aut&oacute;nomo sin cuota mensual</span><span class="kw-meta"><span class="kw-vol">100&ndash;300/mes</span></span></div>
+        <div class="kw-row"><span class="kw-text">app aut&oacute;nomos sin suscripci&oacute;n</span><span class="kw-meta"><span class="kw-vol">80&ndash;250/mes</span></span></div>
+        <div class="kw-row"><span class="kw-text">programa facturaci&oacute;n catal&aacute;n aut&oacute;nomo</span><span class="kw-meta"><span class="kw-vol">100&ndash;300/mes</span></span></div>
+      </div>
+      <div class="kw-section">
+        <h3 style="color:var(--warn)">2 a medio plazo <span class="kw-section-tag" style="background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)">6&ndash;18 m</span></h3>
+        <div class="kw-row"><span class="kw-text">calculadora modelo 303 online gratis</span><span class="kw-meta"><span class="kw-vol">800&ndash;1.500/mes</span></span></div>
+        <div class="kw-row"><span class="kw-text">verifactu aut&oacute;nomos estimaci&oacute;n directa</span><span class="kw-meta"><span class="kw-vol">300&ndash;700/mes</span></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 16: Hueco de mercado -->
+  <div class="slide">
+    <span class="act-tag">Acto 2 &middot; El hueco</span>
+    <h2>El hueco que TRACKR puede <span class="accent">ocupar</span></h2>
+    <div class="quote">
+      Suite indie todo-en-uno, <span class="accent">gratis y sin cuenta</span>, para el aut&oacute;nomo espa&ntilde;ol que cobra por proyectos u horas, valora est&eacute;tica y control sobre sus datos, y desconf&iacute;a de programas con suscripci&oacute;n mensual.
+    </div>
+    <div class="cols-3" style="margin-top:1.5rem">
+      <div class="card pillar">
+        <h3>Cansancio de suscripciones</h3>
+        <p style="font-size:.82rem">3 grandes absorbidos por grupos extranjeros. Subidas anuales. Segmento harto de pagar 18&ndash;29 &euro;/mes por uso puntual.</p>
+      </div>
+      <div class="card pillar">
+        <h3>El free de la competencia es feo</h3>
+        <p style="font-size:.82rem">Contasimple limita a 50 facturas/a&ntilde;o y arrastra UI vieja. Espacio para &laquo;gratis sin asterisco&raquo;.</p>
+      </div>
+      <div class="card pillar">
+        <h3>Nadie combina lo que combinamos</h3>
+        <p style="font-size:.82rem">Time-tracking + 4 modos de facturaci&oacute;n + cobros parciales + 303/130 + CA nativo + local-first. Ninguno de los grandes lo tiene junto.</p>
+      </div>
+    </div>
+    <p class="small" style="margin-top:1.25rem;text-align:center">Nuevos entrantes son <strong>freemium con suelo</strong>. <span class="accent">TRACKR es el &uacute;nico que se mantiene gratis estructuralmente.</span></p>
+  </div>
+</div>
+
+<!-- Navigation -->
+<div class="nav">
+  <button id="prev">&#8592;</button>
+  <span class="cnt" id="cnt">1 / 8</span>
+  <button id="next">&#8594;</button>
+</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+let cur = 0;
+
+function go(n) {
+  if (n < 0 || n >= total) return;
+  slides[cur].classList.remove('on');
+  cur = n;
+  slides[cur].classList.add('on');
+  document.getElementById('cnt').textContent = (cur + 1) + ' / ' + total;
+  document.getElementById('prog').style.width = ((cur + 1) / total * 100) + '%';
+}
+
+document.getElementById('prev').onclick = () => go(cur - 1);
+document.getElementById('next').onclick = () => go(cur + 1);
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(cur + 1); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); go(cur - 1); }
+  if (e.key === 'Home') go(0);
+  if (e.key === 'End') go(total - 1);
+});
+
+// Init
+go(0);
+</script>
+</body>
+</html>
