@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRACKR - Deck</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#111;--bg2:#191919;--bg3:#222;--bg4:#2a2a2a;
+  --b1:#262626;--b2:#333;--b3:#444;
+  --t1:#ccc;--t2:#888;--t3:#555;
+  --ok:#5a9;--warn:#c93;--bad:#c55;
+  --ac:#5a9;--r:3px;
+}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--t1);overflow:hidden;height:100vh}
+::selection{background:color-mix(in srgb,var(--ac) 30%,transparent);color:var(--t1)}
+
+/* Slides */
+.deck{position:relative;height:100vh;width:100vw}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:6vh 8vw;opacity:0;pointer-events:none;transition:opacity .4s ease}
+.slide.on{opacity:1;pointer-events:auto}
+
+/* Nav */
+.nav{position:fixed;bottom:2rem;right:3rem;display:flex;gap:.5rem;z-index:100;align-items:center}
+.nav button{background:var(--bg3);border:1px solid var(--b1);color:var(--t2);width:36px;height:36px;border-radius:var(--r);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.nav button:hover{background:var(--bg4);color:var(--t1)}
+.nav .cnt{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--t3);min-width:3rem;text-align:center}
+
+/* Progress bar */
+.progress{position:fixed;top:0;left:0;height:2px;background:var(--ac);transition:width .4s ease;z-index:100}
+
+/* Typography */
+.logo{font-family:'DM Mono',monospace;font-weight:500;letter-spacing:.35em;color:var(--t1)}
+h1{font-size:2.8rem;font-weight:600;letter-spacing:-.02em;line-height:1.15;margin-bottom:1rem}
+h2{font-size:1.8rem;font-weight:500;letter-spacing:-.01em;margin-bottom:1.5rem;color:var(--t1)}
+h3{font-size:1.1rem;font-weight:500;margin-bottom:.75rem;color:var(--ac)}
+p{font-size:1rem;color:var(--t2);line-height:1.6;max-width:55ch}
+.sub{font-size:1.15rem;color:var(--t2);margin-bottom:.5rem;line-height:1.5}
+.accent{color:var(--ac)}
+.warn{color:var(--warn)}
+.bad{color:var(--bad)}
+.mono{font-family:'DM Mono',monospace}
+.small{font-size:.85rem;color:var(--t3)}
+.tag{display:inline-block;padding:.15rem .55rem;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);font-size:.75rem;color:var(--t2);font-family:'DM Mono',monospace}
+.tag.green{border-color:color-mix(in srgb,var(--ok) 40%,transparent);color:var(--ok)}
+
+/* Lists */
+ul{list-style:none;display:flex;flex-direction:column;gap:.6rem}
+ul li{font-size:.95rem;color:var(--t2);padding-left:1.2rem;position:relative;line-height:1.5}
+ul li::before{content:'';position:absolute;left:0;top:.55rem;width:5px;height:5px;background:var(--ac);border-radius:50%}
+
+/* Grid layouts */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:3rem;margin-top:1rem}
+.cols-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;margin-top:1rem}
+
+/* Cards */
+.card{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:1.25rem 1.5rem}
+.card h3{margin-bottom:.5rem}
+
+/* Feature grid */
+.feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:1rem}
+.feat{display:flex;align-items:flex-start;gap:.75rem;background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:.75rem 1rem}
+.feat .ic{font-size:1.3rem;min-width:1.8rem;text-align:center;line-height:1.6}
+.feat .ft{font-size:.85rem;font-weight:500;color:var(--t1)}
+.feat .fd{font-size:.75rem;color:var(--t3);margin-top:.15rem}
+
+/* Table */
+table{width:100%;border-collapse:collapse;font-size:.78rem;margin-top:1rem}
+th{font-family:'DM Mono',monospace;font-weight:500;text-align:left;padding:.5rem .75rem;border-bottom:1px solid var(--b2);color:var(--t3);font-size:.7rem;letter-spacing:.05em;text-transform:uppercase}
+td{padding:.45rem .75rem;border-bottom:1px solid var(--b1);color:var(--t2)}
+tr td:first-child{color:var(--t1);font-weight:500}
+.yes{color:var(--ok)}
+.no{color:var(--t3)}
+.partial{color:var(--warn)}
+
+/* Pillar */
+.pillar{text-align:left}
+.pillar h3{font-size:1rem;margin-bottom:.4rem}
+.pillar p{font-size:.85rem;max-width:none}
+
+/* Timeline */
+.timeline{display:flex;flex-direction:column;gap:1.25rem;margin-top:1rem}
+.tl-item{display:flex;gap:1rem;align-items:flex-start}
+.tl-dot{width:8px;height:8px;border-radius:50%;background:var(--ac);margin-top:.45rem;flex-shrink:0}
+.tl-dot.warn{background:var(--warn)}
+.tl-dot.dim{background:var(--t3)}
+
+/* Portada center */
+.center{text-align:center;align-items:center}
+.center p{max-width:none}
+
+/* Stat */
+.stat{text-align:center}
+.stat .num{font-family:'DM Mono',monospace;font-size:2.2rem;font-weight:500;color:var(--ac)}
+.stat .lbl{font-size:.8rem;color:var(--t3);margin-top:.25rem}
+
+/* CTA */
+.cta{display:inline-flex;align-items:center;gap:.5rem;padding:.6rem 1.25rem;background:color-mix(in srgb,var(--ac) 15%,transparent);border:1px solid color-mix(in srgb,var(--ac) 30%,transparent);border-radius:var(--r);color:var(--ac);font-family:'DM Mono',monospace;font-size:.85rem;margin-top:1.5rem}
+
+/* Act cover slides */
+.act-cover{align-items:flex-start;justify-content:center}
+.act-num{font-family:'DM Mono',monospace;font-size:9rem;font-weight:300;color:color-mix(in srgb,var(--ac) 40%,transparent);line-height:1;letter-spacing:-.05em;margin-bottom:1rem}
+.act-lbl{font-family:'DM Mono',monospace;font-size:.85rem;letter-spacing:.3em;color:var(--t3);text-transform:uppercase;margin-bottom:.5rem}
+.act-title{font-size:3rem;font-weight:600;letter-spacing:-.02em;line-height:1.1;color:var(--t1);margin-bottom:.75rem}
+.act-sub{font-size:1.05rem;color:var(--t2);max-width:600px}
+
+/* Act tag (corner indicator) */
+.act-tag{position:absolute;top:2rem;right:3rem;font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.2em;color:var(--t3);text-transform:uppercase}
+
+/* Persona card */
+.persona{display:grid;grid-template-columns:auto 1fr;gap:1.25rem;background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:1.25rem 1.5rem;align-items:start}
+.persona-avatar{width:64px;height:64px;border-radius:50%;background:color-mix(in srgb,var(--ac) 18%,transparent);display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0}
+.persona h3{margin-bottom:.15rem}
+.persona .ph{font-size:.78rem;color:var(--t3);margin-bottom:.5rem}
+.persona ul{gap:.3rem;margin-top:.4rem}
+.persona ul li{font-size:.78rem;padding-left:.9rem}
+.persona ul li::before{width:3px;height:3px;top:.5rem}
+.personas-sec{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem}
+.persona-sm{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:.75rem 1rem;font-size:.78rem}
+.persona-sm strong{color:var(--t1)}
+.persona-sm .desc{color:var(--t3);font-size:.72rem;margin-top:.25rem}
+
+/* Competitor deep dive */
+.comp-head{display:flex;align-items:baseline;gap:1rem;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid var(--b1)}
+.comp-name{font-size:1.6rem;font-weight:600;color:var(--t1)}
+.comp-tag{font-size:.72rem;color:var(--t3);font-family:'DM Mono',monospace}
+.comp-tag .price{color:var(--warn)}
+.comp-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;font-size:.8rem}
+.comp-col h3{font-size:.78rem;letter-spacing:.05em;text-transform:uppercase;color:var(--t3);margin-bottom:.5rem}
+.comp-col.win h3{color:var(--ok)}
+.comp-col.lose h3{color:var(--warn)}
+.comp-col.us h3{color:var(--ac)}
+.comp-col ul{gap:.4rem}
+.comp-col ul li{font-size:.78rem;padding-left:.9rem;color:var(--t2)}
+.comp-col ul li::before{width:3px;height:3px;top:.5rem;background:var(--t3)}
+.comp-col.us ul li::before{background:var(--ac)}
+
+/* Keyword priority list */
+.kw-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:.5rem}
+.kw-section h3{display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem;font-size:.9rem}
+.kw-section h3 .kw-section-tag{font-family:'DM Mono',monospace;font-size:.65rem;padding:.1rem .4rem;border-radius:2px;letter-spacing:.05em}
+.kw-row{display:flex;align-items:center;justify-content:space-between;padding:.45rem .65rem;background:var(--bg2);border:1px solid var(--b1);border-radius:2px;margin-bottom:.35rem;font-size:.78rem}
+.kw-row .kw-text{color:var(--t1);font-family:'DM Mono',monospace;font-size:.72rem}
+.kw-row .kw-meta{display:flex;gap:.4rem;font-size:.65rem;color:var(--t3);font-family:'DM Mono',monospace}
+.kw-vol{color:var(--t2)}
+.kw-diff-low{color:var(--ok)}
+.kw-diff-med{color:var(--warn)}
+.kw-diff-high{color:var(--bad)}
+
+/* Channel cards */
+.chan-list{display:flex;flex-direction:column;gap:.75rem;margin-top:.5rem}
+.chan{display:grid;grid-template-columns:auto 1fr auto;gap:1rem;align-items:center;padding:.85rem 1.1rem;background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r)}
+.chan-ic{font-size:1.4rem;width:2.2rem;text-align:center}
+.chan-title{font-size:.95rem;font-weight:500;color:var(--t1);margin-bottom:.15rem}
+.chan-desc{font-size:.78rem;color:var(--t2)}
+.chan-eff{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--t3);text-align:right;min-width:7rem}
+
+/* Content calendar */
+.cc-list{display:flex;flex-direction:column;gap:.5rem;margin-top:.5rem;font-size:.78rem}
+.cc-item{display:grid;grid-template-columns:5rem 1fr auto;gap:1rem;align-items:center;padding:.5rem .85rem;background:var(--bg2);border:1px solid var(--b1);border-radius:2px}
+.cc-date{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--ac);letter-spacing:.05em}
+.cc-title{color:var(--t1);font-weight:500}
+.cc-kw{font-size:.65rem;color:var(--t3);font-family:'DM Mono',monospace;margin-top:.15rem}
+.cc-channel{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--t2);padding:.15rem .45rem;background:var(--bg3);border-radius:2px;letter-spacing:.05em}
+
+/* Goal cards */
+.goals{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:.5rem}
+.goal{padding:.85rem 1rem;background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);display:flex;flex-direction:column;gap:.25rem}
+.goal-num{font-family:'DM Mono',monospace;font-size:1.5rem;color:var(--ac);line-height:1}
+.goal-num small{font-size:.85rem;color:var(--t3)}
+.goal-text{font-size:.78rem;color:var(--t2);line-height:1.4}
+.goal-date{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--t3);letter-spacing:.05em;text-transform:uppercase;margin-top:.15rem}
+
+/* Risk row */
+.risks{display:flex;flex-direction:column;gap:.65rem;margin-top:.5rem}
+.risk{display:grid;grid-template-columns:auto 1fr 1fr;gap:1rem;padding:.65rem 1rem;background:var(--bg2);border:1px solid var(--b1);border-radius:2px;font-size:.78rem;align-items:start}
+.risk-ic{font-size:1.1rem;color:var(--warn)}
+.risk-name{color:var(--t1);font-weight:500;margin-bottom:.15rem}
+.risk-desc{font-size:.72rem;color:var(--t3)}
+.risk-mit{color:var(--t2);font-size:.78rem}
+.risk-mit::before{content:'→ ';color:var(--ac)}
+
+/* Quote line */
+.quote{font-size:1.4rem;color:var(--t1);font-style:italic;line-height:1.4;max-width:700px;margin:1.5rem 0;padding-left:1.5rem;border-left:3px solid var(--ac)}
+.quote .accent{color:var(--ac);font-style:normal;font-weight:600}
+</style>
+</head>
+<body>
+
+<div class="progress" id="prog"></div>
+
+<div class="deck" id="deck">
+
+  <!-- SLIDE 1: Portada -->
+  <div class="slide center on">
+    <div class="logo" style="font-size:3.5rem;margin-bottom:.5rem">TRACKR</div>
+    <p class="sub" style="font-size:1.15rem;margin-bottom:.3rem;color:var(--t1)">Plan de captaci&oacute;n y crecimiento</p>
+    <p class="sub" style="font-size:.95rem;margin-bottom:1.8rem">Tu gestor freelance en el navegador &middot; Verano 2026</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <span class="tag">Proyectos</span>
+      <span class="tag">Horas</span>
+      <span class="tag">Facturas</span>
+      <span class="tag">Gastos</span>
+      <span class="tag">Impuestos</span>
+    </div>
+    <div style="margin-top:3rem;display:flex;gap:2.5rem;justify-content:center">
+      <div class="stat"><div class="num">0&euro;</div><div class="lbl">Para siempre</div></div>
+      <div class="stat"><div class="num" style="color:var(--t1)">0</div><div class="lbl">Cuentas necesarias</div></div>
+      <div class="stat"><div class="num" style="color:var(--warn)">0</div><div class="lbl">Datos en la nube</div></div>
+    </div>
+    <p class="small" style="margin-top:2.5rem">tr4ckr.com &middot; meowrhino.studio</p>
+  </div>
+
+  <!-- SLIDE 2: El problema -->
+  <div class="slide">
+    <h2>Ser aut&oacute;nomo en Espa&ntilde;a es un <span class="bad">infierno fiscal</span></h2>
+    <div class="cols">
+      <ul>
+        <li><strong>4 declaraciones trimestrales</strong> &mdash; Modelo 303 + 130, con multas si te despistas</li>
+        <li><strong>Facturaci&oacute;n</strong> con IVA, IRPF, exenciones y numeraci&oacute;n correlativa</li>
+        <li><strong>Cuota fija</strong> de 230-530 &euro;/mes aunque no factures nada</li>
+        <li><strong>Verifactu</strong> obligatorio desde el <span class="warn">1 jul 2027</span> &mdash; todos buscando software</li>
+      </ul>
+      <div>
+        <h3>Y las herramientas que hay?</h3>
+        <ul>
+          <li><span class="warn">18-29 &euro;/mes</span> las buenas (Quipu, Holded)</li>
+          <li>Tus datos viven en <span class="bad">su nube</span>, sin export real</li>
+          <li>Pensadas para gestores, no para freelancers</li>
+          <li>Las tres grandes <strong>absorbidas por grupos extranjeros</strong> &rarr; subidas anuales</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: La solucion -->
+  <div class="slide">
+    <h2>Trackr: <span class="accent">todo en tu navegador</span></h2>
+    <div class="cols">
+      <div>
+        <h3>Que es</h3>
+        <ul>
+          <li>App web que corre <strong>100% en tu navegador</strong></li>
+          <li>Datos en localStorage + export a <span class="mono">JSON</span></li>
+          <li>Abres <span class="mono">index.html</span> y funciona</li>
+          <li>Pensada para autonomos espanoles</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Filosofia</h3>
+        <ul>
+          <li><span class="accent">Tus datos son tuyos</span> &mdash; JSON portable, versionable con git</li>
+          <li><span class="accent">Gratis siempre</span> &mdash; Sin trucos, sin tier premium</li>
+          <li><span class="accent">Sin cuenta</span> &mdash; Sin login, sin cloud, sin tracking</li>
+          <li><span class="accent">Vanilla JS</span> &mdash; ~6000 lineas, sin frameworks, sin build step</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: Features -->
+  <div class="slide">
+    <h2>Que puedes hacer con Trackr</h2>
+    <div class="feat-grid">
+      <div class="feat"><div class="ic">&#128209;</div><div><div class="ft">Proyectos + Clientes</div><div class="fd">Estados, fechas, notas. Clientes con NIF y datos fiscales</div></div></div>
+      <div class="feat"><div class="ic">&#9201;</div><div><div class="ft">Control de horas</div><div class="fd">Trabajo vs reuniones, con fecha y notas</div></div></div>
+      <div class="feat"><div class="ic">&#128176;</div><div><div class="ft">Facturacion inteligente</div><div class="fd">4 modos: desde base, desde total, por hora, gratis. IVA + IRPF auto</div></div></div>
+      <div class="feat"><div class="ic">&#128179;</div><div><div class="ft">Cobros parciales</div><div class="fd">Trackea pagos con barra de progreso por proyecto</div></div></div>
+      <div class="feat"><div class="ic">&#128200;</div><div><div class="ft">Dashboard financiero</div><div class="fd">Facturado vs cobrado vs gastos vs neto. &euro;/hora real</div></div></div>
+      <div class="feat"><div class="ic">&#128197;</div><div><div class="ft">Calendario</div><div class="fd">Vista mes/semana con horas, gastos y objetivos</div></div></div>
+      <div class="feat"><div class="ic">&#128196;</div><div><div class="ft">Facturas PDF</div><div class="fd">Genera facturas profesionales con un click</div></div></div>
+      <div class="feat"><div class="ic">&#127991;</div><div><div class="ft">Gastos y recurrentes</div><div class="fd">Base + IVA + total reales. Puntuales y recurrentes</div></div></div>
+      <div class="feat"><div class="ic">&#128202;</div><div><div class="ft">Asistente fiscal</div><div class="fd">Modelo 303, 130 y datos para la Renta</div></div></div>
+      <div class="feat"><div class="ic">&#127912;</div><div><div class="ft">Temas + idiomas</div><div class="fd">8 temas visuales. ES, EN, CA</div></div></div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: Competencia (vista r&aacute;pida) -->
+  <div class="slide">
+    <h2>El mercado actual <span class="small" style="font-size:.85rem;color:var(--t3)">&middot; vista r&aacute;pida</span></h2>
+    <table>
+      <tr><th></th><th style="color:var(--ac)">Trackr</th><th>Quipu</th><th>Holded</th><th>Contasimple</th></tr>
+      <tr><td>Precio entrada</td><td class="yes">0 &euro;</td><td class="partial">17&ndash;20 &euro;/mes</td><td class="partial">14&ndash;29 &euro;/mes</td><td class="partial">0 &euro; (l&iacute;mite 50 fact/a&ntilde;o)</td></tr>
+      <tr><td>Plan gratuito real</td><td class="yes">Si, sin l&iacute;mite</td><td class="no">Trial 15 d&iacute;as</td><td class="no">Trial 14 d&iacute;as</td><td class="partial">Limitado</td></tr>
+      <tr><td>Sin cuenta / cloud</td><td class="yes">Si</td><td class="no">En la nube, obligatorio</td><td class="no">En la nube, obligatorio</td><td class="no">En la nube, obligatorio</td></tr>
+      <tr><td>Datos portables</td><td class="yes">JSON nativo</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
+      <tr><td>Funciona offline</td><td class="yes">Si</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
+      <tr><td>Modelo 303 / 130</td><td class="yes">Si</td><td class="yes">Si</td><td class="partial">Parcial</td><td class="yes">Si</td></tr>
+      <tr><td>Proyectos + horas + &euro;/h</td><td class="yes">Si</td><td class="no">No</td><td class="partial">Parcial</td><td class="no">No</td></tr>
+      <tr><td>Cobros parciales nativos</td><td class="yes">Si</td><td class="partial">B&aacute;sicos</td><td class="partial">B&aacute;sicos</td><td class="no">No</td></tr>
+      <tr><td>Catal&aacute;n nativo</td><td class="yes">Si</td><td class="no">No</td><td class="partial">Limitado</td><td class="no">No</td></tr>
+      <tr><td>Verifactu (SIF)</td><td class="partial">Antes jul 2027</td><td class="yes">29 jul 2025</td><td class="yes">Activo</td><td class="yes">29 jul 2025</td></tr>
+      <tr><td>Due&ntilde;o</td><td class="yes">Indie</td><td class="no">TeamSystem (IT)</td><td class="no">Visma (NO)</td><td class="no">Cegid (FR)</td></tr>
+    </table>
+    <p class="small" style="margin-top:1rem">An&aacute;lisis a fondo de los 3 en el <span class="accent">Acto 2</span>. La diferencia clave: <span class="accent">filosof&iacute;a</span> &mdash; privacidad, control, gratis estructural.</p>
+  </div>
+
+  <!-- SLIDE 6: Diferenciacion -->
+  <div class="slide">
+    <h2>Por que Trackr es <span class="accent">diferente</span></h2>
+    <div class="cols-3">
+      <div class="card pillar">
+        <h3>Privacidad por diseno</h3>
+        <p>Tus datos nunca salen de tu maquina. Export JSON: un archivo que puedes leer, versionar con git, o meter en un USB. Sin tracking, sin cookies.</p>
+      </div>
+      <div class="card pillar">
+        <h3>Pensado para Espana</h3>
+        <p>IVA (21/10/4/0%), IRPF, exenciones. Modelo 303 y 130 integrados. Clientes con NIF, facturacion con numero correlativo.</p>
+      </div>
+      <div class="card pillar">
+        <h3>Simple sin ser basico</h3>
+        <p>No es un ERP: no tiene inventario, nominas ni CRM. Tiene todo lo que un freelancer necesita y nada mas. 6000 lineas de vanilla JS.</p>
+      </div>
+    </div>
+    <div style="margin-top:2.5rem;text-align:center">
+      <p class="small">Quipu y Holded: <em>"nosotros gestionamos tu contabilidad en la nube"</em></p>
+      <p class="small">Trackr: <em>"<span class="accent">tu gestionas tus finanzas en tu navegador, con tus datos</span>"</em></p>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: Modelo -->
+  <div class="slide">
+    <h2>Modelo: <span class="accent">gratis de verdad</span>, sin trampa freemium</h2>
+    <div class="cols">
+      <div>
+        <h3>Hoy</h3>
+        <div class="card" style="margin-bottom:1rem">
+          <div style="display:flex;align-items:baseline;gap:.5rem;margin-bottom:.5rem">
+            <span class="mono" style="font-size:1.8rem;color:var(--ac)">0 &euro;</span>
+            <span class="small">/ para siempre</span>
+          </div>
+          <ul>
+            <li>Todas las funciones, sin l&iacute;mites</li>
+            <li>Uso local con JSON</li>
+            <li>Sin cuenta, sin cloud, sin tracking</li>
+          </ul>
+        </div>
+        <p class="small">Gratis <span class="accent">estructural</span>: no hay backend que mantener &rarr; no hay coste que tapar con suscripciones.</p>
+      </div>
+      <div>
+        <h3>Futuro (Q4 2026 &mdash; Q1 2027)</h3>
+        <div class="card">
+          <div style="display:flex;align-items:baseline;gap:.5rem;margin-bottom:.5rem">
+            <span class="mono" style="font-size:1.4rem;color:var(--warn)">~3&ndash;5 &euro;</span>
+            <span class="small">/ mes opcional</span>
+          </div>
+          <ul>
+            <li><strong>Cuenta opcional</strong> con backup cifrado <em>client-side</em></li>
+            <li>El servidor solo guarda blobs cifrados &mdash; <span class="accent">no podemos leerlos</span></li>
+            <li>Sync entre dispositivos sin renunciar a la privacidad</li>
+            <li>Cloud UE puro (Scaleway / OVH Espa&ntilde;a)</li>
+          </ul>
+        </div>
+        <p class="small" style="margin-top:.75rem">Escenario A (RGPD art. 34.3.a): cifrado robusto = riesgo legal m&iacute;nimo y promesa "tus datos son tuyos" intacta.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: Cierre Acto 1 + transici&oacute;n a Acto 2 -->
+  <div class="slide center">
+    <h2 style="margin-bottom:2rem">Hasta aqu&iacute;, el <span class="accent">qu&eacute; es</span> TRACKR</h2>
+    <div class="cols-3" style="margin-bottom:2rem;max-width:900px">
+      <div class="pillar" style="text-align:center">
+        <div style="font-size:2.4rem;color:var(--ac);margin-bottom:.4rem">&check;</div>
+        <h3>Producto real</h3>
+        <p style="font-size:.82rem">Suite completa funcionando en tr4ckr.com. Lo uso cada d&iacute;a.</p>
+      </div>
+      <div class="pillar" style="text-align:center">
+        <div style="font-size:2.4rem;color:var(--ac);margin-bottom:.4rem">&check;</div>
+        <h3>Posicionamiento claro</h3>
+        <p style="font-size:.82rem">Indie, local-first, sin cuenta, sin trampa. Un hueco real de mercado.</p>
+      </div>
+      <div class="pillar" style="text-align:center">
+        <div style="font-size:2.4rem;color:var(--warn);margin-bottom:.4rem">?</div>
+        <h3>Pero...</h3>
+        <p style="font-size:.82rem">Nadie lo conoce todav&iacute;a. Cero tracci&oacute;n, cero beta testers activos.</p>
+      </div>
+    </div>
+    <p style="font-size:1.15rem;color:var(--t1);max-width:680px;text-align:center;margin-bottom:.5rem">
+      La pregunta no es <em>"&iquest;el producto vale?"</em> &mdash; es:
+    </p>
+    <p style="font-size:1.4rem;color:var(--ac);font-weight:500">
+      &iquest;C&oacute;mo encontramos a los <em>autonomos correctos</em> y se lo ponemos delante?
+    </p>
+    <p class="small" style="margin-top:1.5rem;color:var(--t3)">Acto 2: el mercado y la batalla. Acto 3: c&oacute;mo lo movemos.</p>
+  </div>
+
+  <!-- ═══════════════ ACTO 2 ═══════════════ -->
+
+  <!-- SLIDE 9: Portada Acto 2 -->
+  <div class="slide act-cover">
+    <div class="act-num">02</div>
+    <div class="act-lbl">Acto 2</div>
+    <h1 class="act-title">El mercado <span class="accent">y la batalla</span></h1>
+    <p class="act-sub">Verifactu como catalizador &middot; los 3 competidores que importan &middot; keywords atacables &middot; el hueco real de mercado.</p>
+  </div>
+
+  <!-- SLIDE 10: Verifactu como catalizador -->
+  <div class="slide">
+    <span class="act-tag">Acto 2 &middot; El momento</span>
+    <h2>Verifactu: la ventana de oportunidad <span class="accent">2026-2027</span></h2>
+    <div class="cols">
+      <div>
+        <h3>Qu&eacute; cambia</h3>
+        <ul>
+          <li>RDL 15/2025 obliga a Verifactu el <span class="warn">1 jul 2027</span> a aut&oacute;nomos</li>
+          <li>Todos van a tener que migrar o actualizar herramienta</li>
+          <li>Sanciones de hasta <span class="bad">50.000 &euro;/ejercicio</span> por software no homologado</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Estado de los grandes</h3>
+        <ul>
+          <li><strong>Quipu</strong>, <strong>Contasimple</strong>, <strong>Holded</strong> ya tienen declaraci&oacute;n responsable firmada</li>
+          <li><strong>TRACKR</strong>: homologaci&oacute;n SIF antes del 1 jul 2027 (compromiso roadmap)</li>
+        </ul>
+      </div>
+    </div>
+    <p class="quote" style="font-size:1.15rem;margin-top:1.5rem">Ventana de <span class="accent">14&ndash;18 meses</span> con pico sostenido de b&uacute;squedas &laquo;verifactu aut&oacute;nomos&raquo;.<br><span style="font-style:normal;color:var(--ac)">Es el momento.</span></p>
+  </div>
+
+  <!-- SLIDE 11: Buyer persona (sint&eacute;tica) -->
+  <div class="slide">
+    <span class="act-tag">Acto 2 &middot; A qui&eacute;n hablamos</span>
+    <h2>A qui&eacute;n le hablamos</h2>
+    <p class="sub" style="font-size:1rem;margin-bottom:2rem">Aut&oacute;nomo espa&ntilde;ol en estimaci&oacute;n directa, sin equipo, que ya factura pero todav&iacute;a no tiene una herramienta que le funcione.</p>
+    <div class="cols">
+      <div>
+        <h3 style="color:var(--warn);font-size:.85rem;letter-spacing:.05em;text-transform:uppercase">Hoy le duele</h3>
+        <ul>
+          <li>Por miedo a &laquo;liarla&raquo; con Hacienda, paga <strong>gestor&iacute;a por defecto</strong> (40&ndash;100 &euro;/mes) aunque facture poco. Patr&oacute;n com&uacute;n en <strong>artistas y oficios creativos</strong> sin formaci&oacute;n fiscal.</li>
+          <li>Lleva facturas y gastos en Excel + memoria</li>
+          <li>Las herramientas conocidas cuestan <strong>18&ndash;29 &euro;/mes</strong> para uso puntual</li>
+          <li>No quiere sus datos fiscales en la nube de nadie</li>
+          <li>Le agobian los modelos 303 y 130 cada trimestre</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="color:var(--ac);font-size:.85rem;letter-spacing:.05em;text-transform:uppercase">Le motivar&iacute;a</h3>
+        <ul>
+          <li>Una app <strong>sin cuenta</strong> y gratis de verdad</li>
+          <li>Que entienda IVA real (21/10/4/0) e intracomunitario</li>
+          <li>Que calcule 303 y 130 <strong>sin pasar por gestor</strong></li>
+          <li>Una factura PDF bonita que pueda enviar tal cual</li>
+        </ul>
+      </div>
+    </div>
+    <p class="small" style="margin-top:1.5rem;text-align:center;color:var(--t3)">D&oacute;nde le encontramos: Reddit &middot; X/Bluesky &middot; b&uacute;squedas Google &middot; referidos de freelancers.</p>
+  </div>
+
+  <!-- SLIDE 12: Los 3 competidores que importan (s&iacute;ntesis) -->
+  <div class="slide">
+    <span class="act-tag">Acto 2 &middot; BENCHMARK</span>
+    <h2>Los 3 competidores que <span class="accent">importan</span></h2>
+    <p class="small" style="margin-top:-.5rem;margin-bottom:.75rem">Cada uno cubre un arquetipo distinto. Ninguno tapa el hueco donde est&aacute; TRACKR.</p>
+    <table style="font-size:.78rem">
+      <tr><th style="width:11%">Competidor</th><th style="width:14%">Precio</th><th style="width:22%">Para qui&eacute;n</th><th style="width:23%">Mayor debilidad</th><th style="width:30%;color:var(--ac)">D&oacute;nde TRACKR gana</th></tr>
+      <tr>
+        <td><strong>Quipu</strong><br><span class="small">TeamSystem (IT)</span></td>
+        <td class="partial">17&ndash;20 &euro;/mes</td>
+        <td>Aut&oacute;nomo que <em>ya tiene</em> gestor&iacute;a y quiere panel propio</td>
+        <td>Sin plan gratuito desde 2024. Sin time-tracking. Catal&aacute;n limitado.</td>
+        <td>Gratis &middot; sin cuenta &middot; time-tracking + &euro;/h &middot; catal&aacute;n nativo</td>
+      </tr>
+      <tr>
+        <td><strong>Holded</strong><br><span class="small">Visma (NO)</span></td>
+        <td class="partial">14,50&ndash;149 &euro;/mes</td>
+        <td>PYME que necesita CRM + inventario + RRHH</td>
+        <td>Sobredimensionado para el aut&oacute;nomo solo. Curva alta.</td>
+        <td>Dr&aacute;sticamente m&aacute;s simple &middot; cero curva &middot; dise&ntilde;o indie</td>
+      </tr>
+      <tr>
+        <td><strong>Contasimple</strong><br><span class="small">Cegid (FR)</span></td>
+        <td class="partial">0 &euro; (50 fact/a&ntilde;o)<br>hasta ~22 &euro;/mes</td>
+        <td>Aut&oacute;nomo de volumen bajo que solo quiere &laquo;cumplir&raquo;</td>
+        <td>UI anticuada. Sin time-tracking. Subidas anuales.</td>
+        <td>Dise&ntilde;o moderno &middot; sin l&iacute;mite &middot; tracking + fiscal en uno</td>
+      </tr>
+    </table>
+    <h3 style="margin-top:1.25rem;margin-bottom:.4rem;font-size:.82rem;letter-spacing:.05em;text-transform:uppercase;color:var(--ac)">Eje pol&iacute;tico &amp; ecol&oacute;gico</h3>
+    <table style="font-size:.76rem">
+      <tr><th style="width:22%">Dimensi&oacute;n</th><th style="width:39%">Quipu / Holded / Contasimple</th><th style="width:39%;color:var(--ac)">TRACKR</th></tr>
+      <tr>
+        <td><strong>Propiedad &amp; datos</strong></td>
+        <td class="partial">Capital extranjero &middot; tus datos en su cloud privada</td>
+        <td>Indie espa&ntilde;ol &middot; tus datos en tu navegador, sin servidor</td>
+      </tr>
+      <tr>
+        <td><strong>Modelo econ&oacute;mico</strong></td>
+        <td class="partial">Suscripci&oacute;n mensual creciente &middot; extracci&oacute;n</td>
+        <td><strong>Gratis para siempre</strong> &middot; p&uacute;blico y abierto</td>
+      </tr>
+      <tr>
+        <td><strong>Huella</strong></td>
+        <td class="partial">Servidores 24/7 procesando tus datos</td>
+        <td>Ejecuci&oacute;n en cliente &middot; sin backend permanente</td>
+      </tr>
+    </table>
+    <p class="small" style="margin-top:.9rem;text-align:center"><span class="accent">El hueco para algo gratis-de-verdad, indie y p&uacute;blico es real.</span></p>
+  </div>
+
+  <!-- SLIDE 15: Keywords -->
+  <div class="slide">
+    <span class="act-tag">Acto 2 &middot; SEO &middot; Posicionament</span>
+    <h2>SEO &mdash; d&oacute;nde podemos <span class="accent">aparecer en Google</span></h2>
+    <p class="small" style="margin-top:-.5rem;margin-bottom:1rem">Long-tail donde nadie compite. SERPs saturados (&laquo;programa facturaci&oacute;n aut&oacute;nomos&raquo;, DA 70+) los dejamos para 2027+.</p>
+    <div class="kw-grid">
+      <div class="kw-section">
+        <h3 style="color:var(--ok)">3 prioritarias <span class="kw-section-tag" style="background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)">atacables ya</span></h3>
+        <div class="kw-row"><span class="kw-text">facturaci&oacute;n aut&oacute;nomo sin cuota mensual</span><span class="kw-meta"><span class="kw-vol">100&ndash;300/mes</span></span></div>
+        <div class="kw-row"><span class="kw-text">app aut&oacute;nomos sin suscripci&oacute;n</span><span class="kw-meta"><span class="kw-vol">80&ndash;250/mes</span></span></div>
+        <div class="kw-row"><span class="kw-text">programa facturaci&oacute;n catal&aacute;n aut&oacute;nomo</span><span class="kw-meta"><span class="kw-vol">100&ndash;300/mes</span></span></div>
+      </div>
+      <div class="kw-section">
+        <h3 style="color:var(--warn)">2 a medio plazo <span class="kw-section-tag" style="background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)">6&ndash;18 m</span></h3>
+        <div class="kw-row"><span class="kw-text">calculadora modelo 303 online gratis</span><span class="kw-meta"><span class="kw-vol">800&ndash;1.500/mes</span></span></div>
+        <div class="kw-row"><span class="kw-text">verifactu aut&oacute;nomos estimaci&oacute;n directa</span><span class="kw-meta"><span class="kw-vol">300&ndash;700/mes</span></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 16: Hueco de mercado -->
+  <div class="slide">
+    <span class="act-tag">Acto 2 &middot; El hueco</span>
+    <h2>El hueco que TRACKR puede <span class="accent">ocupar</span></h2>
+    <div class="quote">
+      Suite indie todo-en-uno, <span class="accent">gratis y sin cuenta</span>, para el aut&oacute;nomo espa&ntilde;ol que cobra por proyectos u horas, valora est&eacute;tica y control sobre sus datos, y desconf&iacute;a de programas con suscripci&oacute;n mensual.
+    </div>
+    <div class="cols-3" style="margin-top:1.5rem">
+      <div class="card pillar">
+        <h3>Cansancio de suscripciones</h3>
+        <p style="font-size:.82rem">3 grandes absorbidos por grupos extranjeros. Subidas anuales. Segmento harto de pagar 18&ndash;29 &euro;/mes por uso puntual.</p>
+      </div>
+      <div class="card pillar">
+        <h3>El free de la competencia es feo</h3>
+        <p style="font-size:.82rem">Contasimple limita a 50 facturas/a&ntilde;o y arrastra UI vieja. Espacio para &laquo;gratis sin asterisco&raquo;.</p>
+      </div>
+      <div class="card pillar">
+        <h3>Nadie combina lo que combinamos</h3>
+        <p style="font-size:.82rem">Time-tracking + 4 modos de facturaci&oacute;n + cobros parciales + 303/130 + CA nativo + local-first. Ninguno de los grandes lo tiene junto.</p>
+      </div>
+    </div>
+    <p class="small" style="margin-top:1.25rem;text-align:center">Nuevos entrantes son <strong>freemium con suelo</strong>. <span class="accent">TRACKR es el &uacute;nico que se mantiene gratis estructuralmente.</span></p>
+  </div>
+
+  <!-- ═══════════════ ACTO 3 ═══════════════ -->
+
+  <!-- SLIDE 17: Portada Acto 3 -->
+  <div class="slide act-cover">
+    <div class="act-num">03</div>
+    <div class="act-lbl">Acto 3</div>
+    <h1 class="act-title">Plan de <span class="accent">captaci&oacute;n</span></h1>
+    <p class="act-sub">Objetivos verano 2026 &middot; canales &middot; 90 d&iacute;as de contenido &middot; m&eacute;tricas &middot; riesgos &middot; roadmap producto alineado.</p>
+  </div>
+
+  <!-- SLIDE 18: Qu&eacute; vamos a observar -->
+  <div class="slide">
+    <span class="act-tag">Acto 3 &middot; Lo que observamos</span>
+    <h2>Qu&eacute; vamos a <span class="accent">observar</span></h2>
+    <p class="small" style="margin-top:-.5rem;margin-bottom:.75rem">Sin objetivos n&uacute;mero-or&aacute;culo. Medimos para aprender, no para cumplir cuota.</p>
+    <div class="cols">
+      <div>
+        <h3 style="color:var(--ac);font-size:.78rem;letter-spacing:.05em;text-transform:uppercase">M&eacute;tricas duras &middot; Cloudflare Web Analytics</h3>
+        <ul>
+          <li><strong>Visitas &uacute;nicas/mes</strong> a tr4ckr.com</li>
+          <li><strong>Nuevos vs recurrentes</strong></li>
+          <li><strong>De d&oacute;nde vienen</strong> &mdash; referrer + pa&iacute;s</li>
+          <li><strong>Tr&aacute;fico cruzado</strong> tr4ckr.com &harr; meowrhino.studio</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="color:var(--warn);font-size:.78rem;letter-spacing:.05em;text-transform:uppercase">Hitos cualitativos &middot; auto-observados</h3>
+        <ul>
+          <li><strong>Ensayos publicados</strong> al mes</li>
+          <li><strong>Comentarios reales</strong> en Reddit/X</li>
+          <li><strong>Emails</strong> de gente que usa TRACKR</li>
+          <li><strong>Menciones org&aacute;nicas</strong> en blogs/podcasts</li>
+        </ul>
+      </div>
+    </div>
+    <p class="small" style="margin-top:1.5rem;text-align:center"><strong>Revisi&oacute;n fin de mes</strong>: ~30 min. Canal que aporta &rarr; doblar. Sin tracci&oacute;n a 2 meses &rarr; podar.</p>
+  </div>
+
+  <!-- SLIDE 19: Canales -->
+  <div class="slide">
+    <span class="act-tag">Acto 3 &middot; Canales</span>
+    <h2>Ideas de <span class="accent">canales</span></h2>
+    <p class="small" style="margin-top:-.5rem;margin-bottom:1rem">Todav&iacute;a no hay nada en marcha. Estas son las opciones; elegimos sobre la marcha lo que funcione.</p>
+    <div class="chan-list">
+      <div class="chan" style="border-color:color-mix(in srgb,var(--ac) 35%,var(--b1))">
+        <div class="chan-ic">&#9998;</div>
+        <div>
+          <div class="chan-title">meowrhino.studio/blog/ &mdash; ensayos</div>
+          <div class="chan-desc">~1 al mes sobre el proceso real de hacer TRACKR. Cada ensayo enlaza a tr4ckr.com cuando encaja.</div>
+        </div>
+        <div class="chan-eff" style="color:var(--ac)">candidato firme</div>
+      </div>
+      <div class="chan">
+        <div class="chan-ic">&#128172;</div>
+        <div>
+          <div class="chan-title">Comunidades de aut&oacute;nomos</div>
+          <div class="chan-desc">r/Autonomos, X, Bluesky. Presencia sin spam. Indie Hackers / HN cuando haya algo que contar.</div>
+        </div>
+        <div class="chan-eff">a probar</div>
+      </div>
+      <div class="chan">
+        <div class="chan-ic">&#129309;</div>
+        <div>
+          <div class="chan-title">Asesor&iacute;as o creadores fiscales c&oacute;mplices</div>
+          <div class="chan-desc">Sin partnerships formales. 1&ndash;2 personas con autoridad fiscal que prueben TRACKR y lo compartan si les gusta.</div>
+        </div>
+        <div class="chan-eff">a explorar</div>
+      </div>
+      <div class="chan">
+        <div class="chan-ic">&#128295;</div>
+        <div>
+          <div class="chan-title">Microherramienta p&uacute;blica</div>
+          <div class="chan-desc">Calculadora 303 sin login en tr4ckr.com/303. Gancho SEO y branding (siguiente slide).</div>
+        </div>
+        <div class="chan-eff">idea</div>
+      </div>
+    </div>
+    <p class="small" style="margin-top:1rem;text-align:center;color:var(--t3)">Lo que <strong>NO</strong> haremos: Google Ads, LinkedIn Ads, influencers de pago, ferias. 0 &euro; presupuesto, todo org&aacute;nico.</p>
+  </div>
+
+  <!-- SLIDE 20: Plan de contenidos asumible -->
+  <div class="slide">
+    <span class="act-tag">Acto 3 &middot; Contenidos</span>
+    <h2>3 posts en <span class="accent">3 meses</span></h2>
+    <p class="small" style="margin-top:-.5rem;margin-bottom:1rem">1 al mes. Cada uno con un objetivo claro: ense&ntilde;ar, comparar o contar.</p>
+    <div class="cc-list">
+      <div class="cc-item">
+        <div class="cc-date">Junio</div>
+        <div>
+          <div class="cc-title">Verifactu para aut&oacute;nomos que no quieren pagar gestor</div>
+          <div class="cc-kw">post pilar &middot; <em>ense&ntilde;ar</em> &mdash; lo que cambia el 1 jul 2027 y c&oacute;mo prepararse</div>
+        </div>
+        <div class="cc-channel">meowrhino blog</div>
+      </div>
+      <div class="cc-item">
+        <div class="cc-date">Julio</div>
+        <div>
+          <div class="cc-title">TRACKR vs Quipu &middot; comparativa honesta</div>
+          <div class="cc-kw">comparativa &middot; <em>contrastar</em> &mdash; d&oacute;nde gana cada uno, sin trampas</div>
+        </div>
+        <div class="cc-channel">meowrhino blog</div>
+      </div>
+      <div class="cc-item">
+        <div class="cc-date">Agosto</div>
+        <div>
+          <div class="cc-title">Construir una app indie de facturaci&oacute;n: el viaje</div>
+          <div class="cc-kw">narrativa &middot; <em>conectar</em> &mdash; el proceso real de hacer TRACKR + lanzamiento calc 303</div>
+        </div>
+        <div class="cc-channel">meowrhino blog</div>
+      </div>
+    </div>
+    <p class="small" style="margin-top:1rem;text-align:center">Cada post se trocea en hilo en X y comentario en r/Autonomos. Un post = 3 piezas de presencia. <span class="accent">Si publicas 3 posts en 90 d&iacute;as, el plan funciona.</span></p>
+  </div>
+
+  <!-- SLIDE 21: Microherramienta / idea SEO -->
+  <div class="slide">
+    <span class="act-tag">Acto 3 &middot; Idea</span>
+    <h2>Idea: una <span class="accent">microherramienta</span> p&uacute;blica</h2>
+    <p class="small" style="margin-top:-.5rem;margin-bottom:1rem">No es compromiso, es opci&oacute;n. Si TRACKR coge tracci&oacute;n, le damos prioridad. Si no, queda apuntado.</p>
+    <div class="cols">
+      <div>
+        <h3>Hip&oacute;tesis: tr4ckr.com/303</h3>
+        <div class="card" style="font-size:.9rem;margin-bottom:.75rem">
+          Calculadora del Modelo 303 sin cuenta. Reutiliza la l&oacute;gica que ya tiene TRACKR dentro. ~1 jornada de desarrollo.
+        </div>
+        <p class="small" style="color:var(--t3)">130 queda para 2027 si la 303 demuestra que la jugada funciona.</p>
+      </div>
+      <div>
+        <h3>Por qu&eacute; podr&iacute;a funcionar</h3>
+        <ul>
+          <li>Tr&aacute;fico recurrente: 4 picos al a&ntilde;o (cierres de trimestre)</li>
+          <li>Enlaces naturales: blogs fiscales enlazan herramientas &uacute;tiles + gratuitas</li>
+          <li>Marca: refuerza el "los que dan herramientas gratis sin cuenta"</li>
+          <li>~800&ndash;1.500 b&uacute;squedas/mes para <em>"calculadora modelo 303 online gratis"</em></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 22: Riesgos -->
+  <div class="slide">
+    <span class="act-tag">Acto 3 &middot; Riesgos</span>
+    <h2>4 riesgos <span class="accent">y c&oacute;mo los mitigamos</span></h2>
+    <div class="risks">
+      <div class="risk">
+        <div class="risk-ic">&#9888;</div>
+        <div>
+          <div class="risk-name">Verifactu llega antes de la homologaci&oacute;n</div>
+          <div class="risk-desc">Obligados desde 1 jul 2027. Sin declaraci&oacute;n firmada: riesgo legal y de marca.</div>
+        </div>
+        <div class="risk-mit">Sprint t&eacute;cnico Q1 2027 + declaraci&oacute;n responsable en URL p&uacute;blica antes del 1 jul 2027</div>
+      </div>
+      <div class="risk">
+        <div class="risk-ic">&#9888;</div>
+        <div>
+          <div class="risk-name">Fundador solo + tiempo limitado</div>
+          <div class="risk-desc">Una persona sosteniendo producto + marketing: fr&aacute;gil ante burnout.</div>
+        </div>
+        <div class="risk-mit">Plan acotado a 90 d&iacute;as. Reciclar cada pieza en 3 canales. IA como copiloto</div>
+      </div>
+      <div class="risk">
+        <div class="risk-ic">&#9888;</div>
+        <div>
+          <div class="risk-name">Dependencia narrativa de meowrhino.studio</div>
+          <div class="risk-desc">Si TRACKR queda como subproducto del estudio, no construye identidad propia.</div>
+        </div>
+        <div class="risk-mit">tr4ckr.com con identidad, copy y OG propios. Estudio aparece como autor, no como propietario operativo</div>
+      </div>
+      <div class="risk">
+        <div class="risk-ic">&#9888;</div>
+        <div>
+          <div class="risk-name">Competidores grandes copan el SERP</div>
+          <div class="risk-desc">Quipu/Holded/Contasimple tienen DA 70+ y presupuesto editorial.</div>
+        </div>
+        <div class="risk-mit">Atacar solo long-tail diferencial. SERPs saturados quedan para 2027+</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 24: Roadmap producto alineado al plan -->
+  <div class="slide">
+    <span class="act-tag">Acto 3 &middot; Roadmap</span>
+    <h2>Roadmap producto <span class="accent">alineado al plan</span></h2>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div>
+          <h3>Q2-Q3 2026 &mdash; lo inmediato</h3>
+          <ul>
+            <li>Microherramienta <code class="mono">tr4ckr.com/303</code> p&uacute;blica (canal SEO)</li>
+            <li>Cierre del asistente trimestral 303/130 dentro de la app</li>
+            <li>Categor&iacute;as de gasto extra (cotizaci&oacute;n, amortizaci&oacute;n)</li>
+            <li>Imagen OG pulida + meta tags optimizados (ya hecho)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot warn"></div>
+        <div>
+          <h3>Q3 2026 &mdash; verano, fase de captaci&oacute;n</h3>
+          <ul>
+            <li>Refinamientos UX seg&uacute;n feedback de los primeros 50 beta testers</li>
+            <li>Posible PWA / app m&oacute;vil offline-capable</li>
+            <li>Inicio de estudio t&eacute;cnico para homologaci&oacute;n SIF</li>
+          </ul>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot dim"></div>
+        <div>
+          <h3>Q4 2026 &mdash; Q1 2027 &mdash; pivot opcional</h3>
+          <ul>
+            <li>Pivot A: cuentas + backup cifrado client-side (Cloud UE puro)</li>
+            <li>Textos legales completos (aviso, privacidad, cookies, T&amp;C)</li>
+            <li>Modelo de suscripci&oacute;n opcional 3&ndash;5 &euro;/mes (solo hosting, el core sigue gratis)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot dim"></div>
+        <div>
+          <h3>Antes del 1 jul 2027 &mdash; compromiso fiscal</h3>
+          <ul>
+            <li>Declaraci&oacute;n responsable Verifactu firmada y publicada en URL abierta de tr4ckr.com</li>
+            <li>Comunicaci&oacute;n del cumplimiento como nota de blog + actualizaci&oacute;n de landing</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 25: Cierre / CTA -->
+  <div class="slide center">
+    <div class="logo" style="font-size:3rem;margin-bottom:.5rem">TRACKR</div>
+    <p class="sub" style="font-size:1.1rem;margin-bottom:2rem">Tu gestor freelance en el navegador</p>
+    <div class="quote" style="text-align:left;max-width:760px;margin-left:auto;margin-right:auto;font-size:1.2rem">
+      TRACKR no compite por precio &mdash; ya est&aacute; en el suelo.<br>
+      Compite por <span class="accent">filosof&iacute;a y producto integrado</span>.<br>
+      <span style="font-size:.9rem;font-style:normal;color:var(--t3)">Hecho indie. Para los aut&oacute;nomos que entienden que sus datos no son un producto.</span>
+    </div>
+    <div style="display:flex;gap:1.5rem;justify-content:center;margin-top:2rem;flex-wrap:wrap">
+      <div class="cta">tr4ckr.com</div>
+      <div class="cta" style="color:var(--t1);background:transparent;border-color:var(--b2)">meowrhino.studio</div>
+      <div class="cta" style="color:var(--t2);background:transparent;border-color:var(--b2)">manuellatourf@gmail.com</div>
+    </div>
+    <p class="small" style="margin-top:2.5rem;color:var(--t3)">Plan vigente: mayo &ndash; septiembre 2026 &middot; Revisi&oacute;n: fin de cada mes</p>
+  </div>
+
+</div>
+
+<!-- Navigation -->
+<div class="nav">
+  <button id="prev">&#8592;</button>
+  <span class="cnt" id="cnt">1 / 8</span>
+  <button id="next">&#8594;</button>
+</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+let cur = 0;
+
+function go(n) {
+  if (n < 0 || n >= total) return;
+  slides[cur].classList.remove('on');
+  cur = n;
+  slides[cur].classList.add('on');
+  document.getElementById('cnt').textContent = (cur + 1) + ' / ' + total;
+  document.getElementById('prog').style.width = ((cur + 1) / total * 100) + '%';
+}
+
+document.getElementById('prev').onclick = () => go(cur - 1);
+document.getElementById('next').onclick = () => go(cur + 1);
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(cur + 1); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); go(cur - 1); }
+  if (e.key === 'Home') go(0);
+  if (e.key === 'End') go(total - 1);
+});
+
+// Init
+go(0);
+</script>
+</body>
+</html>
