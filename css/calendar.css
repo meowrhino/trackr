@@ -94,11 +94,13 @@
 .cal-day.out{opacity:.3}
 
 /* Número del día */
-.cal-num{
+.cal-day-header{
   font-family:'DM Mono',monospace;
   font-size:.75rem;
   color:var(--t2);
   margin-bottom:.3rem;
+  display:flex;
+  justify-content:space-between;
 }
 
 /* Hoy: círculo invertido en el número */
@@ -111,6 +113,13 @@
   display:flex;
   align-items:center;
   justify-content:center;
+  gap:.2rem;
+}
+
+/* Total de horas dentro de celda mensual */
+.cal-day-total{
+  font-size:.62rem;
+  color:var(--t3);
 }
 
 /* ── Entrada de hora dentro de celda mensual ── */
@@ -199,6 +208,13 @@
   display:flex;
   align-items:center;
   justify-content:center;
+}
+
+/* Total de horas en el header semanal */
+.cal-wh-total{
+  font-size:.6rem;
+  color:var(--t2);
+  margin-top:.1rem;
 }
 
 /* Body: columna etiquetas + 7 columnas día */
