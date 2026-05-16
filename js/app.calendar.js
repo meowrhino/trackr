@@ -145,19 +145,28 @@ Object.assign(App, {
       ? `${days[0].num}–${days[6].num} ${MESES[d0.getMonth()]} ${d0.getFullYear()}`
       : `${days[0].num} ${MESES[d0.getMonth()]} – ${days[6].num} ${MESES[d6.getMonth()]} ${d6.getFullYear()}`;
 
+    const startHour = (D.d.settings && D.d.settings.calStartHour) || 0;
+    const dayAfter = new Date(ws.getFullYear(), ws.getMonth(), ws.getDate() + 7);
+    const dayAfterStr = `${dayAfter.getFullYear()}-${String(dayAfter.getMonth() + 1).padStart(2, '0')}-${String(dayAfter.getDate()).padStart(2, '0')}`;
+
     const ps = D.ps();
     const hm = {}; let wt = 0;
     const pStats = {};
     const dateSet = new Set(days.map(d => d.date));
+    const renderSet = new Set(dateSet);
+    if (startHour > 0) renderSet.add(dayAfterStr);
     ps.forEach(p => {
       const hex = colorHex(p.color);
       p.horas.forEach(h => {
-        if (!h.fecha || !dateSet.has(h.fecha)) return;
+        if (!h.fecha) return;
+        if (dateSet.has(h.fecha)) {
+          wt += h.cantidad;
+          if (!pStats[p.id]) pStats[p.id] = { pn: p.nombre, pc: hex, h: 0 };
+          pStats[p.id].h += h.cantidad;
+        }
+        if (!renderSet.has(h.fecha)) return;
         if (!hm[h.fecha]) hm[h.fecha] = [];
         hm[h.fecha].push({ pid: p.id, hid: h.id, pn: p.nombre, pc: hex, tipo: h.tipo, cant: h.cantidad, nota: h.nota, hi: h.horaInicio });
-        wt += h.cantidad;
-        if (!pStats[p.id]) pStats[p.id] = { pn: p.nombre, pc: hex, h: 0 };
-        pStats[p.id].h += h.cantidad;
       });
     });
 
@@ -171,40 +180,102 @@ Object.assign(App, {
       });
     });
 
-    const hStart = 0, hEnd = 24, slotH = 60;
+    const slotH = 60;
+    const colStartMins = startHour * 60;
+    const colEndMins = colStartMins + 24 * 60;
+
     let hdr = '<div class="cal-wc"></div>';
     days.forEach(d => { hdr += `<div class="cal-wh${d.today ? ' today' : ''}"><span class="cal-wh-dow">${d.dow}</span><span class="cal-wh-num">${d.num}</span></div>`; });
 
+    /* Pushear noTime entries solo una vez por evento (su columna natural di) */
     const noTimeEntries = [];
-    const colEvts = days.map(d => {
-      const es = hm[d.date] || [];
-      const timed = [];
-      es.forEach(e => { if (!e.hi) { noTimeEntries.push({ ...e, fecha: d.date }); return; } timed.push(e); });
-      return timed;
+    days.forEach(d => {
+      (hm[d.date] || []).forEach(e => { if (!e.hi) noTimeEntries.push({ ...e, fecha: d.date }); });
+    });
+
+    /* Distribuir eventos a columnas con split visual cuando cruzan el borde de columna */
+    const colEvts = days.map(() => []);
+    const pushEvt = (di, e, top, heightPx, splitFirst, splitSecond) => {
+      colEvts[di].push({ ...e, top, height: heightPx, splitFirst, splitSecond });
+    };
+    days.forEach((d, di) => {
+      const nextDate = di < 6 ? days[di + 1].date : dayAfterStr;
+      /* Eventos con fecha=d y hi >= startHour */
+      (hm[d.date] || []).forEach(e => {
+        if (!e.hi) return;
+        const [hh, mm] = e.hi.split(':');
+        const mins = parseInt(hh) * 60 + parseInt(mm);
+        if (mins < colStartMins) return; /* va en la columna anterior */
+        const topPx = (mins - colStartMins) / 60 * slotH;
+        const durMins = e.cant * 60;
+        const endMins = mins + durMins;
+        if (endMins > colEndMins) {
+          const visibleMins = colEndMins - mins;
+          pushEvt(di, e, topPx, visibleMins / 60 * slotH, true, false);
+          if (di + 1 < 7) pushEvt(di + 1, e, 0, (endMins - colEndMins) / 60 * slotH, false, true);
+        } else {
+          pushEvt(di, e, topPx, durMins / 60 * slotH, false, false);
+        }
+      });
+      /* Eventos con fecha=nextDate y hi < startHour (solo si startHour > 0) */
+      if (startHour > 0) {
+        (hm[nextDate] || []).forEach(e => {
+          if (!e.hi) return;
+          const [hh, mm] = e.hi.split(':');
+          const mins = parseInt(hh) * 60 + parseInt(mm);
+          if (mins >= colStartMins) return;
+          const adjustedMins = mins + 24 * 60;
+          const topPx = (adjustedMins - colStartMins) / 60 * slotH;
+          const durMins = e.cant * 60;
+          const endMinsAdj = adjustedMins + durMins;
+          if (endMinsAdj > colEndMins) {
+            const visibleMins = colEndMins - adjustedMins;
+            pushEvt(di, e, topPx, visibleMins / 60 * slotH, true, false);
+            if (di + 1 < 7) pushEvt(di + 1, e, 0, (endMinsAdj - colEndMins) / 60 * slotH, false, true);
+          } else {
+            pushEvt(di, e, topPx, durMins / 60 * slotH, false, false);
+          }
+        });
+      }
     });
 
     let timeLbl = '';
-    for (let hr = hStart; hr < hEnd; hr++) timeLbl += `<div class="cal-tl">${String(hr).padStart(2, '0')}:00</div>`;
+    for (let i = 0; i < 24; i++) {
+      const hr = (startHour + i) % 24;
+      timeLbl += `<div class="cal-tl">${String(hr).padStart(2, '0')}:00</div>`;
+    }
+
+    const now = new Date();
+    const nowMins = now.getHours() * 60 + now.getMinutes();
+    const nowTop = ((nowMins - colStartMins + 24 * 60) % (24 * 60)) / 60 * slotH;
+    /* Columna lógica de "ahora": si la hora real está antes de startHour, pertenece al día anterior */
+    let nowDateForCol = today;
+    if (startHour > 0 && nowMins < colStartMins) {
+      const y = new Date();
+      y.setDate(y.getDate() - 1);
+      nowDateForCol = `${y.getFullYear()}-${String(y.getMonth() + 1).padStart(2, '0')}-${String(y.getDate()).padStart(2, '0')}`;
+    }
 
     let cols = '';
     days.forEach((d, di) => {
+      const nextDate = di < 6 ? days[di + 1].date : dayAfterStr;
       let slots = '';
-      for (let hr = hStart; hr < hEnd; hr++) {
-        slots += `<div class="cal-slot" data-date="${d.date}" data-hr="${hr}" data-min="0" data-col="${di}"></div>`;
-        slots += `<div class="cal-slot" data-date="${d.date}" data-hr="${hr}" data-min="30" data-col="${di}"></div>`;
+      for (let i = 0; i < 24; i++) {
+        const hr = (startHour + i) % 24;
+        const slotDate = (startHour > 0 && hr < startHour) ? nextDate : d.date;
+        slots += `<div class="cal-slot" data-date="${slotDate}" data-hr="${hr}" data-min="0" data-col="${di}" data-vidx="${i * 2}"></div>`;
+        slots += `<div class="cal-slot" data-date="${slotDate}" data-hr="${hr}" data-min="30" data-col="${di}" data-vidx="${i * 2 + 1}"></div>`;
       }
       let evts = '';
       colEvts[di].forEach(e => {
-        const parts = e.hi.split(':');
-        const mins = parseInt(parts[0]) * 60 + parseInt(parts[1]);
-        const top = ((mins - hStart * 60) / 60) * slotH;
-        const height = e.cant * slotH;
         const isSm = e.cant <= 0.5;
         const smCls = isSm ? ' cal-evt-sm' : '';
+        const splitCls = e.splitFirst ? ' cal-evt-split-1' : (e.splitSecond ? ' cal-evt-split-2' : '');
         const ico = isSm ? '' : (e.tipo === 'trabajo' ? '💻 ' : '👥 ');
-        evts += `<div class="cal-evt${smCls}" style="top:${top}px;height:${Math.max(height, 20)}px;--ec:${e.pc}" onclick="event.stopPropagation();App.eHour('${e.pid}','${e.hid}')"><span class="cal-evt-t">${ico}${e.cant}h</span><span class="cal-evt-n">${esc(e.pn)}</span></div>`;
+        evts += `<div class="cal-evt${smCls}${splitCls}" style="top:${e.top}px;height:${Math.max(e.height, 20)}px;--ec:${e.pc}" onclick="event.stopPropagation();App.eHour('${e.pid}','${e.hid}')"><span class="cal-evt-t">${ico}${e.cant}h</span><span class="cal-evt-n">${esc(e.pn)}</span></div>`;
       });
-      cols += `<div class="cal-wcol" data-col="${di}">${slots}${evts}</div>`;
+      const nowMarker = d.date === nowDateForCol ? `<div class="cal-now-line" style="top:${nowTop}px"><span class="cal-now-dot"></span></div>` : '';
+      cols += `<div class="cal-wcol${d.today ? ' today' : ''}" data-col="${di}">${slots}${evts}${nowMarker}</div>`;
     });
 
     let ntHtml = '';
@@ -279,7 +350,7 @@ Object.assign(App, {
       + this._calProjStats(pStats)
       + this._calFinancial(ws.getFullYear(), ws.getMonth());
 
-    this._calWeekDrag(hStart, hEnd, slotH);
+    this._calWeekDrag(startHour, slotH);
   },
 
   _calHeader(title, stat) {
@@ -394,28 +465,38 @@ Object.assign(App, {
       + `</div></div>`;
   },
 
-  _calWeekDrag(hStart, hEnd, slotH) {
+  _calWeekDrag(startHour, slotH) {
     const wkBody = document.querySelector('.cal-week-body');
     if (!wkBody) return;
 
+    const colStartMins = startHour * 60;
+    const colSpanMins = 24 * 60;
+
     let drag = null;
 
-    const minFromY = (y, wcol) => {
+    /* Píxel Y dentro de la columna → minutos visuales desde el top de la columna */
+    const visMinFromY = (y, wcol) => {
       const rect = wcol.getBoundingClientRect();
-      return hStart * 60 + Math.floor(Math.max(0, y - rect.top) / slotH * 60);
+      return Math.max(0, Math.min(colSpanMins, Math.floor((y - rect.top) / slotH * 60)));
+    };
+
+    /* Slot data-hr/data-min → minutos visuales desde el top de la columna */
+    const slotVisMin = (slot) => {
+      const real = parseInt(slot.dataset.hr) * 60 + parseInt(slot.dataset.min);
+      return (real - colStartMins + colSpanMins) % colSpanMins;
     };
 
     const snap30 = m => Math.floor(m / 30) * 30;
 
-    const updatePreview = endMin => {
+    const updatePreview = endVisMin => {
       if (!drag) return;
-      const st = drag.startHr * 60 + drag.startMin;
-      let et = snap30(endMin) + 30;
-      if (et <= st) et = st + 30;
-      if (et > hEnd * 60) et = hEnd * 60;
-      drag.preview.style.top = ((st - hStart * 60) / 60) * slotH + 'px';
-      drag.preview.style.height = Math.max(((et - st) / 60) * slotH, 15) + 'px';
-      drag.endMin = et;
+      const stVis = drag.startVisMin;
+      let etVis = snap30(endVisMin) + 30;
+      if (etVis <= stVis) etVis = stVis + 30;
+      if (etVis > colSpanMins) etVis = colSpanMins;
+      drag.preview.style.top = (stVis / 60 * slotH) + 'px';
+      drag.preview.style.height = Math.max(((etVis - stVis) / 60) * slotH, 15) + 'px';
+      drag.endVisMin = etVis;
     };
 
     const finishDrag = () => {
@@ -424,15 +505,14 @@ Object.assign(App, {
       document.removeEventListener('mousemove', onDocMove);
       document.removeEventListener('mouseup', onDocUp);
       if (d.preview.parentNode) d.preview.remove();
-      const st = d.startHr * 60 + d.startMin;
-      const dur = (d.endMin - st) / 60;
+      const dur = (d.endVisMin - d.startVisMin) / 60;
       App.calAddHour(d.date, `${String(d.startHr).padStart(2, '0')}:${String(d.startMin).padStart(2, '0')}`, dur > 0 ? dur : 0.5);
     };
 
     const onDocMove = ev => {
       if (!drag) return;
       ev.preventDefault();
-      updatePreview(minFromY(ev.clientY, drag.wcol));
+      updatePreview(visMinFromY(ev.clientY, drag.wcol));
     };
     const onDocUp = () => finishDrag();
 
@@ -444,15 +524,17 @@ Object.assign(App, {
       const pv = document.createElement('div');
       pv.className = 'cal-drag-pv';
       wcol.appendChild(pv);
+      const startVisMin = slotVisMin(slot);
       drag = {
         startHr: parseInt(slot.dataset.hr),
         startMin: parseInt(slot.dataset.min),
         date: slot.dataset.date,
+        startVisMin,
         preview: pv,
         wcol,
-        endMin: parseInt(slot.dataset.hr) * 60 + parseInt(slot.dataset.min) + 30
+        endVisMin: startVisMin + 30
       };
-      updatePreview(drag.startHr * 60 + drag.startMin);
+      updatePreview(startVisMin);
       document.addEventListener('mousemove', onDocMove);
       document.addEventListener('mouseup', onDocUp);
     });

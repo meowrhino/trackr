@@ -33,6 +33,11 @@ Object.assign(App, {
       + `<div class="fg"><label>${t('cfg.incomeMonth')}</label><input type="number" id="cfgTIm" value="${tg.ingresosMes || ''}" min="0" step="100" placeholder="${t('ph.incomeMonth')}"></div>`
       + `<div class="fg"><label>${t('cfg.hoursWeek')}</label><input type="number" id="cfgTHs" value="${tg.horasSemana || ''}" min="0" step="1" placeholder="${t('ph.hoursWeek')}"></div>`
       + `</div><div class="cfg-save"><button class="bt bt-p" onclick="App.saveGoals()">${t('btn.save')}</button></div></div>`
+      + `<div class="cfg-section"><div class="cfg-section-title">${t('cfg.calendar')}</div><div class="cfg-grid">`
+      + `<div class="fg"><label>${t('cfg.calStartHour')}</label><select id="cfgCalStart">`
+      +   [0, 6, 8, 22].map(h => `<option value="${h}" ${(s.calStartHour || 0) === h ? 'selected' : ''}>${String(h).padStart(2, '0')}:00</option>`).join('')
+      + `</select><div style="font-size:.72rem;color:var(--t3);margin-top:.35rem">${t('cfg.calStartHourHelp')}</div></div>`
+      + `</div><div class="cfg-save"><button class="bt bt-p" onclick="App.saveCalSettings()">${t('btn.save')}</button></div></div>`
       + `<div class="cfg-section"><div class="cfg-section-title">${t('cfg.theme')}</div>`
       + `<div class="theme-grid">${THEME_ORDER.map(id => {
           const th = THEMES[id];
@@ -50,7 +55,78 @@ Object.assign(App, {
       + `<button class="bt bt-add" style="margin-top:.75rem" onclick="App.clModal()">${t('btn.newClient')}</button></div>`
       + `<div class="cfg-section" style="margin-top:2.5rem"><div class="cfg-section-title">${t('cfg.importOldInvoices')}</div>`
       + `<div style="color:var(--t3);font-size:.82rem;margin-bottom:.75rem">${t('cfg.importOldDesc')}</div>`
-      + `<button class="bt bt-add" onclick="App.importOldInvoicesClick()">${t('cfg.importOldInvoices')}</button></div>`;
+      + `<button class="bt bt-add" onclick="App.importOldInvoicesClick()">${t('cfg.importOldInvoices')}</button></div>`
+      + this._cfgVerifactuSection();
+  },
+
+  /** Sección Verifactu: identidad SIF + lista de facturas firmadas + verificar cadena */
+  _cfgVerifactuSection() {
+    const v = D.d.settings.verifactu || {};
+    const facts = D.fs() || [];
+    const emisor = D.d.settings.emisor?.nif || '';
+    const lastH = v.lastInvoiceHash ? v.lastInvoiceHash.slice(0, 24) + '…' : '—';
+    let listHtml = '';
+    if (facts.length) {
+      const sorted = [...facts].sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
+      listHtml = `<div class="cl-list" style="margin-top:.5rem">`
+        + sorted.slice(0, 50).map(f => {
+          const hashShort = (f.hash || '').slice(0, 14) + '…';
+          const fechaShort = (f.fecha || '').slice(0, 10);
+          return `<div class="cl-item">`
+            + `<span class="cl-name" style="font-family:'DM Mono',monospace;font-size:.78rem">${esc(f.numero)}</span>`
+            + `<span class="cl-nif" style="font-size:.72rem">${fechaShort}</span>`
+            + `<span class="cl-nif" style="font-size:.72rem">${fmtMoney(f.totalFactura || 0)}</span>`
+            + `<span class="cl-nif" style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--t3)">${hashShort}</span>`
+            + `</div>`;
+        }).join('')
+        + `</div>`;
+      if (facts.length > 50) {
+        listHtml += `<p class="small" style="margin-top:.5rem;color:var(--t3)">${t('cfg.vfShowingFirst', 50, facts.length)}</p>`;
+      }
+    } else {
+      listHtml = `<div style="color:var(--t3);font-size:.82rem">${t('cfg.vfNoneYet')}</div>`;
+    }
+    return `<div class="cfg-section" style="margin-top:2.5rem"><div class="cfg-section-title">${t('cfg.vfTitle')}</div>`
+      + `<p style="color:var(--t3);font-size:.82rem;margin-bottom:.75rem">${t('cfg.vfDesc')}</p>`
+      + `<div style="background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:.7rem 1rem;margin-bottom:.75rem;font-size:.82rem">`
+      +   `<div><strong>${t('cfg.vfSifId')}:</strong> <code class="mono">${esc(V.SIF_ID)}</code> &middot; <strong>${t('cfg.vfVersion')}:</strong> <code class="mono">${esc(V.SOFTWARE_VERSION)}</code></div>`
+      +   `<div style="color:var(--t3);font-size:.72rem;margin-top:.25rem">${t('cfg.vfFixedNote')}</div>`
+      + `</div>`
+      + `<div class="cfg-grid">`
+      + `<div class="fg"><label>${t('cfg.vfEnv')}</label><select id="cfgVfEnv"><option value="prod" ${v.env !== 'test' ? 'selected' : ''}>${t('cfg.vfEnvProd')}</option><option value="test" ${v.env === 'test' ? 'selected' : ''}>${t('cfg.vfEnvTest')}</option></select></div>`
+      + `<div class="fg"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="cfgVfEnabled" ${v.habilitado !== false ? 'checked' : ''}> ${t('cfg.vfEnabled')}</label></div>`
+      + `</div>`
+      + `<p class="small" style="color:var(--t3);margin-top:.5rem">${t('cfg.vfLastHash')}: <code class="mono" style="font-size:.72rem">${esc(lastH)}</code> · ${t('cfg.vfTotalSigned', facts.length)} · ${t('cfg.vfEmisor')}: ${esc(emisor || t('cfg.vfNoEmisor'))}</p>`
+      + `<div class="cfg-save" style="gap:.5rem;display:flex"><button class="bt bt-p" onclick="App.saveVerifactu()">${t('btn.save')}</button>`
+      + `<button class="bt" onclick="App.verifyChain()">&#128274; ${t('cfg.vfVerifyChain')}</button></div>`
+      + `<div style="margin-top:1.25rem"><div class="cfg-section-title" style="font-size:.85rem;margin-bottom:.5rem">${t('cfg.vfRegistry')}</div>`
+      + listHtml
+      + `</div>`
+      + `</div>`;
+  },
+
+  saveVerifactu() {
+    const v = D.d.settings.verifactu || {};
+    /* sifId y softwareVersion son constantes en js/verifactu.js, no aquí */
+    v.env = document.getElementById('cfgVfEnv').value === 'test' ? 'test' : 'prod';
+    v.habilitado = document.getElementById('cfgVfEnabled').checked;
+    D.d.settings.verifactu = v;
+    D.save();
+    Toast.ok(t('cfg.saved'));
+  },
+
+  async verifyChain() {
+    const emisor = D.d.settings.emisor?.nif;
+    if (!emisor) { Toast.warn(t('cfg.vfNoEmisor')); return; }
+    const facts = D.fsBy(emisor);
+    if (!facts.length) { Toast.ok(t('cfg.vfNothingToVerify')); return; }
+    const res = await V.verifyChain(facts);
+    if (res.ok) {
+      Toast.ok(t('cfg.vfChainOk', res.total));
+    } else {
+      Toast.error(t('cfg.vfChainBroken', res.broken.length, res.total));
+      console.warn('Verifactu cadena rota:', res.broken);
+    }
   },
 
   setLanguage(code) {
@@ -113,6 +189,14 @@ Object.assign(App, {
     tg.horasSemana = parseFloat(document.getElementById('cfgTHs').value) || null;
     D.save();
     Toast.ok(t('cfg.saved'));
+  },
+
+  saveCalSettings() {
+    const v = parseInt(document.getElementById('cfgCalStart').value, 10);
+    D.d.settings.calStartHour = (v >= 0 && v <= 23) ? v : 0;
+    D.save();
+    Toast.ok(t('cfg.saved'));
+    if (this.cv === 'cal') this.rCal();
   },
 
   clModal(cid) {

@@ -60,6 +60,20 @@ const App = {
 
     this.enter();
     this._maybeWelcome();
+
+    /* Línea "ahora" del calendario: reposicionar cada minuto sin re-renderizar */
+    setInterval(() => this._tickNow(), 60000);
+  },
+
+  /** Reposiciona la línea horizontal "ahora" si el calendario está visible */
+  _tickNow() {
+    const el = document.querySelector('.cal-now-line');
+    if (!el) return;
+    const startHour = (D.d.settings && D.d.settings.calStartHour) || 0;
+    const slotH = 60;
+    const n = new Date();
+    const mins = n.getHours() * 60 + n.getMinutes();
+    el.style.top = (((mins - startHour * 60 + 24 * 60) % (24 * 60)) / 60 * slotH) + 'px';
   },
 
   enter() { this.go('info'); },
@@ -516,21 +530,81 @@ const App = {
     this.clModal(p.clienteId || null);
   },
 
-  genFactura(pid) {
+  async genFactura(pid) {
     const fecha = document.getElementById('facDate').value;
     const asunto = document.getElementById('facAsunto').value.trim();
     const num = parseInt(document.getElementById('facNum').value) || null;
-    /* Guardar asunto en el proyecto si difiere del default; borrar si vacío o igual al default */
     const p = D.p(pid);
-    if (p) {
-      const def = defaultAsunto(Object.assign({}, p, { facturacion: Object.assign({}, p.facturacion, { asuntoFactura: '' }) }));
-      if (!asunto || asunto === def) {
-        p.facturacion.asuntoFactura = '';
-      } else {
-        p.facturacion.asuntoFactura = asunto;
+    if (!p) return;
+
+    /* Guardar asunto en el proyecto si difiere del default; borrar si vacío o igual al default */
+    const def = defaultAsunto(Object.assign({}, p, { facturacion: Object.assign({}, p.facturacion, { asuntoFactura: '' }) }));
+    if (!asunto || asunto === def) {
+      p.facturacion.asuntoFactura = '';
+    } else {
+      p.facturacion.asuntoFactura = asunto;
+    }
+
+    const s = D.d.settings;
+    const f = p.facturacion;
+    const vCfg = s.verifactu || {};
+    const verifactuOn = vCfg.habilitado !== false && s.emisor?.nif;
+
+    let verifactu = null;
+    if (verifactuOn) {
+      const numStr = String(num || f.facturaNum || s.nextFacturaNum || 1);
+      const cl = p.clienteId ? D.cl(p.clienteId) : null;
+      const hashPrev = D.lastHashFor(s.emisor.nif);
+      try {
+        const hash = await V.signInvoice({
+          nifEmisor: s.emisor.nif,
+          numSerie: numStr,
+          fechaISO: fecha,
+          baseImponible: f.baseImponible || 0,
+          totalFactura: f.totalFactura || 0
+        }, hashPrev);
+        const qrPayload = V.buildQRPayload(
+          s.emisor.nif, numStr, fecha, f.totalFactura || 0, vCfg.env === 'test'
+        );
+        verifactu = {
+          sifId: V.SIF_ID,
+          softwareVersion: V.SOFTWARE_VERSION,
+          qrPayload,
+          hash,
+          publicUrl: 'tr4ckr.com/verifactu'
+        };
+        /* Persistir factura firmada en el registro inmutable */
+        D.addFact({
+          id: uid(),
+          numero: numStr,
+          fecha,
+          emisorNif: s.emisor.nif,
+          emisorNombre: s.emisor.nombre || '',
+          clienteNif: cl?.nif || '',
+          clienteNombre: cl?.nombreCompleto || cl?.nombre || '',
+          baseImponible: f.baseImponible || 0,
+          iva: f.iva || 0,
+          importeIva: f.importeIva || 0,
+          irpf: f.irpf || 0,
+          importeIrpf: f.importeIrpf || 0,
+          totalFactura: f.totalFactura || 0,
+          proyectoId: pid,
+          hash,
+          hashPrev: hashPrev || null,
+          timestamp: new Date().toISOString(),
+          qrPayload,
+          sifId: V.SIF_ID,
+          softwareVersion: V.SOFTWARE_VERSION,
+          tipoFactura: 'ordinaria',
+          eventos: []
+        });
+      } catch (err) {
+        console.warn('Verifactu signing failed:', err);
+        Toast.warn('Verifactu: no se pudo firmar (PDF sin QR)');
       }
     }
-    Fac.download(pid, { fecha, asunto: asunto || defaultAsunto(p), num });
+
+    Fac.download(pid, { fecha, asunto: asunto || defaultAsunto(p), num, verifactu });
     T.ev('action', 'invoice_generate');
     this.cm(); this.rDet(pid);
   },
@@ -540,30 +614,41 @@ const App = {
    *  COBROS PARCIALES (Partial Payments)
    * ══════════════════════════════════════════════ */
 
-  cobroModal(pid) {
+  cobroModal(pid, cid) {
     const p = D.p(pid); if (!p) return;
     B.calc(p);
+    const isEdit = !!cid;
+    const existing = isEdit ? (p.facturacion.cobros || []).find(c => c.id === cid) : null;
+    if (isEdit && !existing) return;
     const pend = B.pendiente(p);
-    if (pend <= 0) { Toast.ok(t('billing.alreadyPaid')); return; }
+    if (!isEdit && pend <= 0) { Toast.ok(t('billing.alreadyPaid')); return; }
+    const defAmount = isEdit ? existing.cantidad : pend.toFixed(2);
+    const defDate = isEdit ? (existing.fecha || todayStr()) : todayStr();
+    const title = isEdit ? t('billing.editPayment') : t('billing.addPayment');
     this.om(
-      `<div class="mt">${t('billing.addPayment')}</div>`
-      + `<div class="fr"><div class="fg"><label>${t('billing.paymentAmount')}</label><input type="number" id="mcA" min="0.01" step="0.01" value="${pend.toFixed(2)}"></div>`
-      + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="mcD" value="${todayStr()}"></div></div>`
-      + `<div style="font-size:.78rem;color:var(--t3);margin-bottom:.75rem">${t('billing.remaining', fmtMoney(pend))}</div>`
-      + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveCobro('${pid}')">${t('btn.save')}</button></div>`
+      `<div class="mt">${title}</div>`
+      + `<div class="fr"><div class="fg"><label>${t('billing.paymentAmount')}</label><input type="number" id="mcA" min="0.01" step="0.01" value="${defAmount}"></div>`
+      + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="mcD" value="${defDate}"></div></div>`
+      + (isEdit ? '' : `<div style="font-size:.78rem;color:var(--t3);margin-bottom:.75rem">${t('billing.remaining', fmtMoney(pend))}</div>`)
+      + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveCobro('${pid}'${isEdit ? `,'${cid}'` : ''})">${t('btn.save')}</button></div>`
     );
   },
 
-  saveCobro(pid) {
+  saveCobro(pid, cid) {
     const cant = parseFloat(document.getElementById('mcA').value) || 0;
     const fecha = document.getElementById('mcD').value || todayStr();
     if (cant <= 0) return;
     const p = D.p(pid); if (!p) return;
     if (!p.facturacion.cobros) p.facturacion.cobros = [];
-    p.facturacion.cobros.push({ id: uid(), fecha, cantidad: roundMoney(cant) });
+    if (cid) {
+      const c = p.facturacion.cobros.find(x => x.id === cid);
+      if (c) { c.fecha = fecha; c.cantidad = roundMoney(cant); }
+    } else {
+      p.facturacion.cobros.push({ id: uid(), fecha, cantidad: roundMoney(cant) });
+    }
     B.calc(p);
     D.up(pid, { facturacion: p.facturacion });
-    Toast.ok(t('billing.addPayment') + ' ✓');
+    Toast.ok((cid ? t('billing.editPayment') : t('billing.addPayment')) + ' ✓');
     this.cm();
     if (this.cv === 'det') this.rDet(pid); else this.rDash();
   },

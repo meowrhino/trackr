@@ -293,6 +293,30 @@
   flex:1;
 }
 
+/* Evento partido visualmente entre dos columnas */
+.cal-evt.cal-evt-split-1{border-radius:0 var(--r) 0 0}
+.cal-evt.cal-evt-split-2{border-radius:0 0 var(--r) 0;border-top:2px dashed color-mix(in srgb, var(--ec,var(--b2)) 60%, transparent)}
+
+/* Línea horizontal "ahora" en la columna del día actual */
+.cal-now-line{
+  position:absolute;
+  left:0;
+  right:0;
+  height:2px;
+  background:var(--ac);
+  z-index:2;
+  pointer-events:none;
+}
+.cal-now-dot{
+  position:absolute;
+  left:-5px;
+  top:-4px;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:var(--ac);
+}
+
 /* Drag preview al crear hora */
 .cal-drag-pv{
   position:absolute;

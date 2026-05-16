@@ -98,7 +98,7 @@ Object.assign(App, {
       let listHtml = '';
       if (cobros.length) {
         listHtml = `<div class="hl" style="margin-top:.5rem">${cobros.map(c =>
-          `<div class="hr"><span class="hr-d">${fmtDate(c.fecha)}</span><span class="hr-a m" style="color:var(--ok)">${fmtMoney(c.cantidad)}</span><span class="hr-x" onclick="App.delCobro('${p.id}','${c.id}')" title="${t('btn.delete')}">&times;</span></div>`
+          `<div class="hr"><span class="hr-d">${fmtDate(c.fecha)}</span><span class="hr-a m" style="color:var(--ok)">${fmtMoney(c.cantidad)}</span><span class="hr-e" onclick="App.cobroModal('${p.id}','${c.id}')" title="${t('btn.edit')}">&#9998;</span><span class="hr-x" onclick="App.delCobro('${p.id}','${c.id}')" title="${t('btn.delete')}">&times;</span></div>`
         ).join('')}</div>`;
       }
 
@@ -130,6 +130,7 @@ Object.assign(App, {
     const p = D.p(pid); if (!p) return;
     const h = p.horas.find(x => x.id === hid); if (!h) return;
     const noDate = !h.fecha;
+    const projOpts = D.ps().map(pr => `<option value="${pr.id}"${pr.id === pid ? ' selected' : ''}>${esc(pr.nombre)}</option>`).join('');
 
     this.om(
       `<div class="mt">${t('det.editHour')}</div>`
@@ -138,12 +139,13 @@ Object.assign(App, {
       +   `<div class="to ${h.tipo === 'trabajo' ? 'on' : ''}" data-type="trabajo" onclick="App.selT(this)"><span class="ic">💻</span><span class="la">${t('det.work')}</span></div>`
       +   `<div class="to ${h.tipo === 'reunion' ? 'on' : ''}" data-type="reunion" onclick="App.selT(this)"><span class="ic">👥</span><span class="la">${t('det.meeting')}</span></div>`
       + `</div>`
+      + `<div class="fg"><label>${t('field.project')}</label><select id="ehProj">${projOpts}</select></div>`
       + `<div class="fr"><div class="fg"><label>${t('field.hours')}</label><input type="number" id="ehA" min="0.25" step="0.25" value="${h.cantidad}"></div>`
       +   `<div class="fg"><label>${t('field.date')}</label><input type="date" id="ehD" value="${h.fecha || ''}" ${noDate ? 'disabled' : ''}>`
       +   `<label style="margin-top:.35rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="ehNd" ${noDate ? 'checked' : ''} onchange="document.getElementById('ehD').disabled=this.checked;if(this.checked)document.getElementById('ehD').value=''" style="width:auto;accent-color:var(--t2)"> ${t('field.noDate')}</label></div></div>`
       + `<div class="fr"><div class="fg"><label>${t('field.startTime')}</label><input type="time" id="ehHI" value="${h.horaInicio || ''}"></div><div class="fg"><label>${t('field.amount')}</label><input type="number" id="ehMo" min="0" step="0.01" value="${h.monto || ''}"></div></div>`
       + `<div class="fg"><label>${t('field.note')}</label><input type="text" id="ehN" value="${esc(h.nota || '')}"></div>`
-      + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveEH('${pid}','${hid}')">${t('btn.save')}</button></div>`
+      + `<div class="ma" style="justify-content:space-between"><button class="bt bt-d" onclick="App.deleteEH('${pid}','${hid}')">${t('btn.delete')}</button><div style="display:flex;gap:.5rem"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveEH('${pid}','${hid}')">${t('btn.save')}</button></div></div>`
     );
   },
 
@@ -157,7 +159,33 @@ Object.assign(App, {
     h.horaInicio = document.getElementById('ehHI').value || null;
     h.nota = document.getElementById('ehN').value.trim();
     h.monto = parseFloat(document.getElementById('ehMo').value) || 0;
+
+    const newPid = document.getElementById('ehProj')?.value || pid;
+    if (newPid !== pid && D.p(newPid)) {
+      /* Mover la entrada al nuevo proyecto */
+      p.horas = p.horas.filter(x => x.id !== hid);
+      const np = D.p(newPid);
+      np.horas.push(h);
+      sortHoras(np.horas);
+      sortHoras(p.horas);
+      D.up(pid, { horas: p.horas });
+      D.up(newPid, { horas: np.horas });
+      this.cm();
+      if (this.cv === 'cal') this.rCal();
+      else if (this.cv === 'det') this.rDet(newPid);
+      return;
+    }
+
     sortHoras(p.horas);
+    D.up(pid, { horas: p.horas });
+    this.cm();
+    if (this.cv === 'cal') this.rCal(); else this.rDet(pid);
+  },
+
+  deleteEH(pid, hid) {
+    if (!confirm(t('det.deleteHourConfirm'))) return;
+    const p = D.p(pid); if (!p) return;
+    p.horas = p.horas.filter(h => h.id !== hid);
     D.up(pid, { horas: p.horas });
     this.cm();
     if (this.cv === 'cal') this.rCal(); else this.rDet(pid);

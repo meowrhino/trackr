@@ -38,7 +38,8 @@ const D = {
         targets: { horasMes: null, ingresosMes: null, horasSemana: null },
         nextFacturaNum: 1,
         tema: 'oscuro',
-        idioma: 'es'
+        idioma: 'es',
+        calStartHour: 0
       }
     };
     this.save();
@@ -60,6 +61,8 @@ const D = {
     if (!d.gastos) d.gastos = [];
     if (!d.projects) d.projects = [];
     if (!d.deducibles) d.deducibles = [];
+    /* Verifactu (SIF no verificable): registro inmutable de facturas firmadas */
+    if (!d.facturas) d.facturas = [];
     /* Migrar deducibles: año → fecha */
     d.deducibles.forEach(dd => {
       if (dd.año && !dd.fecha) dd.fecha = `${dd.año}-01-01`;
@@ -79,6 +82,20 @@ const D = {
     if (s.conceptoAppendCliente == null) s.conceptoAppendCliente = false;
     if (!s.tema) s.tema = 'oscuro';
     if (!s.idioma) s.idioma = 'es';
+    if (s.calStartHour == null) s.calStartHour = 0;
+
+    /* Verifactu / SIF — solo opciones de usuario. SIF_ID y SOFTWARE_VERSION
+       viven en js/verifactu.js como constantes del fabricante, no aquí. */
+    if (!s.verifactu) s.verifactu = {
+      habilitado: true,            /* Toggle para deshabilitar Verifactu en facturas */
+      lastInvoiceHash: null,       /* Hash de la última factura firmada (cadena por emisor) */
+      env: 'prod'                  /* 'prod' o 'test' — endpoint AEAT en el QR */
+    };
+    /* Limpieza: si quedan campos legacy del fabricante en el settings de un user, descartarlos */
+    if (s.verifactu) {
+      delete s.verifactu.sifId;
+      delete s.verifactu.softwareVersion;
+    }
 
     /* Migrar usuario legacy → emisor.nombre */
     if (s.usuario && !s.emisor.nombre) {
@@ -330,6 +347,52 @@ const D = {
   delDed(id) {
     this.d.deducibles = this.d.deducibles.filter(d => d.id !== id);
     this.save();
+  },
+
+  /* ══════════════════════════════════════════════
+   *  FACTURAS (Verifactu — registro inmutable)
+   * ══════════════════════════════════════════════ */
+
+  /** Todas las facturas firmadas (registro Verifactu) */
+  fs() { return this.d.facturas; },
+
+  /** Facturas de un emisor (filtradas por NIF) ordenadas por timestamp ASC */
+  fsBy(nif) {
+    const n = (nif || '').replace(/[\s-]/g, '').toUpperCase();
+    return this.d.facturas
+      .filter(f => (f.emisorNif || '').toUpperCase() === n)
+      .sort((a, b) => (a.timestamp || '').localeCompare(b.timestamp || ''));
+  },
+
+  /** Hash de la última factura del emisor (para encadenar la siguiente) */
+  lastHashFor(nif) {
+    const arr = this.fsBy(nif);
+    return arr.length ? arr[arr.length - 1].hash : null;
+  },
+
+  /**
+   * Persiste una factura firmada en el registro Verifactu.
+   * No permite modificar facturas ya firmadas (registro inmutable).
+   */
+  addFact(f) {
+    this.d.facturas.push(f);
+    /* Actualizar lastInvoiceHash en settings.verifactu */
+    if (!this.d.settings.verifactu) this.d.settings.verifactu = {};
+    this.d.settings.verifactu.lastInvoiceHash = f.hash;
+    this.save();
+  },
+
+  /**
+   * Añade un evento (anulación, rectificación) a una factura existente.
+   * No modifica los datos originales; solo añade al array eventos[].
+   */
+  addFactEvent(factId, evento) {
+    const i = this.d.facturas.findIndex(f => f.id === factId);
+    if (i !== -1) {
+      if (!this.d.facturas[i].eventos) this.d.facturas[i].eventos = [];
+      this.d.facturas[i].eventos.push(evento);
+      this.save();
+    }
   },
 
   /* ══════════════════════════════════════════════
