@@ -751,6 +751,7 @@ document.addEventListener('DOMContentLoaded', () => App.init());
   tip.id = 'barTip';
   document.body.appendChild(tip);
   document.addEventListener('pointerenter', e => {
+    if (!(e.target instanceof Element)) return;
     const seg = e.target.closest('.pbar-seg[data-tip]');
     if (!seg) return;
     tip.textContent = seg.getAttribute('data-tip');
@@ -761,6 +762,7 @@ document.addEventListener('DOMContentLoaded', () => App.init());
     tip.style.transform = 'translate(-50%,-100%)';
   }, true);
   document.addEventListener('pointerleave', e => {
+    if (!(e.target instanceof Element)) return;
     if (e.target.closest('.pbar-seg[data-tip]')) tip.style.opacity = '0';
   }, true);
 })();

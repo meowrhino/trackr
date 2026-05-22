@@ -61,6 +61,9 @@ Object.assign(App, {
 
   /** Sección Verifactu: identidad SIF + lista de facturas firmadas + verificar cadena */
   _cfgVerifactuSection() {
+    /* Si verifactu.js no se ha cargado (p.ej. deploy parcial), omitir la sección
+       en vez de romper toda la vista de Configuración. */
+    if (typeof V === 'undefined') return '';
     const v = D.d.settings.verifactu || {};
     const facts = D.fs() || [];
     const emisor = D.d.settings.emisor?.nif || '';
