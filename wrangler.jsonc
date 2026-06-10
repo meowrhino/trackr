@@ -1,0 +1,11 @@
+{
+  // TRACKR — Worker de assets estáticos (SPA local-first).
+  // Build:  bash build.sh   (genera dist/ con solo el sitio)
+  // Deploy: npx wrangler deploy
+  // En el panel CF (Workers Build): build command = `bash build.sh`, deploy = `npx wrangler deploy`.
+  "name": "trackr",
+  "compatibility_date": "2025-05-01",
+  "assets": {
+    "directory": "dist"
+  }
+}

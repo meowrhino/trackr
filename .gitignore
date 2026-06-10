@@ -25,3 +25,6 @@ build/
 
 # Cloudflare wrangler local state
 .wrangler/
+
+# Build output (Worker static assets)
+dist/
