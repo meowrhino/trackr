@@ -59,61 +59,42 @@ const Fac = {
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(40);
     doc.text(`${tf('fac.invoice', lang)} ${numYY}`, leftX, y);
-    y += 8;
+    y += 10;
 
-    /* ── 2-column header: Emisor (left) | Datos de factura (right) ── */
+    /* ── 2-column header: Emisor (izq) | Cliente (der) ── */
     doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(60);
     doc.text(tf('fac.issuerLabel', lang), leftX, y);
-    doc.text(tf('fac.invoiceData', lang), rightX, y);
+    doc.text(tf('fac.clientLabel', lang), rightX, y);
     y += 5;
 
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(60);
 
-    /* Row 1: Emisor nombre | N.o NNNN/YY */
-    doc.text(data.emisor.nombre || tf('fac.noName', lang), leftX, y);
-    doc.text(`N.\u00BA ${numYY}`, rightX, y);
-    y += 5;
-
-    /* Row 2: Emisor direccion1 | Fecha */
-    if (data.emisor.direccion1) doc.text(data.emisor.direccion1, leftX, y);
-    doc.text(fmtDate(data.factura.fecha), rightX, y);
-    y += 5;
-
-    /* Row 3: Emisor direccion2 */
-    if (data.emisor.direccion2) { doc.text(data.emisor.direccion2, leftX, y); y += 5; }
-
-    /* Row 4: Emisor NIF */
-    if (data.emisor.nif) {
-      doc.text(tf('fac.nif', lang) + data.emisor.nif, leftX, y);
-      y += 5;
-    }
-
-    /* ── Cliente ── */
-    y += 3;
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(60);
-    doc.text(tf('fac.clientLabel', lang), leftX, y);
-    y += 5;
-
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(60);
-    doc.text(data.cliente.nombre || tf('fac.noClient', lang), leftX, y);
-    y += 5;
-    if (data.cliente.direccion1) { doc.text(data.cliente.direccion1, leftX, y); y += 5; }
-    if (data.cliente.direccion2) { doc.text(data.cliente.direccion2, leftX, y); y += 5; }
-    if (data.cliente.nif) {
-      doc.text(tf('fac.nif', lang) + data.cliente.nif, leftX, y);
+    /* Filas paralelas: emisor (izq) | cliente (der) */
+    const emRows = [
+      data.emisor.nombre || tf('fac.noName', lang),
+      data.emisor.direccion1 || '',
+      data.emisor.direccion2 || '',
+      data.emisor.nif ? tf('fac.nif', lang) + data.emisor.nif : ''
+    ].filter(Boolean);
+    const clRows = [
+      data.cliente.nombre || tf('fac.noClient', lang),
+      data.cliente.direccion1 || '',
+      data.cliente.direccion2 || '',
+      data.cliente.nif ? tf('fac.nif', lang) + data.cliente.nif : ''
+    ].filter(Boolean);
+    const partyN = Math.max(emRows.length, clRows.length);
+    for (let i = 0; i < partyN; i++) {
+      if (emRows[i]) doc.text(emRows[i], leftX, y);
+      if (clRows[i]) doc.text(clRows[i], rightX, y);
       y += 5;
     }
 
     /* ── Concepto ── */
-    y += 3;
+    y += 4;
     doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(60);
@@ -126,7 +107,17 @@ const Fac = {
     const concepto = data.factura.asunto || '\u2014';
     const conceptoLines = doc.splitTextToSize(concepto, pageW - mg * 2);
     doc.text(conceptoLines, leftX, y);
-    y += conceptoLines.length * 5 + 6;
+    y += conceptoLines.length * 5 + 4;
+
+    /* ── Datos de factura (n.º + fecha) bajo el concepto ── */
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(120);
+    doc.text(
+      `${tf('fac.invoiceData', lang)} — N.º ${numYY} · ${fmtDate(data.factura.fecha)}`,
+      leftX, y
+    );
+    y += 6;
 
     /* ── Totals (positioned at bottom of page when possible) ── */
     const labelX = pageW - mg - PDF_TOTALS_W;
@@ -224,13 +215,70 @@ const Fac = {
       doc.text(lines, labelX, totalsY);
     }
 
+    /* ── Bloque Verifactu (esquina inferior izquierda, agrupado) ── */
+    if (data.verifactu && data.verifactu.sifId && typeof qrcode === 'function') {
+      try {
+        const qrSize = 28; /* mm — entre 30 y 40 según spec AEAT (28 cabe mejor con texto) */
+        const blockBottom = pageH - mg;
+        const qrX = leftX;
+        const qrY = blockBottom - qrSize;
+
+        /* QR */
+        if (data.verifactu.qrPayload) {
+          const qr = qrcode(0, 'M');
+          qr.addData(data.verifactu.qrPayload);
+          qr.make();
+          const qrDataUrl = qr.createDataURL(8, 0);
+          doc.addImage(qrDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
+        }
+
+        /* Texto a la derecha del QR */
+        const txtX = qrX + qrSize + 4;
+        let txtY = qrY + 4;
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(60);
+        doc.text('VERI*FACTU', txtX, txtY);
+        txtY += 3.5;
+
+        doc.setFontSize(6.5);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(120);
+        const verLines = doc.splitTextToSize(tf('fac.verifactuText', lang), 75);
+        doc.text(verLines, txtX, txtY);
+        txtY += verLines.length * 2.8 + 1.5;
+
+        doc.setFontSize(6.5);
+        doc.setTextColor(100);
+        doc.text(
+          `SIF: ${data.verifactu.sifId} · TRACKR v${data.verifactu.softwareVersion || '0.0.0'}`,
+          txtX, txtY
+        );
+        txtY += 2.8;
+        const complianceLines = doc.splitTextToSize(tf('fac.compliantWith', lang), 75);
+        doc.text(complianceLines, txtX, txtY);
+        txtY += complianceLines.length * 2.8;
+
+        doc.setTextColor(140);
+        doc.text(data.verifactu.publicUrl || 'tr4ckr.com/verifactu', txtX, txtY);
+        txtY += 2.8;
+
+        if (data.verifactu.hash) {
+          const hashShort = String(data.verifactu.hash).slice(0, 16) + '…';
+          doc.setFont('courier', 'normal');
+          doc.text(`hash: ${hashShort}`, txtX, txtY);
+        }
+      } catch (err) { /* si falla qrcode, omitimos el bloque silently */ }
+    }
+
     return doc;
   },
 
   /**
    * Genera y descarga la factura de un proyecto.
-   * @param {string} pid - ID del proyecto
-   * @param {Object} opts - { fecha, asunto } (opcionales, para override)
+   * @param {string} pid ID del proyecto
+   * @param {Object} opts { fecha, asunto, num, verifactu } — verifactu pre-firmado
+   *                       en App.genFactura (no se calcula aquí porque es async)
    */
   download(pid, opts = {}) {
     const p = D.p(pid);
@@ -272,7 +320,8 @@ const Fac = {
         ivaExcepcion: f.ivaExcepcion || ''
       },
       beneficiarioPago: s.emisor.beneficiarioPago || '',
-      instruccionesPago: s.emisor.instruccionesPago || ''
+      instruccionesPago: s.emisor.instruccionesPago || '',
+      verifactu: opts.verifactu || null
     };
 
     /* Generar y descargar */
