@@ -139,7 +139,7 @@ Object.assign(App, {
         actHtml += `<div class="hr"${click}>`
           + `<span class="hr-t">${a.icon}</span>`
           + `<span class="hr-d">${dateLabel}</span>`
-          + `<span style="color:var(--t1);font-size:.82rem;flex:0 0 auto;white-space:nowrap">${esc(a.text)}</span>`
+          + `<span style="color:var(--t1);font-size:.82rem;flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(a.text)}</span>`
           + (a.note ? `<span class="hr-n">${esc(a.note)}</span>` : '')
           + `</div>`;
       });
