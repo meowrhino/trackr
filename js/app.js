@@ -548,7 +548,9 @@ const App = {
     const s = D.d.settings;
     const f = p.facturacion;
     const vCfg = s.verifactu || {};
-    const verifactuOn = vCfg.habilitado !== false && s.emisor?.nif;
+    // Guard: la rama Verifactu solo corre si verifactu.js (global V) esta cargado. En main NO
+    // lo esta (Verifactu aparcado), asi se evita el warning "no se pudo firmar" en cada factura.
+    const verifactuOn = typeof V !== 'undefined' && vCfg.habilitado !== false && s.emisor?.nif;
 
     let verifactu = null;
     if (verifactuOn) {

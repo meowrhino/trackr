@@ -40,6 +40,14 @@
 
   /* Dinero */
   .gas-count{display:none}
+  /* Filas de gasto: evitar desbordamiento en movil (importe/fecha/acciones se salian).
+     Linea 1 = nombre + importe; linea 2 = etiquetas + fecha + acciones. */
+  .gas-header{flex-wrap:wrap;row-gap:.4rem}
+  .gas-name{flex:1 1 auto;min-width:0}
+  .gas-total{min-width:0}
+  .gas-badges{order:4;flex:1 1 auto;justify-content:flex-start;flex-wrap:wrap}
+  .gas-date-info{order:5;min-width:0}
+  .gas-actions{order:6;margin-left:auto}
   .din-fin-header{flex-wrap:wrap;gap:.5rem}
   .din-fin-nav{flex-wrap:wrap}
   .din-gastos-header{flex-wrap:wrap;gap:.5rem}

@@ -104,6 +104,8 @@ Object.assign(App, {
     if (id) {
       Toast.ok(_lang === 'en' ? 'Copy saved' : (_lang === 'ca' ? 'Còpia desada' : 'Copia guardada'));
       this.rCfg();
+    } else {
+      Toast.error(_lang === 'en' ? 'Could not save the copy (storage full?)' : (_lang === 'ca' ? 'No s\'ha pogut desar la còpia' : 'No se pudo guardar la copia (¿almacenamiento lleno?)'));
     }
   },
 
@@ -118,7 +120,9 @@ Object.assign(App, {
         ? 'Això sobreescriurà les teves dades actuals amb aquesta còpia. Et recomanem descarregar abans una còpia de l\'estat actual. Continuar?'
         : 'Esto sobreescribirá tus datos actuales con esta copia. Te recomendamos descargar antes una copia del estado actual. ¿Continuar?');
     if (!confirm(msg)) return;
-    if (typeof H !== 'undefined' && H.restore(id)) {
+    if (typeof H === 'undefined') return;
+    H.snapshot(); // red de seguridad: guarda el estado ACTUAL antes de sobreescribirlo (se puede deshacer)
+    if (H.restore(id)) {
       applyTheme(D.d.settings.theme || D.d.settings.tema || 'oscuro');
       setLang(D.d.settings.lang || D.d.settings.idioma || 'es');
       Toast.ok(_lang === 'en' ? 'Copy restored' : (_lang === 'ca' ? 'Còpia restaurada' : 'Copia restaurada'));
