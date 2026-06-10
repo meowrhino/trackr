@@ -7,17 +7,15 @@
  * Dependencias: window.hashwasm (vendor/hash-wasm/argon2.umd.min.js, con SRI) para Argon2id.
  *               WebCrypto (HKDF, AES-GCM, SHA), CompressionStream (gzip). Sin red.
  *
- * DECISIONES (desviaciones justificadas del blueprint; revisar en auditoria):
- *  D1) AAD ata el envelope al EMAIL (identidad inmutable de la cuenta), no al userId.
- *      Motivo: el userId lo asigna el servidor, pero el cliente necesita el AAD para
- *      envolver la DEK en el signup (antes de conocer userId). El email lo tiene siempre.
- *      Mismo efecto anti-swap; cero cambios de servidor (los envelopes son opacos).
- *  D2) El AAD de la rama RECOVERY no incluye credEpoch (solo email). Motivo: al cambiar
- *      contrasena no se puede re-envolver el recovery (no hay codigo -> no hay wrapKeyRec).
- *      La rama rec solo cambia en signup/rotacion. La rama PWD si lleva credEpoch.
+ * DECISIONES (desviaciones justificadas del blueprint; auditadas):
+ *  D1) AAD ata el envelope al EMAIL CANONICO (no al userId). El cliente canonicaliza el
+ *      email IGUAL que el servidor (trim+lowercase+NFKC+ASCII) ANTES de cualquier AAD, asi
+ *      el binding es a la identidad inmutable real y wrap/unwrap casan byte a byte.
+ *  D2) AAD de la rama RECOVERY sin credEpoch (solo email): el cambio de contrasena no puede
+ *      re-envolver rec (no hay codigo). La rama rec solo cambia en signup/rotacion.
  *
- * Primitivas (PROTOCOL §1): Argon2id m=65536,t=3,p=1,out=32 · HKDF-SHA256 (salt vacio,
- * info etiquetada) · AES-256-GCM (nonce 12B random, tag 128) · gzip-antes-de-cifrar.
+ * Primitivas (§1): Argon2id m>=65536,t>=3,p>=1,out=32 (params del servidor, clamp a minimo)
+ * · HKDF-SHA256 (salt vacio, info etiquetada) · AES-256-GCM (nonce 12B random, tag 128).
  * ================================================ */
 const CA = (() => {
   const enc = new TextEncoder();
@@ -39,18 +37,45 @@ const CA = (() => {
     return out;
   }
 
-  /* ── Argon2id (hash-wasm). NUNCA degradar a PBKDF2 si no carga. ── */
-  async function argon2(passwordBytes, saltBytes) {
-    if (typeof hashwasm === 'undefined' || !hashwasm.argon2id) {
-      throw new Error('crypto_unavailable'); // el navegador no cargo el WASM requerido
-    }
+  /* ── Canonicalizacion de email: IDENTICA al servidor (src/crypto.js canonEmail) ── */
+  const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+  function canonEmail(e) {
+    const s = (e == null ? '' : String(e)).trim().toLowerCase().normalize('NFKC');
+    if (s.length < 3 || s.length > 254) return null;
+    if (!/^[\x00-\x7F]+$/.test(s)) return null;       // solo ASCII (anti homoglyph/IDN)
+    if (!EMAIL_RE.test(s)) return null;
+    return s;
+  }
+  function reqEmail(e) { const c = canonEmail(e); if (!c) throw new Error('invalid_email'); return c; }
+
+  /* ── Capacidades del navegador. NUNCA degradar si falta algo. ── */
+  function available() {
+    return typeof hashwasm !== 'undefined' && !!(hashwasm && hashwasm.argon2id)
+      && typeof CompressionStream !== 'undefined' && typeof DecompressionStream !== 'undefined'
+      && !!(crypto && crypto.subtle);
+  }
+  function assertAvailable() { if (!available()) throw new Error('crypto_unavailable'); }
+
+  /* ── Argon2id (hash-wasm). Params del servidor, clamp a minimo seguro (anti-downgrade). ── */
+  const MIN_KDF = { mem: 65536, time: 3, par: 1 };
+  function clampKdf(p) {
+    p = p || {};
+    return {
+      mem: Math.min(262144, Math.max(MIN_KDF.mem, Number(p.mem) || MIN_KDF.mem)),
+      time: Math.min(10, Math.max(MIN_KDF.time, Number(p.time) || MIN_KDF.time)),
+      par: Math.min(4, Math.max(MIN_KDF.par, Number(p.par) || MIN_KDF.par)),
+    };
+  }
+  async function argon2(passwordBytes, saltBytes, kdf) {
+    assertAvailable();
+    const p = clampKdf(kdf);
     return await hashwasm.argon2id({
       password: passwordBytes, salt: saltBytes,
-      parallelism: 1, iterations: 3, memorySize: 65536, hashLength: 32, outputType: 'binary',
-    }); // Uint8Array(32)
+      parallelism: p.par, iterations: p.time, memorySize: p.mem, hashLength: 32, outputType: 'binary',
+    });
   }
 
-  /* ── HKDF-SHA256: separa masterKey en ramas etiquetadas independientes ── */
+  /* ── HKDF-SHA256 ── */
   async function hkdf(masterKey, infoStr) {
     const k = await crypto.subtle.importKey('raw', masterKey, 'HKDF', false, ['deriveBits']);
     const bits = await crypto.subtle.deriveBits(
@@ -62,7 +87,7 @@ const CA = (() => {
   async function aesEnc(keyBytes, iv, plaintext, aadStr) {
     const key = await crypto.subtle.importKey('raw', keyBytes, 'AES-GCM', false, ['encrypt']);
     const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv, additionalData: enc.encode(aadStr), tagLength: 128 }, key, plaintext);
-    return new Uint8Array(ct); // ciphertext || tag(16)
+    return new Uint8Array(ct);
   }
   async function aesDec(keyBytes, iv, ctWithTag, aadStr) {
     const key = await crypto.subtle.importKey('raw', keyBytes, 'AES-GCM', false, ['decrypt']);
@@ -70,7 +95,7 @@ const CA = (() => {
     return new Uint8Array(pt);
   }
 
-  /* ── gzip (comprimir-antes-de-cifrar; seguro: almacenamiento, no canal con secreto) ── */
+  /* ── gzip ── */
   async function gzip(bytes) {
     const cs = new CompressionStream('gzip');
     return new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(cs)).arrayBuffer());
@@ -80,17 +105,17 @@ const CA = (() => {
     return new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(ds)).arrayBuffer());
   }
 
-  /* ── AAD (D1: email; D2: rec sin epoch) ── */
+  /* ── AAD (D1: email canonico; D2: rec sin epoch) ── */
   const aadPwd = (email, epoch) => `trackr|v1|dek|pwd|${email}|${epoch}`;
   const aadRec = (email) => `trackr|v1|dek|rec|${email}`;
   const aadBlob = (email, version) => `trackr|v1|blob|${email}|${version}`;
 
-  /* ── Envelope de la DEK: magic "TKw"(3) + ver(1) + iv(12) + ct+tag(48) = 64B (§3.2) ── */
+  /* ── Envelope de la DEK: "TKw"(3)+ver(1)+iv(12)+ct+tag(48)=64B (§3.2) ── */
   async function wrapDEK(wrapKey, dek, aadStr) {
     const iv = randBytes(12);
-    const ct = await aesEnc(wrapKey, iv, dek, aadStr); // 32 + 16 = 48
+    const ct = await aesEnc(wrapKey, iv, dek, aadStr);
     const out = new Uint8Array(64);
-    out[0] = 0x54; out[1] = 0x4B; out[2] = 0x77; out[3] = 0x01; // "TKw" v1
+    out[0] = 0x54; out[1] = 0x4B; out[2] = 0x77; out[3] = 0x01;
     out.set(iv, 4); out.set(ct, 16);
     return out;
   }
@@ -98,16 +123,16 @@ const CA = (() => {
     if (envBytes.length !== 64 || envBytes[0] !== 0x54 || envBytes[1] !== 0x4B || envBytes[2] !== 0x77 || envBytes[3] !== 0x01) {
       throw new Error('bad_envelope');
     }
-    return await aesDec(wrapKey, envBytes.slice(4, 16), envBytes.slice(16, 64), aadStr); // DEK 32B (tag invalido -> throw)
+    return await aesDec(wrapKey, envBytes.slice(4, 16), envBytes.slice(16, 64), aadStr);
   }
 
-  /* ── Blob: magic "TKb"(3) + ver(1) + flags(1) + iv(12) + ct+tag (§3.3) ── */
+  /* ── Blob: "TKb"(3)+ver(1)+flags(1)+iv(12)+ct+tag (§3.3) ── */
   async function encryptBlob(dek, obj, email, version) {
     const gz = await gzip(enc.encode(JSON.stringify(obj)));
     const iv = randBytes(12);
     const ct = await aesEnc(dek, iv, gz, aadBlob(email, version));
     const out = new Uint8Array(5 + 12 + ct.length);
-    out[0] = 0x54; out[1] = 0x4B; out[2] = 0x62; out[3] = 0x01; out[4] = 0x01; // "TKb" v1, flags=gzip
+    out[0] = 0x54; out[1] = 0x4B; out[2] = 0x62; out[3] = 0x01; out[4] = 0x01;
     out.set(iv, 5); out.set(ct, 17);
     return out;
   }
@@ -122,30 +147,29 @@ const CA = (() => {
   }
 
   /* ── Derivaciones ── */
-  async function deriveMaster(password, kdfSalt) {
-    const master = await argon2(nfkc(password), kdfSalt);
+  async function deriveMaster(password, kdfSalt, kdf) {
+    const master = await argon2(nfkc(password), kdfSalt, kdf);
     return { authKey: await hkdf(master, 'trackr|v1|authKey'), wrapKeyPwd: await hkdf(master, 'trackr|v1|wrapKeyPwd') };
   }
-  async function deriveRecovery(recoveryCodeCanon, recSalt) {
-    const wrapKeyRec = await argon2(enc.encode(recoveryCodeCanon), recSalt);
+  async function deriveRecovery(recoveryCodeCanon, recSalt, kdf) {
+    const wrapKeyRec = await argon2(enc.encode(recoveryCodeCanon), recSalt, kdf);
     return { wrapKeyRec, recProof: await hkdf(wrapKeyRec, 'trackr|v1|recProof') };
   }
 
-  /* ── Codigo de recuperacion: 16B random -> 26 chars Base32 Crockford = 128 bits exactos ── */
-  const CROCK = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // sin I L O U
+  /* ── Codigo de recuperacion: 16B -> 26 chars Base32 Crockford = 128 bits ── */
+  const CROCK = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
   function encode16(bytes) {
     let bits = 0, val = 0, out = '';
     for (let i = 0; i < bytes.length; i++) { val = (val << 8) | bytes[i]; bits += 8; while (bits >= 5) { out += CROCK[(val >>> (bits - 5)) & 31]; bits -= 5; } }
     if (bits > 0) out += CROCK[(val << (5 - bits)) & 31];
-    return out; // 26 chars para 16 bytes
+    return out;
   }
   function genRecoveryCode() {
-    return 'TRKR-' + encode16(randBytes(16)).match(/.{1,4}/g).join('-'); // TRKR-XXXX-XXXX-...
+    return 'TRKR-' + encode16(randBytes(16)).match(/.{1,4}/g).join('-');
   }
-  // Normaliza la entrada del usuario al string canonico de 26 chars (para Argon2id).
   function canonRecovery(input) {
     let c = String(input || '').toUpperCase().replace(/[ILO]/g, (m) => (m === 'O' ? '0' : '1')).replace(/[^0-9A-Z]/g, '');
-    if (c.length === 30 && c.startsWith('TRKR')) c = c.slice(4); // quitar etiqueta TRKR (entropia siempre 26)
+    if (c.length === 30 && c.startsWith('TRKR')) c = c.slice(4);
     return c;
   }
   function isValidRecovery(input) {
@@ -163,51 +187,52 @@ const CA = (() => {
     const score = Math.max(1, Math.min(4, Math.floor(pw.length / 8) + variety - 1));
     return { ok: true, score, reason: '' };
   }
+  function requirePassword(pw) { if (!checkPassword(pw).ok) throw new Error('weak_password'); }
 
-  function emptyData() {
-    return { version: 2, clientes: [], projects: [], gastos: [], settings: {} };
-  }
+  function emptyData() { return { version: 2, clientes: [], projects: [], gastos: [], settings: {} }; }
 
   /* ════════════════ Flujos de alto nivel ════════════════ */
 
-  // SIGNUP: genera todo el material. Devuelve el payload para POST /v1/signup,
-  // el recoveryCode (mostrar UNA vez) y la DEK (mantener en memoria para la sesion).
-  async function buildSignup(email, password, dataObj) {
+  // SIGNUP. Devuelve {payload (para POST /v1/signup), recoveryCode (mostrar 1 vez), dek, credEpoch, email}.
+  async function buildSignup(emailRaw, password, dataObj) {
+    const email = reqEmail(emailRaw);
+    requirePassword(password);
     const kdfSalt = randBytes(16), recSalt = randBytes(16), credEpoch = 1;
     const recoveryCode = genRecoveryCode();
-    const { authKey, wrapKeyPwd } = await deriveMaster(password, kdfSalt);
-    const { wrapKeyRec, recProof } = await deriveRecovery(canonRecovery(recoveryCode), recSalt);
+    const { authKey, wrapKeyPwd } = await deriveMaster(password, kdfSalt, MIN_KDF);
+    const { wrapKeyRec, recProof } = await deriveRecovery(canonRecovery(recoveryCode), recSalt, MIN_KDF);
     const dek = randBytes(32);
     const wrappedDEK_pwd = await wrapDEK(wrapKeyPwd, dek, aadPwd(email, credEpoch));
     const wrappedDEK_rec = await wrapDEK(wrapKeyRec, dek, aadRec(email));
     const initialBlob = await encryptBlob(dek, dataObj || emptyData(), email, 1);
     return {
       payload: {
-        email, authKey: b64u(authKey), kdfSalt: b64u(kdfSalt), kdfAlgo: 1, kdfMem: 65536, kdfTime: 3, kdfPar: 1,
+        email, authKey: b64u(authKey), kdfSalt: b64u(kdfSalt), kdfAlgo: 1, kdfMem: MIN_KDF.mem, kdfTime: MIN_KDF.time, kdfPar: MIN_KDF.par,
         recSalt: b64u(recSalt), recProof: b64u(recProof),
         wrappedDEK_pwd: b64u(wrappedDEK_pwd), wrappedDEK_rec: b64u(wrappedDEK_rec),
         initialBlob: b64u(initialBlob),
       },
-      recoveryCode, dek, credEpoch,
+      recoveryCode, dek, credEpoch, email,
     };
   }
 
-  // LOGIN paso A: deriva authKey (para enviar) + wrapKeyPwd (para desenvolver despues).
-  async function deriveForLogin(password, kdfSaltB64) {
-    const { authKey, wrapKeyPwd } = await deriveMaster(password, b64uDec(kdfSaltB64));
+  // LOGIN paso A: deriva authKey (enviar) + wrapKeyPwd. `kdf` = params del prelogin (clamp a min).
+  async function deriveForLogin(password, kdfSaltB64, kdf) {
+    const { authKey, wrapKeyPwd } = await deriveMaster(password, b64uDec(kdfSaltB64), kdf);
     return { authKey: b64u(authKey), wrapKeyPwd };
   }
-  // LOGIN paso B: con la respuesta del servidor, desenvuelve la DEK.
-  async function unwrapLogin(wrapKeyPwd, wrappedDEK_pwdB64, email, credEpoch) {
-    return await unwrapDEK(wrapKeyPwd, b64uDec(wrappedDEK_pwdB64), aadPwd(email, credEpoch));
+  // LOGIN paso B: desenvuelve la DEK.
+  async function unwrapLogin(wrapKeyPwd, wrappedDEK_pwdB64, emailRaw, credEpoch) {
+    return await unwrapDEK(wrapKeyPwd, b64uDec(wrappedDEK_pwdB64), aadPwd(reqEmail(emailRaw), credEpoch));
   }
 
-  // CAMBIO DE CONTRASENA (§4.1): re-envuelve solo la rama pwd con nuevo epoch.
-  // Requiere la DEK en memoria. Devuelve {currentAuthKey, newAuthKey, newKdfSalt, newWrappedDEK_pwd, newCredEpoch}.
-  async function buildPasswordChange(email, currentPassword, newPassword, dek, currentKdfSaltB64, credEpoch) {
-    const cur = await deriveMaster(currentPassword, b64uDec(currentKdfSaltB64));
+  // CAMBIO DE CONTRASENA (§4.1): re-envuelve solo la rama pwd. `kdf` = params actuales de la cuenta.
+  async function buildPasswordChange(emailRaw, currentPassword, newPassword, dek, currentKdfSaltB64, credEpoch, kdf) {
+    const email = reqEmail(emailRaw);
+    requirePassword(newPassword);
+    const cur = await deriveMaster(currentPassword, b64uDec(currentKdfSaltB64), kdf);
     const newKdfSalt = randBytes(16);
-    const next = await deriveMaster(newPassword, newKdfSalt);
+    const next = await deriveMaster(newPassword, newKdfSalt, kdf);
     const newEpoch = credEpoch + 1;
     const newWrappedDEK_pwd = await wrapDEK(next.wrapKeyPwd, dek, aadPwd(email, newEpoch));
     return {
@@ -216,21 +241,22 @@ const CA = (() => {
     };
   }
 
-  // RECUPERACION fase material (§4.2): deriva recProof para probar posesion del codigo.
-  async function buildRecoverProof(recoveryCode, recSaltB64) {
-    const { wrapKeyRec, recProof } = await deriveRecovery(canonRecovery(recoveryCode), b64uDec(recSaltB64));
+  // RECUPERACION fase material: deriva recProof (probar posesion). `kdf` = params del recover/start.
+  async function buildRecoverProof(recoveryCode, recSaltB64, kdf) {
+    const { wrapKeyRec, recProof } = await deriveRecovery(canonRecovery(recoveryCode), b64uDec(recSaltB64), kdf);
     return { recProof: b64u(recProof), wrapKeyRec };
   }
-  // RECUPERACION fase commit: con wrapKeyRec (de la fase material) desenvuelve la DEK y
-  // re-envuelve la rama pwd con la nueva contrasena. La rama rec NO cambia (mismo codigo).
-  async function buildRecoverCommit(email, newPassword, wrapKeyRec, wrappedDEK_recB64, credEpoch) {
+  // RECUPERACION fase commit: desenvuelve la DEK con wrapKeyRec y re-envuelve la rama pwd nueva.
+  async function buildRecoverCommit(emailRaw, newPassword, wrapKeyRec, wrappedDEK_recB64, credEpoch, kdf) {
+    const email = reqEmail(emailRaw);
+    requirePassword(newPassword);
     const dek = await unwrapDEK(wrapKeyRec, b64uDec(wrappedDEK_recB64), aadRec(email));
     const newKdfSalt = randBytes(16);
-    const next = await deriveMaster(newPassword, newKdfSalt);
+    const next = await deriveMaster(newPassword, newKdfSalt, kdf);
     const newEpoch = credEpoch + 1;
     const newWrappedDEK_pwd = await wrapDEK(next.wrapKeyPwd, dek, aadPwd(email, newEpoch));
     return {
-      dek, // queda en memoria para la sesion recuperada
+      dek,
       commit: {
         newAuthKey: b64u(next.authKey), newKdfSalt: b64u(newKdfSalt),
         newWrappedDEK_pwd: b64u(newWrappedDEK_pwd), newCredEpoch: newEpoch,
@@ -238,26 +264,21 @@ const CA = (() => {
     };
   }
 
-  // SYNC: cifra los datos locales para PUT /v1/blob (devuelve {blob, blobHash}).
-  async function encryptForUpload(dek, dataObj, email, version) {
-    const blob = await encryptBlob(dek, dataObj, email, version);
+  // SYNC
+  async function encryptForUpload(dek, dataObj, emailRaw, version) {
+    const blob = await encryptBlob(dek, dataObj, reqEmail(emailRaw), version);
     const hash = new Uint8Array(await crypto.subtle.digest('SHA-256', blob));
     return { blob: b64u(blob), blobHash: b64u(hash) };
   }
-  async function decryptDownload(dek, blobB64, email, version) {
-    return await decryptBlob(dek, b64uDec(blobB64), email, version);
+  async function decryptDownload(dek, blobB64, emailRaw, version) {
+    return await decryptBlob(dek, b64uDec(blobB64), reqEmail(emailRaw), version);
   }
 
-  function available() { return typeof hashwasm !== 'undefined' && !!(hashwasm && hashwasm.argon2id); }
-
   return {
-    // alto nivel
     buildSignup, deriveForLogin, unwrapLogin, buildPasswordChange,
     buildRecoverProof, buildRecoverCommit, encryptForUpload, decryptDownload,
-    // utilidades UI
-    genRecoveryCode, canonRecovery, isValidRecovery, checkPassword, available, emptyData,
-    // primitivas (para tests / usos avanzados)
-    _: { argon2, hkdf, wrapDEK, unwrapDEK, encryptBlob, decryptBlob, deriveMaster, deriveRecovery, encode16, b64u, b64uDec, aadPwd, aadRec, aadBlob },
+    genRecoveryCode, canonRecovery, isValidRecovery, checkPassword, canonEmail, available, emptyData,
+    _: { argon2, hkdf, wrapDEK, unwrapDEK, encryptBlob, decryptBlob, deriveMaster, deriveRecovery, encode16, b64u, b64uDec, aadPwd, aadRec, aadBlob, clampKdf, MIN_KDF },
   };
 })();
 if (typeof window !== 'undefined') window.CA = CA;
