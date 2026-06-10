@@ -82,12 +82,11 @@ const B={
 
   /**
    * Calcula resumen financiero de un periodo.
-   * Devuelve { bruto, ivaTotal, irpfTotal, gastosTotal, neto,
-   *            incomeSegs[], gastoSegs[] }
+   * Devuelve { bruto, ivaTotal, gastosTotal, neto, incomeSegs[], gastoSegs[] }
    * Usado por Home y Dineros para no duplicar lógica.
    */
   financialSummary(type, y, m) {
-    let bruto = 0, ivaTotal = 0, irpfTotal = 0;
+    let bruto = 0, ivaTotal = 0;
     const projTotals = {};
 
     D.ps().forEach(p => {
@@ -116,7 +115,6 @@ const B={
           const tf = f.totalFactura || 0;
           const ratio = tf > 0 ? (c.cantidad / tf) : 0;
           ivaTotal += (f.importeIva || 0) * ratio;
-          irpfTotal += (f.importeIrpf || 0) * ratio;
         }
       });
     });
@@ -136,6 +134,6 @@ const B={
 
     const neto = bruto - ivaTotal - gastosTotal;
 
-    return { bruto, ivaTotal, irpfTotal, gastosTotal, neto, incomeSegs, gastoSegs };
+    return { bruto, ivaTotal, gastosTotal, neto, incomeSegs, gastoSegs };
   }
 };

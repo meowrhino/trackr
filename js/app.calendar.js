@@ -453,7 +453,7 @@ Object.assign(App, {
         if (h.fecha && inPeriod(h.fecha, 'mes', year, month)) { horas += h.cantidad; if (h.monto) cobrado += h.monto; }
       });
     });
-    D.gs().forEach(g => { (g.entradas || []).forEach(e => { if (e.fecha && inPeriod(e.fecha, 'mes', year, month)) gastosTotal += e.cantidad || 0; }); });
+    D.gs().forEach(g => { (g.entradas || []).forEach(e => { if (e.fecha && inPeriod(e.fecha, 'mes', year, month)) gastosTotal += e.total || e.cantidad || 0; }); });
     if (cobrado === 0 && gastosTotal === 0) return '';
     const neto = cobrado - gastosTotal;
     const eurH = horas > 0 ? neto / horas : 0;
