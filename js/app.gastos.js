@@ -19,6 +19,12 @@ Object.assign(App, {
     }).join('');
   },
 
+  _segsColor(segs, fallback = 'var(--ok)') {
+    if (segs.length === 1) return segs[0].color;
+    if (segs.length > 1) return colorBlendOklab(segs.map(s => ({ color: s.color, weight: s.total })));
+    return fallback;
+  },
+
   _renderDedList(deds) {
     if (!deds.length) return '';
     let html = `<div class="din-ded-list" style="margin-top:.5rem">`;
@@ -91,12 +97,7 @@ Object.assign(App, {
     const incBarWidth = (bruto / maxBar * 100).toFixed(1);
 
     /* OKLAB blended color for income amount text */
-    let incAmtColor = 'var(--ok)';
-    if (incomeSegs.length === 1) {
-      incAmtColor = incomeSegs[0].color;
-    } else if (incomeSegs.length > 1) {
-      incAmtColor = colorBlendOklab(incomeSegs.map(s => ({ color: s.color, weight: s.total })));
-    }
+    let incAmtColor = this._segsColor(incomeSegs);
 
     const segsHtml = this._buildBarSegments(gastoSegs, gastosTotal);
     const expBarWidth = (gastosTotal / maxBar * 100).toFixed(1);

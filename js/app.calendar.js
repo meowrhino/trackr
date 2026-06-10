@@ -53,7 +53,7 @@ Object.assign(App, {
     const cells = [];
     for (let i = 0; i < totalCells; i++) {
       const d = new Date(year, month, 1 + (i - startDow));
-      const ds = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const ds = localDateStr(d);
       cells.push({ date: ds, num: d.getDate(), in: d.getMonth() === month && d.getFullYear() === year, today: ds === today });
     }
 
@@ -136,7 +136,7 @@ Object.assign(App, {
     const days = [];
     for (let i = 0; i < 7; i++) {
       const d = new Date(ws.getFullYear(), ws.getMonth(), ws.getDate() + i);
-      const ds = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const ds = localDateStr(d);
       days.push({ date: ds, num: d.getDate(), dow: DIAS_SEM[i], today: ds === today, d });
     }
 
@@ -147,7 +147,7 @@ Object.assign(App, {
 
     const startHour = (D.d.settings && D.d.settings.calStartHour) || 0;
     const dayAfter = new Date(ws.getFullYear(), ws.getMonth(), ws.getDate() + 7);
-    const dayAfterStr = `${dayAfter.getFullYear()}-${String(dayAfter.getMonth() + 1).padStart(2, '0')}-${String(dayAfter.getDate()).padStart(2, '0')}`;
+    const dayAfterStr = localDateStr(dayAfter);
 
     const ps = D.ps();
     const hm = {}; let wt = 0;
@@ -253,7 +253,7 @@ Object.assign(App, {
     if (startHour > 0 && nowMins < colStartMins) {
       const y = new Date();
       y.setDate(y.getDate() - 1);
-      nowDateForCol = `${y.getFullYear()}-${String(y.getMonth() + 1).padStart(2, '0')}-${String(y.getDate()).padStart(2, '0')}`;
+      nowDateForCol = localDateStr(y);
     }
 
     let cols = '';

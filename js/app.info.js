@@ -24,7 +24,7 @@ Object.assign(App, {
     const weekDates = new Set();
     for (let i = 0; i < 7; i++) {
       const d = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + i);
-      weekDates.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`);
+      weekDates.add(localDateStr(d));
     }
 
     ps.forEach(p => {
@@ -128,7 +128,7 @@ Object.assign(App, {
       actHtml = `<div class="info-section"><div class="info-section-title">${t('info.recentActivity')}</div><div class="hl">`;
       recent.forEach(a => {
         const dateLabel = a.fecha === today ? t('info.today')
-          : a.fecha === (() => { const y = new Date(now - 86400000); return `${y.getFullYear()}-${String(y.getMonth()+1).padStart(2,'0')}-${String(y.getDate()).padStart(2,'0')}`; })() ? t('info.yesterday')
+          : a.fecha === localDateStr(new Date(now - 86400000)) ? t('info.yesterday')
           : fmtDate(a.fecha);
         if (a.fecha !== lastDate) {
           if (lastDate) actHtml += `<div class="info-act-sep"></div>`;
@@ -212,9 +212,7 @@ Object.assign(App, {
     const incBarWidth = (cobrado / maxBar * 100).toFixed(1);
 
     /* OKLAB blended color */
-    let incAmtColor = 'var(--ok)';
-    if (incomeSegs.length === 1) incAmtColor = incomeSegs[0].color;
-    else if (incomeSegs.length > 1) incAmtColor = colorBlendOklab(incomeSegs.map(s => ({ color: s.color, weight: s.total })));
+    let incAmtColor = this._segsColor(incomeSegs);
 
     el.innerHTML =
       `<div class="info-fin">`

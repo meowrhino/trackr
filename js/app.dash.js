@@ -59,8 +59,8 @@ Object.assign(App, {
     /* Ordenar cada grupo por horas desc */
     Object.keys(groups).forEach(st => {
       groups[st].sort((a, b) => {
-        const ha = a.horas.reduce((s, h) => s + h.cantidad, 0);
-        const hb = b.horas.reduce((s, h) => s + h.cantidad, 0);
+        const ha = B.totalHoras(a);
+        const hb = B.totalHoras(b);
         return hb - ha;
       });
     });
@@ -100,7 +100,7 @@ Object.assign(App, {
   },
 
   card(p) {
-    const th = p.horas.reduce((s, h) => s + h.cantidad, 0);
+    const th = B.totalHoras(p);
     const eph = B.eph(p);
     const hex = colorHex(p.color);
     const cn = clienteName(p);
@@ -129,7 +129,7 @@ Object.assign(App, {
           ? `<span><span class="m">${fmtMoney(f.totalFactura || 0)}</span></span>`
           : `<span style="color:var(--t3)">${t('dash.free')}</span>`}
         ${eph !== null && f.modo !== 'gratis'
-          ? `<span style="color:${eph >= 30 ? 'var(--ok)' : eph >= 15 ? 'var(--warn)' : 'var(--bad)'}">${eph.toFixed(2)} &euro;/h</span>`
+          ? `<span style="color:${B.ephColor(eph)}">${eph.toFixed(2)} &euro;/h</span>`
           : ''}
       </div>
       ${!f.pagado && f.facturaFecha && f.modo !== 'gratis'

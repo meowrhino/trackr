@@ -211,8 +211,12 @@ function inPeriod(date, type, year, month) {
   return y === year;
 }
 
+/** Devuelve una fecha LOCAL como string YYYY-MM-DD (no UTC) */
+function localDateStr(d = new Date()) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 /** Devuelve la fecha de hoy como string YYYY-MM-DD */
 function todayStr() {
-  const n = new Date();
-  return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}`;
+  return localDateStr();
 }

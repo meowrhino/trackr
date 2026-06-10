@@ -37,8 +37,7 @@ const App = {
     if (!D.init()) D.create();
 
     /* Aplicar tema e idioma guardados */
-    applyTheme(D.d.settings.theme || D.d.settings.tema || 'oscuro');
-    setLang(D.d.settings.lang || D.d.settings.idioma || 'es');
+    this._applyPrefs();
 
     /* Cerrar modal con Escape / Enter para submit */
     document.addEventListener('keydown', e => {
@@ -63,6 +62,12 @@ const App = {
 
     /* Línea "ahora" del calendario: reposicionar cada minuto sin re-renderizar */
     setInterval(() => this._tickNow(), 60000);
+  },
+
+  /** Aplica tema e idioma guardados en settings (con fallbacks legacy tema/idioma) */
+  _applyPrefs() {
+    applyTheme(D.d.settings.theme || D.d.settings.tema || 'oscuro');
+    setLang(D.d.settings.lang || D.d.settings.idioma || 'es');
   },
 
   /** Reposiciona la línea horizontal "ahora" si el calendario está visible */
@@ -199,8 +204,7 @@ const App = {
         if (d.gastos && !Array.isArray(d.gastos)) { Toast.error(t('msg.invalidJsonGastos')); return; }
         if (!d.settings) d.settings = { defaultIva: 21, defaultIrpf: 15 };
         D.load(d); T.ev('action', 'import');
-        applyTheme(D.d.settings.theme || D.d.settings.tema || 'oscuro');
-        setLang(D.d.settings.lang || D.d.settings.idioma || 'es');
+        this._applyPrefs();
         Toast.ok(t('msg.importSuccess'));
         this.go(this.cv);
       } catch (err) { Toast.error(t('msg.importError') + err.message); }
@@ -233,8 +237,7 @@ const App = {
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
       D.load(data);
-      applyTheme(D.d.settings.theme || D.d.settings.tema || 'oscuro');
-      setLang(D.d.settings.lang || D.d.settings.idioma || 'es');
+      this._applyPrefs();
       Toast.ok(t('msg.exampleLoaded'));
       this.go('info');
     } catch (err) {

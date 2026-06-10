@@ -24,7 +24,7 @@ const B={
     const iv=f.iva||0, ir=f.irpf||0;
 
     if(f.modo==='por_hora'){
-      const th=p.horas.reduce((s,h)=>s+h.cantidad,0);
+      const th=this.totalHoras(p);
       f.baseImponible=roundMoney(th*(f.precioHora||0));
     } else if(f.modo==='desde_total'){
       const t=f.total||0, fac=1+iv/100-ir/100;
@@ -63,6 +63,9 @@ const B={
     return { importeIva, importeIrpf, totalFactura: roundMoney(base + importeIva - importeIrpf), netoRecibido: roundMoney(base - importeIrpf) };
   },
 
+  /* Suma total de horas registradas en el proyecto */
+  totalHoras(p){ return p.horas.reduce((s,h)=>s+(h.cantidad||0),0); },
+
   /* Suma total cobrada */
   totalCobrado(p) {
     return (p.facturacion.cobros || []).reduce((s, c) => s + (c.cantidad || 0), 0);
@@ -75,10 +78,13 @@ const B={
 
   /* Calcula €/hora (rentabilidad) */
   eph(p){
-    const h=p.horas.reduce((s,x)=>s+x.cantidad,0);
+    const h=this.totalHoras(p);
     if(!h) return null;
     return roundMoney((p.facturacion.netoRecibido||0)/h);
   },
+
+  /* Color del €/h segun rentabilidad (umbrales 30 / 15) */
+  ephColor(e){ return e >= 30 ? 'var(--ok)' : e >= 15 ? 'var(--warn)' : 'var(--bad)'; },
 
   /**
    * Calcula resumen financiero de un periodo.

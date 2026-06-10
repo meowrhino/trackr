@@ -230,7 +230,7 @@ Object.assign(App, {
 
     if (m === 'por_hora') {
       const ph = parseFloat(document.getElementById('mpPH')?.value) || 0;
-      const th = p ? p.horas.reduce((s, h) => s + h.cantidad, 0) : 0;
+      const th = p ? B.totalHoras(p) : 0;
       base = roundMoney(th * ph);
     } else if (m === 'desde_base') {
       base = parseFloat(document.getElementById('mpBa')?.value) || 0;
@@ -250,7 +250,7 @@ Object.assign(App, {
     let phInfo = '';
     if (m === 'por_hora') {
       const ph = parseFloat(document.getElementById('mpPH')?.value) || 0;
-      const th = p ? p.horas.reduce((s, h) => s + h.cantidad, 0) : 0;
+      const th = p ? B.totalHoras(p) : 0;
       phInfo = `<div class="br"><span class="la" style="font-size:.75rem;color:var(--t3)">`
         + (p ? `${th.toFixed(1)}h × ${fmtNum(ph)} €/h` : t('billing.noHoursYet'))
         + `</span></div>`;

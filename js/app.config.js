@@ -123,8 +123,7 @@ Object.assign(App, {
     if (typeof H === 'undefined') return;
     H.snapshot(); // red de seguridad: guarda el estado ACTUAL antes de sobreescribirlo (se puede deshacer)
     if (H.restore(id)) {
-      applyTheme(D.d.settings.theme || D.d.settings.tema || 'oscuro');
-      setLang(D.d.settings.lang || D.d.settings.idioma || 'es');
+      this._applyPrefs();
       Toast.ok(_lang === 'en' ? 'Copy restored' : (_lang === 'ca' ? 'Còpia restaurada' : 'Copia restaurada'));
       this.go(this.cv);
     }

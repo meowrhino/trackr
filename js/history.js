@@ -80,7 +80,7 @@ const H = {
     /* Día LOCAL (coherente con la fecha/hora local que se muestra), no UTC */
     const dayOf = iso => {
       const n = iso ? new Date(iso) : new Date();
-      return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}`;
+      return localDateStr(n);
     };
     const today = dayOf();
     const arr = this._read();

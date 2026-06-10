@@ -17,7 +17,7 @@ Object.assign(App, {
     const hex = colorHex(p.color);
     const cn = clienteName(p);
     const f = p.facturacion;
-    const th = p.horas.reduce((s, h) => s + h.cantidad, 0);
+    const th = B.totalHoras(p);
     const wh = p.horas.filter(h => h.tipo === 'trabajo').reduce((s, h) => s + h.cantidad, 0);
     const mh = p.horas.filter(h => h.tipo === 'reunion').reduce((s, h) => s + h.cantidad, 0);
     const eph = B.eph(p);
@@ -84,7 +84,7 @@ Object.assign(App, {
         + (f.irpf ? `<div class="br"><span class="la">${t('billing.minusIrpfAmt', f.irpf)}</span><span class="va">${fmtMoney(f.importeIrpf || 0)}</span></div>` : '')
         + `<div class="br tot"><span class="la">${t('billing.invoiceTotal')}</span><span class="va">${fmtMoney(f.totalFactura || 0)}</span></div>`
         + `<div class="br"><span class="la">${t('billing.netToReceive')}</span><span class="va" style="color:var(--ok)">${fmtMoney(f.netoRecibido || 0)}</span></div>`
-        + (eph !== null ? `<div class="br"><span class="la">${t('billing.profitability')}</span><span class="va" style="color:${eph >= 30 ? 'var(--ok)' : eph >= 15 ? 'var(--warn)' : 'var(--bad)'}">${eph.toFixed(2)} &euro;/h</span></div>` : '')
+        + (eph !== null ? `<div class="br"><span class="la">${t('billing.profitability')}</span><span class="va" style="color:${B.ephColor(eph)}">${eph.toFixed(2)} &euro;/h</span></div>` : '')
         + `</div>`;
 
     /* ── Cobros parciales ── */
