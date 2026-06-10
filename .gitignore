@@ -22,3 +22,6 @@ Thumbs.db
 node_modules/
 dist/
 build/
+
+# Cloudflare wrangler local state
+.wrangler/

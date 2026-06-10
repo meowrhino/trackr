@@ -743,7 +743,7 @@ const App = {
 };
 
 /* ── Arranque ── */
-document.addEventListener('DOMContentLoaded', () => App.init());
+document.addEventListener('DOMContentLoaded', () => { App.init(); if (typeof H !== 'undefined') H.maybeAutoSnapshot(); });
 
 /* ── Tooltip flotante para segmentos de barras ── */
 (function(){

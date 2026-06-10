@@ -11,6 +11,8 @@
   gap:.5rem;
   margin-bottom:1rem;
 }
+/* Botón "+ Añadir hora": empujado a la derecha; en móvil cae a nueva línea (cal-hd ya tiene flex-wrap en responsive.css) */
+.cal-add-hour{ margin-left:auto; }
 .cal-title{
   font-size:1.1rem;
   font-weight:500;

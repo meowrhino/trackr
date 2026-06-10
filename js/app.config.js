@@ -56,7 +56,74 @@ Object.assign(App, {
       + `<div class="cfg-section" style="margin-top:2.5rem"><div class="cfg-section-title">${t('cfg.importOldInvoices')}</div>`
       + `<div style="color:var(--t3);font-size:.82rem;margin-bottom:.75rem">${t('cfg.importOldDesc')}</div>`
       + `<button class="bt bt-add" onclick="App.importOldInvoicesClick()">${t('cfg.importOldInvoices')}</button></div>`
-      + this._cfgVerifactuSection();
+      + this._cfgVerifactuSection()
+      + this._cfgHistorySection();
+  },
+
+  /** Sección Historial: copias locales (saves) — crear / restaurar / descargar.
+   *  Textos i18n inline (es/en/ca) — migrar a lang.js cuando se valide la UX. */
+  _cfgHistorySection() {
+    const TX = ({
+      es: { title: 'Copias de seguridad', desc: 'TRACKR guarda hasta 10 copias locales de tus datos (una al día, más las que crees tú). Son tu red de seguridad: descárgalas o restáuralas cuando quieras. Nada de esto sale de tu navegador.', saveNow: 'Guardar copia ahora', none: 'Aún no hay copias. Se creará una automáticamente al usar la app.', current: 'ACTUAL', auto: 'auto', load: 'Cargar', download: 'Descargar' },
+      en: { title: 'Backups', desc: 'TRACKR keeps up to 10 local copies of your data (one a day, plus the ones you make). They are your safety net: download or restore them anytime. None of this leaves your browser.', saveNow: 'Save a copy now', none: 'No copies yet. One will be created automatically as you use the app.', current: 'CURRENT', auto: 'auto', load: 'Load', download: 'Download' },
+      ca: { title: 'Còpies de seguretat', desc: 'TRACKR desa fins a 10 còpies locals de les teves dades (una al dia, més les que creïs tu). Són la teva xarxa de seguretat: descarrega-les o restaura-les quan vulguis. Res d\'això surt del teu navegador.', saveNow: 'Desar còpia ara', none: 'Encara no hi ha còpies. Se\'n crearà una automàticament en fer servir l\'app.', current: 'ACTUAL', auto: 'auto', load: 'Carregar', download: 'Descarregar' }
+    })[typeof _lang !== 'undefined' ? _lang : 'es'] || {};
+    const tx = k => TX[k] || k;
+    const locale = (typeof _lang !== 'undefined' && _lang === 'en') ? 'en-GB' : (typeof _lang !== 'undefined' && _lang === 'ca' ? 'ca-ES' : 'es-ES');
+    const fmtTs = iso => {
+      if (!iso) return '—';
+      try { return new Date(iso).toLocaleString(locale, { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+      catch { return iso.slice(0, 16).replace('T', ' '); }
+    };
+    const saves = (typeof H !== 'undefined') ? H.list() : [];
+    let listHtml;
+    if (saves.length) {
+      listHtml = `<div class="cl-list" style="margin-top:.75rem">` + saves.map((s, i) =>
+        `<div class="cl-item">`
+        + `<span class="cl-name" style="font-size:.82rem">${i === 0 ? `<strong style="color:var(--ok)">${tx('current')}</strong> · ` : ''}${fmtTs(s.ts)}</span>`
+        + `<span class="cl-nif" style="font-size:.72rem;color:var(--t3)">${s.auto ? tx('auto') + ' · ' : ''}${s.sizeKB} KB</span>`
+        + `<div class="cl-actions">`
+        +   `<button class="cl-btn" onclick="App.histDownload('${s.id}')" title="${tx('download')}">&#8595;</button>`
+        +   `<button class="cl-btn" onclick="App.histRestore('${s.id}')" title="${tx('load')}">&#8635;</button>`
+        + `</div>`
+        + `</div>`
+      ).join('') + `</div>`;
+    } else {
+      listHtml = `<div style="color:var(--t3);font-size:.82rem;margin-top:.5rem">${tx('none')}</div>`;
+    }
+    return `<div class="cfg-section" style="margin-top:2.5rem"><div class="cfg-section-title">${tx('title')}</div>`
+      + `<div style="color:var(--t3);font-size:.82rem;margin-bottom:.75rem">${tx('desc')}</div>`
+      + `<button class="bt bt-add" onclick="App.histSnapshot()">${tx('saveNow')}</button>`
+      + listHtml
+      + `</div>`;
+  },
+
+  histSnapshot() {
+    if (typeof H === 'undefined') return;
+    const id = H.snapshot();
+    if (id) {
+      Toast.ok(_lang === 'en' ? 'Copy saved' : (_lang === 'ca' ? 'Còpia desada' : 'Copia guardada'));
+      this.rCfg();
+    }
+  },
+
+  histDownload(id) {
+    if (typeof H !== 'undefined') H.download(id);
+  },
+
+  histRestore(id) {
+    const msg = _lang === 'en'
+      ? 'This will overwrite your current data with this copy. We recommend downloading a copy of the current state first. Continue?'
+      : (_lang === 'ca'
+        ? 'Això sobreescriurà les teves dades actuals amb aquesta còpia. Et recomanem descarregar abans una còpia de l\'estat actual. Continuar?'
+        : 'Esto sobreescribirá tus datos actuales con esta copia. Te recomendamos descargar antes una copia del estado actual. ¿Continuar?');
+    if (!confirm(msg)) return;
+    if (typeof H !== 'undefined' && H.restore(id)) {
+      applyTheme(D.d.settings.theme || D.d.settings.tema || 'oscuro');
+      setLang(D.d.settings.lang || D.d.settings.idioma || 'es');
+      Toast.ok(_lang === 'en' ? 'Copy restored' : (_lang === 'ca' ? 'Còpia restaurada' : 'Copia restaurada'));
+      this.go(this.cv);
+    }
   },
 
   /** Sección Verifactu: identidad SIF + lista de facturas firmadas + verificar cadena */
