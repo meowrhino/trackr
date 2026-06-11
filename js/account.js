@@ -155,7 +155,25 @@ const Acc = (() => {
     return { ok: true, version: g.data.version };
   }
 
-  // Cifra D.d y lo sube. Concurrencia optimista: en 409 baja, recarga y reintenta una vez.
+  // Merge de conflicto: union por id de cada coleccion (LOCAL gana en colisiones), settings/version locales.
+  // No pierde registros: conserva los locales y adopta los que solo estan en la nube (otro dispositivo).
+  function mergeData(local, cloud) {
+    local = local || {}; cloud = cloud || {};
+    const out = {};
+    for (const k of Object.keys(cloud)) out[k] = cloud[k];
+    for (const key of ['projects', 'clientes', 'gastos', 'deducibles', 'facturas']) {
+      if (!(local[key] || cloud[key])) continue;
+      const byId = {};
+      (cloud[key] || []).forEach((x) => { if (x && x.id != null) byId[x.id] = x; });
+      (local[key] || []).forEach((x) => { if (x && x.id != null) byId[x.id] = x; }); // local gana
+      out[key] = Object.values(byId);
+    }
+    if (local.settings) out.settings = local.settings;
+    if (local.version != null) out.version = local.version;
+    return out;
+  }
+
+  // Cifra D.d y lo sube. Concurrencia optimista: en 409 baja la nube, MERGEA (union por id) y reintenta una vez.
   async function push(dataObj, _retry) {
     if (!isUnlocked() || !S.active) return { ok: false, error: 'not_ready' };
     const data = dataObj || (typeof D !== 'undefined' ? D.d : null);
@@ -164,8 +182,21 @@ const Acc = (() => {
     const r = await api('/v1/blob', { method: 'PUT', auth: true, body: { blob, blobHash, baseVersion: S.version } });
     if (r.status === 200) { S.version = r.data.version; saveMeta(); return { ok: true, version: r.data.version }; }
     if (r.status === 409 && !_retry) {
-      // conflicto: alguien subio otra version. Baja la actual (local-first: el usuario mergeara) y reintenta.
+      // Conflicto: otro dispositivo subio. Bajamos la nube, MERGEAMOS (union por id, local gana)
+      // y reintentamos UNA vez. Snapshot de seguridad antes de adoptar el merge localmente.
       S.version = r.data.currentVersion;
+      const g = await api('/v1/blob', { method: 'GET', auth: true });
+      if (g.status === 200 && g.data) {
+        let cloud = null;
+        try { cloud = await CA.decryptDownload(S.dek, g.data.blob, S.email, g.data.version); } catch (e) { /* */ }
+        if (cloud) {
+          S.version = g.data.version;
+          const merged = mergeData(data, cloud);
+          if (typeof H !== 'undefined' && H.snapshot) H.snapshot();
+          if (typeof D !== 'undefined' && D.load) D.load(merged);
+          return await push(merged, true);
+        }
+      }
       return { ok: false, error: 'version_conflict', currentVersion: r.data.currentVersion };
     }
     if (r.status === 403) return { ok: false, error: 'inactive' };
@@ -189,7 +220,7 @@ const Acc = (() => {
 
   return {
     signup, login, unlock, logout, changePassword, recover, pull, push,
-    adminListUsers, adminSetActive, adminSetPaid, adminDelete,
+    adminListUsers, adminSetActive, adminSetPaid, adminDelete, _mergeData: mergeData,
     status, isUnlocked, detectLocked, setAutoSync, notifyChange, setApiBase: (u) => { API_BASE = u; },
     get email() { return S.email; }, get version() { return S.version; }, get state() { return S.state; },
   };
