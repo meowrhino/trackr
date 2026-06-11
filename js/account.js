@@ -181,8 +181,15 @@ const Acc = (() => {
     _timer = setTimeout(() => { _timer = null; push().catch(() => {}); }, 2500);
   }
 
+  /* ── Admin (solo is_admin; el servidor reverifica) ── */
+  async function adminListUsers() { const r = await api('/v1/admin/users', { auth: true }); return r.status === 200 ? r.data.users : null; }
+  async function adminSetActive(id, active) { const r = await api(`/v1/admin/users/${encodeURIComponent(id)}/active`, { method: 'POST', auth: true, body: { active } }); return r.status === 200; }
+  async function adminSetPaid(id, paid) { const r = await api(`/v1/admin/users/${encodeURIComponent(id)}/paid`, { method: 'POST', auth: true, body: { paid } }); return r.status === 200; }
+  async function adminDelete(id) { const r = await api(`/v1/admin/users/${encodeURIComponent(id)}`, { method: 'DELETE', auth: true }); return r.status === 204; }
+
   return {
     signup, login, unlock, logout, changePassword, recover, pull, push,
+    adminListUsers, adminSetActive, adminSetPaid, adminDelete,
     status, isUnlocked, detectLocked, setAutoSync, notifyChange, setApiBase: (u) => { API_BASE = u; },
     get email() { return S.email; }, get version() { return S.version; }, get state() { return S.state; },
   };

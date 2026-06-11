@@ -105,7 +105,8 @@
           + (st.active ? `<button class="bt bt-s" onclick="App.accSyncNow()">${t('syncNow')}</button>` : '')
           + `<button class="bt bt-s" onclick="App.accChangePwModal()">${t('changePw')}</button>`
           + `<button class="bt bt-s" onclick="App.accLogout()">${t('logout')}</button>`
-          + `</div>`;
+          + `</div>`
+          + (st.isAdmin ? this._accAdminBlock() : '');
       } else if (Acc.state === 'locked') {
         body = `<div class="acc-warn">${t('locked')}</div>`
           + `<div class="fg" style="margin-top:.6rem"><label>${t('password')}</label><input id="accPw" type="password" autocomplete="current-password"></div>`
@@ -237,6 +238,32 @@
       const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'trackr-recovery-code.txt'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
     },
     accDoneRecovery() { const cb = this._recDone; this._recCode = null; this._recDone = null; this.cm(); if (cb) cb(); },
+
+    /* ── Admin: lista de usuarios + activar/pagar/borrar ── */
+    _accAdminBlock() {
+      return `<div style="margin-top:1.5rem"><div class="cfg-section-title" style="font-size:.95rem">Usuarios (admin)</div>`
+        + `<button class="bt bt-s" onclick="App.accAdminLoad()">Ver / refrescar usuarios</button>`
+        + `<div id="accAdminList"></div></div>`;
+    },
+    async accAdminLoad() {
+      const el = document.getElementById('accAdminList'); if (!el) return;
+      el.innerHTML = `<div style="color:var(--t3);font-size:.8rem;margin-top:.5rem">…</div>`;
+      const users = await Acc.adminListUsers();
+      if (!users) { el.innerHTML = `<div class="acc-warn" style="margin-top:.5rem">No se pudieron cargar los usuarios.</div>`; return; }
+      el.innerHTML = `<div class="cl-list" style="margin-top:.6rem">` + users.map(u =>
+        `<div class="cl-item">`
+        + `<span class="cl-name" style="font-size:.82rem">${esc2(u.email)}${u.isAdmin ? ' <span class="acc-badge">admin</span>' : ''}${u.paid ? ' <span class="acc-badge">pago</span>' : ''}</span>`
+        + `<span class="cl-nif" style="font-size:.72rem;color:var(--t3)">${u.active ? '<span style="color:var(--ok)">activo</span>' : '<span style="color:var(--warn)">pendiente</span>'} · v${u.currentVersion} · ${Math.round((u.totalBytes || 0) / 1024)}KB</span>`
+        + `<div class="cl-actions">`
+        + `<button class="cl-btn" title="${u.active ? 'Desactivar' : 'Activar'}" onclick="App.accAdminActive('${u.userId}',${u.active ? 0 : 1})">${u.active ? '✓' : '○'}</button>`
+        + `<button class="cl-btn" title="${u.paid ? 'Quitar pago' : 'Marcar pagado'}" onclick="App.accAdminPaid('${u.userId}',${u.paid ? 0 : 1})">&euro;</button>`
+        + `<button class="cl-btn cl-btn-del" title="Borrar (soft)" onclick="App.accAdminDelete('${u.userId}','${esc2(u.email).replace(/'/g, '')}')">&times;</button>`
+        + `</div></div>`
+      ).join('') + `</div>`;
+    },
+    async accAdminActive(id, active) { if (await Acc.adminSetActive(id, !!active)) { Toast.ok(active ? 'Activado' : 'Desactivado'); this.accAdminLoad(); } else Toast.error('Error'); },
+    async accAdminPaid(id, paid) { if (await Acc.adminSetPaid(id, !!paid)) { Toast.ok('OK'); this.accAdminLoad(); } else Toast.error('Error'); },
+    async accAdminDelete(id, email) { if (!confirm(`¿Borrar la cuenta ${email}? (soft-delete, reversible 30 días)`)) return; if (await Acc.adminDelete(id)) { Toast.ok('Borrada'); this.accAdminLoad(); } else Toast.error('Error'); },
   });
 
   // ── Auto-sync: engancha D.save() (todos los mutadores pasan por ahi) ──
