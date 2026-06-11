@@ -151,12 +151,15 @@ const Acc = (() => {
     try { data = await CA.decryptDownload(S.dek, g.data.blob, S.email, g.data.version); }
     catch (e) { return { ok: false, error: 'decrypt_failed' }; }
     S.version = g.data.version;
-    if (typeof D !== 'undefined' && D.load) D.load(data);
+    _applyRemote(data);
     return { ok: true, version: g.data.version };
   }
 
-  // Merge de conflicto: union por id de cada coleccion (LOCAL gana en colisiones), settings/version locales.
-  // No pierde registros: conserva los locales y adopta los que solo estan en la nube (otro dispositivo).
+  // Merge de conflicto (multi-dispositivo): union por id (local gana en colisiones).
+  // LIMITACION CONOCIDA (revision Etapa2): sin tombstones, un registro borrado en un dispositivo y
+  // aun presente en la nube REAPARECE (los borrados no se propagan), y una edicion concurrente del
+  // mismo id la pisa el local. Borrado/edicion fiables multi-dispositivo necesitan tombstones + reloj
+  // por registro (futuro). Para 1 dispositivo (caso comun ahora) no aplica. El 409 hace H.snapshot.
   function mergeData(local, cloud) {
     local = local || {}; cloud = cloud || {};
     const out = {};
@@ -168,46 +171,67 @@ const Acc = (() => {
       (local[key] || []).forEach((x) => { if (x && x.id != null) byId[x.id] = x; }); // local gana
       out[key] = Object.values(byId);
     }
-    if (local.settings) out.settings = local.settings;
+    // Settings: UI local gana, pero conservamos campos solo-nube y NO retrocedemos contadores monotonos
+    // (p.ej. numeracion de facturas) para no romper la cadena/correlativo.
+    out.settings = Object.assign({}, cloud.settings || {}, local.settings || {});
+    const lc = local.settings || {}, cc = cloud.settings || {};
+    for (const numKey of ['nextFacturaNum', 'nextNum', 'facturaCounter', 'numFactura']) {
+      if (lc[numKey] != null || cc[numKey] != null) out.settings[numKey] = Math.max(Number(lc[numKey]) || 0, Number(cc[numKey]) || 0);
+    }
     if (local.version != null) out.version = local.version;
     return out;
   }
 
-  // Cifra D.d y lo sube. Concurrencia optimista: en 409 baja la nube, MERGEA (union por id) y reintenta una vez.
+  // Cifra D.d y lo sube. Concurrencia optimista: en 409 baja la nube, MERGEA y reintenta una vez.
+  // Guard _pushing: evita pushes solapados (auto-sync + manual); si llega otro mientras, marca _dirty y relanza al acabar.
   async function push(dataObj, _retry) {
     if (!isUnlocked() || !S.active) return { ok: false, error: 'not_ready' };
-    const data = dataObj || (typeof D !== 'undefined' ? D.d : null);
-    if (!data) return { ok: false, error: 'no_data' };
-    const { blob, blobHash } = await CA.encryptForUpload(S.dek, data, S.email, S.version + 1);
-    const r = await api('/v1/blob', { method: 'PUT', auth: true, body: { blob, blobHash, baseVersion: S.version } });
-    if (r.status === 200) { S.version = r.data.version; saveMeta(); return { ok: true, version: r.data.version }; }
-    if (r.status === 409 && !_retry) {
-      // Conflicto: otro dispositivo subio. Bajamos la nube, MERGEAMOS (union por id, local gana)
-      // y reintentamos UNA vez. Snapshot de seguridad antes de adoptar el merge localmente.
-      S.version = r.data.currentVersion;
-      const g = await api('/v1/blob', { method: 'GET', auth: true });
-      if (g.status === 200 && g.data) {
-        let cloud = null;
-        try { cloud = await CA.decryptDownload(S.dek, g.data.blob, S.email, g.data.version); } catch (e) { /* */ }
-        if (cloud) {
-          S.version = g.data.version;
-          const merged = mergeData(data, cloud);
-          if (typeof H !== 'undefined' && H.snapshot) H.snapshot();
-          if (typeof D !== 'undefined' && D.load) D.load(merged);
-          return await push(merged, true);
-        }
-      }
-      return { ok: false, error: 'version_conflict', currentVersion: r.data.currentVersion };
+    if (!_retry) {
+      if (_pushing) { _dirty = true; return { ok: false, error: 'busy' }; }
+      _pushing = true;
     }
-    if (r.status === 403) return { ok: false, error: 'inactive' };
-    return { ok: false, error: r.data?.error || 'put_failed' };
+    try {
+      const data = dataObj || (typeof D !== 'undefined' ? D.d : null);
+      if (!data) return { ok: false, error: 'no_data' };
+      const { blob, blobHash } = await CA.encryptForUpload(S.dek, data, S.email, S.version + 1);
+      const r = await api('/v1/blob', { method: 'PUT', auth: true, body: { blob, blobHash, baseVersion: S.version } });
+      if (r.status === 200) { S.version = r.data.version; saveMeta(); return { ok: true, version: r.data.version }; }
+      if (r.status === 409 && !_retry) {
+        S.version = r.data.currentVersion;
+        const g = await api('/v1/blob', { method: 'GET', auth: true });
+        if (g.status === 200 && g.data) {
+          let cloud = null;
+          try { cloud = await CA.decryptDownload(S.dek, g.data.blob, S.email, g.data.version); } catch (e) { /* */ }
+          if (cloud) {
+            S.version = g.data.version;
+            const merged = mergeData(data, cloud);
+            if (typeof H !== 'undefined' && H.snapshot) H.snapshot(); // red de seguridad antes del merge
+            _applyRemote(merged);
+            return await push(merged, true);
+          }
+        }
+        return { ok: false, error: 'version_conflict', currentVersion: r.data.currentVersion };
+      }
+      if (r.status === 403) return { ok: false, error: 'inactive' };
+      return { ok: false, error: r.data?.error || 'put_failed' };
+    } finally {
+      if (!_retry) {
+        _pushing = false;
+        if (_dirty) { _dirty = false; setTimeout(() => { push().catch(() => {}); }, 50); }
+      }
+    }
   }
 
-  /* ── auto-sync (debounce) ── */
-  let _timer = null, _enabled = false;
+  /* ── auto-sync (debounce) + guards de concurrencia/reentrada ── */
+  let _timer = null, _enabled = false, _pushing = false, _dirty = false, _applyingRemote = false;
   function setAutoSync(on) { _enabled = !!on; }
+  // Carga datos remotos en D SIN disparar un push de vuelta (evita la reentrada del auto-sync).
+  function _applyRemote(data) {
+    _applyingRemote = true;
+    try { if (typeof D !== 'undefined' && D.load) D.load(data); } finally { _applyingRemote = false; }
+  }
   function notifyChange() {
-    if (!_enabled || !isUnlocked() || !S.active) return;
+    if (!_enabled || _applyingRemote || !isUnlocked() || !S.active) return;
     if (_timer) clearTimeout(_timer);
     _timer = setTimeout(() => { _timer = null; push().catch(() => {}); }, 2500);
   }

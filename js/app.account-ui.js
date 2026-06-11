@@ -257,13 +257,13 @@
         + `<div class="cl-actions">`
         + `<button class="cl-btn" title="${u.active ? 'Desactivar' : 'Activar'}" onclick="App.accAdminActive('${u.userId}',${u.active ? 0 : 1})">${u.active ? '✓' : '○'}</button>`
         + `<button class="cl-btn" title="${u.paid ? 'Quitar pago' : 'Marcar pagado'}" onclick="App.accAdminPaid('${u.userId}',${u.paid ? 0 : 1})">&euro;</button>`
-        + `<button class="cl-btn cl-btn-del" title="Borrar (soft)" onclick="App.accAdminDelete('${u.userId}','${esc2(u.email).replace(/'/g, '')}')">&times;</button>`
+        + `<button class="cl-btn cl-btn-del" title="Borrar (soft)" onclick="App.accAdminDelete('${u.userId}')">&times;</button>`
         + `</div></div>`
       ).join('') + `</div>`;
     },
     async accAdminActive(id, active) { if (await Acc.adminSetActive(id, !!active)) { Toast.ok(active ? 'Activado' : 'Desactivado'); this.accAdminLoad(); } else Toast.error('Error'); },
     async accAdminPaid(id, paid) { if (await Acc.adminSetPaid(id, !!paid)) { Toast.ok('OK'); this.accAdminLoad(); } else Toast.error('Error'); },
-    async accAdminDelete(id, email) { if (!confirm(`¿Borrar la cuenta ${email}? (soft-delete, reversible 30 días)`)) return; if (await Acc.adminDelete(id)) { Toast.ok('Borrada'); this.accAdminLoad(); } else Toast.error('Error'); },
+    async accAdminDelete(id) { if (!confirm('¿Borrar esta cuenta? (soft-delete, reversible 30 días). Mira el email en su fila.')) return; if (await Acc.adminDelete(id)) { Toast.ok('Borrada'); this.accAdminLoad(); } else Toast.error('Error'); },
   });
 
   // ── Auto-sync: engancha D.save() (todos los mutadores pasan por ahi) ──
