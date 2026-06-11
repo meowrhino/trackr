@@ -19,6 +19,9 @@
 <meta name="twitter:image" content="https://trackr.meowrhino.studio/og-image.png">
 <link rel="canonical" href="https://trackr.meowrhino.studio/">
 <link rel="icon" type="image/png" href="navicon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#111111">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -156,5 +159,6 @@
 <script src="js/app.gastos.js"></script>
 <script src="js/app.gastos.modals.js"></script>
 <script src="js/app.account-ui.js"></script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){});});}</script>
 </body>
 </html>
