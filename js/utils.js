@@ -38,6 +38,12 @@ let GASTO_CAT = {
   software:     'Software',
   marketing:    'Marketing',
   oficina:      'Oficina',
+  cotizacion:   'Cotización',
+  amortizacion: 'Amortización',
+  suministros:  'Suministros',
+  gestoria:     'Gestoría',
+  seguros:      'Seguros',
+  transporte:   'Transporte',
   otro:         'Otro'
 };
 

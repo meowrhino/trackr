@@ -69,6 +69,12 @@ const LANGS = {
     'cat.software': 'Software',
     'cat.marketing': 'Marketing',
     'cat.oficina': 'Oficina',
+    'cat.cotizacion': 'Cotización',
+    'cat.amortizacion': 'Amortización',
+    'cat.suministros': 'Suministros',
+    'cat.gestoria': 'Gestoría',
+    'cat.seguros': 'Seguros',
+    'cat.transporte': 'Transporte',
     'cat.otro': 'Otro',
 
     /* ── Constantes: Recurrencia ── */
@@ -634,6 +640,12 @@ const LANGS = {
     'cat.software': 'Software',
     'cat.marketing': 'Marketing',
     'cat.oficina': 'Office',
+    'cat.cotizacion': 'Social security',
+    'cat.amortizacion': 'Depreciation',
+    'cat.suministros': 'Utilities',
+    'cat.gestoria': 'Accountant',
+    'cat.seguros': 'Insurance',
+    'cat.transporte': 'Travel',
     'cat.otro': 'Other',
 
     /* ── Constantes: Recurrencia ── */
@@ -1191,6 +1203,12 @@ const LANGS = {
     'cat.software': 'Programari',
     'cat.marketing': 'Màrqueting',
     'cat.oficina': 'Oficina',
+    'cat.cotizacion': 'Cotització',
+    'cat.amortizacion': 'Amortització',
+    'cat.suministros': 'Subministraments',
+    'cat.gestoria': 'Gestoria',
+    'cat.seguros': 'Assegurances',
+    'cat.transporte': 'Transport',
     'cat.otro': 'Altre',
 
     /* ── Constants: Recurrència ── */
@@ -1752,7 +1770,10 @@ function setLang(code) {
   GASTO_CAT = {
     herramientas: t('cat.herramientas'), formacion: t('cat.formacion'),
     software: t('cat.software'), marketing: t('cat.marketing'),
-    oficina: t('cat.oficina'), otro: t('cat.otro')
+    oficina: t('cat.oficina'), cotizacion: t('cat.cotizacion'),
+    amortizacion: t('cat.amortizacion'), suministros: t('cat.suministros'),
+    gestoria: t('cat.gestoria'), seguros: t('cat.seguros'),
+    transporte: t('cat.transporte'), otro: t('cat.otro')
   };
 
   RECURRENCIA = {
