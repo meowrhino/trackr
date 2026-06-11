@@ -59,6 +59,7 @@ const App = {
 
     this.enter();
     this._maybeWelcome();
+    if (typeof Acc !== 'undefined') { Acc.detectLocked(); if (this.refreshAccountNav) this.refreshAccountNav(); }
 
     /* Línea "ahora" del calendario: reposicionar cada minuto sin re-renderizar */
     setInterval(() => this._tickNow(), 60000);
@@ -118,6 +119,7 @@ const App = {
   go(v, d) {
     T.ev('nav', 'view', v);
     this.cv = v;
+    if (this.refreshAccountNav) this.refreshAccountNav();
 
     /* Toggle clases .on en vistas y nav */
     document.querySelectorAll('.vw').forEach(el => el.classList.remove('on'));

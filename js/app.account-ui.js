@@ -117,10 +117,29 @@
       }
       return `<div class="cfg-section"><div class="cfg-section-title">${t('title')}</div>`
         + `<div style="color:var(--t3);font-size:.82rem;margin-bottom:.9rem">${t('zk')}</div>`
-        + body + `</div>`;
+        + body
+        + `<div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--b1)"><button class="bt bt-s" style="border-color:var(--bad);color:var(--bad)" onclick="App.logoutModal()">${L() === 'en' ? 'Clear this browser\'s data' : (L() === 'ca' ? 'Esborrar dades d\'aquest navegador' : 'Borrar datos de este navegador')}</button> <span style="color:var(--t3);font-size:.74rem">${L() === 'en' ? '(does not touch your cloud account)' : (L() === 'ca' ? '(no toca el teu compte al núvol)' : '(no toca tu cuenta en la nube)')}</span></div>`
+        + `</div>`;
     },
 
     accMode(m) { mode = m; this.rCfg(); },
+
+    // El boton de la barra lateral (#navLogout) refleja el estado de CUENTA y es la via para hacer login.
+    refreshAccountNav() {
+      const el = document.getElementById('navLogout');
+      if (!el || typeof Acc === 'undefined') return;
+      const nt = el.querySelector('.nt') || el;
+      const L = (typeof _lang !== 'undefined' ? _lang : 'es');
+      const T2 = {
+        in: { es: 'Cerrar sesión', en: 'Log out', ca: 'Tancar sessió' },
+        out: { es: 'Iniciar sesión', en: 'Log in', ca: 'Iniciar sessió' },
+        locked: { es: 'Desbloquear', en: 'Unlock', ca: 'Desbloquejar' },
+      };
+      const key = Acc.state === 'in' ? 'in' : (Acc.state === 'locked' ? 'locked' : 'out');
+      nt.textContent = T2[key][L] || T2[key].es;
+      el.setAttribute('onclick', Acc.state === 'in' ? 'App.accLogout()' : "App.go('cfg')");
+      el.setAttribute('title', key === 'out' ? 'Iniciar sesión / crear cuenta' : '');
+    },
 
     accPwMeter(v) {
       const m = document.getElementById('accMeter'); if (!m) return;

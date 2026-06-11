@@ -1821,7 +1821,7 @@ function _updateNav() {
   document.querySelectorAll('.ni:not([data-v])').forEach(el => {
     const nt = el.querySelector('.nt');
     if (!nt) return;
-    if (el.id === 'navLogout') { nt.textContent = t('btn.logout'); return; }
+    if (el.id === 'navLogout') { if (typeof App !== 'undefined' && App.refreshAccountNav) App.refreshAccountNav(); else nt.textContent = t('btn.logout'); return; }
     const ic = el.querySelector('.ic')?.textContent;
     if (ic === '⤓') nt.textContent = t('nav.export');
     else if (ic === '⤒') nt.textContent = t('nav.import');
