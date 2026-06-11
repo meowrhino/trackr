@@ -98,11 +98,15 @@ function uid() {
   );
 }
 
-/** Escapa HTML para prevenir XSS */
+/** Escapa HTML para prevenir XSS. Incluye comillas: es seguro tanto en
+ *  contenido de texto como dentro de atributos (value="${esc(...)}"). */
 function esc(s) {
-  const d = document.createElement('div');
-  d.textContent = s;
-  return d.innerHTML;
+  return String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 /* ══════════════════════════════════════════════

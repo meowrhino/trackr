@@ -21,7 +21,7 @@
       pending: 'Cuenta creada. Pendiente de activación por el administrador antes de poder sincronizar.',
       activeOk: 'Sincronización activa', notActive: 'Pendiente de activación', version: 'versión en la nube', autoSync: 'Sincronizar automáticamente al cambiar',
       pwWeak: 'La contraseña debe tener al menos 12 caracteres.', pwMismatch: 'Las contraseñas no coinciden.', legalReq: 'Debes aceptar para continuar.', emailBad: 'Email no válido.',
-      recTitle: 'Tu código de recuperación', recDesc: 'Apúntalo y guárdalo OFFLINE (no en este dispositivo). Es la ÚNICA forma de recuperar tus datos si olvidas la contraseña. NO se vuelve a mostrar.', copy: 'Copiar', download: 'Descargar .txt', saved: 'Lo he guardado, continuar', copied: 'Copiado',
+      recTitle: 'Tu código de recuperación', recDesc: 'Apúntalo y guárdalo OFFLINE (no en este dispositivo). Es la ÚNICA forma de recuperar tus datos si olvidas la contraseña. NO se vuelve a mostrar.', copy: 'Copiar', download: 'Descargar .txt', saved: 'Lo he guardado, continuar', copied: 'Copiado', copyErr: 'No se pudo copiar. Usa "Descargar .txt".',
       welcome: 'Sesión iniciada', loggedOut: 'Sesión cerrada', synced: 'Sincronizado', syncErr: 'No se pudo sincronizar', pwChanged: 'Contraseña cambiada', recovered: 'Acceso recuperado',
       confirmLogout: '¿Cerrar sesión? Tus datos locales se mantienen en este navegador.', adminBadge: 'admin',
       cfgPrompt: 'Inicia sesión o crea una cuenta para sincronizar tus datos cifrados en la nube y usarlos en varios dispositivos.',
@@ -38,7 +38,7 @@
       pending: 'Account created. Pending admin activation before you can sync.',
       activeOk: 'Sync active', notActive: 'Pending activation', version: 'cloud version', autoSync: 'Auto-sync on change',
       pwWeak: 'Password must be at least 12 characters.', pwMismatch: 'Passwords do not match.', legalReq: 'You must accept to continue.', emailBad: 'Invalid email.',
-      recTitle: 'Your recovery code', recDesc: 'Write it down and keep it OFFLINE (not on this device). It is the ONLY way to recover your data if you forget your password. It will NOT be shown again.', copy: 'Copy', download: 'Download .txt', saved: 'I saved it, continue', copied: 'Copied',
+      recTitle: 'Your recovery code', recDesc: 'Write it down and keep it OFFLINE (not on this device). It is the ONLY way to recover your data if you forget your password. It will NOT be shown again.', copy: 'Copy', download: 'Download .txt', saved: 'I saved it, continue', copied: 'Copied', copyErr: 'Could not copy. Use "Download .txt".',
       welcome: 'Logged in', loggedOut: 'Logged out', synced: 'Synced', syncErr: 'Could not sync', pwChanged: 'Password changed', recovered: 'Access recovered',
       confirmLogout: 'Log out? Your local data stays in this browser.', adminBadge: 'admin',
       cfgPrompt: 'Log in or create an account to sync your encrypted data to the cloud and use it across devices.',
@@ -55,7 +55,7 @@
       pending: 'Compte creat. Pendent d\'activació per l\'administrador abans de sincronitzar.',
       activeOk: 'Sincronització activa', notActive: 'Pendent d\'activació', version: 'versió al núvol', autoSync: 'Sincronitzar automàticament en canviar',
       pwWeak: 'La contrasenya ha de tenir almenys 12 caràcters.', pwMismatch: 'Les contrasenyes no coincideixen.', legalReq: 'Has d\'acceptar per continuar.', emailBad: 'Email no vàlid.',
-      recTitle: 'El teu codi de recuperació', recDesc: 'Apunta\'l i guarda\'l OFFLINE (no en aquest dispositiu). És l\'ÚNICA manera de recuperar les dades si oblides la contrasenya. NO es tornarà a mostrar.', copy: 'Copiar', download: 'Descarregar .txt', saved: 'L\'he guardat, continuar', copied: 'Copiat',
+      recTitle: 'El teu codi de recuperació', recDesc: 'Apunta\'l i guarda\'l OFFLINE (no en aquest dispositiu). És l\'ÚNICA manera de recuperar les dades si oblides la contrasenya. NO es tornarà a mostrar.', copy: 'Copiar', download: 'Descarregar .txt', saved: 'L\'he guardat, continuar', copied: 'Copiat', copyErr: 'No s\'ha pogut copiar. Usa "Descarregar .txt".',
       welcome: 'Sessió iniciada', loggedOut: 'Sessió tancada', synced: 'Sincronitzat', syncErr: 'No s\'ha pogut sincronitzar', pwChanged: 'Contrasenya canviada', recovered: 'Accés recuperat',
       confirmLogout: 'Tancar sessió? Les dades locals es mantenen en aquest navegador.', adminBadge: 'admin',
       cfgPrompt: 'Inicia sessió o crea un compte per sincronitzar les teves dades xifrades al núvol i fer-les servir en diversos dispositius.',
@@ -180,6 +180,7 @@
       nt.textContent = T2[key][L] || T2[key].es;
       el.setAttribute('onclick', Acc.state === 'in' ? 'App.accLogout()' : 'App.accModal()');
       el.setAttribute('title', key === 'out' ? 'Iniciar sesión / crear cuenta' : (key === 'locked' ? 'Desbloquear' : 'Cerrar sesión'));
+      el.setAttribute('aria-label', nt.textContent); // a11y: en movil el .nt se oculta
       // Icono coherente con el estado: entrar (→) / bloqueado (⊘) / salir (←). Antes era ↺ (recargar), confuso.
       const ic = el.querySelector('.ic');
       if (ic) ic.textContent = key === 'in' ? '←' : (key === 'locked' ? '⊘' : '→');
@@ -317,7 +318,14 @@
         + `<div class="ma"><button class="bt bt-p" onclick="App.accDoneRecovery()">${t('saved')}</button></div>`);
       this._recDone = onDone;
     },
-    accCopyRec() { try { navigator.clipboard.writeText(this._recCode || ''); Toast.ok(t('copied')); } catch (e) { /* */ } },
+    accCopyRec() {
+      // Solo confirmar si la copia REALMENTE tuvo éxito (el código es irrecuperable; un falso "Copiado" = pérdida de acceso).
+      try {
+        const p = navigator.clipboard && navigator.clipboard.writeText(this._recCode || '');
+        if (p && p.then) p.then(() => Toast.ok(t('copied'))).catch(() => Toast.error(t('copyErr')));
+        else Toast.error(t('copyErr'));
+      } catch (e) { Toast.error(t('copyErr')); }
+    },
     accDownloadRec() {
       const blob = new Blob([`TRACKR recovery code\n${this._recCode}\n\nGuárdalo offline. Es la única forma de recuperar tus datos si olvidas la contraseña.`], { type: 'text/plain' });
       const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'trackr-recovery-code.txt'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);

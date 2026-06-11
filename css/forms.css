@@ -7,6 +7,9 @@
 /* ── Inputs base ── */
 input,select,textarea{font-family:'Outfit',sans-serif;font-size:.85rem;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);color:var(--t1);padding:.5rem .7rem;transition:border-color var(--tr);width:100%}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--t3)}
+/* Foco visible para teclado (a11y). Solo aparece en navegacion por teclado, no al click. */
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--ac);outline-offset:1px;border-color:var(--ac)}
 input:disabled{opacity:.35;cursor:not-allowed}
 input[type="checkbox"]{width:auto;padding:0;background:none;border:none;border-radius:0;cursor:pointer}
 input[type="number"]{font-family:'DM Mono',monospace}

@@ -57,6 +57,16 @@ const App = {
       mdTarget = null;
     });
 
+    /* A11y: la barra lateral (divs con onclick) navegable por teclado. */
+    document.querySelectorAll('.sb-nav .ni').forEach(el => {
+      if (!el.hasAttribute('role')) el.setAttribute('role', 'button');
+      if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '0');
+    });
+    document.querySelector('.sb-nav')?.addEventListener('keydown', e => {
+      const ni = e.target.closest && e.target.closest('.ni');
+      if (ni && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); ni.click(); }
+    });
+
     this.enter();
     this._maybeWelcome();
     if (typeof Acc !== 'undefined') { Acc.detectLocked(); if (this.refreshAccountNav) this.refreshAccountNav(); }
@@ -142,6 +152,8 @@ const App = {
     else if (v === 'cfg') this.rCfg();
     else if (v === 'guide') this.rGuide();
     else if (v === 'det') this.rDet(d);
+
+    if (viewEl) this._linkLabels(viewEl);
   },
 
 
@@ -149,7 +161,21 @@ const App = {
    *  MODALES COMPARTIDOS
    * ══════════════════════════════════════════════ */
 
-  om(h) { document.getElementById('mC').innerHTML = h; document.getElementById('mO').classList.add('on'); },
+  om(h) { const mc = document.getElementById('mC'); mc.innerHTML = h; this._linkLabels(mc); document.getElementById('mO').classList.add('on'); },
+
+  /** A11y: asocia cada <label> de un .fg con su control (for/id) si no lo está, para lectores de pantalla. */
+  _fldSeq: 0,
+  _linkLabels(root) {
+    if (!root || !root.querySelectorAll) return;
+    root.querySelectorAll('.fg > label').forEach(label => {
+      if (label.htmlFor || label.querySelector('input,select,textarea')) return; // ya asociado o input anidado
+      const ctrl = label.nextElementSibling;
+      if (ctrl && /^(INPUT|SELECT|TEXTAREA)$/.test(ctrl.tagName) && ctrl.type !== 'hidden') {
+        if (!ctrl.id) ctrl.id = 'fld-' + (++this._fldSeq);
+        label.htmlFor = ctrl.id;
+      }
+    });
+  },
   cm() {
     /* Si venimos del flujo facModal→clModal, volver a facModal en lugar de cerrar */
     if (this._facReturn) {

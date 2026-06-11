@@ -5,6 +5,27 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-06-11 — Repaso a fondo: fixes críticos + accesibilidad
+
+Revisión en profundidad (6 agentes de código en paralelo + recorrido UX/UI en vivo, desktop y móvil). Esta tanda implementa los quick wins críticos y la primera tanda de accesibilidad; el resto queda como backlog priorizado (ver memoria del proyecto).
+
+### 🔴 Fixes
+- **Clic muerto en el dashboard** — la tarjeta "€/h real" navegaba a una vista inexistente (`go('din')`) → pantalla en blanco. Ahora abre Dineros. _frontend_
+- **XSS por atributo (hardening)** — `esc()` no escapaba comillas, así que `value="${esc(...)}"` permitía romper el atributo (vector realista: importar un JSON ajeno). `esc()` ahora escapa `"` y `'`, cerrando el vector en todos los campos de golpe. _frontend_
+- **Tope de cobros** — los cobros parciales no podían superar el total de la factura (antes inflaba el IVA y el bruto del período); avisa al capar. _frontend_
+- **Toast "Copiado" honesto** — el código de recuperación solo confirma "Copiado" si el portapapeles tuvo éxito real (antes mentía → riesgo de creer guardado un código irrecuperable). _frontend_
+
+### ♿ Accesibilidad (primera tanda)
+- **Barra lateral navegable por teclado** (`role`/`tabindex` + Enter/Espacio) y con `aria-label` traducido es/en/ca — clave en móvil, donde el texto se oculta y solo quedan los iconos.
+- **Foco visible** (`:focus-visible`) en inputs, botones y navegación (antes `outline:none` sin alternativa).
+- **Toasts con `aria-live="polite"`** → los lectores de pantalla anuncian errores/éxitos (sync, login, import).
+- **`<label>` asociados a sus controles** (for/id) en runtime, sin tocar decenas de plantillas.
+
+### ⏳ Backlog del repaso (no implementado)
+Modelo 130 no acumulativo (pendiente de decisión: bug vs. simplificación), merge sin tombstones, `H.snapshot()` que falla en silencio antes de un merge, estado de modales disperso, i18n inline triplicado, Verifactu muerto en el árbol, contraste de `--t3`, resto de a11y de teclado (tarjetas/calendario).
+
+---
+
 ## 2026-06-11 — Pulido móvil + invitación a instalar la PWA
 
 Tras probar en iPhone (Brave): retoques de la barra lateral en móvil y descubrimiento de la instalación.

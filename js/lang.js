@@ -198,6 +198,7 @@ const LANGS = {
     'billing.partiallyPaid': 'Parcialmente cobrado',
     'billing.deletePayment': '¿Eliminar cobro de {0}?',
     'billing.alreadyPaid': 'Ya está totalmente cobrado',
+    'billing.capped': 'Cobro ajustado al máximo pendiente ({0})',
     'billing.invoiceNo': 'Factura n.º {0} — {1}',
     'billing.base': 'Base',
     'billing.plusIva': '+ IVA {0}%',
@@ -769,6 +770,7 @@ const LANGS = {
     'billing.partiallyPaid': 'Partially paid',
     'billing.deletePayment': 'Delete payment of {0}?',
     'billing.alreadyPaid': 'Already fully paid',
+    'billing.capped': 'Payment capped to the remaining amount ({0})',
     'billing.invoiceNo': 'Invoice no. {0} — {1}',
     'billing.base': 'Base',
     'billing.plusIva': '+ VAT {0}%',
@@ -1332,6 +1334,7 @@ const LANGS = {
     'billing.partiallyPaid': 'Parcialment cobrat',
     'billing.deletePayment': 'Eliminar cobrament de {0}?',
     'billing.alreadyPaid': 'Ja està totalment cobrat',
+    'billing.capped': 'Cobrament ajustat al màxim pendent ({0})',
     'billing.invoiceNo': 'Factura n. {0} — {1}',
     'billing.base': 'Base',
     'billing.plusIva': '+ IVA {0}%',
@@ -1814,7 +1817,7 @@ function _updateNav() {
   };
   document.querySelectorAll('.ni[data-v]').forEach(el => {
     const v = el.dataset.v;
-    if (map[v]) el.querySelector('.nt').textContent = t(map[v]);
+    if (map[v]) { el.querySelector('.nt').textContent = t(map[v]); el.setAttribute('aria-label', t(map[v])); } // a11y: anunciado aunque .nt se oculte en movil
   });
 
   /* Nav items sin data-v: export (⤓), import (⤒), logout (#navLogout) */
@@ -1823,8 +1826,8 @@ function _updateNav() {
     if (!nt) return;
     if (el.id === 'navLogout') { if (typeof App !== 'undefined' && App.refreshAccountNav) App.refreshAccountNav(); else nt.textContent = t('btn.logout'); return; }
     const ic = el.querySelector('.ic')?.textContent;
-    if (ic === '⤓') nt.textContent = t('nav.export');
-    else if (ic === '⤒') nt.textContent = t('nav.import');
+    if (ic === '⤓') { nt.textContent = t('nav.export'); el.setAttribute('aria-label', t('nav.export')); }
+    else if (ic === '⤒') { nt.textContent = t('nav.import'); el.setAttribute('aria-label', t('nav.import')); }
   });
 
   /* Títulos de vistas en HTML */

@@ -83,7 +83,7 @@ Object.assign(App, {
       +   `<div class="info-stat-val">${horasMes.toFixed(1)}<small>h</small></div>`
       +   `<div class="info-stat-lbl">${t('info.thisMonth')}</div>`
       + `</div>`
-      + `<div class="info-stat-card" style="--stat-accent:${horasMes > 0 && (cobradoMes - gastosMes) < 0 ? 'var(--bad)' : 'var(--ok)'}" onclick="App.go('din')">`
+      + `<div class="info-stat-card" style="--stat-accent:${horasMes > 0 && (cobradoMes - gastosMes) < 0 ? 'var(--bad)' : 'var(--ok)'}" onclick="App.go('gas')">`
       +   `<div class="info-stat-val"${horasMes > 0 && (cobradoMes - gastosMes) < 0 ? ' style="color:var(--bad)"' : ''}>${horasMes > 0 ? fmtNum((cobradoMes - gastosMes) / horasMes) : '—'}<small>${horasMes > 0 ? '€/h' : ''}</small></div>`
       +   `<div class="info-stat-lbl">${t('info.realEurH')}</div>`
       + `</div>`

@@ -181,16 +181,24 @@ Object.assign(App, {
   },
 
   saveCobro(pid, cid) {
-    const cant = parseFloat(document.getElementById('mcA').value) || 0;
+    let cant = parseFloat(document.getElementById('mcA').value) || 0;
     const fecha = document.getElementById('mcD').value || todayStr();
     if (cant <= 0) return;
     const p = D.p(pid); if (!p) return;
     if (!p.facturacion.cobros) p.facturacion.cobros = [];
-    if (cid) {
-      const c = p.facturacion.cobros.find(x => x.id === cid);
-      if (c) { c.fecha = fecha; c.cantidad = roundMoney(cant); }
+    B.calc(p);
+    const existing = cid ? p.facturacion.cobros.find(x => x.id === cid) : null;
+    // Tope: el total cobrado no puede superar el total de la factura (solo si hay un total > 0).
+    const total = p.facturacion.totalFactura || 0;
+    if (total > 0) {
+      const room = B.pendiente(p) + (existing ? existing.cantidad : 0);
+      if (cant > room + 0.005) { cant = Math.max(room, 0); Toast.warn(t('billing.capped', fmtMoney(roundMoney(cant)))); }
+    }
+    cant = roundMoney(cant);
+    if (existing) {
+      existing.fecha = fecha; existing.cantidad = cant;
     } else {
-      p.facturacion.cobros.push({ id: uid(), fecha, cantidad: roundMoney(cant) });
+      p.facturacion.cobros.push({ id: uid(), fecha, cantidad: cant });
     }
     B.calc(p);
     D.up(pid, { facturacion: p.facturacion });
