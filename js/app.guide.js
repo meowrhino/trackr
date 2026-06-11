@@ -115,11 +115,11 @@ Object.assign(App, {
         ]
       },
       {
-        icon: '⚙', title: 'guide.config.title', desc: 'guide.config.desc',
+        icon: '⚙︎', title: 'guide.config.title', desc: 'guide.config.desc',
         intro: 'guide.config.intro', body: 'guide.config.body'
       },
       {
-        icon: '↕', title: 'guide.data.title', desc: 'guide.data.desc',
+        icon: '↕︎', title: 'guide.data.title', desc: 'guide.data.desc',
         intro: 'guide.data.intro', body: 'guide.data.body'
       }
     ];

@@ -54,7 +54,7 @@
       <div class="ni" data-v="cal" onclick="App.go('cal')"><span class="ic">▨</span><span class="nt">Calendario</span></div>
       <div class="ni" data-v="gas" onclick="App.go('gas')"><span class="ic">€</span><span class="nt">Dineros</span></div>
       <div class="sep"></div>
-      <div class="ni" data-v="cfg" onclick="App.go('cfg')"><span class="ic">⚙</span><span class="nt">Configuración</span></div>
+      <div class="ni" data-v="cfg" onclick="App.go('cfg')"><span class="ic">⚙&#xFE0E;</span><span class="nt">Configuración</span></div>
       <div class="ni" data-v="guide" onclick="App.go('guide')"><span class="ic">?</span><span class="nt">Guía</span></div>
       <div class="ni" onclick="App.exp()"><span class="ic">⤓</span><span class="nt">Exportar</span></div>
       <div class="ni" onclick="document.getElementById('impA').click()"><span class="ic">⤒</span><span class="nt">Importar</span></div>
@@ -73,6 +73,9 @@
 
   <!-- Main content -->
   <main class="mc">
+
+    <!-- Invitación a instalar la PWA (descartable; oculta si ya instalada) -->
+    <div id="pwaBanner" class="pwa-banner" style="display:none"></div>
 
     <!-- ── Vista: Info (Dashboard) ── -->
     <div id="vInfo" class="vw on">
@@ -160,6 +163,7 @@
 <script src="js/app.gastos.js"></script>
 <script src="js/app.gastos.modals.js"></script>
 <script src="js/app.account-ui.js"></script>
+<script src="js/pwa.js"></script>
 <script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){});});}</script>
 </body>
 </html>

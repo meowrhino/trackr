@@ -5,6 +5,19 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-06-11 — Pulido móvil + invitación a instalar la PWA
+
+Tras probar en iPhone (Brave): retoques de la barra lateral en móvil y descubrimiento de la instalación.
+
+### 🐛 UX móvil
+- **Footer "Hecho con cariño…" oculto en móvil** — en la barra colapsada de 52px el texto se partía en una columna ilegible; se oculta `.sb-foot` en móvil (se mantiene en desktop). _frontend_
+- **Iconos que iOS pintaba como emoji** — la rueda dentada (⚙) de la barra y la rueda/flecha (⚙, ↕) de la Guía salían en color y descompensadas en iOS; render monocromo forzado con el selector de variación de texto `U+FE0E`. _frontend_
+
+### 🟠 Producto
+- **Invitación a instalar la PWA** — nuevo `js/pwa.js`: banner descartable arriba del contenido + sección en Configuración + modal de instrucciones para iOS (Safari no dispara `beforeinstallprompt`). Captura el prompt nativo en Android/desktop, detecta si ya está instalada (standalone) y se oculta. _frontend_
+
+---
+
 ## 2026-06-11 — UX: login en modal, indicador de sync y copy honesto sobre la nube
 
 Repaso UX/UI tras cerrar la Fase 1. Todo verificado en navegador (desktop + móvil), sin errores de consola.

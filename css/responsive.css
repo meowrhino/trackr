@@ -13,6 +13,8 @@
   .ni{justify-content:center;padding:.55rem}
   /* Indicador de sync: en movil solo el punto, centrado (texto oculto via .nt) */
   .sync-status{justify-content:center;padding:.35rem 0}
+  /* Footer "Hecho con cariño…" se rompe en la barra de 52px → ocultar en movil */
+  .sb-foot{display:none}
 
   /* Main content ajustado */
   .mc{margin-left:52px;padding:1.25rem;overflow:hidden}

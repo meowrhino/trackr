@@ -12,6 +12,7 @@ Object.assign(App, {
 
     document.getElementById('cfgC').innerHTML =
       this._cfgAccountSection()
+      + (typeof PWA !== 'undefined' ? PWA.cfgSection() : '')
       + `<div class="cfg-section"><div class="cfg-section-title">${t('lang.label')}</div>`
       + `<div class="lang-toggle">${['es', 'en', 'ca'].map(code =>
           `<button class="lang-btn${_lang === code ? ' on' : ''}" onclick="App.setLanguage('${code}')">${t('lang.' + code)}</button>`
@@ -206,6 +207,7 @@ Object.assign(App, {
   setLanguage(code) {
     T.ev('action', 'lang_change', code);
     setLang(code);
+    if (typeof PWA !== 'undefined') PWA.renderBanner(); // el banner vive fuera de cfgC
     D.d.settings.idioma = code;
     D.save();
     this.rCfg();

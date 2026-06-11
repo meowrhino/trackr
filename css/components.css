@@ -22,6 +22,14 @@
 .bt-add:hover{border-color:var(--t2);color:var(--t1);background:var(--bg3)}
 .bg{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
 
+/* ── Banner de instalar la PWA ── */
+.pwa-banner{display:flex;align-items:center;gap:.75rem;background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:.6rem .85rem;margin-bottom:1.5rem}
+.pwa-banner .pwa-ico{font-size:1.05rem;color:var(--ac);flex-shrink:0}
+.pwa-banner .pwa-txt{flex:1;min-width:0;font-size:.82rem;color:var(--t2);line-height:1.35}
+.pwa-banner .bt{flex-shrink:0}
+.pwa-banner .pwa-x{background:none;border:none;color:var(--t3);font-size:1.15rem;line-height:1;cursor:pointer;padding:.1rem .35rem;flex-shrink:0}
+.pwa-banner .pwa-x:hover{color:var(--t1)}
+
 /* ── Toggle switch ── */
 .tr{display:flex;align-items:center;justify-content:space-between;padding:.4rem 0}
 .tl{font-size:.82rem;color:var(--t1)}
