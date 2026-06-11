@@ -5,6 +5,23 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-06-11 — UX: login en modal, indicador de sync y copy honesto sobre la nube
+
+Repaso UX/UI tras cerrar la Fase 1. Todo verificado en navegador (desktop + móvil), sin errores de consola.
+
+### 🐛 UX
+- **Modal de inicio de sesión dedicado** — "Iniciar sesión" abría toda la pantalla de Configuración con el formulario incrustado; ahora abre un modal propio (entrar / crear cuenta / recuperar / desbloquear), con botón a ancho completo, autofocus y cierre con Escape. Pasa a ser la única superficie de login (el formulario incrustado de Configuración se sustituye por un CTA), lo que además elimina el riesgo de IDs duplicados. _frontend_
+- **Indicador de sincronización en la barra lateral** — punto + estado ("Sincronizando…" / "✓ Sincronizado · vN" / "Pendiente" / "Error"), visible en todas las vistas y no solo en Configuración; oculto sin sesión y reducido a un punto en móvil. Hook nuevo `Acc.setSyncListener` + wrapper `syncPush`, sin tocar la lógica endurecida de `push`. _frontend_
+- **Icono del botón de cuenta coherente con el estado** — `↺` (recargar, confuso) → `→` entrar / `⊘` bloqueado / `←` salir. _frontend_
+
+### 📝 Copy
+- **Mensajería honesta sobre la nube** — el copy seguía diciendo "sin cuenta, sin servidor, sin nube" cuando ya hay sync cifrado opcional (la guía afirmaba algo ya falso). Reescrito en es/en/ca: meta/título (`index.html`) + `welcome.claim` y guía intro/evolución/cómo-funciona/datos (`lang.js`). Nuevo encuadre: local-first y sin cuenta obligatoria; sincronización cifrada de conocimiento cero, opcional. _frontend_
+
+### ⏸ Aparcado
+Invitación a instalar la PWA (ya es instalable, falta el botón + instrucciones iOS), i18n del panel admin, aria-labels en la barra, validación en vivo del código de recuperación.
+
+---
+
 ## 2026-06-11 — Etapa 2 "redonda", revisión profunda y arranque en producción
 
 Cierre de la **Fase 1** (cuentas + sincronización cifrada en la nube). Todo desplegado y validado en producción con datos reales.

@@ -167,6 +167,7 @@ const App = {
     }
     document.getElementById('mO').classList.remove('on');
     this._editPid = null;
+    this._accInModal = false;
   },
   selT(el) { el.parentElement.querySelectorAll('.to').forEach(o => o.classList.remove('on')); el.classList.add('on'); },
 

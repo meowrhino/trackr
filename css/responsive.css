@@ -11,6 +11,8 @@
   .sb .nt,.sb-logo span{display:none}
   .sb-logo{padding:0;text-align:center}
   .ni{justify-content:center;padding:.55rem}
+  /* Indicador de sync: en movil solo el punto, centrado (texto oculto via .nt) */
+  .sync-status{justify-content:center;padding:.35rem 0}
 
   /* Main content ajustado */
   .mc{margin-left:52px;padding:1.25rem;overflow:hidden}

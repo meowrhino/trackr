@@ -3,19 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TRACKR · Gestión y facturación para autónomos · Gratis, sin cuenta</title>
-<meta name="description" content="TRACKR: app gratuita de facturación para autónomos. Controla proyectos, horas, gastos y modelo 303 y 130. Sin cuenta, sin servidor, sin datos en la nube.">
+<title>TRACKR · Gestión y facturación para autónomos · Gratis y privado</title>
+<meta name="description" content="TRACKR: app gratuita de facturación para autónomos. Controla proyectos, horas, gastos y modelo 303 y 130. Funciona sin cuenta en tu navegador; con sincronización cifrada de conocimiento cero, opcional, entre dispositivos.">
 <meta name="keywords" content="autónomos, facturación, modelo 303, modelo 130, gratis, sin registro, gestión proyectos">
 <!-- Open Graph -->
 <meta property="og:title" content="TRACKR · Facturación para autónomos · Gratis">
-<meta property="og:description" content="App gratuita de facturación y gestión para autónomos. Sin cuenta, sin servidor. Todo en tu navegador.">
+<meta property="og:description" content="App gratuita de facturación y gestión para autónomos. Funciona sin cuenta, en tu navegador. Sincronización cifrada de conocimiento cero, opcional.">
 <meta property="og:image" content="https://trackr.meowrhino.studio/og-image.png">
 <meta property="og:url" content="https://trackr.meowrhino.studio">
 <meta property="og:type" content="website">
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="TRACKR · Facturación para autónomos · Gratis">
-<meta name="twitter:description" content="App gratuita de facturación y gestión para autónomos. Sin cuenta, sin servidor.">
+<meta name="twitter:description" content="App gratuita de facturación y gestión para autónomos. Sin cuenta por defecto; sincronización cifrada opcional.">
 <meta name="twitter:image" content="https://trackr.meowrhino.studio/og-image.png">
 <link rel="canonical" href="https://trackr.meowrhino.studio/">
 <link rel="icon" type="image/png" href="navicon.png">
@@ -60,7 +60,8 @@
       <div class="ni" onclick="document.getElementById('impA').click()"><span class="ic">⤒</span><span class="nt">Importar</span></div>
       <input type="file" id="impA" class="fh" accept=".json" onchange="App.imp(event)">
       <div class="sep"></div>
-      <div class="ni" id="navLogout" onclick="App.logoutModal()"><span class="ic">↺</span><span class="nt">Cerrar sesión</span></div>
+      <div class="ni" id="navLogout" onclick="App.accModal()"><span class="ic">→</span><span class="nt">Iniciar sesión</span></div>
+      <div id="syncStatus" class="sync-status" style="display:none"></div>
     </div>
     <div class="sb-foot">
       <a href="https://meowrhino.studio" target="_blank" rel="noopener"

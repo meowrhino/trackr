@@ -24,6 +24,8 @@
       recTitle: 'Tu código de recuperación', recDesc: 'Apúntalo y guárdalo OFFLINE (no en este dispositivo). Es la ÚNICA forma de recuperar tus datos si olvidas la contraseña. NO se vuelve a mostrar.', copy: 'Copiar', download: 'Descargar .txt', saved: 'Lo he guardado, continuar', copied: 'Copiado',
       welcome: 'Sesión iniciada', loggedOut: 'Sesión cerrada', synced: 'Sincronizado', syncErr: 'No se pudo sincronizar', pwChanged: 'Contraseña cambiada', recovered: 'Acceso recuperado',
       confirmLogout: '¿Cerrar sesión? Tus datos locales se mantienen en este navegador.', adminBadge: 'admin',
+      cfgPrompt: 'Inicia sesión o crea una cuenta para sincronizar tus datos cifrados en la nube y usarlos en varios dispositivos.',
+      syncing: 'Sincronizando…', syncErrShort: 'Error de sync', pendingShort: 'Pendiente', locked2: 'Bloqueado',
     },
     en: {
       title: 'Account & sync', zk: 'Your data is encrypted in your browser before upload. Neither we nor the server can read it (zero-knowledge).',
@@ -39,6 +41,8 @@
       recTitle: 'Your recovery code', recDesc: 'Write it down and keep it OFFLINE (not on this device). It is the ONLY way to recover your data if you forget your password. It will NOT be shown again.', copy: 'Copy', download: 'Download .txt', saved: 'I saved it, continue', copied: 'Copied',
       welcome: 'Logged in', loggedOut: 'Logged out', synced: 'Synced', syncErr: 'Could not sync', pwChanged: 'Password changed', recovered: 'Access recovered',
       confirmLogout: 'Log out? Your local data stays in this browser.', adminBadge: 'admin',
+      cfgPrompt: 'Log in or create an account to sync your encrypted data to the cloud and use it across devices.',
+      syncing: 'Syncing…', syncErrShort: 'Sync error', pendingShort: 'Pending', locked2: 'Locked',
     },
     ca: {
       title: 'Compte i sincronització', zk: 'Les teves dades es xifren al navegador abans de pujar-se. Ni nosaltres ni el servidor podem llegir-les (coneixement zero).',
@@ -54,6 +58,8 @@
       recTitle: 'El teu codi de recuperació', recDesc: 'Apunta\'l i guarda\'l OFFLINE (no en aquest dispositiu). És l\'ÚNICA manera de recuperar les dades si oblides la contrasenya. NO es tornarà a mostrar.', copy: 'Copiar', download: 'Descarregar .txt', saved: 'L\'he guardat, continuar', copied: 'Copiat',
       welcome: 'Sessió iniciada', loggedOut: 'Sessió tancada', synced: 'Sincronitzat', syncErr: 'No s\'ha pogut sincronitzar', pwChanged: 'Contrasenya canviada', recovered: 'Accés recuperat',
       confirmLogout: 'Tancar sessió? Les dades locals es mantenen en aquest navegador.', adminBadge: 'admin',
+      cfgPrompt: 'Inicia sessió o crea un compte per sincronitzar les teves dades xifrades al núvol i fer-les servir en diversos dispositius.',
+      syncing: 'Sincronitzant…', syncErrShort: 'Error de sync', pendingShort: 'Pendent', locked2: 'Bloquejat',
     },
   };
   const t = (k) => (TXT[L()] || TXT.es)[k] || k;
@@ -107,13 +113,11 @@
           + `<button class="bt bt-s" onclick="App.accLogout()">${t('logout')}</button>`
           + `</div>`
           + (st.isAdmin ? this._accAdminBlock() : '');
-      } else if (Acc.state === 'locked') {
-        body = `<div class="acc-warn">${t('locked')}</div>`
-          + `<div class="fg" style="margin-top:.6rem"><label>${t('password')}</label><input id="accPw" type="password" autocomplete="current-password"></div>`
-          + `<button class="bt bt-p" onclick="App.accUnlock()">${t('unlock')}</button> `
-          + `<button class="bt bt-s" onclick="App.accLogout()">${t('logout')}</button>`;
       } else {
-        body = fieldsFor(mode);
+        // Fuera o bloqueado: el formulario vive en un modal dedicado (App.accModal).
+        const isLocked = Acc.state === 'locked';
+        body = `<div style="color:var(--t2);font-size:.86rem;margin-bottom:.95rem;line-height:1.5">${isLocked ? t('locked') : t('cfgPrompt')}</div>`
+          + `<button class="bt bt-p" onclick="App.accModal()">${isLocked ? t('unlock') : t('login')}</button>`;
       }
       return `<div class="cfg-section"><div class="cfg-section-title">${t('title')}</div>`
         + `<div style="color:var(--t3);font-size:.82rem;margin-bottom:.9rem">${t('zk')}</div>`
@@ -122,7 +126,44 @@
         + `</div>`;
     },
 
-    accMode(m) { mode = m; this.rCfg(); },
+    accMode(m) { mode = m; if (this._accInModal) this._accRenderModal(); else this.rCfg(); },
+
+    // Abre el modal de inicio de sesión / registro / desbloqueo (la via principal desde la barra).
+    accModal() {
+      if (typeof Acc === 'undefined') return;
+      if (Acc.state === 'in') return this.go('cfg'); // ya dentro: gestionar en Configuración
+      Acc.detectLocked();
+      if (Acc.state !== 'locked') mode = 'login';
+      this._accInModal = true;
+      this._accRenderModal();
+    },
+
+    _accRenderModal() {
+      const cryptoOff = (typeof CA === 'undefined' || !CA.available());
+      let title, body;
+      if (cryptoOff) {
+        title = t('login');
+        body = `<div class="acc-warn">⚠️ ${L() === 'en' ? 'Your browser does not support the required encryption (WebAssembly/WebCrypto). Accounts cannot be created or opened here.' : (L() === 'ca' ? 'El teu navegador no suporta el xifrat requerit (WebAssembly/WebCrypto). No es poden crear ni obrir comptes aquí.' : 'Tu navegador no soporta el cifrado requerido (WebAssembly/WebCrypto). No es posible crear ni abrir cuentas aquí.')}</div>`;
+      } else if (Acc.state === 'locked') {
+        title = t('unlock');
+        body = `<div class="acc-warn">${t('locked')}</div>`
+          + `<div class="fg" style="margin-top:.85rem"><label>${t('password')}</label><input id="accPw" type="password" autocomplete="current-password"></div>`
+          + `<button class="bt bt-p" onclick="App.accUnlock()">${t('unlock')}</button>`
+          + `<div class="acc-links"><a onclick="App.accLogout()">${t('logout')}</a></div>`;
+      } else {
+        title = mode === 'signup' ? t('signup') : (mode === 'recover' ? t('doRecover') : t('login'));
+        body = fieldsFor(mode);
+      }
+      this.om(`<div class="mt">${title}</div>`
+        + `<div class="acc-modal-body">`
+        + `<div style="color:var(--t3);font-size:.8rem;margin-bottom:1.1rem;line-height:1.45">${t('zk')}</div>`
+        + body
+        + `</div>`);
+      setTimeout(() => { const f = document.getElementById('accEmail') || document.getElementById('accPw'); if (f) f.focus(); }, 30);
+    },
+
+    // Cierra el modal de cuenta y refresca la vista actual + la barra.
+    _accDone() { this._accInModal = false; this.cm(); this.go(this.cv); },
 
     // El boton de la barra lateral (#navLogout) refleja el estado de CUENTA y es la via para hacer login.
     refreshAccountNav() {
@@ -137,8 +178,29 @@
       };
       const key = Acc.state === 'in' ? 'in' : (Acc.state === 'locked' ? 'locked' : 'out');
       nt.textContent = T2[key][L] || T2[key].es;
-      el.setAttribute('onclick', Acc.state === 'in' ? 'App.accLogout()' : "App.go('cfg')");
-      el.setAttribute('title', key === 'out' ? 'Iniciar sesión / crear cuenta' : '');
+      el.setAttribute('onclick', Acc.state === 'in' ? 'App.accLogout()' : 'App.accModal()');
+      el.setAttribute('title', key === 'out' ? 'Iniciar sesión / crear cuenta' : (key === 'locked' ? 'Desbloquear' : 'Cerrar sesión'));
+      // Icono coherente con el estado: entrar (→) / bloqueado (⊘) / salir (←). Antes era ↺ (recargar), confuso.
+      const ic = el.querySelector('.ic');
+      if (ic) ic.textContent = key === 'in' ? '←' : (key === 'locked' ? '⊘' : '→');
+      this._renderSyncStatus();
+    },
+
+    // Indicador de sync en la barra lateral. syncState: 'syncing' | 'synced' | 'error' | undefined (lee estado actual).
+    _renderSyncStatus(syncState) {
+      const el = document.getElementById('syncStatus');
+      if (!el || typeof Acc === 'undefined') return;
+      const st = Acc.status();
+      if (st.state !== 'in') { el.style.display = 'none'; el.innerHTML = ''; return; }
+      let cls, txt;
+      if (syncState === 'syncing') { cls = 'syncing'; txt = t('syncing'); }
+      else if (syncState === 'error') { cls = 'err'; txt = t('syncErrShort'); }
+      else if (!st.active) { cls = 'warn'; txt = t('pendingShort'); }
+      else { cls = 'ok'; txt = `${t('synced')} · v${st.version}`; }
+      el.style.display = '';
+      el.className = 'sync-status ' + cls;
+      el.title = txt;
+      el.innerHTML = `<span class="sync-dot"></span><span class="nt">${esc2(txt)}</span>`;
     },
 
     accPwMeter(v) {
@@ -156,7 +218,7 @@
       try {
         const r = await Acc.signup(email, pw, D.d);
         if (r.ok && r.recoveryCode) {
-          this._accShowRecovery(r.recoveryCode, () => { if (Acc.state === 'in' && Acc.status().active) Acc.setAutoSync(true); this.rCfg(); });
+          this._accShowRecovery(r.recoveryCode, () => { if (Acc.state === 'in' && Acc.status().active) Acc.setAutoSync(true); this._accInModal = false; this.refreshAccountNav(); this.go(this.cv); });
           if (r.pending) Toast.ok(t('pending'));
         } else { Toast.error(r.error === 'signups_closed' ? t('pending') : (r.error || 'error')); }
       } catch (e) { Toast.error(String(e.message || e)); }
@@ -170,7 +232,7 @@
         if (!r.ok) return Toast.error(r.error === 'inactive' ? t('pending') : (r.error || 'error'));
         Toast.ok(t('welcome'));
         if (r.active) { if (typeof H !== 'undefined') H.snapshot(); await this._accPull(); Acc.setAutoSync(true); }
-        this.rCfg(); this.go(this.cv);
+        this._accDone();
       } catch (e) { Toast.error(String(e.message || e)); }
     },
 
@@ -181,7 +243,7 @@
         if (!r.ok) return Toast.error(r.error || 'error');
         Toast.ok(t('welcome'));
         if (r.active) { if (typeof H !== 'undefined') H.snapshot(); await this._accPull(); Acc.setAutoSync(true); }
-        this.rCfg(); this.go(this.cv);
+        this._accDone();
       } catch (e) { Toast.error(String(e.message || e)); }
     },
 
@@ -189,7 +251,11 @@
       if (!confirm(t('confirmLogout'))) return;
       Acc.setAutoSync(false);
       await Acc.logout();
-      Toast.ok(t('loggedOut')); this.rCfg();
+      Toast.ok(t('loggedOut'));
+      mode = 'login';
+      this.refreshAccountNav();
+      // Desde el modal de "bloqueado": vuelve al formulario de login en el mismo modal.
+      if (this._accInModal) this._accRenderModal(); else this.rCfg();
     },
 
     async accSyncNow() {
@@ -235,7 +301,7 @@
         if (!r.ok) return Toast.error(r.error || 'error');
         Toast.ok(t('recovered'));
         if (typeof H !== 'undefined') H.snapshot(); await this._accPull(); Acc.setAutoSync(true);
-        this.rCfg(); this.go(this.cv);
+        this._accDone();
       } catch (e) { Toast.error(String(e.message || e)); }
     },
 
@@ -290,5 +356,10 @@
     const orig = D.save.bind(D);
     D.save = function () { orig(); try { if (typeof Acc !== 'undefined') Acc.notifyChange(); } catch (e) { /* */ } };
     D._accHooked = true;
+  }
+
+  // ── Indicador de sync: la cuenta avisa al cambiar de estado (sincronizando/ok/error) ──
+  if (typeof Acc !== 'undefined' && Acc.setSyncListener) {
+    Acc.setSyncListener((state) => { try { App._renderSyncStatus(state); } catch (e) { /* */ } });
   }
 })();

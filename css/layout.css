@@ -19,6 +19,16 @@
 .ni.on{color:var(--t1)}
 .ni .ic{font-size:.95rem;width:18px;text-align:center}
 .sep{height:1px;background:var(--b1);margin:.75rem 1.25rem}
+
+/* ── Indicador de sincronizacion (estado de la cuenta) ── */
+.sync-status{display:flex;align-items:center;gap:.5rem;padding:.15rem 1.25rem .25rem;font-size:.7rem;color:var(--t3);min-width:0}
+.sync-status .nt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--t3);flex-shrink:0}
+.sync-status.ok .sync-dot{background:var(--ok)}
+.sync-status.warn .sync-dot{background:var(--warn)}
+.sync-status.err .sync-dot{background:var(--bad)}
+.sync-status.syncing .sync-dot{background:var(--ac);animation:syncPulse 1s ease-in-out infinite}
+@keyframes syncPulse{0%,100%{opacity:.25}50%{opacity:1}}
 .sb-foot{padding:.75rem 1.25rem 1rem;font-size:.72rem;line-height:1.5}
 .sb-foot a{color:var(--t3);text-decoration:none;display:block}
 .sb-foot a:hover{color:var(--t1)}

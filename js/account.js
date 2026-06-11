@@ -217,7 +217,7 @@ const Acc = (() => {
     } finally {
       if (!_retry) {
         _pushing = false;
-        if (_dirty) { _dirty = false; setTimeout(() => { push().catch(() => {}); }, 50); }
+        if (_dirty) { _dirty = false; setTimeout(() => { syncPush().catch(() => {}); }, 50); }
       }
     }
   }
@@ -225,6 +225,22 @@ const Acc = (() => {
   /* ── auto-sync (debounce) + guards de concurrencia/reentrada ── */
   let _timer = null, _enabled = false, _pushing = false, _dirty = false, _applyingRemote = false;
   function setAutoSync(on) { _enabled = !!on; }
+
+  /* ── Notificacion de estado de sync a la UI (indicador en la barra) ── */
+  let _onSync = null;
+  function setSyncListener(fn) { _onSync = fn; }
+  function emitSync(state, info) { if (_onSync) { try { _onSync(state, info || {}); } catch (e) { /* */ } } }
+  // Envuelve push() para emitir 'syncing'/'synced'/'error' a la UI (manual + auto).
+  // La recursion interna del 409 llama a push() directamente, asi que NO re-emite.
+  async function syncPush(dataObj) {
+    emitSync('syncing');
+    let res;
+    try { res = await push(dataObj); }
+    catch (e) { emitSync('error', { error: String(e && e.message || e) }); throw e; } // no dejar el indicador atascado en 'syncing'
+    if (res && res.ok) emitSync('synced', res);
+    else if (!res || res.error !== 'busy') emitSync('error', res || {}); // 'busy' = coalescado, el push en curso ya emitira
+    return res;
+  }
   // Carga datos remotos en D SIN disparar un push de vuelta (evita la reentrada del auto-sync).
   function _applyRemote(data) {
     _applyingRemote = true;
@@ -233,7 +249,7 @@ const Acc = (() => {
   function notifyChange() {
     if (!_enabled || _applyingRemote || !isUnlocked() || !S.active) return;
     if (_timer) clearTimeout(_timer);
-    _timer = setTimeout(() => { _timer = null; push().catch(() => {}); }, 2500);
+    _timer = setTimeout(() => { _timer = null; syncPush().catch(() => {}); }, 2500);
   }
 
   /* ── Admin (solo is_admin; el servidor reverifica) ── */
@@ -243,9 +259,9 @@ const Acc = (() => {
   async function adminDelete(id) { const r = await api(`/v1/admin/users/${encodeURIComponent(id)}`, { method: 'DELETE', auth: true }); return r.status === 204; }
 
   return {
-    signup, login, unlock, logout, changePassword, recover, pull, push,
+    signup, login, unlock, logout, changePassword, recover, pull, push: syncPush,
     adminListUsers, adminSetActive, adminSetPaid, adminDelete, _mergeData: mergeData,
-    status, isUnlocked, detectLocked, setAutoSync, notifyChange, setApiBase: (u) => { API_BASE = u; },
+    status, isUnlocked, detectLocked, setAutoSync, setSyncListener, notifyChange, setApiBase: (u) => { API_BASE = u; },
     get email() { return S.email; }, get version() { return S.version; }, get state() { return S.state; },
   };
 })();

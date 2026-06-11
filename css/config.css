@@ -175,7 +175,7 @@
 .acc-status.ok{color:var(--ok)}
 .acc-status.warn{color:var(--warn)}
 .acc-actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.85rem}
-.acc-legal{display:flex;align-items:flex-start;font-size:.78rem;color:var(--t2);line-height:1.4;cursor:pointer}
+.acc-legal{display:flex;align-items:flex-start;font-size:.78rem;color:var(--t2);line-height:1.4;cursor:pointer;text-transform:none;letter-spacing:normal}
 .acc-links{margin-top:.85rem;font-size:.82rem;color:var(--t3)}
 .acc-links a{color:var(--t2);cursor:pointer;text-decoration:underline}
 .acc-warn{background:color-mix(in srgb,var(--warn) 12%,transparent);border:1px solid color-mix(in srgb,var(--warn) 35%,transparent);color:var(--t1);font-size:.82rem;padding:.6rem .75rem;border-radius:var(--r)}
@@ -184,3 +184,8 @@
 .acc-meter span.on{background:var(--warn)}
 .acc-meter span.on.ok{background:var(--ok)}
 .acc-reccode{font-family:'DM Mono',monospace;font-size:1.05rem;letter-spacing:.05em;background:var(--bg3);border:1px solid var(--b2);border-radius:var(--r);padding:.75rem;text-align:center;word-break:break-all;color:var(--t1)}
+
+/* ── Modal de cuenta (login / registro / desbloqueo) ── */
+.acc-modal-body .bt-p{width:100%;justify-content:center}
+.acc-modal-body .acc-links{text-align:center;margin-top:1rem}
+.acc-modal-body .acc-legal{margin-top:.25rem}
