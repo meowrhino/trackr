@@ -1,0 +1,248 @@
+/* ================================================
+ * TRACKR — App: UI del panel "Cuenta" (Etapa 2 C-UI)
+ *
+ * Extiende App. Renderiza una seccion en Configuracion segun Acc.state
+ * (out / locked / in) y cablea los flujos de Acc (signup/login/unlock/logout/
+ * cambio de contrasena/recuperacion) + sync. Auto-sync: engancha D.save().
+ * Textos i18n inline (es/en/ca) — migrar a lang.js cuando se valide la UX.
+ * Globales usados: Acc, CA, D, H, Toast.
+ * ================================================ */
+(() => {
+  const L = () => (typeof _lang !== 'undefined' ? _lang : 'es');
+  const TXT = {
+    es: {
+      title: 'Cuenta y sincronización', zk: 'Tus datos se cifran en tu navegador antes de subirse. Ni nosotros ni el servidor podemos leerlos (cifrado de conocimiento cero).',
+      login: 'Iniciar sesión', signup: 'Crear cuenta', recover: '¿Olvidaste tu contraseña?',
+      email: 'Email', password: 'Contraseña', password2: 'Repite la contraseña', newPassword: 'Contraseña nueva', currentPassword: 'Contraseña actual',
+      recoveryCode: 'Código de recuperación', enter: 'Entrar', create: 'Crear cuenta', unlock: 'Desbloquear', logout: 'Cerrar sesión', syncNow: 'Sincronizar ahora', changePw: 'Cambiar contraseña', save: 'Guardar', cancel: 'Cancelar', doRecover: 'Recuperar acceso',
+      legal: 'He leído que TRACKR cifra mis datos en mi navegador y que soy responsable de guardar mi contraseña y mi código de recuperación (no se pueden recuperar si los pierdo).',
+      backLogin: '← Volver a iniciar sesión', haveCode: 'Tengo un código de recuperación',
+      locked: 'Sesión bloqueada tras recargar. Introduce tu contraseña para desbloquear y descifrar tus datos.',
+      pending: 'Cuenta creada. Pendiente de activación por el administrador antes de poder sincronizar.',
+      activeOk: 'Sincronización activa', notActive: 'Pendiente de activación', version: 'versión en la nube', autoSync: 'Sincronizar automáticamente al cambiar',
+      pwWeak: 'La contraseña debe tener al menos 12 caracteres.', pwMismatch: 'Las contraseñas no coinciden.', legalReq: 'Debes aceptar para continuar.', emailBad: 'Email no válido.',
+      recTitle: 'Tu código de recuperación', recDesc: 'Apúntalo y guárdalo OFFLINE (no en este dispositivo). Es la ÚNICA forma de recuperar tus datos si olvidas la contraseña. NO se vuelve a mostrar.', copy: 'Copiar', download: 'Descargar .txt', saved: 'Lo he guardado, continuar', copied: 'Copiado',
+      welcome: 'Sesión iniciada', loggedOut: 'Sesión cerrada', synced: 'Sincronizado', syncErr: 'No se pudo sincronizar', pwChanged: 'Contraseña cambiada', recovered: 'Acceso recuperado',
+      confirmLogout: '¿Cerrar sesión? Tus datos locales se mantienen en este navegador.', adminBadge: 'admin',
+    },
+    en: {
+      title: 'Account & sync', zk: 'Your data is encrypted in your browser before upload. Neither we nor the server can read it (zero-knowledge).',
+      login: 'Log in', signup: 'Create account', recover: 'Forgot your password?',
+      email: 'Email', password: 'Password', password2: 'Repeat password', newPassword: 'New password', currentPassword: 'Current password',
+      recoveryCode: 'Recovery code', enter: 'Log in', create: 'Create account', unlock: 'Unlock', logout: 'Log out', syncNow: 'Sync now', changePw: 'Change password', save: 'Save', cancel: 'Cancel', doRecover: 'Recover access',
+      legal: 'I understand TRACKR encrypts my data in my browser and that I am responsible for keeping my password and recovery code (they cannot be recovered if lost).',
+      backLogin: '← Back to log in', haveCode: 'I have a recovery code',
+      locked: 'Session locked after reload. Enter your password to unlock and decrypt your data.',
+      pending: 'Account created. Pending admin activation before you can sync.',
+      activeOk: 'Sync active', notActive: 'Pending activation', version: 'cloud version', autoSync: 'Auto-sync on change',
+      pwWeak: 'Password must be at least 12 characters.', pwMismatch: 'Passwords do not match.', legalReq: 'You must accept to continue.', emailBad: 'Invalid email.',
+      recTitle: 'Your recovery code', recDesc: 'Write it down and keep it OFFLINE (not on this device). It is the ONLY way to recover your data if you forget your password. It will NOT be shown again.', copy: 'Copy', download: 'Download .txt', saved: 'I saved it, continue', copied: 'Copied',
+      welcome: 'Logged in', loggedOut: 'Logged out', synced: 'Synced', syncErr: 'Could not sync', pwChanged: 'Password changed', recovered: 'Access recovered',
+      confirmLogout: 'Log out? Your local data stays in this browser.', adminBadge: 'admin',
+    },
+    ca: {
+      title: 'Compte i sincronització', zk: 'Les teves dades es xifren al navegador abans de pujar-se. Ni nosaltres ni el servidor podem llegir-les (coneixement zero).',
+      login: 'Iniciar sessió', signup: 'Crear compte', recover: 'Has oblidat la contrasenya?',
+      email: 'Email', password: 'Contrasenya', password2: 'Repeteix la contrasenya', newPassword: 'Contrasenya nova', currentPassword: 'Contrasenya actual',
+      recoveryCode: 'Codi de recuperació', enter: 'Entrar', create: 'Crear compte', unlock: 'Desbloquejar', logout: 'Tancar sessió', syncNow: 'Sincronitzar ara', changePw: 'Canviar contrasenya', save: 'Desar', cancel: 'Cancel·lar', doRecover: 'Recuperar accés',
+      legal: 'Entenc que TRACKR xifra les meves dades al navegador i que soc responsable de guardar la contrasenya i el codi de recuperació (no es poden recuperar si els perdo).',
+      backLogin: '← Tornar a iniciar sessió', haveCode: 'Tinc un codi de recuperació',
+      locked: 'Sessió bloquejada després de recarregar. Introdueix la contrasenya per desbloquejar i desxifrar les dades.',
+      pending: 'Compte creat. Pendent d\'activació per l\'administrador abans de sincronitzar.',
+      activeOk: 'Sincronització activa', notActive: 'Pendent d\'activació', version: 'versió al núvol', autoSync: 'Sincronitzar automàticament en canviar',
+      pwWeak: 'La contrasenya ha de tenir almenys 12 caràcters.', pwMismatch: 'Les contrasenyes no coincideixen.', legalReq: 'Has d\'acceptar per continuar.', emailBad: 'Email no vàlid.',
+      recTitle: 'El teu codi de recuperació', recDesc: 'Apunta\'l i guarda\'l OFFLINE (no en aquest dispositiu). És l\'ÚNICA manera de recuperar les dades si oblides la contrasenya. NO es tornarà a mostrar.', copy: 'Copiar', download: 'Descarregar .txt', saved: 'L\'he guardat, continuar', copied: 'Copiat',
+      welcome: 'Sessió iniciada', loggedOut: 'Sessió tancada', synced: 'Sincronitzat', syncErr: 'No s\'ha pogut sincronitzar', pwChanged: 'Contrasenya canviada', recovered: 'Accés recuperat',
+      confirmLogout: 'Tancar sessió? Les dades locals es mantenen en aquest navegador.', adminBadge: 'admin',
+    },
+  };
+  const t = (k) => (TXT[L()] || TXT.es)[k] || k;
+  const val = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
+  const esc2 = (s) => (typeof esc === 'function' ? esc(s) : String(s));
+
+  let mode = 'login'; // out-state: login | signup | recover
+
+  function fieldsFor(m) {
+    if (m === 'signup') {
+      return `<div class="fg"><label>${t('email')}</label><input id="accEmail" type="email" autocomplete="username"></div>`
+        + `<div class="fg"><label>${t('password')}</label><input id="accPw" type="password" autocomplete="new-password" oninput="App.accPwMeter(this.value)"><div id="accMeter" class="acc-meter"><span></span><span></span><span></span><span></span></div></div>`
+        + `<div class="fg"><label>${t('password2')}</label><input id="accPw2" type="password" autocomplete="new-password"></div>`
+        + `<label class="acc-legal"><input id="accLegal" type="checkbox" style="width:auto;margin-right:.5rem">${t('legal')}</label>`
+        + `<button class="bt bt-p" style="margin-top:.85rem" onclick="App.accSignup()">${t('create')}</button>`
+        + `<div class="acc-links"><a onclick="App.accMode('login')">${t('backLogin')}</a></div>`;
+    }
+    if (m === 'recover') {
+      return `<div class="fg"><label>${t('email')}</label><input id="accEmail" type="email" autocomplete="username"></div>`
+        + `<div class="fg"><label>${t('recoveryCode')}</label><input id="accRec" type="text" placeholder="TRKR-XXXX-XXXX-..."></div>`
+        + `<div class="fg"><label>${t('newPassword')}</label><input id="accPw" type="password" autocomplete="new-password" oninput="App.accPwMeter(this.value)"><div id="accMeter" class="acc-meter"><span></span><span></span><span></span><span></span></div></div>`
+        + `<button class="bt bt-p" style="margin-top:.5rem" onclick="App.accRecover()">${t('doRecover')}</button>`
+        + `<div class="acc-links"><a onclick="App.accMode('login')">${t('backLogin')}</a></div>`;
+    }
+    // login
+    return `<div class="fg"><label>${t('email')}</label><input id="accEmail" type="email" autocomplete="username"></div>`
+      + `<div class="fg"><label>${t('password')}</label><input id="accPw" type="password" autocomplete="current-password"></div>`
+      + `<button class="bt bt-p" style="margin-top:.25rem" onclick="App.accLogin()">${t('enter')}</button>`
+      + `<div class="acc-links"><a onclick="App.accMode('signup')">${t('signup')}</a> · <a onclick="App.accMode('recover')">${t('recover')}</a></div>`;
+  }
+
+  Object.assign(App, {
+    _cfgAccountSection() {
+      if (typeof Acc === 'undefined') return '';
+      if (Acc.state === 'out') Acc.detectLocked();
+      const cryptoOff = (typeof CA === 'undefined' || !CA.available());
+      let body;
+      if (cryptoOff) {
+        body = `<div class="acc-warn">⚠️ Tu navegador no soporta el cifrado requerido (WebAssembly/WebCrypto). No es posible crear ni abrir cuentas aquí.</div>`;
+      } else if (Acc.state === 'in') {
+        const st = Acc.status();
+        const tabs = ['es', 'en', 'ca'];
+        body = `<div class="acc-card">`
+          + `<div class="acc-row"><span class="acc-email">${esc2(st.email)}</span>${st.isAdmin ? `<span class="acc-badge">${t('adminBadge')}</span>` : ''}</div>`
+          + `<div class="acc-status ${st.active ? 'ok' : 'warn'}">${st.active ? `● ${t('activeOk')} · ${t('version')} ${st.version}` : `● ${t('notActive')}`}</div>`
+          + `</div>`
+          + (st.active ? `<label class="acc-legal" style="margin-top:.6rem"><input type="checkbox" id="accAuto" style="width:auto;margin-right:.5rem" onchange="App.accToggleAuto(this.checked)">${t('autoSync')}</label>` : `<div class="acc-warn" style="margin-top:.6rem">${t('pending')}</div>`)
+          + `<div class="acc-actions">`
+          + (st.active ? `<button class="bt bt-s" onclick="App.accSyncNow()">${t('syncNow')}</button>` : '')
+          + `<button class="bt bt-s" onclick="App.accChangePwModal()">${t('changePw')}</button>`
+          + `<button class="bt bt-s" onclick="App.accLogout()">${t('logout')}</button>`
+          + `</div>`;
+      } else if (Acc.state === 'locked') {
+        body = `<div class="acc-warn">${t('locked')}</div>`
+          + `<div class="fg" style="margin-top:.6rem"><label>${t('password')}</label><input id="accPw" type="password" autocomplete="current-password"></div>`
+          + `<button class="bt bt-p" onclick="App.accUnlock()">${t('unlock')}</button> `
+          + `<button class="bt bt-s" onclick="App.accLogout()">${t('logout')}</button>`;
+      } else {
+        body = fieldsFor(mode);
+      }
+      return `<div class="cfg-section"><div class="cfg-section-title">${t('title')}</div>`
+        + `<div style="color:var(--t3);font-size:.82rem;margin-bottom:.9rem">${t('zk')}</div>`
+        + body + `</div>`;
+    },
+
+    accMode(m) { mode = m; this.rCfg(); },
+
+    accPwMeter(v) {
+      const m = document.getElementById('accMeter'); if (!m) return;
+      const score = (typeof CA !== 'undefined') ? CA.checkPassword(v).score : 0;
+      [...m.children].forEach((seg, i) => { seg.className = i < score ? (score >= 3 ? 'on ok' : 'on') : ''; });
+    },
+
+    async accSignup() {
+      const email = val('accEmail'), pw = val('accPw'), pw2 = val('accPw2');
+      if (!CA.canonEmail(email)) return Toast.error(t('emailBad'));
+      if (!CA.checkPassword(pw).ok) return Toast.error(t('pwWeak'));
+      if (pw !== pw2) return Toast.error(t('pwMismatch'));
+      if (!document.getElementById('accLegal')?.checked) return Toast.error(t('legalReq'));
+      try {
+        const r = await Acc.signup(email, pw, D.d);
+        if (r.ok && r.recoveryCode) {
+          this._accShowRecovery(r.recoveryCode, () => { if (Acc.state === 'in' && Acc.status().active) Acc.setAutoSync(true); this.rCfg(); });
+          if (r.pending) Toast.ok(t('pending'));
+        } else { Toast.error(r.error === 'signups_closed' ? t('pending') : (r.error || 'error')); }
+      } catch (e) { Toast.error(String(e.message || e)); }
+    },
+
+    async accLogin() {
+      const email = val('accEmail'), pw = val('accPw');
+      if (!email) return Toast.error(t('emailBad'));
+      try {
+        const r = await Acc.login(email, pw);
+        if (!r.ok) return Toast.error(r.error === 'inactive' ? t('pending') : (r.error || 'error'));
+        Toast.ok(t('welcome'));
+        if (r.active) { if (typeof H !== 'undefined') H.snapshot(); await this._accPull(); Acc.setAutoSync(true); }
+        this.rCfg(); this.go(this.cv);
+      } catch (e) { Toast.error(String(e.message || e)); }
+    },
+
+    async accUnlock() {
+      const pw = val('accPw'); if (!pw) return;
+      try {
+        const r = await Acc.unlock(pw);
+        if (!r.ok) return Toast.error(r.error || 'error');
+        Toast.ok(t('welcome'));
+        if (r.active) { if (typeof H !== 'undefined') H.snapshot(); await this._accPull(); Acc.setAutoSync(true); }
+        this.rCfg(); this.go(this.cv);
+      } catch (e) { Toast.error(String(e.message || e)); }
+    },
+
+    async accLogout() {
+      if (!confirm(t('confirmLogout'))) return;
+      Acc.setAutoSync(false);
+      await Acc.logout();
+      Toast.ok(t('loggedOut')); this.rCfg();
+    },
+
+    async accSyncNow() {
+      const r = await Acc.push();
+      if (r.ok) Toast.ok(`${t('synced')} · v${r.version}`);
+      else if (r.error === 'version_conflict') { await this._accPull(); Toast.warn(`${t('synced')} (${t('version')} ${r.currentVersion})`); }
+      else Toast.error(t('syncErr') + (r.error ? ` (${r.error})` : ''));
+      this.rCfg();
+    },
+
+    async _accPull() {
+      const r = await Acc.pull();
+      if (r.ok && !r.empty) { this._applyPrefs && this._applyPrefs(); this.go(this.cv); }
+      return r;
+    },
+
+    accToggleAuto(on) { Acc.setAutoSync(on); if (on) this.accSyncNow(); },
+
+    accChangePwModal() {
+      this.om(`<div class="mt">${t('changePw')}</div>`
+        + `<div class="fg"><label>${t('currentPassword')}</label><input id="accCur" type="password" autocomplete="current-password"></div>`
+        + `<div class="fg"><label>${t('newPassword')}</label><input id="accNew" type="password" autocomplete="new-password" oninput="App.accPwMeter(this.value)"><div id="accMeter" class="acc-meter"><span></span><span></span><span></span><span></span></div></div>`
+        + `<div class="fg"><label>${t('password2')}</label><input id="accNew2" type="password" autocomplete="new-password"></div>`
+        + `<div class="ma"><button class="bt" onclick="App.cm()">${t('cancel')}</button><button class="bt bt-p" onclick="App.accChangePwSave()">${t('save')}</button></div>`);
+    },
+
+    async accChangePwSave() {
+      const cur = val('accCur'), nw = val('accNew'), nw2 = val('accNew2');
+      if (!CA.checkPassword(nw).ok) return Toast.error(t('pwWeak'));
+      if (nw !== nw2) return Toast.error(t('pwMismatch'));
+      const r = await Acc.changePassword(cur, nw);
+      if (r.ok) { Toast.ok(t('pwChanged')); this.cm(); this.rCfg(); }
+      else Toast.error(r.error === 'invalid_credentials' ? t('currentPassword') + ' ✗' : (r.error || 'error'));
+    },
+
+    async accRecover() {
+      const email = val('accEmail'), code = val('accRec'), pw = val('accPw');
+      if (!CA.canonEmail(email)) return Toast.error(t('emailBad'));
+      if (!CA.isValidRecovery(code)) return Toast.error(t('recoveryCode') + ' ✗');
+      if (!CA.checkPassword(pw).ok) return Toast.error(t('pwWeak'));
+      try {
+        const r = await Acc.recover(email, code, pw);
+        if (!r.ok) return Toast.error(r.error || 'error');
+        Toast.ok(t('recovered'));
+        if (typeof H !== 'undefined') H.snapshot(); await this._accPull(); Acc.setAutoSync(true);
+        this.rCfg(); this.go(this.cv);
+      } catch (e) { Toast.error(String(e.message || e)); }
+    },
+
+    _accShowRecovery(code, onDone) {
+      this._recCode = code;
+      this.om(`<div class="mt">${t('recTitle')}</div>`
+        + `<div style="color:var(--warn);font-size:.82rem;margin-bottom:.85rem">${t('recDesc')}</div>`
+        + `<div class="acc-reccode" id="accRecCode">${esc2(code)}</div>`
+        + `<div class="acc-actions" style="margin-top:.85rem">`
+        + `<button class="bt bt-s" onclick="App.accCopyRec()">${t('copy')}</button>`
+        + `<button class="bt bt-s" onclick="App.accDownloadRec()">${t('download')}</button>`
+        + `</div>`
+        + `<div class="ma"><button class="bt bt-p" onclick="App.accDoneRecovery()">${t('saved')}</button></div>`);
+      this._recDone = onDone;
+    },
+    accCopyRec() { try { navigator.clipboard.writeText(this._recCode || ''); Toast.ok(t('copied')); } catch (e) { /* */ } },
+    accDownloadRec() {
+      const blob = new Blob([`TRACKR recovery code\n${this._recCode}\n\nGuárdalo offline. Es la única forma de recuperar tus datos si olvidas la contraseña.`], { type: 'text/plain' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'trackr-recovery-code.txt'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    },
+    accDoneRecovery() { const cb = this._recDone; this._recCode = null; this._recDone = null; this.cm(); if (cb) cb(); },
+  });
+
+  // ── Auto-sync: engancha D.save() (todos los mutadores pasan por ahi) ──
+  if (typeof D !== 'undefined' && typeof D.save === 'function' && !D._accHooked) {
+    const orig = D.save.bind(D);
+    D.save = function () { orig(); try { if (typeof Acc !== 'undefined') Acc.notifyChange(); } catch (e) { /* */ } };
+    D._accHooked = true;
+  }
+})();

@@ -11,7 +11,8 @@ Object.assign(App, {
     const s = D.d.settings, em = s.emisor, tg = s.targets, cls = D.cls();
 
     document.getElementById('cfgC').innerHTML =
-      `<div class="cfg-section"><div class="cfg-section-title">${t('lang.label')}</div>`
+      this._cfgAccountSection()
+      + `<div class="cfg-section"><div class="cfg-section-title">${t('lang.label')}</div>`
       + `<div class="lang-toggle">${['es', 'en', 'ca'].map(code =>
           `<button class="lang-btn${_lang === code ? ' on' : ''}" onclick="App.setLanguage('${code}')">${t('lang.' + code)}</button>`
         ).join('')}</div></div>`
