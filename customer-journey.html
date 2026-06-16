@@ -19,47 +19,38 @@
   header{max-width:1100px;margin:0 auto 1.75rem}
   .kicker{font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--t3);margin-bottom:.5rem}
   h1{font-size:1.9rem;font-weight:600;letter-spacing:-.01em}
-  .sub{color:var(--t2);font-size:.95rem;margin-top:.4rem;max-width:70ch}
+  .sub{color:var(--t2);font-size:.95rem;margin-top:.4rem;max-width:72ch}
   .channels{margin-top:.9rem;font-size:.82rem;color:var(--t2);display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
   .chip{display:inline-flex;align-items:center;gap:.35rem;background:var(--bg2);border:1px solid var(--b1);border-radius:999px;padding:.2rem .7rem;font-size:.78rem;color:var(--t1)}
 
-  .map-wrap{overflow-x:auto;padding-bottom:1rem}
-  .map{display:grid;min-width:1080px}
-  .map > div{border-bottom:1px solid var(--b1);padding:.7rem .8rem;font-size:.82rem}
-  .rowlabel{position:sticky;left:0;z-index:2;background:var(--bg);font-family:'DM Mono',monospace;font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);display:flex;align-items:center;border-right:1px solid var(--b1)}
+  .map-wrap{overflow-x:auto;padding-bottom:.5rem}
+  .map{display:grid;min-width:960px;max-width:1300px;margin:0 auto}
 
   /* Cabecera de fase */
-  .phase-h{border-top:3px solid var(--c);background:var(--bg2)}
-  .phase-h .num{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--c)}
-  .phase-h .nm{font-weight:600;font-size:.92rem;margin-top:.1rem;line-height:1.2}
+  .phase-h{border-top:3px solid var(--c);background:var(--bg2);padding:.7rem .8rem;border-right:1px solid var(--b1)}
+  .phase-h:last-child{border-right:none}
+  .phase-h .num{font-family:'DM Mono',monospace;font-size:.66rem;color:var(--c)}
+  .phase-h .nm{font-weight:600;font-size:.9rem;margin-top:.1rem;line-height:1.2}
+  .phase-h .canal{font-size:.72rem;color:var(--t2);margin-top:.35rem}
+  .phase-h .canal.empty{color:var(--t3);opacity:.6}
 
-  /* Curva de emoción (SVG ocupa todas las columnas de fase) */
-  .emo-curve{grid-column:2 / -1;padding:0 !important;position:relative;background:var(--bg2)}
-  .emo-curve svg{display:block;width:100%;height:120px}
-  .emo-labels{grid-column:2 / -1;display:grid;background:var(--bg2)}
-  .emo-labels > div{padding:.45rem .6rem;text-align:center}
-  .emo-emoji{font-size:1.15rem}
-  .emo-word{font-size:.72rem;color:var(--t2);margin-top:.1rem}
+  /* Curva de emoción */
+  .emo{grid-column:1 / -1;position:relative;background:var(--bg2);border-top:1px solid var(--b1)}
+  .emo svg{display:block;width:100%;height:170px}
 
-  .cell-canal{color:var(--t2);font-size:.78rem}
-  .cell-quiere{color:var(--t1)}
-  .cell-tu{color:var(--t2)}
-  .cell-fric{color:#d98a8a}
-  .cell-opp{color:#7fcfb0}
-  .cell .ic{display:block;font-size:.66rem;color:var(--t3);font-family:'DM Mono',monospace;letter-spacing:.06em;margin-bottom:.2rem;text-transform:uppercase}
-  .bottleneck{box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--bad) 45%,transparent)}
-  .badge{display:inline-block;font-size:.6rem;font-family:'DM Mono',monospace;letter-spacing:.05em;text-transform:uppercase;background:color-mix(in srgb,var(--bad) 20%,transparent);color:#e0a0a0;border-radius:4px;padding:.05rem .35rem;margin-bottom:.25rem}
-  .badge-gold{background:color-mix(in srgb,var(--warn) 20%,transparent);color:#e6c07a}
+  /* Notas (dónde se enfría) — solo lo real */
+  .notes{display:grid;grid-column:1 / -1;background:var(--bg2);border-top:1px solid var(--b1)}
+  .notes > div{padding:.7rem .8rem;border-right:1px solid var(--b1);font-size:.8rem;line-height:1.4;min-height:64px}
+  .notes > div:last-child{border-right:none}
+  .note-hi{color:#e6c07a}
+  .note-lo{color:#d98a8a}
 
-  .insight{max-width:1100px;margin:1.5rem auto 0;background:var(--bg2);border:1px solid var(--b1);border-left:3px solid var(--ac);border-radius:var(--r);padding:1rem 1.2rem;font-size:.9rem;color:var(--t1);line-height:1.55}
+  .insight{max-width:1100px;margin:1.75rem auto 0;background:var(--bg2);border:1px solid var(--b1);border-left:3px solid var(--ac);border-radius:var(--r);padding:1rem 1.2rem;font-size:.92rem;color:var(--t1);line-height:1.6}
   .insight b{color:#fff}
+  .foot-note{max-width:1100px;margin:1rem auto 0;font-size:.8rem;color:var(--t2)}
   footer{max-width:1100px;margin:1.5rem auto 0;font-size:.74rem;color:var(--t3);font-family:'DM Mono',monospace}
 
-  @media print{
-    @page{size:landscape;margin:1cm}
-    body{padding:0}
-    .map-wrap{overflow:visible}
-  }
+  @media print{ @page{size:landscape;margin:1cm} body{padding:0} .map-wrap{overflow:visible} }
 </style>
 </head>
 <body>
@@ -67,10 +58,10 @@
 <header>
   <div class="kicker">Customer Journey</div>
   <h1>El recorrido del cliente · <span class="m" style="color:var(--ac)">meowrhino</span></h1>
-  <p class="sub">Cómo vive un cliente el encargo de su web, fase por fase: qué quiere, cómo se siente, dónde hay fricción y dónde está la oportunidad de enamorarle.</p>
-  <div class="channels"><span style="color:var(--t3)">Cómo te descubren →</span>
+  <p class="sub">Cómo vive el cliente el encargo de su web. Lo que importa: su <b style="color:var(--t1)">ánimo</b> a lo largo del proceso y <b style="color:var(--t1)">dónde se enfría</b>.</p>
+  <div class="channels"><span style="color:var(--t3)">Llega por →</span>
     <span class="chip">📣 Boca a boca</span>
-    <span class="chip">💼 LinkedIn</span>
+    <span class="chip">💼 LinkedIn (pronto)</span>
     <span class="chip">🪪 Tarjeta de visita</span>
   </div>
 </header>
@@ -80,98 +71,62 @@
 </div>
 
 <div class="insight">
-  💡 <b>Dos valles de riesgo y dos picos de oro.</b> El cliente se enfría en <b>el silencio tras el presupuesto</b> y, sobre todo, en <b>«Me envían las cosas»</b> — tu verdadero cuello de botella, donde el proyecto se atasca. Tus dos <b>momentos mágicos</b> son la <b>reunión de diseño</b> (ve su idea cobrar vida) y la <b>entrega + post de Instagram</b> (orgullo). Cuídalos: son los que generan boca a boca y cierran el ciclo trayendo nuevos «primer contacto».
+  💡 El cliente llega <b>con muchísima ilusión</b> (primer contacto y reunión de diseño). El <b>gran bache</b> es entre la reunión y el envío de materiales: se enfría y <b>se frustra recopilando textos y fotos</b> — ahí se atasca la mayoría de proyectos. Hay un <b>segundo bache, ~4× menos frecuente</b>: cuando la web ya está hecha, le da vueltas y cuesta cerrar la entrega.
 </div>
+<p class="foot-note">Nota: no hay trabajo tuyo hasta la reunión de diseño (ahí montas el Figma). Antes, como mucho, miran tu web.</p>
 
-<footer>meowrhino · customer journey v1 · <span id="today"></span></footer>
+<footer>meowrhino · customer journey v2 · <span id="today"></span></footer>
 
 <script>
 const PHASES = [
-  { n:'01', name:'Primer contacto', color:'#87CEEB', emoji:'🤔', feel:'Curiosidad', emo:.62,
-    canal:'Instagram · LinkedIn · tarjeta',
-    quiere:'«¿Hacéis lo que necesito? ¿Encajamos?»',
-    tu:'Respondes rápido y cercano; preguntas para entender el proyecto.',
-    fric:'Tardar en responder; no saber precio ni proceso; verte «caro/pro».',
-    opp:'Respuesta humana + enseñar un caso parecido al suyo desde el minuto 1.' },
-  { n:'02', name:'Presupuesto', color:'#DAA520', emoji:'😟', feel:'Cautela', emo:.42,
-    canal:'Email / PDF · videollamada',
-    quiere:'Claridad de precio, alcance y plazos; sentir que controla el gasto.',
-    tu:'Presupuesto claro: qué incluye, qué no, y cuándo estará.',
-    fric:'Confuso o con sorpresas; silencio tras enviarlo; comparar con opciones baratas.',
-    opp:'Presupuesto bonito + explicar el «por qué» del precio + testimonios.' },
-  { n:'03', name:'Reunión de diseño', color:'#9370DB', emoji:'🤩', feel:'Ilusión', emo:.90,
-    canal:'Reunión presencial / videollamada (Figma en vivo)',
-    quiere:'Ver su idea cobrar forma; sentirse escuchado; participar.',
-    tu:'Co-diseñáis el prototipo en directo, traduciendo sus ideas.',
-    fric:'Jerga técnica; no sentirse escuchado; expectativas no alineadas.',
-    opp:'El «momento mágico»: involúcrale — es lo que recordará y contará.' },
-  { n:'04', name:'Diseño verificado', color:'#DA70D6', emoji:'🙂', feel:'Satisfacción', emo:.78,
-    canal:'Enlace a Figma / email',
-    quiere:'Que quede como lo imaginó; entender qué viene después.',
-    tu:'Pasas el diseño a limpio y pides un «sí» claro.',
-    fric:'Rondas de cambios sin fin; no saber si «ya está aprobado».',
-    opp:'Límite de rondas + un hito de aprobación que ilusione.' },
-  { n:'05', name:'Me envían las cosas', color:'#F4A460', emoji:'😩', feel:'Agobio', emo:.25, bottleneck:true,
-    canal:'Carpeta compartida / checklist',
-    quiere:'Saber exactamente qué darte, sin bloquear el proyecto.',
-    tu:'Checklist guiada: textos, fotos, logos y accesos.',
-    fric:'No sabe qué darte → el proyecto se atasca aquí. Fotos malas, textos a medias.',
-    opp:'Plantillas de texto + recordatorios amables + ofrecer copy/fotos.' },
-  { n:'06', name:'Programando', color:'#20B2AA', emoji:'😐', feel:'Expectación', emo:.55,
-    canal:'Poca comunicación (riesgo) · un update / preview',
-    quiere:'Saber que avanza; algo de visibilidad.',
-    tu:'Programas la web; idealmente un preview a mitad.',
-    fric:'Silencio largo = ansiedad; sentir que «desapareciste».',
-    opp:'Un link de preview mantiene la ilusión y la confianza.' },
-  { n:'07', name:'Reunión de entrega', color:'#3CB371', emoji:'😍', feel:'Orgullo', emo:.92,
-    canal:'Reunión + traspaso de accesos + mini-guía',
-    quiere:'Que funcione; saber gestionarla; estar orgulloso.',
-    tu:'Presentas la web, traspasas accesos y enseñas lo básico.',
-    fric:'No saber editarla luego; dudas post-entrega sin resolver.',
-    opp:'Mini-guía/vídeo «cómo gestionar tu web» + pedir feedback.' },
-  { n:'08', name:'Post de Instagram', color:'#FF1493', emoji:'🥳', feel:'Orgullo', emo:.85,
-    canal:'Instagram (tu post + su reshare) · boca a boca',
-    quiere:'Presumir su nueva web; que le etiquetes.',
-    tu:'Post chulo del proyecto, etiquetas al cliente y agradeces.',
-    fric:'Que no le hagas justicia / no le etiquetes / no le pidas compartir.',
-    opp:'Convertirle en EMBAJADOR: reseña + referidos → nuevos «primer contacto».' },
+  { n:'01', name:'Primer contacto',   color:'#87CEEB', canal:'DM / WhatsApp',          emo:.90, note:'🔥 Emocionadísimo',                                        tone:'hi' },
+  { n:'02', name:'Presupuesto',       color:'#DAA520', canal:'DM / WhatsApp o llamada', emo:.45, note:'😕 Se enfría esperando la reunión',                        tone:'lo' },
+  { n:'03', name:'Reunión de diseño', color:'#9370DB', canal:'Presencial · Figma',     emo:.95, note:'🔥 Emocionadísimo',                                        tone:'hi' },
+  { n:'04', name:'Diseño verificado', color:'#DA70D6', canal:null,                     emo:.60, note:null },
+  { n:'05', name:'Me envían las cosas',color:'#F4A460',canal:'WeTransfer',             emo:.18, note:'❄️ Se frustra recopilando materiales · aquí se atasca la mayoría', tone:'lo' },
+  { n:'06', name:'Programando',       color:'#20B2AA', canal:null,                     emo:.55, note:null },
+  { n:'07', name:'Reunión de entrega',color:'#3CB371', canal:null,                     emo:.72, note:'😬 A veces le da vueltas y cuesta cerrar (~4× menos)',     tone:'lo' },
+  { n:'08', name:'Post de Instagram', color:'#FF1493', canal:'Instagram',              emo:.82, note:null },
 ];
 
 const N = PHASES.length;
 const map = document.getElementById('map');
-map.style.gridTemplateColumns = `150px repeat(${N}, minmax(150px, 1fr))`;
+map.style.gridTemplateColumns = `repeat(${N}, minmax(120px, 1fr))`;
 
-/* fila helper: etiqueta + celdas */
-function row(label, cellFn, extraLabelClass){
-  map.insertAdjacentHTML('beforeend', `<div class="rowlabel ${extraLabelClass||''}">${label}</div>`);
-  PHASES.forEach((p,i)=> map.insertAdjacentHTML('beforeend', cellFn(p,i)));
-}
+/* 1) Cabeceras de fase (con canal donde se sabe) */
+PHASES.forEach(p => {
+  const canal = p.canal
+    ? `<div class="canal">${p.canal}</div>`
+    : `<div class="canal empty">—</div>`;
+  map.insertAdjacentHTML('beforeend',
+    `<div class="phase-h" style="--c:${p.color}"><div class="num">${p.n}</div><div class="nm">${p.name}</div>${canal}</div>`);
+});
 
-/* 1. Cabecera de fase */
-row('Fase', p => `<div class="phase-h" style="--c:${p.color}"><div class="num">${p.n}</div><div class="nm">${p.name}</div></div>`);
-
-/* 2. Curva de emoción (SVG) + etiquetas */
-const pts = PHASES.map((p,i)=>{ const x=(i+0.5)/N*1000; const y=130-p.emo*110; return [x,y]; });
-const poly = pts.map(pt=>pt.map(v=>v.toFixed(1)).join(',')).join(' ');
-const dots = PHASES.map((p,i)=>`<circle cx="${pts[i][0].toFixed(1)}" cy="${pts[i][1].toFixed(1)}" r="7" fill="${p.color}" stroke="#111" stroke-width="2"/>`).join('');
-map.insertAdjacentHTML('beforeend', `<div class="rowlabel">Emoción</div>`);
+/* 2) Curva de emoción (un SVG sobre todas las columnas) */
+const W = 1000, H = 170, pad = 26;
+const x = i => (i + 0.5) / N * W;
+const y = e => H - pad - e * (H - pad*2);
+const pts = PHASES.map((p,i) => [x(i), y(p.emo)]);
+const poly = pts.map(pt => pt.map(v => v.toFixed(1)).join(',')).join(' ');
+const dots = PHASES.map((p,i) =>
+  `<circle cx="${pts[i][0].toFixed(1)}" cy="${pts[i][1].toFixed(1)}" r="7" fill="${p.color}" stroke="#191919" stroke-width="2"/>`).join('');
+/* línea base sutil */
+const mid = y(.5).toFixed(1);
 map.insertAdjacentHTML('beforeend',
-  `<div class="emo-curve"><svg viewBox="0 0 1000 140" preserveAspectRatio="none">
-     <polyline points="${poly}" fill="none" stroke="#5a9" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" opacity="0.85"/>
+  `<div class="emo"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+     <line x1="0" y1="${mid}" x2="${W}" y2="${mid}" stroke="#2a2a2a" stroke-width="1" stroke-dasharray="4 5"/>
+     <polyline points="${poly}" fill="none" stroke="#5a9" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
      ${dots}
    </svg></div>`);
-map.insertAdjacentHTML('beforeend', `<div class="rowlabel"></div>`);
-let emoCells = `<div class="emo-labels" style="grid-template-columns:repeat(${N},1fr)">`;
-PHASES.forEach(p => emoCells += `<div><div class="emo-emoji">${p.emoji}</div><div class="emo-word">${p.feel}</div></div>`);
-emoCells += `</div>`;
-map.insertAdjacentHTML('beforeend', emoCells);
 
-/* 3..n filas de contenido */
-row('Canal', p => `<div class="cell cell-canal">${p.canal}</div>`);
-row('El cliente quiere', p => `<div class="cell cell-quiere">${p.quiere}</div>`);
-row('Tú haces', p => `<div class="cell cell-tu">${p.tu}</div>`);
-row('Fricción', p => `<div class="cell cell-fric${p.bottleneck?' bottleneck':''}">${p.bottleneck?'<span class="badge">⚠ cuello de botella</span>':''}${p.fric}</div>`);
-row('Oportunidad', p => `<div class="cell cell-opp">${p.emo>=.85?'<span class="badge badge-gold">★ momento de oro</span>':''}${p.opp}</div>`);
+/* 3) Notas: solo donde hay info real */
+let notes = `<div class="notes" style="grid-template-columns:repeat(${N},minmax(120px,1fr))">`;
+PHASES.forEach(p => {
+  const cls = p.tone === 'hi' ? 'note-hi' : p.tone === 'lo' ? 'note-lo' : '';
+  notes += `<div class="${cls}">${p.note || ''}</div>`;
+});
+notes += `</div>`;
+map.insertAdjacentHTML('beforeend', notes);
 
 document.getElementById('today').textContent = new Date().toLocaleDateString('es-ES', {year:'numeric',month:'long',day:'numeric'});
 </script>
