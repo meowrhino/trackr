@@ -5,7 +5,10 @@
  * Todas las clases van prefijadas con .jrn- para no chocar.
  * ================================================ */
 
-.jrn-root{
+/* Las variables se definen también en .jrn-modal-bg porque el overlay del
+ * modal se cuelga del <body>, fuera del ámbito de .jrn-root. Sin esto el
+ * modal se quedaría sin fondo (transparente) y se vería el tablero detrás. */
+.jrn-root,.jrn-modal-bg{
   --jbg:var(--bg,#111);--jbg2:var(--bg2,#191919);--jbg3:var(--bg3,#222);--jbg4:var(--bg4,#2a2a2a);
   --jb1:var(--b1,#262626);--jb2:var(--b2,#333);
   --jt1:var(--t1,#ccc);--jt2:var(--t2,#888);--jt3:var(--t3,#555);
