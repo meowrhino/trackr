@@ -24,6 +24,27 @@ const D = {
     return false;
   },
 
+  /**
+   * Customer journey por defecto (tablero kanban).
+   * Plantilla genérica reutilizable: estadios editables + tarjetas libres
+   * (no atadas a las entidades `clientes`). Se siembra una sola vez.
+   */
+  _seedJourney() {
+    return {
+      stages: [
+        { id: 'jst-contacto',    nombre: 'Primer contacto',      color: 'SkyBlue' },
+        { id: 'jst-presupuesto', nombre: 'Presupuesto',          color: 'Goldenrod' },
+        { id: 'jst-diseno',      nombre: 'Diseño (prototipo)',   color: 'MediumPurple' },
+        { id: 'jst-disenook',    nombre: 'Diseño verificado',    color: 'Orchid' },
+        { id: 'jst-materiales',  nombre: 'Esperando materiales', color: 'SandyBrown' },
+        { id: 'jst-programando', nombre: 'Programando',          color: 'LightSeaGreen' },
+        { id: 'jst-entrega',     nombre: 'Entrega',              color: 'MediumSeaGreen' },
+        { id: 'jst-publicado',   nombre: 'Publicado (post IG)',  color: 'DeepPink' }
+      ],
+      cards: []
+    };
+  },
+
   /** Crea estructura de datos vacía (formato v2) */
   create() {
     this.d = {
@@ -31,6 +52,7 @@ const D = {
       clientes: [],
       projects: [],
       gastos: [],
+      journey: this._seedJourney(),
       settings: {
         emisor: { nombre: '', direccion1: '', direccion2: '', nif: '' },
         defaultIva: 21,
@@ -63,6 +85,17 @@ const D = {
     if (!d.deducibles) d.deducibles = [];
     /* Verifactu (SIF no verificable): registro inmutable de facturas firmadas */
     if (!d.facturas) d.facturas = [];
+    /* Customer journey (tablero kanban). Se siembra una sola vez; editable. */
+    if (!d.journey) d.journey = this._seedJourney();
+    if (!Array.isArray(d.journey.stages)) d.journey.stages = [];
+    if (!Array.isArray(d.journey.cards)) d.journey.cards = [];
+    /* Tarjetas huérfanas (su estadio fue borrado) → al primer estadio existente */
+    if (d.journey.stages.length) {
+      const validStage = new Set(d.journey.stages.map(s => s.id));
+      d.journey.cards.forEach(c => {
+        if (!validStage.has(c.stageId)) c.stageId = d.journey.stages[0].id;
+      });
+    }
     /* Migrar deducibles: año → fecha */
     d.deducibles.forEach(dd => {
       if (dd.año && !dd.fecha) dd.fecha = `${dd.año}-01-01`;
@@ -393,6 +426,50 @@ const D = {
       this.d.facturas[i].eventos.push(evento);
       this.save();
     }
+  },
+
+  /* ══════════════════════════════════════════════
+   *  CUSTOMER JOURNEY (tablero kanban)
+   *  Estadios (columnas) + tarjetas (clientes/personas).
+   *  Plantilla genérica, independiente de `clientes`.
+   * ══════════════════════════════════════════════ */
+
+  /* ── Estadios (columnas) ── */
+  jStages() { return this.d.journey.stages; },
+  jStage(id) { return this.d.journey.stages.find(s => s.id === id); },
+  addJStage(s) { this.d.journey.stages.push(s); this.save(); return s; },
+  upJStage(id, u) {
+    const i = this.d.journey.stages.findIndex(s => s.id === id);
+    if (i !== -1) { Object.assign(this.d.journey.stages[i], u); this.save(); }
+  },
+  /** Elimina un estadio. Sus tarjetas se reasignan a `toStageId` (o se borran si null). */
+  delJStage(id, toStageId) {
+    if (toStageId) this.d.journey.cards.forEach(c => { if (c.stageId === id) c.stageId = toStageId; });
+    else this.d.journey.cards = this.d.journey.cards.filter(c => c.stageId !== id);
+    this.d.journey.stages = this.d.journey.stages.filter(s => s.id !== id);
+    this.save();
+  },
+  /** Reordena un estadio una posición (dir: -1 izquierda, +1 derecha) */
+  moveJStage(id, dir) {
+    const a = this.d.journey.stages;
+    const i = a.findIndex(s => s.id === id), j = i + dir;
+    if (i === -1 || j < 0 || j >= a.length) return;
+    [a[i], a[j]] = [a[j], a[i]];
+    this.save();
+  },
+
+  /* ── Tarjetas ── */
+  jCards() { return this.d.journey.cards; },
+  jCard(id) { return this.d.journey.cards.find(c => c.id === id); },
+  jCardsIn(stageId) { return this.d.journey.cards.filter(c => c.stageId === stageId); },
+  addJCard(c) { this.d.journey.cards.push(c); this.save(); return c; },
+  upJCard(id, u) {
+    const i = this.d.journey.cards.findIndex(c => c.id === id);
+    if (i !== -1) { Object.assign(this.d.journey.cards[i], u); this.save(); }
+  },
+  delJCard(id) {
+    this.d.journey.cards = this.d.journey.cards.filter(c => c.id !== id);
+    this.save();
   },
 
   /* ══════════════════════════════════════════════

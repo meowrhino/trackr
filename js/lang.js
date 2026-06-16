@@ -579,6 +579,42 @@ const LANGS = {
     'guide.data.desc': 'Exportar, importar, ejemplos y privacidad',
     'guide.data.intro': '<p>Tu privacidad es sagrada. Por defecto, Trackr funciona <strong>sin cuenta y sin servidor</strong>: todo vive en tu navegador y tú decides cuándo exportarlo o importarlo. Si activas la sincronización en la nube (opcional), tus datos se cifran en tu dispositivo antes de subirse, con <strong>cifrado de conocimiento cero</strong>: ni nosotros ni el servidor podemos leerlos.</p>',
     'guide.data.body': '<ul><li><strong>Exportar</strong> (⤓): descarga tu archivo de guardado .json con todos tus proyectos, horas, gastos y configuración.</li><li><strong>Importar</strong> (⤒): carga un .json para restaurar o mover tus datos a otro navegador.</li><li><strong>Datos de ejemplo</strong>: en la pantalla de bienvenida puedes cargar 3 perfiles de prueba (traductora, música, formador) para explorar Trackr antes de usarlo con tus datos reales.</li></ul><div class="guide-tip">Haz backups regulares exportando tu archivo. Si cambias de navegador o borras datos, necesitarás el .json para recuperar todo.</div>',
+    /* ── Customer Journey ── */
+    'nav.journey': 'Journey',
+    'journey.subtitle': 'Coloca a cada cliente en la fase de la relación en la que está. Arrastra las tarjetas entre columnas para moverlas, o toca una para editarla.',
+    'journey.addStage': 'Añadir estadio',
+    'journey.addCard': 'Añadir',
+    'journey.importClients': 'Traer mis clientes ({0})',
+    'journey.importedClients': '{0} cliente(s) añadidos al tablero',
+    'journey.importedNone': 'Tus clientes ya estaban en el tablero',
+    'journey.empty': 'Aún no hay estadios. Crea el primero o restaura el journey por defecto.',
+    'journey.emptyColumn': 'Sin tarjetas',
+    'journey.restoreDefaults': 'Restaurar journey por defecto',
+    'journey.restored': 'Journey por defecto restaurado',
+    'journey.restoreConfirm': 'Esto reemplazará tus estadios y tarjetas actuales por el journey por defecto. ¿Continuar?',
+    'journey.color': 'Color',
+    'journey.stage': 'Estadio',
+    'journey.newStage': 'Nuevo estadio',
+    'journey.editStage': 'Editar estadio',
+    'journey.stageName': 'Nombre del estadio',
+    'journey.stageNamePh': 'Ej. Propuesta enviada',
+    'journey.stageNameRequired': 'Ponle un nombre al estadio',
+    'journey.moveLeft': 'Mover a la izquierda',
+    'journey.moveRight': 'Mover a la derecha',
+    'journey.minOneStage': 'Debe quedar al menos un estadio',
+    'journey.deleteStage': 'Eliminar estadio',
+    'journey.deleteStageBody': 'Este estadio tiene {0} tarjeta(s). Elige a dónde moverlas (o bórralas).',
+    'journey.moveCardsTo': 'Mover las tarjetas a',
+    'journey.deleteCardsToo': 'Borrar también las tarjetas',
+    'journey.needStageFirst': 'Crea primero un estadio',
+    'journey.newCard': 'Nueva tarjeta',
+    'journey.editCard': 'Editar tarjeta',
+    'journey.cardName': 'Nombre',
+    'journey.cardNamePh': 'Cliente o persona',
+    'journey.cardNameRequired': 'Ponle un nombre a la tarjeta',
+    'journey.cardNote': 'Nota (opcional)',
+    'journey.cardNotePh': 'Contexto, siguiente paso, recordatorio…',
+    'journey.deleteCardConfirm': '¿Eliminar esta tarjeta?',
     /* ── Footer ── */
     'footer.madeWith': 'Hecho con cariño por meowrhino.studio',
   },
@@ -1143,6 +1179,42 @@ const LANGS = {
     'guide.data.desc': 'Export, import, examples and privacy',
     'guide.data.intro': '<p>Your privacy is sacred. By default, Trackr works <strong>with no account and no server</strong>: everything lives in your browser and you decide when to export or import it. If you turn on cloud sync (optional), your data is encrypted on your device before upload, with <strong>zero-knowledge encryption</strong>: neither we nor the server can read it.</p>',
     'guide.data.body': '<ul><li><strong>Export</strong> (⤓): download your .json save file with all your projects, hours, expenses and settings.</li><li><strong>Import</strong> (⤒): load a .json to restore or move your data to another browser.</li><li><strong>Sample data</strong>: on the welcome screen you can load 3 test profiles (translator, musician, trainer) to explore Trackr before using your real data.</li></ul><div class="guide-tip">Make regular backups by exporting your file. If you switch browsers or clear data, you\'ll need the .json to recover everything.</div>',
+    /* ── Customer Journey ── */
+    'nav.journey': 'Journey',
+    'journey.subtitle': 'Place each client in the stage of the relationship they’re at. Drag cards between columns to move them, or tap one to edit it.',
+    'journey.addStage': 'Add stage',
+    'journey.addCard': 'Add',
+    'journey.importClients': 'Bring my clients ({0})',
+    'journey.importedClients': '{0} client(s) added to the board',
+    'journey.importedNone': 'Your clients were already on the board',
+    'journey.empty': 'No stages yet. Create the first one or restore the default journey.',
+    'journey.emptyColumn': 'No cards',
+    'journey.restoreDefaults': 'Restore default journey',
+    'journey.restored': 'Default journey restored',
+    'journey.restoreConfirm': 'This will replace your current stages and cards with the default journey. Continue?',
+    'journey.color': 'Color',
+    'journey.stage': 'Stage',
+    'journey.newStage': 'New stage',
+    'journey.editStage': 'Edit stage',
+    'journey.stageName': 'Stage name',
+    'journey.stageNamePh': 'e.g. Proposal sent',
+    'journey.stageNameRequired': 'Give the stage a name',
+    'journey.moveLeft': 'Move left',
+    'journey.moveRight': 'Move right',
+    'journey.minOneStage': 'At least one stage must remain',
+    'journey.deleteStage': 'Delete stage',
+    'journey.deleteStageBody': 'This stage has {0} card(s). Choose where to move them (or delete them).',
+    'journey.moveCardsTo': 'Move cards to',
+    'journey.deleteCardsToo': 'Delete the cards too',
+    'journey.needStageFirst': 'Create a stage first',
+    'journey.newCard': 'New card',
+    'journey.editCard': 'Edit card',
+    'journey.cardName': 'Name',
+    'journey.cardNamePh': 'Client or person',
+    'journey.cardNameRequired': 'Give the card a name',
+    'journey.cardNote': 'Note (optional)',
+    'journey.cardNotePh': 'Context, next step, reminder…',
+    'journey.deleteCardConfirm': 'Delete this card?',
     /* ── Footer ── */
     'footer.madeWith': 'Made with love by meowrhino.studio',
   },
@@ -1708,6 +1780,42 @@ const LANGS = {
     'guide.data.intro': '<p>La teva privacitat és sagrada. Per defecte, Trackr funciona <strong>sense compte i sense servidor</strong>: tot viu al teu navegador i tu decideixes quan exportar-lo o importar-lo. Si actives la sincronització al núvol (opcional), les teves dades es xifren al teu dispositiu abans de pujar-se, amb <strong>xifrat de coneixement zero</strong>: ni nosaltres ni el servidor podem llegir-les.</p>',
     'guide.data.body': '<ul><li><strong>Exportar</strong> (⤓): descarrega el teu fitxer de guardat .json amb tots els teus projectes, hores, despeses i configuració.</li><li><strong>Importar</strong> (⤒): carrega un .json per restaurar o moure les teves dades a un altre navegador.</li><li><strong>Dades d\'exemple</strong>: a la pantalla de benvinguda pots carregar 3 perfils de prova (traductora, música, formador) per explorar Trackr abans d\'usar-lo amb les teves dades reals.</li></ul><div class="guide-tip">Fes backups regulars exportant el teu fitxer. Si canvies de navegador o esborres dades, necessitaràs el .json per recuperar-ho tot.</div>',
 
+    /* ── Customer Journey ── */
+    'nav.journey': 'Journey',
+    'journey.subtitle': 'Col·loca cada client a la fase de la relació on és. Arrossega les targetes entre columnes per moure-les, o toca’n una per editar-la.',
+    'journey.addStage': 'Afegir estadi',
+    'journey.addCard': 'Afegir',
+    'journey.importClients': 'Portar els meus clients ({0})',
+    'journey.importedClients': '{0} client(s) afegits al tauler',
+    'journey.importedNone': 'Els teus clients ja eren al tauler',
+    'journey.empty': 'Encara no hi ha estadis. Crea el primer o restaura el journey per defecte.',
+    'journey.emptyColumn': 'Sense targetes',
+    'journey.restoreDefaults': 'Restaurar journey per defecte',
+    'journey.restored': 'Journey per defecte restaurat',
+    'journey.restoreConfirm': 'Això reemplaçarà els teus estadis i targetes actuals pel journey per defecte. Continuar?',
+    'journey.color': 'Color',
+    'journey.stage': 'Estadi',
+    'journey.newStage': 'Nou estadi',
+    'journey.editStage': 'Editar estadi',
+    'journey.stageName': 'Nom de l’estadi',
+    'journey.stageNamePh': 'Ex. Proposta enviada',
+    'journey.stageNameRequired': 'Posa un nom a l’estadi',
+    'journey.moveLeft': 'Moure a l’esquerra',
+    'journey.moveRight': 'Moure a la dreta',
+    'journey.minOneStage': 'Ha de quedar almenys un estadi',
+    'journey.deleteStage': 'Eliminar estadi',
+    'journey.deleteStageBody': 'Aquest estadi té {0} targeta/es. Tria on moure-les (o esborra-les).',
+    'journey.moveCardsTo': 'Moure les targetes a',
+    'journey.deleteCardsToo': 'Esborrar també les targetes',
+    'journey.needStageFirst': 'Crea primer un estadi',
+    'journey.newCard': 'Nova targeta',
+    'journey.editCard': 'Editar targeta',
+    'journey.cardName': 'Nom',
+    'journey.cardNamePh': 'Client o persona',
+    'journey.cardNameRequired': 'Posa un nom a la targeta',
+    'journey.cardNote': 'Nota (opcional)',
+    'journey.cardNotePh': 'Context, següent pas, recordatori…',
+    'journey.deleteCardConfirm': 'Eliminar aquesta targeta?',
     /* ── Footer ── */
     'footer.madeWith': 'Fet amb estima per meowrhino.studio',
   }
@@ -1813,7 +1921,7 @@ function setLang(code) {
 function _updateNav() {
   const map = {
     info: 'nav.info', dash: 'nav.projects', cal: 'nav.calendar',
-    gas: 'nav.expenses', cfg: 'nav.config', guide: 'nav.guide'
+    gas: 'nav.expenses', jrn: 'nav.journey', cfg: 'nav.config', guide: 'nav.guide'
   };
   document.querySelectorAll('.ni[data-v]').forEach(el => {
     const v = el.dataset.v;
@@ -1843,6 +1951,9 @@ function _updateNav() {
   if (gasTitle) gasTitle.textContent = t('nav.expenses');
   const gasBtn = document.querySelector('#vGas .bt-p');
   if (gasBtn) gasBtn.textContent = t('btn.newExpense');
+
+  const jrnTitle = document.querySelector('#vJrn .pt');
+  if (jrnTitle) jrnTitle.textContent = t('nav.journey');
 
   const cfgTitle = document.querySelector('#vCfg .pt');
   if (cfgTitle) cfgTitle.textContent = t('nav.config');

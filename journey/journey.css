@@ -1,0 +1,107 @@
+/* ================================================
+ * Journey — widget kanban de customer journey (standalone)
+ * Reutilizable fuera de trackr: usa variables CSS con
+ * fallback, así funciona aunque no exista variables.css.
+ * Todas las clases van prefijadas con .jrn- para no chocar.
+ * ================================================ */
+
+.jrn-root{
+  --jbg:var(--bg,#111);--jbg2:var(--bg2,#191919);--jbg3:var(--bg3,#222);--jbg4:var(--bg4,#2a2a2a);
+  --jb1:var(--b1,#262626);--jb2:var(--b2,#333);
+  --jt1:var(--t1,#ccc);--jt2:var(--t2,#888);--jt3:var(--t3,#555);
+  --jac:var(--ac,#5a9);--jbad:var(--bad,#c55);
+  --jr:var(--r,3px);--jtr:var(--tr,.15s ease);
+  --jfont:var(--font,'Outfit',system-ui,sans-serif);
+  --jmono:var(--mono,'DM Mono',ui-monospace,monospace);
+  color:var(--jt1);font-family:var(--jfont);
+}
+
+/* ── Barra de acciones + subtítulo ── */
+.jrn-sub{font-size:.82rem;color:var(--jt2);line-height:1.45;margin:0 0 1.25rem;max-width:62ch}
+.jrn-bar{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-bottom:1.25rem}
+
+/* ── Botones propios ── */
+.jrn-bt{padding:.45rem 1rem;border-radius:var(--jr);border:1px solid var(--jb1);background:var(--jbg2);color:var(--jt1);font-family:var(--jfont);font-size:.82rem;cursor:pointer;transition:all var(--jtr);display:inline-flex;align-items:center;gap:.4rem}
+.jrn-bt:hover{border-color:var(--jb2);background:var(--jbg3)}
+.jrn-bt-p{background:var(--jac);border-color:var(--jac);color:#fff}
+.jrn-bt-p:hover{filter:brightness(1.15)}
+.jrn-bt-d{border-color:var(--jbad);color:var(--jbad);background:transparent}
+.jrn-bt-d:hover{background:color-mix(in srgb,var(--jbad) 10%,transparent)}
+
+/* ── Tablero: fila de columnas con scroll horizontal ── */
+.jrn-board{display:flex;gap:.85rem;overflow-x:auto;padding-bottom:1rem;align-items:flex-start;scroll-snap-type:x proximity}
+.jrn-board::-webkit-scrollbar{height:8px}
+.jrn-board::-webkit-scrollbar-thumb{background:var(--jb2);border-radius:4px}
+
+/* ── Columna (estadio) ── */
+.jrn-col{flex:0 0 264px;width:264px;background:var(--jbg2);border:1px solid var(--jb1);border-top:3px solid var(--stage-color,var(--jb2));border-radius:var(--jr);display:flex;flex-direction:column;max-height:calc(100vh - 220px);scroll-snap-align:start;transition:background var(--jtr),box-shadow var(--jtr)}
+.jrn-col.drag-over{background:var(--jbg3);box-shadow:inset 0 0 0 2px var(--stage-color,var(--jac))}
+.jrn-col-hd{display:flex;align-items:center;gap:.45rem;padding:.7rem .75rem .5rem}
+.jrn-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;background:var(--stage-color,var(--jb2))}
+.jrn-col-name{font-size:.85rem;font-weight:500;color:var(--jt1);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.jrn-col-count{font-family:var(--jmono);font-size:.7rem;color:var(--jt3);background:var(--jbg3);border-radius:10px;padding:.05rem .45rem;flex-shrink:0}
+
+/* Acciones de columna (aparecen al hover) */
+.jrn-col-actions{display:flex;gap:.1rem;opacity:0;transition:opacity var(--jtr)}
+.jrn-col:hover .jrn-col-actions,.jrn-col:focus-within .jrn-col-actions{opacity:1}
+.jrn-ica{background:none;border:none;color:var(--jt3);cursor:pointer;font-size:.85rem;line-height:1;padding:.2rem .3rem;border-radius:var(--jr);transition:color var(--jtr),background var(--jtr)}
+.jrn-ica:hover{color:var(--jt1);background:var(--jbg4)}
+.jrn-ica:disabled{opacity:.25;cursor:not-allowed}
+.jrn-ica-d:hover{color:var(--jbad)}
+
+/* Cuerpo de la columna (zona de drop) */
+.jrn-col-body{display:flex;flex-direction:column;gap:.5rem;padding:.25rem .6rem .6rem;overflow-y:auto;flex:1;min-height:54px}
+.jrn-col-empty{font-size:.72rem;color:var(--jt3);text-align:center;padding:.9rem .5rem;border:1px dashed var(--jb2);border-radius:var(--jr);opacity:.7}
+
+/* ── Tarjeta ── */
+.jrn-card{background:var(--jbg3);border:1px solid var(--jb1);border-left:3px solid var(--card-color,var(--jb2));border-radius:var(--jr);padding:.55rem .65rem;cursor:grab;transition:background var(--jtr),border-color var(--jtr)}
+.jrn-card:hover{background:var(--jbg4);border-color:var(--jb2)}
+.jrn-card:active{cursor:grabbing}
+.jrn-card.dragging{opacity:.45}
+.jrn-card-n{font-size:.85rem;color:var(--jt1);font-weight:500;line-height:1.3}
+.jrn-card-note{font-size:.74rem;color:var(--jt3);line-height:1.35;margin-top:.2rem;white-space:pre-wrap;word-break:break-word}
+
+.jrn-add{margin:.1rem .6rem .6rem;padding:.4rem;border:1px dashed var(--jb2);background:transparent;color:var(--jt3);border-radius:var(--jr);font-family:var(--jfont);font-size:.78rem;cursor:pointer;transition:all var(--jtr);width:calc(100% - 1.2rem)}
+.jrn-add:hover{border-color:var(--jt2);color:var(--jt1);background:var(--jbg3)}
+
+/* Columna fantasma "añadir estadio" */
+.jrn-col-ghost{flex:0 0 200px;width:200px;border:1px dashed var(--jb2);background:transparent;border-radius:var(--jr);color:var(--jt3);min-height:120px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.82rem;transition:all var(--jtr)}
+.jrn-col-ghost:hover{border-color:var(--jt2);color:var(--jt1);background:var(--jbg2)}
+
+/* ── Empty state ── */
+.jrn-es{text-align:center;padding:2.5rem 1rem;color:var(--jt3)}
+.jrn-es .jrn-es-ic{font-size:1.8rem;margin-bottom:.5rem;opacity:.3}
+.jrn-es .jrn-es-tx{font-size:.88rem}
+
+/* ── Modal propio ── */
+.jrn-modal-bg{position:fixed;inset:0;background:color-mix(in srgb,var(--jbg) 75%,transparent);display:flex;align-items:center;justify-content:center;z-index:1000;padding:2rem;opacity:0;pointer-events:none;transition:opacity var(--jtr)}
+.jrn-modal-bg.on{opacity:1;pointer-events:all}
+.jrn-modal{background:var(--jbg2);border:1px solid var(--jb1);border-radius:var(--jr);padding:1.75rem;width:100%;max-width:460px;max-height:85vh;overflow-y:auto}
+.jrn-mt{font-size:1.1rem;font-weight:500;margin-bottom:1.25rem;color:var(--jt1)}
+.jrn-p{font-size:.85rem;color:var(--jt2);line-height:1.5;margin-bottom:1rem}
+.jrn-ma{display:flex;justify-content:flex-end;gap:.5rem;margin-top:1.25rem}
+
+/* Formulario propio */
+.jrn-fg{margin-bottom:.85rem}
+.jrn-label{font-size:.75rem;color:var(--jt3);display:block;margin-bottom:.25rem;text-transform:uppercase;letter-spacing:.04em}
+.jrn-input,.jrn-select,.jrn-textarea{font-family:var(--jfont);font-size:.85rem;background:var(--jbg3);border:1px solid var(--jb1);border-radius:var(--jr);color:var(--jt1);padding:.5rem .7rem;transition:border-color var(--jtr);width:100%}
+.jrn-input:focus,.jrn-select:focus,.jrn-textarea:focus{outline:none;border-color:var(--jac)}
+.jrn-textarea{resize:vertical;min-height:70px}
+.jrn-select{cursor:pointer}
+
+/* Color picker propio */
+.jrn-cs-hd{display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem}
+.jrn-cs-dot{width:20px;height:20px;border-radius:var(--jr);flex-shrink:0;border:1px solid var(--jb2)}
+.jrn-cs-lbl{font-size:.78rem;color:var(--jt2)}
+.jrn-cs-grid{display:flex;flex-wrap:wrap;gap:3px;max-height:120px;overflow-y:auto;padding:2px}
+.jrn-cs-sw{width:18px;height:18px;border-radius:3px;cursor:pointer;border:2px solid transparent;transition:transform .1s,border-color .1s;flex-shrink:0}
+.jrn-cs-sw:hover{transform:scale(1.35);z-index:1;border-color:var(--jt1)}
+.jrn-cs-sw.on{border-color:var(--jt1);transform:scale(1.25)}
+
+/* ── Mobile ── */
+@media(max-width:768px){
+  .jrn-col,.jrn-col-ghost{flex-basis:80vw;width:80vw;max-width:300px}
+  .jrn-col{max-height:none}
+  .jrn-col-body{overflow:visible}
+  .jrn-col-actions{opacity:1}
+}
