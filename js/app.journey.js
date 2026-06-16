@@ -2,29 +2,40 @@
  * TRACKR — App: Customer Journey (adaptador del widget)
  *
  * La lógica del tablero vive en el widget reutilizable journey/journey.js
- * (global `Journey`). Este archivo solo lo conecta con trackr:
- *  - le pasa los datos (D.d.journey) y el guardado (D.save)
- *  - traduce sus textos con t() y le da la paleta W3C
- *  - añade acciones propias de trackr (traer clientes, restaurar por defecto)
+ * (global `Journey`). Este archivo lo conecta con trackr en MODO PROYECTO:
  *
- * Extiende el objeto global App. Dependencias: app.js, store.js, lang.js,
- * colors.js (W3C_COLORS), toast.js, y journey/journey.js (cargado antes).
+ *  - Las tarjetas se construyen desde los proyectos reales (D.ps()).
+ *  - La columna donde está cada tarjeta = p.journeyStage (fase de producción),
+ *    un eje aparte del `estado` (Activo/Completado…), que no se toca aquí.
+ *  - Arrastrar una tarjeta sincroniza p.journeyStage.
+ *  - Tocar una tarjeta abre el detalle del proyecto.
+ *  - Los estadios (columnas) siguen siendo editables y viven en D.d.journey.stages.
+ *
+ * El widget sigue siendo genérico/reutilizable; el cruce con proyectos se hace
+ * aquí vía hooks (onCardClick, onChange, showAddCard:false).
+ *
+ * Extiende App. Dependencias: app.js, store.js, lang.js, colors.js (W3C_COLORS),
+ * utils.js (clienteName, EST), toast.js, y journey/journey.js (cargado antes).
  * ================================================ */
 Object.assign(App, {
 
   rJourney() {
     const el = document.getElementById('jrnC');
     if (!el || typeof Journey === 'undefined') return;
+
+    const data = this._jData();
     if (this._jb) {
-      this._jb.setData(D.d.journey);
+      this._jb.setData(data);
       this._jb.strings = Object.assign({}, Journey.DEFAULT_STRINGS, this._jStrings());
       this._jb.actions = this._jActions();
       this._jb.emptyActions = this._jEmptyActions();
       this._jb.render();
     } else {
       this._jb = Journey.mount(el, {
-        data: D.d.journey,
-        onChange: (d) => { D.d.journey = d; D.save(); },
+        data,
+        onChange: (d) => this._jSync(d),
+        onCardClick: (id) => this.go('det', id),
+        showAddCard: false,
         colors: Object.values(W3C_COLORS).flat(),
         strings: this._jStrings(),
         actions: this._jActions(),
@@ -37,6 +48,38 @@ Object.assign(App, {
         }
       });
     }
+  },
+
+  /** Construye los datos del widget: estadios + una tarjeta por proyecto. */
+  _jData() {
+    const stages = D.jStages();
+    const first = stages.length ? stages[0].id : null;
+    const valid = new Set(stages.map(s => s.id));
+    const cards = D.ps().map(p => ({
+      id: p.id,
+      nombre: p.nombre,
+      nota: this._jCardNota(p),
+      color: p.color || 'CornflowerBlue',
+      stageId: (p.journeyStage && valid.has(p.journeyStage)) ? p.journeyStage : first
+    }));
+    return { stages, cards };
+  },
+
+  /** Subtítulo de tarjeta: cliente · estado (los dos ejes de un vistazo). */
+  _jCardNota(p) {
+    const cn = clienteName(p);
+    const est = (typeof EST !== 'undefined' && EST[p.estado]) ? EST[p.estado] : (p.estado || '');
+    return cn ? (cn + (est ? ' · ' + est : '')) : est;
+  },
+
+  /** Persiste lo que cambia el widget: definiciones de columna + fase de cada proyecto. */
+  _jSync(d) {
+    D.d.journey.stages = d.stages;
+    (d.cards || []).forEach(c => {
+      const p = D.p(c.id);
+      if (p && p.journeyStage !== c.stageId) p.journeyStage = c.stageId;
+    });
+    D.save();
   },
 
   /** Mapea las claves i18n de trackr a los textos del widget */
@@ -55,41 +98,30 @@ Object.assign(App, {
     return out;
   },
 
-  /** Botones extra de la barra (visibles siempre) */
+  /** Botón extra de la barra: crear proyecto (aparece en "Primer contacto"). */
   _jActions() {
-    const n = D.cls().length;
-    return n ? [{ label: t('journey.importClients', n), onClick: () => this.jImportClients() }] : [];
+    return [{ label: t('btn.newProject'), onClick: () => this.pModal() }];
   },
 
-  /** Botones extra del estado vacío */
+  /** Botón del estado vacío: restaurar los estadios por defecto. */
   _jEmptyActions() {
     return [{ label: t('journey.restoreDefaults'), onClick: () => this.jRestoreDefaults() }];
   },
 
-  /** Crea una tarjeta por cada cliente de trackr (snapshot, no enlazado). */
-  jImportClients() {
-    const stages = D.jStages();
-    if (!stages.length) { Toast.error(t('journey.needStageFirst')); return; }
-    const firstStage = stages[0].id;
-    const existing = new Set(D.jCards().map(c => c.nombre.trim().toLowerCase()));
-    let added = 0;
-    D.cls().forEach(cl => {
-      const key = cl.nombre.trim().toLowerCase();
-      if (existing.has(key)) return;
-      existing.add(key);
-      D.addJCard({ id: uid(), nombre: cl.nombre, nota: '', color: cl.color || 'CornflowerBlue', stageId: firstStage });
-      added++;
-    });
-    this._jb.setData(D.d.journey).render();
-    added ? Toast.ok(t('journey.importedClients', added)) : Toast.info(t('journey.importedNone'));
-  },
-
-  /** Restaura el journey por defecto (reemplaza estadios y tarjetas). */
+  /** Restaura los estadios (columnas) por defecto y recoloca proyectos huérfanos. */
   jRestoreDefaults() {
-    if (D.jCards().length && !confirm(t('journey.restoreConfirm'))) return;
-    D.d.journey = D._seedJourney();
+    D.d.journey.stages = D._seedJourney().stages;
+    const stages = D.jStages();
+    const valid = new Set(stages.map(s => s.id));
+    const first = stages.length ? stages[0].id : null;
+    const last = stages.length ? stages[stages.length - 1].id : null;
+    D.ps().forEach(p => {
+      if (first && (!p.journeyStage || !valid.has(p.journeyStage))) {
+        p.journeyStage = (p.estado === 'completado') ? last : first;
+      }
+    });
     D.save();
-    this._jb.setData(D.d.journey).render();
+    this.rJourney();
     Toast.ok(t('journey.restored'));
   }
 

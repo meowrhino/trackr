@@ -73,6 +73,11 @@
     this.actions = opts.actions || [];
     this.emptyActions = opts.emptyActions || [];
     this.notify = typeof opts.notify === 'function' ? opts.notify : function (m) { try { alert(m); } catch (e) {} };
+    /* Hooks opcionales para integrar tarjetas gestionadas por fuera (p.ej. proyectos):
+       - onCardClick(id): al tocar una tarjeta (en vez de abrir el modal de edición)
+       - showAddCard=false: oculta el botón "+ Añadir" de cada columna */
+    this.onCardClick = typeof opts.onCardClick === 'function' ? opts.onCardClick : null;
+    this.showAddCard = opts.showAddCard !== false;
     this._dragId = null;
     this._overCol = null;
     this._overlay = null;
@@ -163,7 +168,7 @@
       + '<div class="jrn-col-body">'
       +   (cards.length ? cards.map(function (c) { return self._card(c); }).join('') : '<div class="jrn-col-empty">' + esc(this.t('emptyColumn')) + '</div>')
       + '</div>'
-      + '<button class="jrn-add" data-act="add-card" data-stage="' + esc(stage.id) + '">+ ' + esc(this.t('addCard')) + '</button>'
+      + (this.showAddCard ? '<button class="jrn-add" data-act="add-card" data-stage="' + esc(stage.id) + '">+ ' + esc(this.t('addCard')) + '</button>' : '')
       + '</div>';
   };
 
@@ -189,7 +194,7 @@
       else if (act === 'del-stage') self.deleteStage(t.getAttribute('data-id'));
       else if (act === 'move-stage') self.moveStage(t.getAttribute('data-id'), parseInt(t.getAttribute('data-dir'), 10));
       else if (act === 'add-card') self.cardModal(null, t.getAttribute('data-stage'));
-      else if (act === 'edit-card') self.cardModal(t.getAttribute('data-id'));
+      else if (act === 'edit-card') { if (self.onCardClick) self.onCardClick(t.getAttribute('data-id')); else self.cardModal(t.getAttribute('data-id')); }
       else if (act === 'action') { var a = self.actions[+t.getAttribute('data-idx')]; if (a && a.onClick) a.onClick(); }
       else if (act === 'empty-action') { var ea = self.emptyActions[+t.getAttribute('data-idx')]; if (ea && ea.onClick) ea.onClick(); }
     });

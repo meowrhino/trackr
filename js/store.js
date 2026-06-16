@@ -96,6 +96,11 @@ const D = {
         if (!validStage.has(c.stageId)) c.stageId = d.journey.stages[0].id;
       });
     }
+    /* Refs de estadios para asignar la fase de journey a cada proyecto (abajo) */
+    const _jStages = d.journey.stages;
+    const _jFirst = _jStages.length ? _jStages[0].id : null;
+    const _jLast = _jStages.length ? _jStages[_jStages.length - 1].id : null;
+    const _jValid = new Set(_jStages.map(s => s.id));
     /* Migrar deducibles: año → fecha */
     d.deducibles.forEach(dd => {
       if (dd.año && !dd.fecha) dd.fecha = `${dd.año}-01-01`;
@@ -167,6 +172,14 @@ const D = {
       /* Flags por defecto */
       if (p.interno == null) p.interno = false;
       if (p.recurrente == null) p.recurrente = false;
+
+      /* Customer journey: fase de producción (eje aparte del estado).
+         Completados → última fase; el resto → primera. Reasigna si apunta
+         a un estadio borrado. */
+      if (_jFirst) {
+        if (p.journeyStage == null) p.journeyStage = (p.estado === 'completado') ? _jLast : _jFirst;
+        else if (!_jValid.has(p.journeyStage)) p.journeyStage = _jFirst;
+      }
 
       /* Campos de facturación v2 */
       if (p.facturacion) {

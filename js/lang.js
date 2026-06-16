@@ -581,7 +581,7 @@ const LANGS = {
     'guide.data.body': '<ul><li><strong>Exportar</strong> (⤓): descarga tu archivo de guardado .json con todos tus proyectos, horas, gastos y configuración.</li><li><strong>Importar</strong> (⤒): carga un .json para restaurar o mover tus datos a otro navegador.</li><li><strong>Datos de ejemplo</strong>: en la pantalla de bienvenida puedes cargar 3 perfiles de prueba (traductora, música, formador) para explorar Trackr antes de usarlo con tus datos reales.</li></ul><div class="guide-tip">Haz backups regulares exportando tu archivo. Si cambias de navegador o borras datos, necesitarás el .json para recuperar todo.</div>',
     /* ── Customer Journey ── */
     'nav.journey': 'Journey',
-    'journey.subtitle': 'Coloca a cada cliente en la fase de la relación en la que está. Arrastra las tarjetas entre columnas para moverlas, o toca una para editarla.',
+    'journey.subtitle': 'Cada tarjeta es un proyecto. Arrástralo a su fase de producción, o tócalo para abrir su detalle. El estado del proyecto (Activo, Completado…) se gestiona aparte.',
     'journey.addStage': 'Añadir estadio',
     'journey.addCard': 'Añadir',
     'journey.importClients': 'Traer mis clientes ({0})',
@@ -1181,7 +1181,7 @@ const LANGS = {
     'guide.data.body': '<ul><li><strong>Export</strong> (⤓): download your .json save file with all your projects, hours, expenses and settings.</li><li><strong>Import</strong> (⤒): load a .json to restore or move your data to another browser.</li><li><strong>Sample data</strong>: on the welcome screen you can load 3 test profiles (translator, musician, trainer) to explore Trackr before using your real data.</li></ul><div class="guide-tip">Make regular backups by exporting your file. If you switch browsers or clear data, you\'ll need the .json to recover everything.</div>',
     /* ── Customer Journey ── */
     'nav.journey': 'Journey',
-    'journey.subtitle': 'Place each client in the stage of the relationship they’re at. Drag cards between columns to move them, or tap one to edit it.',
+    'journey.subtitle': 'Each card is a project. Drag it to its production stage, or tap it to open its detail. The project status (Active, Completed…) is managed separately.',
     'journey.addStage': 'Add stage',
     'journey.addCard': 'Add',
     'journey.importClients': 'Bring my clients ({0})',
@@ -1782,7 +1782,7 @@ const LANGS = {
 
     /* ── Customer Journey ── */
     'nav.journey': 'Journey',
-    'journey.subtitle': 'Col·loca cada client a la fase de la relació on és. Arrossega les targetes entre columnes per moure-les, o toca’n una per editar-la.',
+    'journey.subtitle': 'Cada targeta és un projecte. Arrossega’l a la seva fase de producció, o toca’l per obrir-ne el detall. L’estat del projecte (Actiu, Completat…) es gestiona a part.',
     'journey.addStage': 'Afegir estadi',
     'journey.addCard': 'Afegir',
     'journey.importClients': 'Portar els meus clients ({0})',
