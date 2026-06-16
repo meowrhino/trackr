@@ -621,6 +621,13 @@ const LANGS = {
     'journey.allShown': 'Todos tus proyectos ya están en el journey',
     'journey.added': 'Añadido al journey',
     'journey.removed': 'Quitado del journey',
+    /* ── Indicador de guardado (pie del sidebar) ── */
+    'saved.never': 'Aún sin guardar',
+    'saved.unknown': 'Guardado',
+    'saved.now': 'Guardado ahora mismo',
+    'saved.mins': 'Guardado hace {0} min',
+    'saved.hours': 'Guardado hace {0} h',
+    'saved.days': 'Guardado hace {0} d',
     /* ── Footer ── */
     'footer.madeWith': 'Hecho con cariño por meowrhino.studio',
   },
@@ -1227,6 +1234,13 @@ const LANGS = {
     'journey.allShown': 'All your projects are already on the journey',
     'journey.added': 'Added to the journey',
     'journey.removed': 'Removed from the journey',
+    /* ── Save indicator (sidebar footer) ── */
+    'saved.never': 'Not saved yet',
+    'saved.unknown': 'Saved',
+    'saved.now': 'Saved just now',
+    'saved.mins': 'Saved {0} min ago',
+    'saved.hours': 'Saved {0} h ago',
+    'saved.days': 'Saved {0} d ago',
     /* ── Footer ── */
     'footer.madeWith': 'Made with love by meowrhino.studio',
   },
@@ -1834,6 +1848,13 @@ const LANGS = {
     'journey.allShown': 'Tots els teus projectes ja són al journey',
     'journey.added': 'Afegit al journey',
     'journey.removed': 'Tret del journey',
+    /* ── Indicador de desat (peu del sidebar) ── */
+    'saved.never': 'Encara sense desar',
+    'saved.unknown': 'Desat',
+    'saved.now': 'Desat ara mateix',
+    'saved.mins': 'Desat fa {0} min',
+    'saved.hours': 'Desat fa {0} h',
+    'saved.days': 'Desat fa {0} d',
     /* ── Footer ── */
     'footer.madeWith': 'Fet amb estima per meowrhino.studio',
   }
@@ -1976,6 +1997,5 @@ function _updateNav() {
   const cfgTitle = document.querySelector('#vCfg .pt');
   if (cfgTitle) cfgTitle.textContent = t('nav.config');
 
-  const footMade = document.getElementById('footMade');
-  if (footMade) footMade.textContent = t('footer.madeWith');
+  if (typeof App !== 'undefined' && App._renderSaved) App._renderSaved();
 }

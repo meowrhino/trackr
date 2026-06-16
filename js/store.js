@@ -8,11 +8,13 @@
 
 const D = {
   d: null,
+  lastSaved: null,   /* timestamp (ms) del último guardado; persiste en trackr_saved_at */
 
   /* ── Inicialización ── */
 
   /** Carga datos de localStorage. Devuelve true si había datos. */
   init() {
+    this.lastSaved = parseInt(localStorage.getItem('trackr_saved_at'), 10) || null;
     const raw = localStorage.getItem('trackr_data');
     if (raw) {
       try {
@@ -298,6 +300,9 @@ const D = {
   save() {
     try {
       localStorage.setItem('trackr_data', JSON.stringify(this.d));
+      this.lastSaved = Date.now();
+      try { localStorage.setItem('trackr_saved_at', String(this.lastSaved)); } catch (e) { /* cuota: el timestamp es prescindible */ }
+      if (typeof App !== 'undefined' && App._renderSaved) App._renderSaved();
     } catch (e) {
       if (typeof Toast !== 'undefined') Toast.error('Error al guardar: ' + (e.name === 'QuotaExceededError' ? 'almacenamiento lleno' : e.message));
       console.error('D.save() failed:', e);

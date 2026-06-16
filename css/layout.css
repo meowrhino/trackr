@@ -29,9 +29,7 @@
 .sync-status.err .sync-dot{background:var(--bad)}
 .sync-status.syncing .sync-dot{background:var(--ac);animation:syncPulse 1s ease-in-out infinite}
 @keyframes syncPulse{0%,100%{opacity:.25}50%{opacity:1}}
-.sb-foot{padding:.75rem 1.25rem 1rem;font-size:.72rem;line-height:1.5}
-.sb-foot a{color:var(--t3);text-decoration:none;display:block}
-.sb-foot a:hover{color:var(--t1)}
+.sb-foot{padding:.75rem 1.25rem 1rem;font-size:.72rem;line-height:1.5;color:var(--t3)}
 
 /* ── Main content ── */
 .mc{flex:1;margin-left:200px;padding:2rem 2.5rem;min-height:100vh}

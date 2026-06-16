@@ -71,8 +71,39 @@ const App = {
     this._maybeWelcome();
     if (typeof Acc !== 'undefined') { Acc.detectLocked(); if (this.refreshAccountNav) this.refreshAccountNav(); }
 
-    /* Línea "ahora" del calendario: reposicionar cada minuto sin re-renderizar */
-    setInterval(() => this._tickNow(), 60000);
+    /* Indicador "Guardado hace…" en el pie del sidebar */
+    this._renderSaved();
+
+    /* Cada minuto: reposicionar la línea "ahora" del calendario y refrescar el "Guardado hace…" */
+    setInterval(() => { this._tickNow(); this._renderSaved(); }, 60000);
+  },
+
+  /** Formato relativo del último guardado (i18n) */
+  _fmtSaved(ts) {
+    const sec = Math.max(0, Math.floor((Date.now() - ts) / 1000));
+    if (sec < 45) return t('saved.now');
+    const min = Math.round(sec / 60);
+    if (min < 60) return t('saved.mins', min);
+    const h = Math.round(min / 60);
+    if (h < 24) return t('saved.hours', h);
+    return t('saved.days', Math.round(h / 24));
+  },
+
+  /** Pinta "Guardado hace…" en el pie del sidebar (con la fecha exacta en el title) */
+  _renderSaved() {
+    const el = document.getElementById('footSaved');
+    if (!el) return;
+    const ts = D.lastSaved;
+    if (!ts) {
+      /* Sin timestamp: distinguir usuario con datos previos (guardado en sesión
+         anterior, hora desconocida) de uno realmente sin nada. */
+      const hasData = D.d && ((D.d.projects || []).length || (D.d.clientes || []).length || (D.d.gastos || []).length);
+      el.textContent = t(hasData ? 'saved.unknown' : 'saved.never');
+      el.removeAttribute('title');
+      return;
+    }
+    el.textContent = this._fmtSaved(ts);
+    try { el.title = new Date(ts).toLocaleString(typeof currentLocale === 'function' ? currentLocale() : 'es-ES'); } catch (e) { /* noop */ }
   },
 
   /** Aplica tema e idioma guardados en settings (con fallbacks legacy tema/idioma) */
