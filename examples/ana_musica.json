@@ -226,7 +226,8 @@
           "horaInicio": "19:00"
         }
       ],
-      "notas": "EP de 3 tracks: pop electrònic. Cobro parcial: 50% al començar, 50% al entregar master. Gran èxit!"
+      "notas": "EP de 3 tracks: pop electrònic. Cobro parcial: 50% al començar, 50% al entregar master. Gran èxit!",
+      "journeyStage": "jst-mescla"
     },
     {
       "id": "p302-m2m2-n2n2",
@@ -301,7 +302,8 @@
           "horaInicio": "20:00"
         }
       ],
-      "notas": "Concert acústic + banda. IVA reduït 10% (espectacles en viu)."
+      "notas": "Concert acústic + banda. IVA reduït 10% (espectacles en viu).",
+      "journeyStage": "jst-entrega"
     },
     {
       "id": "p303-m3m3-n3n3",
@@ -400,7 +402,8 @@
           "horaInicio": "21:00"
         }
       ],
-      "notas": "Actuació festival estiu. IVA 10%. Pagament a 30 dies post-event."
+      "notas": "Actuació festival estiu. IVA 10%. Pagament a 30 dies post-event.",
+      "journeyStage": "jst-publicat"
     },
     {
       "id": "p304-m4m4-n4n4",
@@ -467,7 +470,8 @@
           "horaInicio": "18:00"
         }
       ],
-      "notas": "Concert + masterclass de producció musical per joves."
+      "notas": "Concert + masterclass de producció musical per joves.",
+      "journeyStage": "jst-mescla"
     },
     {
       "id": "p305-m5m5-n5n5",
@@ -640,7 +644,8 @@
           "horaInicio": "22:00"
         }
       ],
-      "notas": "Catàleg propi de beats. Tancat juny 2028 — massa feina de clients. Ingressos passius via Beatstars."
+      "notas": "Catàleg propi de beats. Tancat juny 2028 — massa feina de clients. Ingressos passius via Beatstars.",
+      "journeyStage": "jst-entrega"
     },
     {
       "id": "p306-m6m6-n6n6",
@@ -1037,7 +1042,8 @@
           "monto": 60
         }
       ],
-      "notas": "Classes particulars de producció musical. Tarifa puja a 40€/h des de set 2026. Fins a 3 alumnes simultanis."
+      "notas": "Classes particulars de producció musical. Tarifa puja a 40€/h des de set 2026. Fins a 3 alumnes simultanis.",
+      "journeyStage": "jst-contacte"
     },
     {
       "id": "p307-m7m7-n7n7",
@@ -1213,7 +1219,8 @@
           "horaInicio": "19:00"
         }
       ],
-      "notas": "Àlbum complet 10 tracks. Cantautor electrònic. Recomanat per Samantha Vega. Gran producció."
+      "notas": "Àlbum complet 10 tracks. Cantautor electrònic. Recomanat per Samantha Vega. Gran producció.",
+      "journeyStage": "jst-publicat"
     },
     {
       "id": "p308-m8m8-n8n8",
@@ -1490,7 +1497,8 @@
           "horaInicio": "23:00"
         }
       ],
-      "notas": "Residència mensual Sala Apolo. 500€/mes → 600€/mes des de set 2028. Finalitza juny 2029 per excés de feina."
+      "notas": "Residència mensual Sala Apolo. 500€/mes → 600€/mes des de set 2028. Finalitza juny 2029 per excés de feina.",
+      "journeyStage": "jst-mescla"
     },
     {
       "id": "p309-m9m9-n9n9",
@@ -1573,7 +1581,8 @@
           "horaInicio": "21:00"
         }
       ],
-      "notas": "Segon any al Cruïlla. Escenari més gran, slot de 90 min. 2500€."
+      "notas": "Segon any al Cruïlla. Escenari més gran, slot de 90 min. 2500€.",
+      "journeyStage": "jst-entrega"
     },
     {
       "id": "p310-m10m-n10n",
@@ -1672,7 +1681,8 @@
           "horaInicio": "11:00"
         }
       ],
-      "notas": "Taller producció musical per joves (14-18 anys). 6 sessions estiu. Subvenció Ajuntament Girona."
+      "notas": "Taller producció musical per joves (14-18 anys). 6 sessions estiu. Subvenció Ajuntament Girona.",
+      "journeyStage": "jst-publicat"
     },
     {
       "id": "p311-m11m-n11n",
@@ -1808,7 +1818,8 @@
           "horaInicio": "12:00"
         }
       ],
-      "notas": "Primer àlbum per Llum Records. Artista: Noa Serra. Pop indie, 8 tracks."
+      "notas": "Primer àlbum per Llum Records. Artista: Noa Serra. Pop indie, 8 tracks.",
+      "journeyStage": "jst-mescla"
     },
     {
       "id": "p312-m12m-n12n",
@@ -1899,7 +1910,8 @@
           "horaInicio": "20:00"
         }
       ],
-      "notas": "Tercer Cruïlla. Doble funció: actuació + sound design escenari electrònic. 3000€."
+      "notas": "Tercer Cruïlla. Doble funció: actuació + sound design escenari electrònic. 3000€.",
+      "journeyStage": "jst-entrega"
     },
     {
       "id": "p313-m13m-n13n",
@@ -2019,7 +2031,8 @@
           "horaInicio": "11:00"
         }
       ],
-      "notas": "Primer encàrrec Netflix — via contacte Llum Records. Soundtrack curt documental sobre música urbana BCN. 8000€!"
+      "notas": "Primer encàrrec Netflix — via contacte Llum Records. Soundtrack curt documental sobre música urbana BCN. 8000€!",
+      "journeyStage": "jst-publicat"
     },
     {
       "id": "p314-m14m-n14n",
@@ -2123,7 +2136,8 @@
           "horaInicio": "20:00"
         }
       ],
-      "notas": "Lot de singles per artistes Llum 2028. 3 singles + 1 remix."
+      "notas": "Lot de singles per artistes Llum 2028. 3 singles + 1 remix.",
+      "journeyStage": "jst-mescla"
     },
     {
       "id": "p315-m15m-n15n",
@@ -2182,7 +2196,8 @@
           "horaInicio": "17:00"
         }
       ],
-      "notas": "Masterclass sobre producció electrònica. IVA exempt per formació."
+      "notas": "Masterclass sobre producció electrònica. IVA exempt per formació.",
+      "journeyStage": "jst-entrega"
     },
     {
       "id": "p316-m16m-n16n",
@@ -2265,7 +2280,8 @@
           "horaInicio": "22:00"
         }
       ],
-      "notas": "Primera actuació al Primavera Sound. Escenari electrònic. 3000€. Gran fita!"
+      "notas": "Primera actuació al Primavera Sound. Escenari electrònic. 3000€. Gran fita!",
+      "journeyStage": "jst-publicat"
     },
     {
       "id": "p317-m17m-n17n",
@@ -2406,7 +2422,8 @@
           "horaInicio": "11:00"
         }
       ],
-      "notas": "Segon Netflix — sèrie documental 4 episodis sobre cultura mediterrània. 12.000€. Gran projecte!"
+      "notas": "Segon Netflix — sèrie documental 4 episodis sobre cultura mediterrània. 12.000€. Gran projecte!",
+      "journeyStage": "jst-mescla"
     },
     {
       "id": "p318-m18m-n18n",
@@ -2497,7 +2514,8 @@
           "horaInicio": "22:00"
         }
       ],
-      "notas": "Quart any al Cruïlla. Headliner escenari electrònic! 3500€."
+      "notas": "Quart any al Cruïlla. Headliner escenari electrònic! 3500€.",
+      "journeyStage": "jst-entrega"
     },
     {
       "id": "p319-m19m-n19n",
@@ -2612,7 +2630,8 @@
           "horaInicio": "09:00"
         }
       ],
-      "notas": "Gran àlbum per l'artista estrella de Llum Records. 12 tracks. 6000€. La producció més gran fins ara."
+      "notas": "Gran àlbum per l'artista estrella de Llum Records. 12 tracks. 6000€. La producció més gran fins ara.",
+      "journeyStage": "jst-proposta"
     },
     {
       "id": "p320-m20m-n20n",
@@ -2673,7 +2692,8 @@
           "horaInicio": "15:00"
         }
       ],
-      "notas": "Segon Primavera Sound. Escenari més gran. 4000€. Puja de caché!"
+      "notas": "Segon Primavera Sound. Escenari més gran. 4000€. Puja de caché!",
+      "journeyStage": "jst-preprod"
     },
     {
       "id": "p321-m21m-n21n",
@@ -2764,7 +2784,8 @@
           "horaInicio": "09:00"
         }
       ],
-      "notas": "Tercer Netflix — llargmetratge documental. 15.000€. Consolidació com a compositora audiovisual."
+      "notas": "Tercer Netflix — llargmetratge documental. 15.000€. Consolidació com a compositora audiovisual.",
+      "journeyStage": "jst-gravacio"
     }
   ],
   "gastos": [
@@ -4678,5 +4699,45 @@
     "nif": "43987654K",
     "direccion1": "Carrer de Verdi 78, 2n 1a",
     "direccion2": "08012 Barcelona"
+  },
+  "journey": {
+    "stages": [
+      {
+        "id": "jst-contacte",
+        "nombre": "Contacte",
+        "color": "SkyBlue"
+      },
+      {
+        "id": "jst-proposta",
+        "nombre": "Proposta",
+        "color": "Goldenrod"
+      },
+      {
+        "id": "jst-preprod",
+        "nombre": "Preproducció",
+        "color": "MediumPurple"
+      },
+      {
+        "id": "jst-gravacio",
+        "nombre": "Gravació",
+        "color": "Orchid"
+      },
+      {
+        "id": "jst-mescla",
+        "nombre": "Mescla i màster",
+        "color": "LightSeaGreen"
+      },
+      {
+        "id": "jst-entrega",
+        "nombre": "Entrega",
+        "color": "MediumSeaGreen"
+      },
+      {
+        "id": "jst-publicat",
+        "nombre": "Publicat",
+        "color": "DeepPink"
+      }
+    ],
+    "cards": []
   }
 }

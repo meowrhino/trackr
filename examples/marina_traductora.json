@@ -172,7 +172,8 @@
           "horaInicio": "11:00"
         }
       ],
-      "notas": "Catálogo completo de cosméticos naturales. 48 fichas + textos institucionales."
+      "notas": "Catálogo completo de cosméticos naturales. 48 fichas + textos institucionales.",
+      "journeyStage": "jst-revision"
     },
     {
       "id": "p202-o3o3-p4p4",
@@ -429,7 +430,8 @@
           "monto": 60
         }
       ],
-      "notas": "SaaS de gestión para pymes. Localización continua DE→ES via Crowdin. Facturación mensual por horas. Primer año completado."
+      "notas": "SaaS de gestión para pymes. Localización continua DE→ES via Crowdin. Facturación mensual por horas. Primer año completado.",
+      "journeyStage": "jst-entregado"
     },
     {
       "id": "p203-q5q5-r6r6",
@@ -664,7 +666,8 @@
           "horaInicio": "09:00"
         }
       ],
-      "notas": "2 artículos SEO/mes (~1000 palabras cada uno). 600€/mes fijo. Temática branding y diseño. Contrato año 1 completado."
+      "notas": "2 artículos SEO/mes (~1000 palabras cada uno). 600€/mes fijo. Temática branding y diseño. Contrato año 1 completado.",
+      "journeyStage": "jst-cobrado"
     },
     {
       "id": "p204-s7s7-t8t8",
@@ -851,7 +854,8 @@
           "horaInicio": "11:00"
         }
       ],
-      "notas": "Novela italiana contemporánea, IT→ES. ~280 páginas. IVA reducido 4% por ser traducción literaria. Pausada por revisión editorial, retomada en abril."
+      "notas": "Novela italiana contemporánea, IT→ES. ~280 páginas. IVA reducido 4% por ser traducción literaria. Pausada por revisión editorial, retomada en abril.",
+      "journeyStage": "jst-revision"
     },
     {
       "id": "p205-u9u9-v0v0",
@@ -1014,7 +1018,8 @@
           "horaInicio": "10:00"
         }
       ],
-      "notas": "Redacción de copy para Instagram y TikTok. 12 posts/mes + stories puntuales. 450€/mes. Año 1 completado."
+      "notas": "Redacción de copy para Instagram y TikTok. 12 posts/mes + stories puntuales. 450€/mes. Año 1 completado.",
+      "journeyStage": "jst-entregado"
     },
     {
       "id": "p206-w1w1-x2x2",
@@ -1105,7 +1110,8 @@
           "horaInicio": "14:00"
         }
       ],
-      "notas": "Traducción web completa ES→FR para expansión a Francia. Precio cerrado 950€."
+      "notas": "Traducción web completa ES→FR para expansión a Francia. Precio cerrado 950€.",
+      "journeyStage": "jst-cobrado"
     },
     {
       "id": "p207-y3y3-z4z4",
@@ -1276,7 +1282,8 @@
           "horaInicio": "17:00"
         }
       ],
-      "notas": "Mantenimiento de memorias de traducción y glosarios terminológicos. Inversión en productividad."
+      "notas": "Mantenimiento de memorias de traducción y glosarios terminológicos. Inversión en productividad.",
+      "journeyStage": "jst-contacto"
     },
     {
       "id": "p208-a5a5-b6b6",
@@ -1335,7 +1342,8 @@
           "horaInicio": "09:00"
         }
       ],
-      "notas": "Empresa cerró operaciones inesperadamente. 8h trabajadas sin cobrar."
+      "notas": "Empresa cerró operaciones inesperadamente. 8h trabajadas sin cobrar.",
+      "journeyStage": "jst-presupuesto"
     },
     {
       "id": "p209-c7c7-d8d8",
@@ -1434,7 +1442,8 @@
           "horaInicio": "14:00"
         }
       ],
-      "notas": "Catálogo premium de vinos del Priorat para exportación. 35 fichas + textos web + tasting notes."
+      "notas": "Catálogo premium de vinos del Priorat para exportación. 35 fichas + textos web + tasting notes.",
+      "journeyStage": "jst-revision"
     },
     {
       "id": "p210-e9e9-f0f0",
@@ -1667,7 +1676,8 @@
           "monto": 67.5
         }
       ],
-      "notas": "Segundo año TechBridge. Añadido FR como segundo idioma. Tarifa subió a 45€/h."
+      "notas": "Segundo año TechBridge. Añadido FR como segundo idioma. Tarifa subió a 45€/h.",
+      "journeyStage": "jst-entregado"
     },
     {
       "id": "p211-g1g1-h2h2",
@@ -1894,7 +1904,8 @@
           "horaInicio": "09:00"
         }
       ],
-      "notas": "Renovación blog Naranjo. Mismo formato 2 posts/mes a 600€/mes."
+      "notas": "Renovación blog Naranjo. Mismo formato 2 posts/mes a 600€/mes.",
+      "journeyStage": "jst-cobrado"
     },
     {
       "id": "p212-i3i3-j4j4",
@@ -2065,7 +2076,8 @@
           "horaInicio": "11:00"
         }
       ],
-      "notas": "Segunda novela IT→ES para Mediterráneo. 350 páginas, más compleja. La primera novela recibió excelentes reseñas."
+      "notas": "Segunda novela IT→ES para Mediterráneo. 350 páginas, más compleja. La primera novela recibió excelentes reseñas.",
+      "journeyStage": "jst-revision"
     },
     {
       "id": "p213-k5k5-l6l6",
@@ -2361,7 +2373,8 @@
           "monto": 168
         }
       ],
-      "notas": "App de salud digital noruega. Localización continua NO→ES, y desde 2028 también NO→CA. Segundo cliente internacional más estable."
+      "notas": "App de salud digital noruega. Localización continua NO→ES, y desde 2028 también NO→CA. Segundo cliente internacional más estable.",
+      "journeyStage": "jst-presupuesto"
     },
     {
       "id": "p214-m7m7-n8n8",
@@ -2603,7 +2616,8 @@
           "monto": 200
         }
       ],
-      "notas": "Tercer año+ TechBridge. Tarifa 50€/h. Subcontrata parte del volumen FR a partir de 2028. Cliente más estable."
+      "notas": "Tercer año+ TechBridge. Tarifa 50€/h. Subcontrata parte del volumen FR a partir de 2028. Cliente más estable.",
+      "journeyStage": "jst-traduciendo"
     },
     {
       "id": "p215-o9o9-p0p0",
@@ -2782,7 +2796,8 @@
           "horaInicio": "09:00"
         }
       ],
-      "notas": "Blog Naranjo año 3. Reducido a 1 post/mes (350€/mes) porque contrataron redactor interno parcial. Finaliza junio 2029."
+      "notas": "Blog Naranjo año 3. Reducido a 1 post/mes (350€/mes) porque contrataron redactor interno parcial. Finaliza junio 2029.",
+      "journeyStage": "jst-entregado"
     },
     {
       "id": "p216-q1q1-r2r2",
@@ -3009,7 +3024,8 @@
           "horaInicio": "14:00"
         }
       ],
-      "notas": "RRSS Solera años 2-3. Subida a 500€/mes. Finaliza sep 2028: Solera contrata community manager propio."
+      "notas": "RRSS Solera años 2-3. Subida a 500€/mes. Finaliza sep 2028: Solera contrata community manager propio.",
+      "journeyStage": "jst-cobrado"
     },
     {
       "id": "p217-s3s3-t4t4",
@@ -3084,7 +3100,8 @@
           "horaInicio": "18:00"
         }
       ],
-      "notas": "Web profesional marinacrespo.com. Portfolio, servicios, blog. Inversión en marca personal."
+      "notas": "Web profesional marinacrespo.com. Portfolio, servicios, blog. Inversión en marca personal.",
+      "journeyStage": "jst-revision"
     },
     {
       "id": "p218-u5u5-v6v6",
@@ -3231,7 +3248,8 @@
           "horaInicio": "11:00"
         }
       ],
-      "notas": "Libro de no-ficción: gastronomía italiana. IT→ES. 250 páginas + recetas + glosario. IVA 4% literario."
+      "notas": "Libro de no-ficción: gastronomía italiana. IT→ES. 250 páginas + recetas + glosario. IVA 4% literario.",
+      "journeyStage": "jst-entregado"
     },
     {
       "id": "p219-w7w7-x8x8",
@@ -3362,7 +3380,8 @@
           "horaInicio": "10:00"
         }
       ],
-      "notas": "Subcontrata para traducción institucional EU. Documentos de política digital + regulación IA + sostenibilidad. EN→ES y EN→FR. Exento IVA intracomunitario."
+      "notas": "Subcontrata para traducción institucional EU. Documentos de política digital + regulación IA + sostenibilidad. EN→ES y EN→FR. Exento IVA intracomunitario.",
+      "journeyStage": "jst-cobrado"
     },
     {
       "id": "p220-y9y9-z0z0",
@@ -3477,7 +3496,8 @@
           "horaInicio": "17:00"
         }
       ],
-      "notas": "Mentoría gratuita para traductores junior. 1-2 sesiones/mes. Devolviendo a la comunidad."
+      "notas": "Mentoría gratuita para traductores junior. 1-2 sesiones/mes. Devolviendo a la comunidad.",
+      "journeyStage": "jst-revision"
     },
     {
       "id": "p221-a1a1-b2b2",
@@ -3584,7 +3604,8 @@
           "horaInicio": "09:00"
         }
       ],
-      "notas": "Segundo proyecto EU-Translate. Regulación IA ampliada. 10.000€. EN→ES y EN→FR. Mayor que el primero."
+      "notas": "Segundo proyecto EU-Translate. Regulación IA ampliada. 10.000€. EN→ES y EN→FR. Mayor que el primero.",
+      "journeyStage": "jst-contacto"
     },
     {
       "id": "p222-c3c3-d4d4",
@@ -3683,7 +3704,8 @@
           "horaInicio": "08:30"
         }
       ],
-      "notas": "Cuarta traducción literaria para Mediterráneo. Novela negra IT→ES, 320 págs. 7000€. Marina se ha convertido en su traductora de referencia."
+      "notas": "Cuarta traducción literaria para Mediterráneo. Novela negra IT→ES, 320 págs. 7000€. Marina se ha convertido en su traductora de referencia.",
+      "journeyStage": "jst-presupuesto"
     }
   ],
   "gastos": [
@@ -4430,7 +4452,7 @@
           "nota": "",
           "total": 293,
           "iva": 0,
-          "base": 293.0,
+          "base": 293,
           "tipoIva": 0
         },
         {
@@ -4440,7 +4462,7 @@
           "nota": "",
           "total": 293,
           "iva": 0,
-          "base": 293.0,
+          "base": 293,
           "tipoIva": 0
         },
         {
@@ -4450,7 +4472,7 @@
           "nota": "",
           "total": 293,
           "iva": 0,
-          "base": 293.0,
+          "base": 293,
           "tipoIva": 0
         },
         {
@@ -4460,7 +4482,7 @@
           "nota": "",
           "total": 293,
           "iva": 0,
-          "base": 293.0,
+          "base": 293,
           "tipoIva": 0
         },
         {
@@ -4470,7 +4492,7 @@
           "nota": "",
           "total": 293,
           "iva": 0,
-          "base": 293.0,
+          "base": 293,
           "tipoIva": 0
         },
         {
@@ -4480,7 +4502,7 @@
           "nota": "",
           "total": 293,
           "iva": 0,
-          "base": 293.0,
+          "base": 293,
           "tipoIva": 0
         },
         {
@@ -4490,7 +4512,7 @@
           "nota": "",
           "total": 293,
           "iva": 0,
-          "base": 293.0,
+          "base": 293,
           "tipoIva": 0
         },
         {
@@ -4500,7 +4522,7 @@
           "nota": "",
           "total": 293,
           "iva": 0,
-          "base": 293.0,
+          "base": 293,
           "tipoIva": 0
         },
         {
@@ -4510,7 +4532,7 @@
           "nota": "",
           "total": 293,
           "iva": 0,
-          "base": 293.0,
+          "base": 293,
           "tipoIva": 0
         },
         {
@@ -4520,7 +4542,7 @@
           "nota": "",
           "total": 293,
           "iva": 0,
-          "base": 293.0,
+          "base": 293,
           "tipoIva": 0
         },
         {
@@ -4530,7 +4552,7 @@
           "nota": "",
           "total": 293,
           "iva": 0,
-          "base": 293.0,
+          "base": 293,
           "tipoIva": 0
         },
         {
@@ -4540,7 +4562,7 @@
           "nota": "",
           "total": 293,
           "iva": 0,
-          "base": 293.0,
+          "base": 293,
           "tipoIva": 0
         },
         {
@@ -4550,7 +4572,7 @@
           "nota": "",
           "total": 293,
           "iva": 0,
-          "base": 293.0,
+          "base": 293,
           "tipoIva": 0
         },
         {
@@ -4560,7 +4582,7 @@
           "nota": "",
           "total": 293,
           "iva": 0,
-          "base": 293.0,
+          "base": 293,
           "tipoIva": 0
         },
         {
@@ -4570,7 +4592,7 @@
           "nota": "",
           "total": 293,
           "iva": 0,
-          "base": 293.0,
+          "base": 293,
           "tipoIva": 0
         },
         {
@@ -4580,7 +4602,7 @@
           "nota": "Subida cuota",
           "total": 320,
           "iva": 0,
-          "base": 320.0,
+          "base": 320,
           "tipoIva": 0
         },
         {
@@ -4590,7 +4612,7 @@
           "nota": "",
           "total": 320,
           "iva": 0,
-          "base": 320.0,
+          "base": 320,
           "tipoIva": 0
         },
         {
@@ -4600,7 +4622,7 @@
           "nota": "",
           "total": 320,
           "iva": 0,
-          "base": 320.0,
+          "base": 320,
           "tipoIva": 0
         },
         {
@@ -4610,7 +4632,7 @@
           "nota": "",
           "total": 320,
           "iva": 0,
-          "base": 320.0,
+          "base": 320,
           "tipoIva": 0
         },
         {
@@ -4620,7 +4642,7 @@
           "nota": "",
           "total": 320,
           "iva": 0,
-          "base": 320.0,
+          "base": 320,
           "tipoIva": 0
         },
         {
@@ -4630,7 +4652,7 @@
           "nota": "",
           "total": 320,
           "iva": 0,
-          "base": 320.0,
+          "base": 320,
           "tipoIva": 0
         },
         {
@@ -4640,7 +4662,7 @@
           "nota": "",
           "total": 320,
           "iva": 0,
-          "base": 320.0,
+          "base": 320,
           "tipoIva": 0
         },
         {
@@ -4650,7 +4672,7 @@
           "nota": "",
           "total": 320,
           "iva": 0,
-          "base": 320.0,
+          "base": 320,
           "tipoIva": 0
         },
         {
@@ -4660,7 +4682,7 @@
           "nota": "",
           "total": 320,
           "iva": 0,
-          "base": 320.0,
+          "base": 320,
           "tipoIva": 0
         },
         {
@@ -4670,7 +4692,7 @@
           "nota": "",
           "total": 320,
           "iva": 0,
-          "base": 320.0,
+          "base": 320,
           "tipoIva": 0
         },
         {
@@ -4680,7 +4702,7 @@
           "nota": "",
           "total": 320,
           "iva": 0,
-          "base": 320.0,
+          "base": 320,
           "tipoIva": 0
         },
         {
@@ -4690,7 +4712,7 @@
           "nota": "",
           "total": 320,
           "iva": 0,
-          "base": 320.0,
+          "base": 320,
           "tipoIva": 0
         },
         {
@@ -4700,7 +4722,7 @@
           "nota": "Tramo superior por ingresos",
           "total": 350,
           "iva": 0,
-          "base": 350.0,
+          "base": 350,
           "tipoIva": 0
         },
         {
@@ -4710,7 +4732,7 @@
           "nota": "",
           "total": 350,
           "iva": 0,
-          "base": 350.0,
+          "base": 350,
           "tipoIva": 0
         },
         {
@@ -4720,7 +4742,7 @@
           "nota": "",
           "total": 350,
           "iva": 0,
-          "base": 350.0,
+          "base": 350,
           "tipoIva": 0
         },
         {
@@ -4730,7 +4752,7 @@
           "nota": "",
           "total": 350,
           "iva": 0,
-          "base": 350.0,
+          "base": 350,
           "tipoIva": 0
         },
         {
@@ -4740,7 +4762,7 @@
           "nota": "",
           "total": 350,
           "iva": 0,
-          "base": 350.0,
+          "base": 350,
           "tipoIva": 0
         },
         {
@@ -4750,7 +4772,7 @@
           "nota": "",
           "total": 350,
           "iva": 0,
-          "base": 350.0,
+          "base": 350,
           "tipoIva": 0
         },
         {
@@ -4760,7 +4782,7 @@
           "nota": "",
           "total": 350,
           "iva": 0,
-          "base": 350.0,
+          "base": 350,
           "tipoIva": 0
         },
         {
@@ -4770,7 +4792,7 @@
           "nota": "",
           "total": 350,
           "iva": 0,
-          "base": 350.0,
+          "base": 350,
           "tipoIva": 0
         },
         {
@@ -4780,7 +4802,7 @@
           "nota": "",
           "total": 350,
           "iva": 0,
-          "base": 350.0,
+          "base": 350,
           "tipoIva": 0
         },
         {
@@ -4790,7 +4812,7 @@
           "nota": "",
           "total": 350,
           "iva": 0,
-          "base": 350.0,
+          "base": 350,
           "tipoIva": 0
         },
         {
@@ -4800,7 +4822,7 @@
           "nota": "",
           "total": 350,
           "iva": 0,
-          "base": 350.0,
+          "base": 350,
           "tipoIva": 0
         },
         {
@@ -4810,7 +4832,7 @@
           "nota": "",
           "total": 350,
           "iva": 0,
-          "base": 350.0,
+          "base": 350,
           "tipoIva": 0
         },
         {
@@ -4820,7 +4842,7 @@
           "nota": "Subida 2029",
           "total": 380,
           "iva": 0,
-          "base": 380.0,
+          "base": 380,
           "tipoIva": 0
         },
         {
@@ -4830,7 +4852,7 @@
           "nota": "",
           "total": 380,
           "iva": 0,
-          "base": 380.0,
+          "base": 380,
           "tipoIva": 0
         },
         {
@@ -4840,7 +4862,7 @@
           "nota": "",
           "total": 380,
           "iva": 0,
-          "base": 380.0,
+          "base": 380,
           "tipoIva": 0
         },
         {
@@ -4850,7 +4872,7 @@
           "nota": "",
           "total": 380,
           "iva": 0,
-          "base": 380.0,
+          "base": 380,
           "tipoIva": 0
         },
         {
@@ -4860,7 +4882,7 @@
           "nota": "",
           "total": 380,
           "iva": 0,
-          "base": 380.0,
+          "base": 380,
           "tipoIva": 0
         },
         {
@@ -4870,7 +4892,7 @@
           "nota": "",
           "total": 380,
           "iva": 0,
-          "base": 380.0,
+          "base": 380,
           "tipoIva": 0
         },
         {
@@ -4880,7 +4902,7 @@
           "nota": "",
           "total": 380,
           "iva": 0,
-          "base": 380.0,
+          "base": 380,
           "tipoIva": 0
         },
         {
@@ -4890,7 +4912,7 @@
           "nota": "",
           "total": 380,
           "iva": 0,
-          "base": 380.0,
+          "base": 380,
           "tipoIva": 0
         },
         {
@@ -4900,7 +4922,7 @@
           "nota": "",
           "total": 380,
           "iva": 0,
-          "base": 380.0,
+          "base": 380,
           "tipoIva": 0
         },
         {
@@ -4910,7 +4932,7 @@
           "nota": "",
           "total": 380,
           "iva": 0,
-          "base": 380.0,
+          "base": 380,
           "tipoIva": 0
         },
         {
@@ -4920,7 +4942,7 @@
           "nota": "",
           "total": 380,
           "iva": 0,
-          "base": 380.0,
+          "base": 380,
           "tipoIva": 0
         },
         {
@@ -4930,7 +4952,7 @@
           "nota": "",
           "total": 380,
           "iva": 0,
-          "base": 380.0,
+          "base": 380,
           "tipoIva": 0
         },
         {
@@ -4940,7 +4962,7 @@
           "nota": "Subida 2030",
           "total": 410,
           "iva": 0,
-          "base": 410.0,
+          "base": 410,
           "tipoIva": 0
         },
         {
@@ -4950,7 +4972,7 @@
           "nota": "",
           "total": 410,
           "iva": 0,
-          "base": 410.0,
+          "base": 410,
           "tipoIva": 0
         },
         {
@@ -4960,7 +4982,7 @@
           "nota": "",
           "total": 410,
           "iva": 0,
-          "base": 410.0,
+          "base": 410,
           "tipoIva": 0
         },
         {
@@ -4970,7 +4992,7 @@
           "nota": "",
           "total": 410,
           "iva": 0,
-          "base": 410.0,
+          "base": 410,
           "tipoIva": 0
         },
         {
@@ -4980,7 +5002,7 @@
           "nota": "",
           "total": 410,
           "iva": 0,
-          "base": 410.0,
+          "base": 410,
           "tipoIva": 0
         },
         {
@@ -4990,7 +5012,7 @@
           "nota": "",
           "total": 410,
           "iva": 0,
-          "base": 410.0,
+          "base": 410,
           "tipoIva": 0
         }
       ]
@@ -5735,5 +5757,40 @@
     },
     "nextFacturaNum": 26,
     "tema": "monokai"
+  },
+  "journey": {
+    "stages": [
+      {
+        "id": "jst-contacto",
+        "nombre": "Contacto",
+        "color": "SkyBlue"
+      },
+      {
+        "id": "jst-presupuesto",
+        "nombre": "Presupuesto",
+        "color": "Goldenrod"
+      },
+      {
+        "id": "jst-traduciendo",
+        "nombre": "Traduciendo",
+        "color": "MediumPurple"
+      },
+      {
+        "id": "jst-revision",
+        "nombre": "Revisión",
+        "color": "Orchid"
+      },
+      {
+        "id": "jst-entregado",
+        "nombre": "Entregado",
+        "color": "MediumSeaGreen"
+      },
+      {
+        "id": "jst-cobrado",
+        "nombre": "Cobrado",
+        "color": "DeepPink"
+      }
+    ],
+    "cards": []
   }
 }

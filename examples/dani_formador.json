@@ -164,7 +164,8 @@
           "horaInicio": "15:00"
         }
       ],
-      "notas": "2-day intensive React workshop for 15 senior devs. Includes hands-on exercises."
+      "notas": "2-day intensive React workshop for 15 senior devs. Includes hands-on exercises.",
+      "journeyStage": "jst-materials"
     },
     {
       "id": "p402-m2m2-n2n2",
@@ -307,7 +308,8 @@
           "horaInicio": "14:00"
         }
       ],
-      "notas": "Monthly agile coaching sessions for Glovo product managers. 6-month program."
+      "notas": "Monthly agile coaching sessions for Glovo product managers. 6-month program.",
+      "journeyStage": "jst-running"
     },
     {
       "id": "p403-m3m3-n3n3",
@@ -360,7 +362,8 @@
           "horaInicio": "19:00"
         }
       ],
-      "notas": "Free community talk at BarcelonaJS meetup. Good for networking + brand."
+      "notas": "Free community talk at BarcelonaJS meetup. Good for networking + brand.",
+      "journeyStage": "jst-closed"
     },
     {
       "id": "p404-m4m4-n4n4",
@@ -419,7 +422,8 @@
           "horaInicio": "10:00"
         }
       ],
-      "notas": "Guest lecture at UPC master's program. IVA-exempt (educational)."
+      "notas": "Guest lecture at UPC master's program. IVA-exempt (educational).",
+      "journeyStage": "jst-materials"
     },
     {
       "id": "p405-m5m5-n5n5",
@@ -510,7 +514,8 @@
           "horaInicio": "15:00"
         }
       ],
-      "notas": "4-session web dev bootcamp for job seekers. Public funding, IVA exempt."
+      "notas": "4-session web dev bootcamp for job seekers. Public funding, IVA exempt.",
+      "journeyStage": "jst-running"
     },
     {
       "id": "p406-m6m6-n6n6",
@@ -683,7 +688,8 @@
           "horaInicio": "09:00"
         }
       ],
-      "notas": "\"Modern React from Zero\" — Udemy course. Revenue tracked outside Trackr (Udemy pays monthly)."
+      "notas": "\"Modern React from Zero\" — Udemy course. Revenue tracked outside Trackr (Udemy pays monthly).",
+      "journeyStage": "jst-contact"
     },
     {
       "id": "p407-a1a1-b1b1",
@@ -801,7 +807,8 @@
           "horaInicio": "11:00"
         }
       ],
-      "notas": "Follow-up to Agile for PMs. Deeper dive for the same Glovo team, más técnico."
+      "notas": "Follow-up to Agile for PMs. Deeper dive for the same Glovo team, más técnico.",
+      "journeyStage": "jst-closed"
     },
     {
       "id": "p408-a2a2-b2b2",
@@ -884,7 +891,8 @@
           "horaInicio": "09:00"
         }
       ],
-      "notas": "First engagement with CaixaBank Tech. 20 developers, enfocado en patterns para banca digital."
+      "notas": "First engagement with CaixaBank Tech. 20 developers, enfocado en patterns para banca digital.",
+      "journeyStage": "jst-materials"
     },
     {
       "id": "p409-a3a3-b3b3",
@@ -983,7 +991,8 @@
           "horaInicio": "15:00"
         }
       ],
-      "notas": "Fall bootcamp — expanded to 5 sessions based on spring feedback. IVA exempt."
+      "notas": "Fall bootcamp — expanded to 5 sessions based on spring feedback. IVA exempt.",
+      "journeyStage": "jst-running"
     },
     {
       "id": "p410-a4a4-b4b4",
@@ -1042,7 +1051,8 @@
           "horaInicio": "09:00"
         }
       ],
-      "notas": "JSConf Barcelona — 30 min talk. Great for visibility in local community."
+      "notas": "JSConf Barcelona — 30 min talk. Great for visibility in local community.",
+      "journeyStage": "jst-closed"
     },
     {
       "id": "p411-a5a5-b5b5",
@@ -1517,7 +1527,8 @@
           "monto": 800
         }
       ],
-      "notas": "Ongoing quarterly training contract. CaixaBank's biggest frontend investment. Rate increased to 100€/h from 2028."
+      "notas": "Ongoing quarterly training contract. CaixaBank's biggest frontend investment. Rate increased to 100€/h from 2028.",
+      "journeyStage": "jst-proposal"
     },
     {
       "id": "p412-a6a6-b6b6",
@@ -1637,7 +1648,8 @@
           "horaInicio": "10:00"
         }
       ],
-      "notas": "6-month DevOps bootcamp for Vueling engineering team. 12 engineers, hands-on labs cada sesión."
+      "notas": "6-month DevOps bootcamp for Vueling engineering team. 12 engineers, hands-on labs cada sesión.",
+      "journeyStage": "jst-materials"
     },
     {
       "id": "p413-a7a7-b7b7",
@@ -1704,7 +1716,8 @@
           "horaInicio": "09:00"
         }
       ],
-      "notas": "UPC summer intensive — 2-day program for master's students. IVA exempt."
+      "notas": "UPC summer intensive — 2-day program for master's students. IVA exempt.",
+      "journeyStage": "jst-running"
     },
     {
       "id": "p414-a8a8-b8b8",
@@ -1803,7 +1816,8 @@
           "horaInicio": "15:00"
         }
       ],
-      "notas": "Spring bootcamp 2027. Mismo formato que otoño pero con TypeScript."
+      "notas": "Spring bootcamp 2027. Mismo formato que otoño pero con TypeScript.",
+      "journeyStage": "jst-closed"
     },
     {
       "id": "p415-a9a9-b9b9",
@@ -1862,7 +1876,8 @@
           "horaInicio": "09:00"
         }
       ],
-      "notas": "JSConf 2027 — invited speaker. Higher fee this year, 45 min slot."
+      "notas": "JSConf 2027 — invited speaker. Higher fee this year, 45 min slot.",
+      "journeyStage": "jst-materials"
     },
     {
       "id": "p416-b1b1-c1c1",
@@ -2027,7 +2042,8 @@
           "horaInicio": "10:00"
         }
       ],
-      "notas": "\"El Frontend\" — tech podcast in Spanish. Bimonthly episodes. Monetization TBD, currently for brand building."
+      "notas": "\"El Frontend\" — tech podcast in Spanish. Bimonthly episodes. Monetization TBD, currently for brand building.",
+      "journeyStage": "jst-design"
     },
     {
       "id": "p417-b2b2-c2c2",
@@ -2147,7 +2163,8 @@
           "horaInicio": "10:00"
         }
       ],
-      "notas": "Strategic consulting: help Vueling migrate booking frontend to React. 6-month engagement."
+      "notas": "Strategic consulting: help Vueling migrate booking frontend to React. 6-month engagement.",
+      "journeyStage": "jst-running"
     },
     {
       "id": "p418-b3b3-c3c3",
@@ -2265,7 +2282,8 @@
           "horaInicio": "14:00"
         }
       ],
-      "notas": "Remote training for N26 Barcelona team. All sessions via Zoom. IVA reverse charge (intracomunitaria)."
+      "notas": "Remote training for N26 Barcelona team. All sessions via Zoom. IVA reverse charge (intracomunitaria).",
+      "journeyStage": "jst-closed"
     },
     {
       "id": "p419-b4b4-c4c4",
@@ -2446,7 +2464,8 @@
           "horaInicio": "14:00"
         }
       ],
-      "notas": "Annual contract — 3 bootcamps (spring, summer, fall). 1800€ each. IVA exempt."
+      "notas": "Annual contract — 3 bootcamps (spring, summer, fall). 1800€ each. IVA exempt.",
+      "journeyStage": "jst-materials"
     },
     {
       "id": "p420-b5b5-c5c5",
@@ -2563,7 +2582,8 @@
           "horaInicio": "09:00"
         }
       ],
-      "notas": "\"TypeScript Masterclass: From Zero to Advanced\" — second Udemy course. Revenue tracked outside Trackr."
+      "notas": "\"TypeScript Masterclass: From Zero to Advanced\" — second Udemy course. Revenue tracked outside Trackr.",
+      "journeyStage": "jst-materials"
     },
     {
       "id": "p421-b6b6-c6c6",
@@ -2928,7 +2948,8 @@
           "monto": 120
         }
       ],
-      "notas": "1-on-1 mentoring sessions. Started with 2 mentees, grew to 4 by mid-2029. Biweekly cadence per mentee."
+      "notas": "1-on-1 mentoring sessions. Started with 2 mentees, grew to 4 by mid-2029. Biweekly cadence per mentee.",
+      "journeyStage": "jst-contact"
     },
     {
       "id": "p422-b7b7-c7c7",
@@ -3003,7 +3024,8 @@
           "horaInicio": "09:00"
         }
       ],
-      "notas": "ReactConf EU Berlin — 45 min talk. Travel expenses: flights + 2 nights hotel ~450€."
+      "notas": "ReactConf EU Berlin — 45 min talk. Travel expenses: flights + 2 nights hotel ~450€.",
+      "journeyStage": "jst-running"
     },
     {
       "id": "p423-b8b8-c8c8",
@@ -3121,7 +3143,8 @@
           "horaInicio": "14:00"
         }
       ],
-      "notas": "Extended N26 engagement — Berlin-based team. Same format as BCN training. All remote."
+      "notas": "Extended N26 engagement — Berlin-based team. Same format as BCN training. All remote.",
+      "journeyStage": "jst-closed"
     },
     {
       "id": "p424-b9b9-c9c9",
@@ -3233,7 +3256,8 @@
           "horaInicio": "10:00"
         }
       ],
-      "notas": "Second Vueling engagement — post-migration coaching. Focus on team upskilling."
+      "notas": "Second Vueling engagement — post-migration coaching. Focus on team upskilling.",
+      "journeyStage": "jst-materials"
     },
     {
       "id": "p425-c1c1-d1d1",
@@ -3414,7 +3438,8 @@
           "horaInicio": "14:00"
         }
       ],
-      "notas": "Barcelona Activa 2029 — 3 bootcamps. Added AI basics to curriculum this year."
+      "notas": "Barcelona Activa 2029 — 3 bootcamps. Added AI basics to curriculum this year.",
+      "journeyStage": "jst-running"
     },
     {
       "id": "p426-c2c2-d2d2",
@@ -3545,7 +3570,8 @@
           "horaInicio": "09:00"
         }
       ],
-      "notas": "Biggest project to date. Seat/Cupra digital transformation — training 25 engineers on modern frontend. 6-month engagement."
+      "notas": "Biggest project to date. Seat/Cupra digital transformation — training 25 engineers on modern frontend. 6-month engagement.",
+      "journeyStage": "jst-proposal"
     },
     {
       "id": "p427-c3c3-d3d3",
@@ -3620,7 +3646,8 @@
           "horaInicio": "09:00"
         }
       ],
-      "notas": "ReactConf EU 2030 — KEYNOTE speaker! Major career milestone. Travel: flights + 2 nights ~520€."
+      "notas": "ReactConf EU 2030 — KEYNOTE speaker! Major career milestone. Travel: flights + 2 nights ~520€.",
+      "journeyStage": "jst-closed"
     },
     {
       "id": "p428-c4c4-d4d4",
@@ -3711,7 +3738,8 @@
           "horaInicio": "15:00"
         }
       ],
-      "notas": "Barcelona Activa spring bootcamp 2030. New AI-first curriculum approach."
+      "notas": "Barcelona Activa spring bootcamp 2030. New AI-first curriculum approach.",
+      "journeyStage": "jst-materials"
     }
   ],
   "gastos": [
@@ -6596,5 +6624,40 @@
     "nif": "41876543J",
     "direccion1": "Carrer de Bailèn 55, 4t 2a",
     "direccion2": "08010 Barcelona"
+  },
+  "journey": {
+    "stages": [
+      {
+        "id": "jst-contact",
+        "nombre": "First contact",
+        "color": "SkyBlue"
+      },
+      {
+        "id": "jst-proposal",
+        "nombre": "Proposal",
+        "color": "Goldenrod"
+      },
+      {
+        "id": "jst-design",
+        "nombre": "Course design",
+        "color": "MediumPurple"
+      },
+      {
+        "id": "jst-materials",
+        "nombre": "Materials",
+        "color": "SandyBrown"
+      },
+      {
+        "id": "jst-running",
+        "nombre": "Running",
+        "color": "LightSeaGreen"
+      },
+      {
+        "id": "jst-closed",
+        "nombre": "Closed",
+        "color": "MediumSeaGreen"
+      }
+    ],
+    "cards": []
   }
 }
