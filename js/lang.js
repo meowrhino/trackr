@@ -615,6 +615,12 @@ const LANGS = {
     'journey.cardNote': 'Nota (opcional)',
     'journey.cardNotePh': 'Contexto, siguiente paso, recordatorio…',
     'journey.deleteCardConfirm': '¿Eliminar esta tarjeta?',
+    'journey.removeCard': 'Quitar del journey',
+    'journey.addToJourney': 'Añadir al journey',
+    'journey.pickProject': 'Proyecto',
+    'journey.allShown': 'Todos tus proyectos ya están en el journey',
+    'journey.added': 'Añadido al journey',
+    'journey.removed': 'Quitado del journey',
     /* ── Footer ── */
     'footer.madeWith': 'Hecho con cariño por meowrhino.studio',
   },
@@ -1215,6 +1221,12 @@ const LANGS = {
     'journey.cardNote': 'Note (optional)',
     'journey.cardNotePh': 'Context, next step, reminder…',
     'journey.deleteCardConfirm': 'Delete this card?',
+    'journey.removeCard': 'Remove from journey',
+    'journey.addToJourney': 'Add to journey',
+    'journey.pickProject': 'Project',
+    'journey.allShown': 'All your projects are already on the journey',
+    'journey.added': 'Added to the journey',
+    'journey.removed': 'Removed from the journey',
     /* ── Footer ── */
     'footer.madeWith': 'Made with love by meowrhino.studio',
   },
@@ -1816,6 +1828,12 @@ const LANGS = {
     'journey.cardNote': 'Nota (opcional)',
     'journey.cardNotePh': 'Context, següent pas, recordatori…',
     'journey.deleteCardConfirm': 'Eliminar aquesta targeta?',
+    'journey.removeCard': 'Treure del journey',
+    'journey.addToJourney': 'Afegir al journey',
+    'journey.pickProject': 'Projecte',
+    'journey.allShown': 'Tots els teus projectes ja són al journey',
+    'journey.added': 'Afegit al journey',
+    'journey.removed': 'Tret del journey',
     /* ── Footer ── */
     'footer.madeWith': 'Fet amb estima per meowrhino.studio',
   }

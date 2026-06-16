@@ -34,12 +34,12 @@ const D = {
       stages: [
         { id: 'jst-contacto',    nombre: 'Primer contacto',      color: 'SkyBlue' },
         { id: 'jst-presupuesto', nombre: 'Presupuesto',          color: 'Goldenrod' },
-        { id: 'jst-diseno',      nombre: 'Diseño (prototipo)',   color: 'MediumPurple' },
+        { id: 'jst-diseno',      nombre: 'Reunión de diseño',    color: 'MediumPurple' },
         { id: 'jst-disenook',    nombre: 'Diseño verificado',    color: 'Orchid' },
-        { id: 'jst-materiales',  nombre: 'Esperando materiales', color: 'SandyBrown' },
+        { id: 'jst-materiales',  nombre: 'Me envían las cosas',  color: 'SandyBrown' },
         { id: 'jst-programando', nombre: 'Programando',          color: 'LightSeaGreen' },
-        { id: 'jst-entrega',     nombre: 'Entrega',              color: 'MediumSeaGreen' },
-        { id: 'jst-publicado',   nombre: 'Publicado (post IG)',  color: 'DeepPink' }
+        { id: 'jst-entrega',     nombre: 'Reunión de entrega',   color: 'MediumSeaGreen' },
+        { id: 'jst-publicado',   nombre: 'Post de Instagram',    color: 'DeepPink' }
       ],
       cards: []
     };

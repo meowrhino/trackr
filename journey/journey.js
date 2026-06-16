@@ -54,7 +54,7 @@
     newCard: 'Nueva tarjeta', editCard: 'Editar tarjeta',
     cardName: 'Nombre', cardNamePh: 'Cliente o persona', cardNameRequired: 'Ponle un nombre a la tarjeta',
     cardNote: 'Nota (opcional)', cardNotePh: 'Contexto, siguiente paso, recordatorio…',
-    deleteCardConfirm: '¿Eliminar esta tarjeta?',
+    deleteCardConfirm: '¿Eliminar esta tarjeta?', removeCard: 'Quitar del tablero',
     save: 'Guardar', create: 'Crear', cancel: 'Cancelar', delete: 'Eliminar', edit: 'Editar'
   };
 
@@ -77,6 +77,9 @@
        - onCardClick(id): al tocar una tarjeta (en vez de abrir el modal de edición)
        - showAddCard=false: oculta el botón "+ Añadir" de cada columna */
     this.onCardClick = typeof opts.onCardClick === 'function' ? opts.onCardClick : null;
+    /* onCardRemove(id): si se define, cada tarjeta muestra una × (al hover) que
+       la llama — para "quitar del tablero" sin borrar el elemento subyacente. */
+    this.onCardRemove = typeof opts.onCardRemove === 'function' ? opts.onCardRemove : null;
     this.showAddCard = opts.showAddCard !== false;
     this._dragId = null;
     this._overCol = null;
@@ -174,7 +177,11 @@
 
   P._card = function (c) {
     var hex = this.colorHex(c.color);
+    var rm = this.onCardRemove
+      ? '<button class="jrn-card-x" data-act="remove-card" data-id="' + esc(c.id) + '" title="' + esc(this.t('removeCard')) + '">×</button>'
+      : '';
     return '<div class="jrn-card" style="--card-color:' + hex + '" draggable="true" data-card-id="' + esc(c.id) + '" data-act="edit-card" data-id="' + esc(c.id) + '">'
+      + rm
       + '<div class="jrn-card-n">' + esc(c.nombre) + '</div>'
       + (c.nota ? '<div class="jrn-card-note">' + esc(c.nota) + '</div>' : '')
       + '</div>';
@@ -194,6 +201,7 @@
       else if (act === 'del-stage') self.deleteStage(t.getAttribute('data-id'));
       else if (act === 'move-stage') self.moveStage(t.getAttribute('data-id'), parseInt(t.getAttribute('data-dir'), 10));
       else if (act === 'add-card') self.cardModal(null, t.getAttribute('data-stage'));
+      else if (act === 'remove-card') { if (self.onCardRemove) self.onCardRemove(t.getAttribute('data-id')); }
       else if (act === 'edit-card') { if (self.onCardClick) self.onCardClick(t.getAttribute('data-id')); else self.cardModal(t.getAttribute('data-id')); }
       else if (act === 'action') { var a = self.actions[+t.getAttribute('data-idx')]; if (a && a.onClick) a.onClick(); }
       else if (act === 'empty-action') { var ea = self.emptyActions[+t.getAttribute('data-idx')]; if (ea && ea.onClick) ea.onClick(); }

@@ -35,6 +35,7 @@ Object.assign(App, {
         data,
         onChange: (d) => this._jSync(d),
         onCardClick: (id) => this.go('det', id),
+        onCardRemove: (id) => this.jRemoveFromJourney(id),
         showAddCard: false,
         colors: Object.values(W3C_COLORS).flat(),
         strings: this._jStrings(),
@@ -50,12 +51,19 @@ Object.assign(App, {
     }
   },
 
-  /** Construye los datos del widget: estadios + una tarjeta por proyecto. */
+  /** ¿Se muestra este proyecto en el journey?
+   *  Por defecto solo los externos (no internos). `enJourney` (true/false) lo
+   *  fuerza manualmente: incluir un interno o excluir un externo. */
+  _jShown(p) {
+    return p.enJourney != null ? p.enJourney : !p.interno;
+  },
+
+  /** Construye los datos del widget: estadios + una tarjeta por proyecto mostrado. */
   _jData() {
     const stages = D.jStages();
     const first = stages.length ? stages[0].id : null;
     const valid = new Set(stages.map(s => s.id));
-    const cards = D.ps().map(p => ({
+    const cards = D.ps().filter(p => this._jShown(p)).map(p => ({
       id: p.id,
       nombre: p.nombre,
       nota: this._jCardNota(p),
@@ -89,7 +97,7 @@ Object.assign(App, {
       'newStage', 'editStage', 'stageName', 'stageNamePh', 'stageNameRequired',
       'moveLeft', 'moveRight', 'minOneStage', 'deleteStage', 'deleteStageBody',
       'moveCardsTo', 'deleteCardsToo', 'needStageFirst', 'newCard', 'editCard',
-      'cardName', 'cardNamePh', 'cardNameRequired', 'cardNote', 'cardNotePh', 'deleteCardConfirm'
+      'cardName', 'cardNamePh', 'cardNameRequired', 'cardNote', 'cardNotePh', 'deleteCardConfirm', 'removeCard'
     ];
     const out = {};
     k.forEach(key => { out[key] = t('journey.' + key); });
@@ -98,9 +106,47 @@ Object.assign(App, {
     return out;
   },
 
-  /** Botón extra de la barra: crear proyecto (aparece en "Primer contacto"). */
+  /** Botones extra de la barra: crear proyecto + añadir al journey (si hay ocultos). */
   _jActions() {
-    return [{ label: t('btn.newProject'), onClick: () => this.pModal() }];
+    const acts = [{ label: t('btn.newProject'), onClick: () => this.pModal() }];
+    const hidden = D.ps().filter(p => !this._jShown(p)).length;
+    if (hidden) acts.push({ label: t('journey.addToJourney') + ' (' + hidden + ')', onClick: () => this.jAddToJourney() });
+    return acts;
+  },
+
+  /** Selector para incluir manualmente un proyecto que no se muestra. */
+  jAddToJourney() {
+    const hidden = D.ps().filter(p => !this._jShown(p));
+    if (!hidden.length) { Toast.info(t('journey.allShown')); return; }
+    this.om(
+      `<div class="mt">${t('journey.addToJourney')}</div>`
+      + `<div class="fg"><label>${t('journey.pickProject')}</label><select id="jAddSel">`
+      +   hidden.map(p => `<option value="${p.id}">${esc(p.nombre)}${p.interno ? ' · ' + t('dash.flagInternal') : ''}</option>`).join('')
+      + `</select></div>`
+      + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button>`
+      +   `<button class="bt bt-p" onclick="App.jConfirmAdd()">${t('btn.add')}</button></div>`
+    );
+  },
+
+  jConfirmAdd() {
+    const id = document.getElementById('jAddSel').value;
+    const p = D.p(id);
+    if (p) {
+      p.enJourney = true;
+      if (!p.journeyStage || !D.jStage(p.journeyStage)) p.journeyStage = D.jStages()[0] ? D.jStages()[0].id : null;
+      D.save();
+    }
+    this.cm();
+    this.rJourney();
+    Toast.ok(t('journey.added'));
+  },
+
+  /** Quita un proyecto del tablero (no lo borra; marca enJourney=false). */
+  jRemoveFromJourney(id) {
+    const p = D.p(id);
+    if (p) { p.enJourney = false; D.save(); }
+    this.rJourney();
+    Toast.ok(t('journey.removed'));
   },
 
   /** Botón del estado vacío: restaurar los estadios por defecto. */

@@ -57,8 +57,11 @@
 .jrn-col-empty{font-size:.72rem;color:var(--jt3);text-align:center;padding:.9rem .5rem;border:1px dashed var(--jb2);border-radius:var(--jr);opacity:.7}
 
 /* ── Tarjeta ── */
-.jrn-card{background:var(--jbg3);border:1px solid var(--jb1);border-left:3px solid var(--card-color,var(--jb2));border-radius:var(--jr);padding:.55rem .65rem;cursor:grab;transition:background var(--jtr),border-color var(--jtr)}
+.jrn-card{position:relative;background:var(--jbg3);border:1px solid var(--jb1);border-left:3px solid var(--card-color,var(--jb2));border-radius:var(--jr);padding:.55rem .65rem;cursor:grab;transition:background var(--jtr),border-color var(--jtr)}
 .jrn-card:hover{background:var(--jbg4);border-color:var(--jb2)}
+.jrn-card-x{position:absolute;top:2px;right:3px;width:18px;height:18px;display:flex;align-items:center;justify-content:center;background:none;border:none;color:var(--jt3);font-size:1rem;line-height:1;cursor:pointer;border-radius:var(--jr);opacity:0;transition:opacity var(--jtr),color var(--jtr),background var(--jtr)}
+.jrn-card:hover .jrn-card-x{opacity:1}
+.jrn-card-x:hover{color:var(--jt1);background:var(--jbg2)}
 .jrn-card:active{cursor:grabbing}
 .jrn-card.dragging{opacity:.45}
 .jrn-card-n{font-size:.85rem;color:var(--jt1);font-weight:500;line-height:1.3}
