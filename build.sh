@@ -3,7 +3,7 @@
 # Usado por Cloudflare Workers Build (build command: `bash build.sh`) y en local.
 set -e
 rm -rf dist && mkdir -p dist
-for item in index.html css js journey vendor examples analytics navicon.png og-image.png manifest.json sw.js icon-192.png icon-512.png robots.txt sitemap.xml; do
+for item in index.html customer-journey.html css js journey vendor examples analytics navicon.png og-image.png manifest.json sw.js icon-192.png icon-512.png robots.txt sitemap.xml; do
   [ -e "$item" ] && cp -R "$item" dist/
 done
 # Bump del cache name del service worker por release (sha de git o timestamp) -> activate() purga el cache viejo
