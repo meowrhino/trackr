@@ -88,7 +88,7 @@ const D = {
     /* Verifactu (SIF no verificable): registro inmutable de facturas firmadas */
     if (!d.facturas) d.facturas = [];
     /* Customer journey (tablero kanban). Se siembra una sola vez; editable. */
-    if (!d.journey) d.journey = this._seedJourney();
+    if (!d.journey || typeof d.journey !== 'object') d.journey = this._seedJourney();
     if (!Array.isArray(d.journey.stages)) d.journey.stages = [];
     if (!Array.isArray(d.journey.cards)) d.journey.cards = [];
     /* Tarjetas huérfanas (su estadio fue borrado) → al primer estadio existente */
@@ -302,7 +302,8 @@ const D = {
       localStorage.setItem('trackr_data', JSON.stringify(this.d));
       this.lastSaved = Date.now();
       try { localStorage.setItem('trackr_saved_at', String(this.lastSaved)); } catch (e) { /* cuota: el timestamp es prescindible */ }
-      if (typeof App !== 'undefined' && App._renderSaved) App._renderSaved();
+      /* El refresco del indicador es UI no crítica: si falla, el guardado YA fue OK. */
+      try { if (typeof App !== 'undefined' && App._renderSaved) App._renderSaved(); } catch (e) { /* noop */ }
     } catch (e) {
       if (typeof Toast !== 'undefined') Toast.error('Error al guardar: ' + (e.name === 'QuotaExceededError' ? 'almacenamiento lleno' : e.message));
       console.error('D.save() failed:', e);

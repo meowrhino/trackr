@@ -89,7 +89,19 @@ Object.assign(App, {
       const p = D.p(c.id);
       if (p && p.journeyStage !== c.stageId) p.journeyStage = c.stageId;
     });
+    /* Reconciliar proyectos huérfanos (su fase fue borrada) → primera fase,
+       para que ninguno desaparezca del tablero (los proyectos nunca se borran aquí). */
+    const stages = D.jStages();
+    if (stages.length) {
+      const valid = new Set(stages.map(s => s.id));
+      const first = stages[0].id;
+      D.ps().forEach(p => { if (!p.journeyStage || !valid.has(p.journeyStage)) p.journeyStage = first; });
+    }
     D.save();
+    /* Re-sincroniza las tarjetas del widget desde la fuente real (D.ps()), para que
+       el render que el widget hace tras onChange refleje reasignaciones (p.ej. al borrar
+       un estadio con proyectos) y ninguna tarjeta desaparezca del tablero. */
+    if (this._jb) this._jb.setData(this._jData());
   },
 
   /** Mapea las claves i18n de trackr a los textos del widget */

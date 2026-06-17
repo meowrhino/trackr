@@ -332,7 +332,7 @@
     this._modalColor = current;
     var hex = this.colorHex(current);
     var sw = this.colors.map(function (c) {
-      return '<div class="jrn-cs-sw' + (c[0] === current ? ' on' : '') + '" style="background:' + c[1] + '" title="' + esc(c[0]) + '" data-act="pick-color" data-name="' + esc(c[0]) + '" data-hex="' + c[1] + '"></div>';
+      return '<div class="jrn-cs-sw' + (c[0] === current ? ' on' : '') + '" style="background:' + esc(c[1]) + '" title="' + esc(c[0]) + '" data-act="pick-color" data-name="' + esc(c[0]) + '" data-hex="' + esc(c[1]) + '"></div>';
     }).join('');
     return '<div class="jrn-cs">'
       + '<div class="jrn-cs-hd"><div class="jrn-cs-dot" data-cs-dot style="background:' + hex + '"></div><span class="jrn-cs-lbl" data-cs-lbl>' + esc(current) + '</span></div>'
@@ -401,7 +401,7 @@
       +   '<option value="__del">' + esc(this.t('deleteCardsToo')) + '</option>'
       + '</select></div>'
       + '<div class="jrn-ma"><button class="jrn-bt" data-act="close">' + esc(this.t('cancel')) + '</button>'
-      +   '<button class="jrn-bt jrn-bt-d jrn-bt-p" data-act="confirm-del-stage" data-id="' + esc(id) + '">' + esc(this.t('delete')) + '</button></div>'
+      +   '<button class="jrn-bt jrn-bt-d" data-act="confirm-del-stage" data-id="' + esc(id) + '">' + esc(this.t('delete')) + '</button></div>'
     );
   };
   P._confirmDeleteStage = function (id) {
