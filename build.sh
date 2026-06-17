@@ -6,6 +6,8 @@ rm -rf dist && mkdir -p dist
 for item in index.html customer-journey.html deck css js journey vendor examples analytics navicon.png og-image.png manifest.json sw.js icon-192.png icon-512.png robots.txt sitemap.xml; do
   [ -e "$item" ] && cp -R "$item" dist/
 done
+# No publicar las fuentes markdown del deck (solo las páginas .html)
+rm -f dist/deck/*.md 2>/dev/null || true
 # Bump del cache name del service worker por release (sha de git o timestamp) -> activate() purga el cache viejo
 if [ -f dist/sw.js ]; then
   VER="$(git rev-parse --short HEAD 2>/dev/null || date +%s)"

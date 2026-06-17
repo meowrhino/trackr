@@ -94,16 +94,33 @@ const App = {
     const el = document.getElementById('footSaved');
     if (!el) return;
     const ts = D.lastSaved;
+    let txt, title = '';
     if (!ts) {
       /* Sin timestamp: distinguir usuario con datos previos (guardado en sesión
          anterior, hora desconocida) de uno realmente sin nada. */
       const hasData = D.d && ((D.d.projects || []).length || (D.d.clientes || []).length || (D.d.gastos || []).length);
-      el.textContent = t(hasData ? 'saved.unknown' : 'saved.never');
-      el.removeAttribute('title');
+      txt = t(hasData ? 'saved.unknown' : 'saved.never');
+    } else {
+      txt = this._fmtSaved(ts);
+      try { title = new Date(ts).toLocaleString(typeof currentLocale === 'function' ? currentLocale() : 'es-ES'); } catch (e) { /* noop */ }
+    }
+    /* Punto (visible en móvil) + texto (visible en escritorio). */
+    el.innerHTML = '<span class="sv-dot"></span><span class="sv-tx">' + esc(txt) + '</span>';
+    if (title) el.title = title; else el.removeAttribute('title');
+  },
+
+  /** Tap en el indicador "Guardado": muestra la hora exacta (útil en móvil, sin hover). */
+  _savedTap() {
+    if (typeof Toast === 'undefined') return;
+    const ts = D.lastSaved;
+    if (!ts) {
+      const hasData = D.d && ((D.d.projects || []).length || (D.d.clientes || []).length || (D.d.gastos || []).length);
+      Toast.info(t(hasData ? 'saved.unknown' : 'saved.never'));
       return;
     }
-    el.textContent = this._fmtSaved(ts);
-    try { el.title = new Date(ts).toLocaleString(typeof currentLocale === 'function' ? currentLocale() : 'es-ES'); } catch (e) { /* noop */ }
+    let exact = '';
+    try { exact = new Date(ts).toLocaleString(typeof currentLocale === 'function' ? currentLocale() : 'es-ES'); } catch (e) { /* noop */ }
+    Toast.info(this._fmtSaved(ts) + (exact ? ' · ' + exact : ''));
   },
 
   /** Aplica tema e idioma guardados en settings (con fallbacks legacy tema/idioma) */

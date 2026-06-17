@@ -105,8 +105,11 @@ Object.assign(App, {
    *  MODAL PROYECTO (crear/editar)
    * ══════════════════════════════════════════════ */
 
-  pModal(eid) {
+  pModal(eid, journeyStage) {
     this._editPid = eid || null;
+    /* Fase del journey para un proyecto NUEVO creado desde una columna concreta.
+       Se resetea en cada apertura, así el alta normal (barra/dashboard) no la hereda. */
+    this._pendNewStage = journeyStage || null;
     const isE = !!eid, p = isE ? D.p(eid) : null, st = D.d.settings, cls = D.cls();
     const df = {
       nombre: p?.nombre || '', clienteId: p?.clienteId || '', color: p?.color || 'CornflowerBlue',
@@ -304,6 +307,8 @@ Object.assign(App, {
       },
       horas: prev?.horas || [], notas: document.getElementById('mpNo').value.trim()
     };
+    /* Proyecto nuevo creado desde una columna del journey → nace en esa fase */
+    if (!eid && this._pendNewStage) proj.journeyStage = this._pendNewStage;
     B.calc(proj);
     if (eid) { D.up(eid, proj); T.ev('action', 'project_edit'); } else { D.add(proj); T.ev('action', 'project_create'); }
     this.cm();

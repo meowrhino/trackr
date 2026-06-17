@@ -81,6 +81,12 @@
     /* onCardRemove(id): si se define, cada tarjeta muestra una × (al hover) que
        la llama — para "quitar del tablero" sin borrar el elemento subyacente. */
     this.onCardRemove = typeof opts.onCardRemove === 'function' ? opts.onCardRemove : null;
+    /* onAddCard(stageId): si se define, el "+ Añadir" de cada columna lo llama
+       (en vez del modal de tarjeta propio) — para crear el elemento donde toque. */
+    this.onAddCard = typeof opts.onAddCard === 'function' ? opts.onAddCard : null;
+    /* onCardMove(id, toStageId): se llama cuando una tarjeta cambia de fase
+       (arrastrando o por el menú "mover a"). */
+    this.onCardMove = typeof opts.onCardMove === 'function' ? opts.onCardMove : null;
     this.showAddCard = opts.showAddCard !== false;
     /* Vista compacta (columnas/tarjetas más estrechas). onCompactToggle(bool) para persistir fuera. */
     this.compact = !!opts.compact;
@@ -187,7 +193,7 @@
       + '<div class="jrn-col-body">'
       +   (cards.length ? cards.map(function (c) { return self._card(c); }).join('') : '<div class="jrn-col-empty">' + esc(this.t('emptyColumn')) + '</div>')
       + '</div>'
-      + (this.showAddCard ? '<button class="jrn-add" data-act="add-card" data-stage="' + esc(stage.id) + '">+ ' + esc(this.t('addCard')) + '</button>' : '')
+      + ((this.showAddCard || this.onAddCard) ? '<button class="jrn-add" data-act="add-card" data-stage="' + esc(stage.id) + '">+ ' + esc(this.t('addCard')) + '</button>' : '')
       + '</div>';
   };
 
@@ -201,6 +207,7 @@
       + acts
       + '<div class="jrn-card-n">' + esc(c.nombre) + '</div>'
       + (c.nota ? '<div class="jrn-card-note">' + esc(c.nota) + '</div>' : '')
+      + (c.meta ? '<div class="jrn-card-meta">' + esc(c.meta) + '</div>' : '')
       + '</div>';
   };
 
@@ -220,7 +227,7 @@
       else if (act === 'toggle-collapse') { var stc = self.stage(t.getAttribute('data-id')); if (stc) { stc.collapsed = !stc.collapsed; self._save(); self.render(); } }
       else if (act === 'toggle-compact') { self.compact = !self.compact; if (self.onCompactToggle) self.onCompactToggle(self.compact); self.render(); }
       else if (act === 'move-card') self.cardMoveMenu(t.getAttribute('data-id'));
-      else if (act === 'add-card') self.cardModal(null, t.getAttribute('data-stage'));
+      else if (act === 'add-card') { var asid = t.getAttribute('data-stage'); if (self.onAddCard) self.onAddCard(asid); else self.cardModal(null, asid); }
       else if (act === 'remove-card') { if (self.onCardRemove) self.onCardRemove(t.getAttribute('data-id')); }
       else if (act === 'edit-card') { if (self.onCardClick) self.onCardClick(t.getAttribute('data-id')); else self.cardModal(t.getAttribute('data-id')); }
       else if (act === 'action') { var a = self.actions[+t.getAttribute('data-idx')]; if (a && a.onClick) a.onClick(); }
@@ -257,7 +264,7 @@
       self._dragId = null;
       if (!id) return;
       var c = self.card(id), stageId = col.getAttribute('data-stage-drop');
-      if (c && c.stageId !== stageId) { c.stageId = stageId; self._save(); self.render(); }
+      if (c && c.stageId !== stageId) { c.stageId = stageId; if (self.onCardMove) self.onCardMove(id, stageId); self._save(); self.render(); }
     });
   };
   P._clearOver = function () { if (this._overCol) { this._overCol.classList.remove('drag-over'); this._overCol = null; } };
@@ -265,7 +272,7 @@
   /* ── Mover tarjeta a otra fase sin arrastrar (menú) ── */
   P.moveCardTo = function (id, stageId) {
     var c = this.card(id);
-    if (c && c.stageId !== stageId) { c.stageId = stageId; this._save(); }
+    if (c && c.stageId !== stageId) { c.stageId = stageId; if (this.onCardMove) this.onCardMove(id, stageId); this._save(); }
     this.closeModal();
     this.render();
   };

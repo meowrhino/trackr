@@ -36,6 +36,8 @@ Object.assign(App, {
         onChange: (d) => this._jSync(d),
         onCardClick: (id) => this.go('det', id),
         onCardRemove: (id) => this.jRemoveFromJourney(id),
+        onAddCard: (stageId) => this.pModal(null, stageId),
+        onCardMove: (id, toStageId) => this._jAutoEstado(id, toStageId),
         showAddCard: false,
         compact: localStorage.getItem('trackr_journey_compact') === '1',
         onCompactToggle: (v) => { try { localStorage.setItem('trackr_journey_compact', v ? '1' : '0'); } catch (e) { /* noop */ } },
@@ -69,6 +71,7 @@ Object.assign(App, {
       id: p.id,
       nombre: p.nombre,
       nota: this._jCardNota(p),
+      meta: this._jCardMeta(p),
       color: p.color || 'CornflowerBlue',
       stageId: (p.journeyStage && valid.has(p.journeyStage)) ? p.journeyStage : first
     }));
@@ -80,6 +83,28 @@ Object.assign(App, {
     const cn = clienteName(p);
     const est = (typeof EST !== 'undefined' && EST[p.estado]) ? EST[p.estado] : (p.estado || '');
     return cn ? (cn + (est ? ' · ' + est : '')) : est;
+  },
+
+  /** Meta de tarjeta: horas (· importe si es de pago). */
+  _jCardMeta(p) {
+    if (typeof B !== 'undefined' && B.calc) B.calc(p);
+    const th = (typeof B !== 'undefined' && B.totalHoras) ? B.totalHoras(p) : 0;
+    const f = p.facturacion || {};
+    const parts = [th.toFixed(1) + ' h'];
+    if (f.modo && f.modo !== 'gratis' && f.totalFactura > 0) parts.push(fmtMoney(f.totalFactura));
+    return parts.join('  ·  ');
+  },
+
+  /** Auto-estado: al mover un proyecto a la última fase, marcarlo Completado. */
+  _jAutoEstado(id, toStageId) {
+    const stages = D.jStages();
+    const last = stages.length ? stages[stages.length - 1].id : null;
+    if (!last || toStageId !== last) return;
+    const p = D.p(id);
+    if (p && p.estado !== 'completado') {
+      p.estado = 'completado';   /* el _save del movimiento lo persiste */
+      if (typeof Toast !== 'undefined') Toast.ok(t('journey.autoCompleted', p.nombre));
+    }
   },
 
   /** Persiste lo que cambia el widget: definiciones de columna + fase de cada proyecto. */

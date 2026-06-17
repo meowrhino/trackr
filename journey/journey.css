@@ -67,6 +67,7 @@
 .jrn-card.dragging{opacity:.45}
 .jrn-card-n{font-size:.85rem;color:var(--jt1);font-weight:500;line-height:1.3;padding-right:.5rem}
 .jrn-card-note{font-size:.74rem;color:var(--jt3);line-height:1.35;margin-top:.2rem;white-space:pre-wrap;word-break:break-word}
+.jrn-card-meta{font-family:'DM Mono',ui-monospace,monospace;font-size:.7rem;color:var(--jt3);margin-top:.3rem;letter-spacing:.02em}
 
 .jrn-add{margin:.1rem .6rem .6rem;padding:.4rem;border:1px dashed var(--jb2);background:transparent;color:var(--jt3);border-radius:var(--jr);font-family:var(--jfont);font-size:.78rem;cursor:pointer;transition:all var(--jtr);width:calc(100% - 1.2rem)}
 .jrn-add:hover{border-color:var(--jt2);color:var(--jt1);background:var(--jbg3)}

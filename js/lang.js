@@ -584,9 +584,7 @@ const LANGS = {
     'journey.subtitle': 'Cada tarjeta es un proyecto. Arrástralo a su fase de producción, o tócalo para abrir su detalle. El estado del proyecto (Activo, Completado…) se gestiona aparte.',
     'journey.addStage': 'Añadir estadio',
     'journey.addCard': 'Añadir',
-    'journey.importClients': 'Traer mis clientes ({0})',
-    'journey.importedClients': '{0} cliente(s) añadidos al tablero',
-    'journey.importedNone': 'Tus clientes ya estaban en el tablero',
+    'journey.autoCompleted': '«{0}» marcado como completado',
     'journey.empty': 'Aún no hay estadios. Crea el primero o restaura el journey por defecto.',
     'journey.emptyColumn': 'Sin tarjetas',
     'journey.restoreDefaults': 'Restaurar journey por defecto',
@@ -605,7 +603,7 @@ const LANGS = {
     'journey.deleteStage': 'Eliminar estadio',
     'journey.deleteStageBody': 'Este estadio tiene {0} tarjeta(s). Elige a dónde moverlas (o bórralas).',
     'journey.moveCardsTo': 'Mover las tarjetas a',
-    'journey.deleteCardsToo': 'Borrar también las tarjetas',
+    'journey.deleteCardsToo': 'Moverlas a la primera fase',
     'journey.needStageFirst': 'Crea primero un estadio',
     'journey.newCard': 'Nueva tarjeta',
     'journey.editCard': 'Editar tarjeta',
@@ -633,8 +631,6 @@ const LANGS = {
     'saved.mins': 'Guardado hace {0} min',
     'saved.hours': 'Guardado hace {0} h',
     'saved.days': 'Guardado hace {0} d',
-    /* ── Footer ── */
-    'footer.madeWith': 'Hecho con cariño por meowrhino.studio',
   },
 
   en: {
@@ -1202,9 +1198,7 @@ const LANGS = {
     'journey.subtitle': 'Each card is a project. Drag it to its production stage, or tap it to open its detail. The project status (Active, Completed…) is managed separately.',
     'journey.addStage': 'Add stage',
     'journey.addCard': 'Add',
-    'journey.importClients': 'Bring my clients ({0})',
-    'journey.importedClients': '{0} client(s) added to the board',
-    'journey.importedNone': 'Your clients were already on the board',
+    'journey.autoCompleted': '“{0}” marked as completed',
     'journey.empty': 'No stages yet. Create the first one or restore the default journey.',
     'journey.emptyColumn': 'No cards',
     'journey.restoreDefaults': 'Restore default journey',
@@ -1223,7 +1217,7 @@ const LANGS = {
     'journey.deleteStage': 'Delete stage',
     'journey.deleteStageBody': 'This stage has {0} card(s). Choose where to move them (or delete them).',
     'journey.moveCardsTo': 'Move cards to',
-    'journey.deleteCardsToo': 'Delete the cards too',
+    'journey.deleteCardsToo': 'Move them to the first stage',
     'journey.needStageFirst': 'Create a stage first',
     'journey.newCard': 'New card',
     'journey.editCard': 'Edit card',
@@ -1251,8 +1245,6 @@ const LANGS = {
     'saved.mins': 'Saved {0} min ago',
     'saved.hours': 'Saved {0} h ago',
     'saved.days': 'Saved {0} d ago',
-    /* ── Footer ── */
-    'footer.madeWith': 'Made with love by meowrhino.studio',
   },
 
   ca: {
@@ -1821,9 +1813,7 @@ const LANGS = {
     'journey.subtitle': 'Cada targeta és un projecte. Arrossega’l a la seva fase de producció, o toca’l per obrir-ne el detall. L’estat del projecte (Actiu, Completat…) es gestiona a part.',
     'journey.addStage': 'Afegir estadi',
     'journey.addCard': 'Afegir',
-    'journey.importClients': 'Portar els meus clients ({0})',
-    'journey.importedClients': '{0} client(s) afegits al tauler',
-    'journey.importedNone': 'Els teus clients ja eren al tauler',
+    'journey.autoCompleted': '«{0}» marcat com a completat',
     'journey.empty': 'Encara no hi ha estadis. Crea el primer o restaura el journey per defecte.',
     'journey.emptyColumn': 'Sense targetes',
     'journey.restoreDefaults': 'Restaurar journey per defecte',
@@ -1842,7 +1832,7 @@ const LANGS = {
     'journey.deleteStage': 'Eliminar estadi',
     'journey.deleteStageBody': 'Aquest estadi té {0} targeta/es. Tria on moure-les (o esborra-les).',
     'journey.moveCardsTo': 'Moure les targetes a',
-    'journey.deleteCardsToo': 'Esborrar també les targetes',
+    'journey.deleteCardsToo': 'Moure-les a la primera fase',
     'journey.needStageFirst': 'Crea primer un estadi',
     'journey.newCard': 'Nova targeta',
     'journey.editCard': 'Editar targeta',
@@ -1870,8 +1860,6 @@ const LANGS = {
     'saved.mins': 'Desat fa {0} min',
     'saved.hours': 'Desat fa {0} h',
     'saved.days': 'Desat fa {0} d',
-    /* ── Footer ── */
-    'footer.madeWith': 'Fet amb estima per meowrhino.studio',
   }
 
 };
