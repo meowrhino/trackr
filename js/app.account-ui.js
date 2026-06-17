@@ -70,24 +70,30 @@
 
   function fieldsFor(m) {
     if (m === 'signup') {
-      return `<div class="fg"><label>${t('email')}</label><input id="accEmail" type="email" autocomplete="username"></div>`
-        + `<div class="fg"><label>${t('password')}</label><input id="accPw" type="password" autocomplete="new-password" oninput="App.accPwMeter(this.value)"><div id="accMeter" class="acc-meter"><span></span><span></span><span></span><span></span></div></div>`
-        + `<div class="fg"><label>${t('password2')}</label><input id="accPw2" type="password" autocomplete="new-password"></div>`
+      return `<form style="display:contents" onsubmit="App.accSignup();return false">`
+        + `<div class="fg"><label>${t('email')}</label><input id="accEmail" name="email" type="email" autocomplete="username"></div>`
+        + `<div class="fg"><label>${t('password')}</label><input id="accPw" name="password" type="password" autocomplete="new-password" oninput="App.accPwMeter(this.value)"><div id="accMeter" class="acc-meter"><span></span><span></span><span></span><span></span></div></div>`
+        + `<div class="fg"><label>${t('password2')}</label><input id="accPw2" name="password2" type="password" autocomplete="new-password"></div>`
         + `<label class="acc-legal"><input id="accLegal" type="checkbox" style="width:auto;margin-right:.5rem">${t('legal')}</label>`
-        + `<button class="bt bt-p" style="margin-top:.85rem" onclick="App.accSignup()">${t('create')}</button>`
+        + `<button type="submit" class="bt bt-p" style="margin-top:.85rem">${t('create')}</button>`
+        + `</form>`
         + `<div class="acc-links"><a onclick="App.accMode('login')">${t('backLogin')}</a></div>`;
     }
     if (m === 'recover') {
-      return `<div class="fg"><label>${t('email')}</label><input id="accEmail" type="email" autocomplete="username"></div>`
-        + `<div class="fg"><label>${t('recoveryCode')}</label><input id="accRec" type="text" placeholder="TRKR-XXXX-XXXX-..."></div>`
-        + `<div class="fg"><label>${t('newPassword')}</label><input id="accPw" type="password" autocomplete="new-password" oninput="App.accPwMeter(this.value)"><div id="accMeter" class="acc-meter"><span></span><span></span><span></span><span></span></div></div>`
-        + `<button class="bt bt-p" style="margin-top:.5rem" onclick="App.accRecover()">${t('doRecover')}</button>`
+      return `<form style="display:contents" onsubmit="App.accRecover();return false">`
+        + `<div class="fg"><label>${t('email')}</label><input id="accEmail" name="email" type="email" autocomplete="username"></div>`
+        + `<div class="fg"><label>${t('recoveryCode')}</label><input id="accRec" name="recovery-code" type="text" autocomplete="one-time-code" placeholder="TRKR-XXXX-XXXX-..."></div>`
+        + `<div class="fg"><label>${t('newPassword')}</label><input id="accPw" name="password" type="password" autocomplete="new-password" oninput="App.accPwMeter(this.value)"><div id="accMeter" class="acc-meter"><span></span><span></span><span></span><span></span></div></div>`
+        + `<button type="submit" class="bt bt-p" style="margin-top:.5rem">${t('doRecover')}</button>`
+        + `</form>`
         + `<div class="acc-links"><a onclick="App.accMode('login')">${t('backLogin')}</a></div>`;
     }
     // login
-    return `<div class="fg"><label>${t('email')}</label><input id="accEmail" type="email" autocomplete="username"></div>`
-      + `<div class="fg"><label>${t('password')}</label><input id="accPw" type="password" autocomplete="current-password"></div>`
-      + `<button class="bt bt-p" style="margin-top:.25rem" onclick="App.accLogin()">${t('enter')}</button>`
+    return `<form style="display:contents" onsubmit="App.accLogin();return false">`
+      + `<div class="fg"><label>${t('email')}</label><input id="accEmail" name="email" type="email" autocomplete="username"></div>`
+      + `<div class="fg"><label>${t('password')}</label><input id="accPw" name="password" type="password" autocomplete="current-password"></div>`
+      + `<button type="submit" class="bt bt-p" style="margin-top:.25rem">${t('enter')}</button>`
+      + `</form>`
       + `<div class="acc-links"><a onclick="App.accMode('signup')">${t('signup')}</a> · <a onclick="App.accMode('recover')">${t('recover')}</a></div>`;
   }
 
@@ -146,9 +152,13 @@
         body = `<div class="acc-warn">⚠️ ${L() === 'en' ? 'Your browser does not support the required encryption (WebAssembly/WebCrypto). Accounts cannot be created or opened here.' : (L() === 'ca' ? 'El teu navegador no suporta el xifrat requerit (WebAssembly/WebCrypto). No es poden crear ni obrir comptes aquí.' : 'Tu navegador no soporta el cifrado requerido (WebAssembly/WebCrypto). No es posible crear ni abrir cuentas aquí.')}</div>`;
       } else if (Acc.state === 'locked') {
         title = t('unlock');
+        const lockedEmail = (Acc.status && Acc.status() && Acc.status().email) ? Acc.status().email : '';
         body = `<div class="acc-warn">${t('locked')}</div>`
-          + `<div class="fg" style="margin-top:.85rem"><label>${t('password')}</label><input id="accPw" type="password" autocomplete="current-password"></div>`
-          + `<button class="bt bt-p" onclick="App.accUnlock()">${t('unlock')}</button>`
+          + `<form style="display:contents" onsubmit="App.accUnlock();return false">`
+          + (lockedEmail ? `<input type="email" name="email" autocomplete="username" value="${esc2(lockedEmail)}" readonly tabindex="-1" aria-hidden="true" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">` : '')
+          + `<div class="fg" style="margin-top:.85rem"><label>${t('password')}</label><input id="accPw" name="password" type="password" autocomplete="current-password"></div>`
+          + `<button type="submit" class="bt bt-p">${t('unlock')}</button>`
+          + `</form>`
           + `<div class="acc-links"><a onclick="App.accLogout()">${t('logout')}</a></div>`;
       } else {
         title = mode === 'signup' ? t('signup') : (mode === 'recover' ? t('doRecover') : t('login'));
