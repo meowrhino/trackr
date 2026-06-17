@@ -37,6 +37,8 @@ Object.assign(App, {
         onCardClick: (id) => this.go('det', id),
         onCardRemove: (id) => this.jRemoveFromJourney(id),
         showAddCard: false,
+        compact: localStorage.getItem('trackr_journey_compact') === '1',
+        onCompactToggle: (v) => { try { localStorage.setItem('trackr_journey_compact', v ? '1' : '0'); } catch (e) { /* noop */ } },
         colors: Object.values(W3C_COLORS).flat(),
         strings: this._jStrings(),
         actions: this._jActions(),
@@ -97,7 +99,8 @@ Object.assign(App, {
       'newStage', 'editStage', 'stageName', 'stageNamePh', 'stageNameRequired',
       'moveLeft', 'moveRight', 'minOneStage', 'deleteStage', 'deleteStageBody',
       'moveCardsTo', 'deleteCardsToo', 'needStageFirst', 'newCard', 'editCard',
-      'cardName', 'cardNamePh', 'cardNameRequired', 'cardNote', 'cardNotePh', 'deleteCardConfirm', 'removeCard'
+      'cardName', 'cardNamePh', 'cardNameRequired', 'cardNote', 'cardNotePh', 'deleteCardConfirm', 'removeCard',
+      'moveTo', 'compact', 'expand', 'collapse', 'expandCol'
     ];
     const out = {};
     k.forEach(key => { out[key] = t('journey.' + key); });

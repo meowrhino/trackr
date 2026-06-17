@@ -55,6 +55,7 @@
     cardName: 'Nombre', cardNamePh: 'Cliente o persona', cardNameRequired: 'Ponle un nombre a la tarjeta',
     cardNote: 'Nota (opcional)', cardNotePh: 'Contexto, siguiente paso, recordatorio…',
     deleteCardConfirm: '¿Eliminar esta tarjeta?', removeCard: 'Quitar del tablero',
+    moveTo: 'Mover a…', compact: 'Compactar', expand: 'Expandir', collapse: 'Plegar', expandCol: 'Desplegar',
     save: 'Guardar', create: 'Crear', cancel: 'Cancelar', delete: 'Eliminar', edit: 'Editar'
   };
 
@@ -81,6 +82,9 @@
        la llama — para "quitar del tablero" sin borrar el elemento subyacente. */
     this.onCardRemove = typeof opts.onCardRemove === 'function' ? opts.onCardRemove : null;
     this.showAddCard = opts.showAddCard !== false;
+    /* Vista compacta (columnas/tarjetas más estrechas). onCompactToggle(bool) para persistir fuera. */
+    this.compact = !!opts.compact;
+    this.onCompactToggle = typeof opts.onCompactToggle === 'function' ? opts.onCompactToggle : null;
     this._dragId = null;
     this._overCol = null;
     this._overlay = null;
@@ -122,14 +126,16 @@
   P.render = function () {
     if (!this.el) return this;
     if (!this.el.classList.contains('jrn-root')) this.el.classList.add('jrn-root');
+    this.el.classList.toggle('compact', !!this.compact);
     var stages = this.data.stages;
     var html = '';
     if (this.strings.subtitle) html += '<div class="jrn-sub">' + esc(this.t('subtitle')) + '</div>';
 
-    /* Barra: añadir estadio + acciones extra */
+    /* Barra: añadir estadio + acciones extra + toggle compacto */
     html += '<div class="jrn-bar">'
       + '<button class="jrn-bt jrn-bt-p" data-act="add-stage">+ ' + esc(this.t('addStage')) + '</button>'
       + this.actions.map(function (a, i) { return '<button class="jrn-bt" data-act="action" data-idx="' + i + '">' + esc(a.label) + '</button>'; }).join('')
+      + (stages.length ? '<button class="jrn-bt" data-act="toggle-compact">' + esc(this.t(this.compact ? 'expand' : 'compact')) + '</button>' : '')
       + '</div>';
 
     if (!stages.length) {
@@ -156,12 +162,22 @@
     var hex = this.colorHex(stage.color);
     var cards = this.cardsIn(stage.id);
     var self = this;
+    if (stage.collapsed) {
+      return '<div class="jrn-col collapsed" style="--stage-color:' + hex + '" data-stage-drop="' + esc(stage.id) + '">'
+        + '<button class="jrn-col-collapsed" data-act="toggle-collapse" data-id="' + esc(stage.id) + '" title="' + esc(this.t('expandCol')) + '">'
+        +   '<span class="jrn-dot"></span>'
+        +   '<span class="jrn-col-count">' + cards.length + '</span>'
+        +   '<span class="jrn-col-vname">' + esc(stage.nombre) + '</span>'
+        + '</button>'
+        + '</div>';
+    }
     return '<div class="jrn-col" style="--stage-color:' + hex + '" data-stage-drop="' + esc(stage.id) + '">'
       + '<div class="jrn-col-hd">'
       +   '<span class="jrn-dot"></span>'
       +   '<span class="jrn-col-name" title="' + esc(stage.nombre) + '">' + esc(stage.nombre) + '</span>'
       +   '<span class="jrn-col-count">' + cards.length + '</span>'
       +   '<span class="jrn-col-actions">'
+      +     '<button class="jrn-ica" title="' + esc(this.t('collapse')) + '" data-act="toggle-collapse" data-id="' + esc(stage.id) + '">–</button>'
       +     '<button class="jrn-ica" title="' + esc(this.t('moveLeft')) + '" data-act="move-stage" data-id="' + esc(stage.id) + '" data-dir="-1"' + (idx === 0 ? ' disabled' : '') + '>◂</button>'
       +     '<button class="jrn-ica" title="' + esc(this.t('moveRight')) + '" data-act="move-stage" data-id="' + esc(stage.id) + '" data-dir="1"' + (idx === total - 1 ? ' disabled' : '') + '>▸</button>'
       +     '<button class="jrn-ica" title="' + esc(this.t('edit')) + '" data-act="edit-stage" data-id="' + esc(stage.id) + '">✎</button>'
@@ -177,11 +193,12 @@
 
   P._card = function (c) {
     var hex = this.colorHex(c.color);
-    var rm = this.onCardRemove
-      ? '<button class="jrn-card-x" data-act="remove-card" data-id="' + esc(c.id) + '" title="' + esc(this.t('removeCard')) + '">×</button>'
-      : '';
+    var acts = '<span class="jrn-card-acts">'
+      + '<button class="jrn-card-x" data-act="move-card" data-id="' + esc(c.id) + '" title="' + esc(this.t('moveTo')) + '">⇄</button>'
+      + (this.onCardRemove ? '<button class="jrn-card-x" data-act="remove-card" data-id="' + esc(c.id) + '" title="' + esc(this.t('removeCard')) + '">×</button>' : '')
+      + '</span>';
     return '<div class="jrn-card" style="--card-color:' + hex + '" draggable="true" data-card-id="' + esc(c.id) + '" data-act="edit-card" data-id="' + esc(c.id) + '">'
-      + rm
+      + acts
       + '<div class="jrn-card-n">' + esc(c.nombre) + '</div>'
       + (c.nota ? '<div class="jrn-card-note">' + esc(c.nota) + '</div>' : '')
       + '</div>';
@@ -200,6 +217,9 @@
       else if (act === 'edit-stage') self.stageModal(t.getAttribute('data-id'));
       else if (act === 'del-stage') self.deleteStage(t.getAttribute('data-id'));
       else if (act === 'move-stage') self.moveStage(t.getAttribute('data-id'), parseInt(t.getAttribute('data-dir'), 10));
+      else if (act === 'toggle-collapse') { var stc = self.stage(t.getAttribute('data-id')); if (stc) { stc.collapsed = !stc.collapsed; self._save(); self.render(); } }
+      else if (act === 'toggle-compact') { self.compact = !self.compact; if (self.onCompactToggle) self.onCompactToggle(self.compact); self.render(); }
+      else if (act === 'move-card') self.cardMoveMenu(t.getAttribute('data-id'));
       else if (act === 'add-card') self.cardModal(null, t.getAttribute('data-stage'));
       else if (act === 'remove-card') { if (self.onCardRemove) self.onCardRemove(t.getAttribute('data-id')); }
       else if (act === 'edit-card') { if (self.onCardClick) self.onCardClick(t.getAttribute('data-id')); else self.cardModal(t.getAttribute('data-id')); }
@@ -242,6 +262,28 @@
   };
   P._clearOver = function () { if (this._overCol) { this._overCol.classList.remove('drag-over'); this._overCol = null; } };
 
+  /* ── Mover tarjeta a otra fase sin arrastrar (menú) ── */
+  P.moveCardTo = function (id, stageId) {
+    var c = this.card(id);
+    if (c && c.stageId !== stageId) { c.stageId = stageId; this._save(); }
+    this.closeModal();
+    this.render();
+  };
+  P.cardMoveMenu = function (id) {
+    var c = this.card(id); if (!c) return;
+    var self = this;
+    var btns = this.data.stages.map(function (s) {
+      var on = s.id === c.stageId;
+      return '<button class="jrn-movebtn' + (on ? ' on' : '') + '" style="--stage-color:' + self.colorHex(s.color) + '" data-act="pick-stage" data-id="' + esc(id) + '" data-stage="' + esc(s.id) + '">'
+        + '<span class="jrn-dot"></span><span class="jrn-movebtn-nm">' + esc(s.nombre) + '</span>' + (on ? '<span class="jrn-movebtn-on">✓</span>' : '')
+        + '</button>';
+    }).join('');
+    this._openModal('<div class="jrn-mt">' + esc(this.t('moveTo')) + '</div>'
+      + '<div class="jrn-p" style="margin-bottom:.6rem">' + esc(c.nombre) + '</div>'
+      + '<div class="jrn-movelist">' + btns + '</div>'
+      + '<div class="jrn-ma"><button class="jrn-bt" data-act="close">' + esc(this.t('cancel')) + '</button></div>');
+  };
+
   /* ════════════════════════════════════════════════
    *  MODAL propio
    * ════════════════════════════════════════════════ */
@@ -265,6 +307,7 @@
       else if (act === 'confirm-del-stage') self._confirmDeleteStage(t.getAttribute('data-id'));
       else if (act === 'save-card') self._saveCard();
       else if (act === 'del-card') self._deleteCard(t.getAttribute('data-id'));
+      else if (act === 'pick-stage') self.moveCardTo(t.getAttribute('data-id'), t.getAttribute('data-stage'));
       else if (act === 'pick-color') self._pickColor(t);
     });
     document.addEventListener('keydown', function (e) {
