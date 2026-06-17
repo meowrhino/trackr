@@ -286,11 +286,17 @@
     accToggleAuto(on) { Acc.setAutoSync(on); if (on) this.accSyncNow(); },
 
     accChangePwModal() {
+      // Username oculto (email de la cuenta) para que el gestor asocie la actualización
+      // a la credencial guardada y ofrezca actualizarla (mismo patrón que el desbloqueo).
+      const email = (Acc.status && Acc.status() && Acc.status().email) ? Acc.status().email : '';
       this.om(`<div class="mt">${t('changePw')}</div>`
-        + `<div class="fg"><label>${t('currentPassword')}</label><input id="accCur" type="password" autocomplete="current-password"></div>`
-        + `<div class="fg"><label>${t('newPassword')}</label><input id="accNew" type="password" autocomplete="new-password" oninput="App.accPwMeter(this.value)"><div id="accMeter" class="acc-meter"><span></span><span></span><span></span><span></span></div></div>`
-        + `<div class="fg"><label>${t('password2')}</label><input id="accNew2" type="password" autocomplete="new-password"></div>`
-        + `<div class="ma"><button class="bt" onclick="App.cm()">${t('cancel')}</button><button class="bt bt-p" onclick="App.accChangePwSave()">${t('save')}</button></div>`);
+        + `<form style="display:contents" onsubmit="App.accChangePwSave();return false">`
+        + (email ? `<input type="email" name="email" autocomplete="username" value="${esc2(email)}" readonly tabindex="-1" aria-hidden="true" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">` : '')
+        + `<div class="fg"><label>${t('currentPassword')}</label><input id="accCur" name="current-password" type="password" autocomplete="current-password"></div>`
+        + `<div class="fg"><label>${t('newPassword')}</label><input id="accNew" name="new-password" type="password" autocomplete="new-password" oninput="App.accPwMeter(this.value)"><div id="accMeter" class="acc-meter"><span></span><span></span><span></span><span></span></div></div>`
+        + `<div class="fg"><label>${t('password2')}</label><input id="accNew2" name="new-password2" type="password" autocomplete="new-password"></div>`
+        + `<div class="ma"><button type="button" class="bt" onclick="App.cm()">${t('cancel')}</button><button type="submit" class="bt bt-p">${t('save')}</button></div>`
+        + `</form>`);
     },
 
     async accChangePwSave() {
