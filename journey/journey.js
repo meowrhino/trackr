@@ -4,7 +4,8 @@
  * Reutilizable en cualquier web, sin dependencias. Uso:
  *
  *   const board = Journey.mount(el, {
- *     data: { stages:[{id,nombre,color}], cards:[{id,nombre,nota,color,stageId}] },
+ *     data: { stages:[{id,nombre,color}], cards:[{id,nombre,nota,color,stageId,muted?,strike?}] },
+ *       // muted: tarjeta atenuada · strike: nombre tachado (flags visuales opcionales)
  *     onChange(data) { ...persiste... },   // se llama tras cada cambio
  *     colors: [['SkyBlue','#87CEEB'], ...],// paleta del picker (opcional)
  *     strings: { addStage:'…', … },        // textos (opcional, por defecto ES)
@@ -203,7 +204,9 @@
       + '<button class="jrn-card-x" data-act="move-card" data-id="' + esc(c.id) + '" title="' + esc(this.t('moveTo')) + '">⇄</button>'
       + (this.onCardRemove ? '<button class="jrn-card-x" data-act="remove-card" data-id="' + esc(c.id) + '" title="' + esc(this.t('removeCard')) + '">×</button>' : '')
       + '</span>';
-    return '<div class="jrn-card" style="--card-color:' + hex + '" draggable="true" data-card-id="' + esc(c.id) + '" data-act="edit-card" data-id="' + esc(c.id) + '">'
+    // Flags de presentación genéricos (opcionales): muted = atenuada, strike = nombre tachado.
+    var cls = 'jrn-card' + (c.muted ? ' jrn-card-muted' : '') + (c.strike ? ' jrn-card-strike' : '');
+    return '<div class="' + cls + '" style="--card-color:' + hex + '" draggable="true" data-card-id="' + esc(c.id) + '" data-act="edit-card" data-id="' + esc(c.id) + '">'
       + acts
       + '<div class="jrn-card-n">' + esc(c.nombre) + '</div>'
       + (c.nota ? '<div class="jrn-card-note">' + esc(c.nota) + '</div>' : '')

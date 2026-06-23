@@ -73,7 +73,11 @@ Object.assign(App, {
       nota: this._jCardNota(p),
       meta: this._jCardMeta(p),
       color: p.color || 'CornflowerBlue',
-      stageId: (p.journeyStage && valid.has(p.journeyStage)) ? p.journeyStage : first
+      stageId: (p.journeyStage && valid.has(p.journeyStage)) ? p.journeyStage : first,
+      // Estado del proyecto reflejado en la tarjeta (sin moverla de fase):
+      // pausado → atenuada · abandonado → atenuada + tachada.
+      muted: p.estado === 'pausado' || p.estado === 'abandonado',
+      strike: p.estado === 'abandonado'
     }));
     return { stages, cards };
   },
