@@ -130,7 +130,7 @@ Object.assign(App, {
     const p = D.p(pid); if (!p) return;
     const h = p.horas.find(x => x.id === hid); if (!h) return;
     const noDate = !h.fecha;
-    const projOpts = D.ps().map(pr => `<option value="${pr.id}"${pr.id === pid ? ' selected' : ''}>${esc(pr.nombre)}</option>`).join('');
+    const projOpts = this._projOptions(pid);
 
     this.om(
       `<div class="mt">${t('det.editHour')}</div>`
@@ -139,7 +139,8 @@ Object.assign(App, {
       +   `<div class="to ${h.tipo === 'trabajo' ? 'on' : ''}" data-type="trabajo" onclick="App.selT(this)"><span class="ic">💻</span><span class="la">${t('det.work')}</span></div>`
       +   `<div class="to ${h.tipo === 'reunion' ? 'on' : ''}" data-type="reunion" onclick="App.selT(this)"><span class="ic">👥</span><span class="la">${t('det.meeting')}</span></div>`
       + `</div>`
-      + `<div class="fg"><label>${t('field.project')}</label><select id="ehProj">${projOpts}</select></div>`
+      + `<div class="fg"><label>${t('field.project')}</label><select id="ehProj" onchange="App._ehProjChange(this.value)">${projOpts}</select>${this._projToggle('ehProj', false)}</div>`
+      + `<div class="fg"><label>${t('field.color')}</label>${this.colorSelect(p.color)}</div>`
       + `<div class="fr"><div class="fg"><label>${t('field.hours')}</label><input type="number" id="ehA" min="0.25" step="0.25" value="${h.cantidad}"></div>`
       +   `<div class="fg"><label>${t('field.date')}</label><input type="date" id="ehD" value="${h.fecha || ''}" ${noDate ? 'disabled' : ''}>`
       +   `<label style="margin-top:.35rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="ehNd" ${noDate ? 'checked' : ''} onchange="document.getElementById('ehD').disabled=this.checked;if(this.checked)document.getElementById('ehD').value=''" style="width:auto;accent-color:var(--t2)"> ${t('field.noDate')}</label></div></div>`
@@ -147,6 +148,18 @@ Object.assign(App, {
       + `<div class="fg"><label>${t('field.note')}</label><input type="text" id="ehN" value="${esc(h.nota || '')}"></div>`
       + `<div class="ma" style="justify-content:space-between"><button class="bt bt-d" onclick="App.deleteEH('${pid}','${hid}')">${t('btn.delete')}</button><div style="display:flex;gap:.5rem"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveEH('${pid}','${hid}')">${t('btn.save')}</button></div></div>`
     );
+  },
+
+  /** Al cambiar el proyecto en editar-hora, refleja su color en el picker (el picker
+   *  edita el color del proyecto SELECCIONADO). */
+  _ehProjChange(val) {
+    const p = D.p(val); if (!p) return;
+    const sw = document.querySelector(`.cs-sw[data-name="${p.color}"]`);
+    if (sw) { this._csPick(sw); return; }
+    // Color que no está en la paleta: ajusta el input oculto y refresca el preview.
+    document.querySelectorAll('.cs-sw.on').forEach(s => s.classList.remove('on'));
+    const inp = document.getElementById('mpColor'); if (inp) inp.value = p.color;
+    this._csReset();
   },
 
   saveEH(pid, hid) {
@@ -161,6 +174,13 @@ Object.assign(App, {
     h.monto = parseFloat(document.getElementById('ehMo').value) || 0;
 
     const newPid = document.getElementById('ehProj')?.value || pid;
+
+    // Color del proyecto (editable desde este modal): se aplica al proyecto seleccionado.
+    // Mutamos directo; el D.up(...) de más abajo lo persiste al serializar todo D.d.
+    const newColor = document.getElementById('mpColor')?.value;
+    const colorTarget = D.p(newPid);
+    if (colorTarget && newColor) colorTarget.color = newColor;
+
     if (newPid !== pid && D.p(newPid)) {
       /* Mover la entrada al nuevo proyecto */
       p.horas = p.horas.filter(x => x.id !== hid);
