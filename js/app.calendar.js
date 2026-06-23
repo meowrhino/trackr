@@ -597,17 +597,28 @@ Object.assign(App, {
     this.om(`<div class="mt">${fmtDate(ds)}</div><div style="margin-bottom:.75rem;font-size:.82rem;color:var(--t3)">Total: <span class="m">${tot.toFixed(1)}h</span></div>${body}<div class="ma"><button class="bt bt-p" onclick="App.cm();App.calAddHour('${ds}','')">${t('btn.addHourCal')}</button><button class="bt" onclick="App.cm()">${t('btn.close')}</button></div>`);
   },
 
-  _projOptions(selectedId) {
+  // Estados que se ocultan del desplegable por defecto (lista larga y poco editada).
+  _PROJ_HIDDEN: { completado: 1, abandonado: 1 },
+
+  // Opciones del select de proyecto, agrupadas por estado. Por defecto oculta los
+  // estados de _PROJ_HIDDEN; showAll los incluye. El proyecto `selectedId` siempre
+  // se muestra aunque su estado esté oculto (para no perder el valor en edición).
+  _projOptions(selectedId, showAll) {
     const ps = D.ps();
     const groups = {};
     ps.forEach(p => { if (!groups[p.estado]) groups[p.estado] = []; groups[p.estado].push(p); });
     const labels = { potencial: t('est.potenciales'), activo: t('est.activos'), pausado: t('est.pausados'), completado: t('est.completados'), abandonado: t('est.abandonados') };
+    const selProj = selectedId ? ps.find(p => p.id === selectedId) : null;
     let html = '';
     EST_ORDER.forEach(st => {
       const g = groups[st];
       if (!g || !g.length) return;
+      const hideGroup = this._PROJ_HIDDEN[st] && !showAll;
+      // Si el grupo está oculto, lo incluimos solo para mostrar el proyecto seleccionado (si cae aquí).
+      const list = hideGroup ? g.filter(p => selProj && p.id === selProj.id) : g;
+      if (!list.length) return;
       html += `<optgroup label="${labels[st]}">`;
-      g.forEach(p => {
+      list.forEach(p => {
         const cn = clienteName(p);
         html += `<option value="${p.id}" ${p.id === selectedId ? 'selected' : ''}>${esc(p.nombre)}${cn ? ' — ' + esc(cn) : ''}</option>`;
       });
@@ -616,12 +627,36 @@ Object.assign(App, {
     return html;
   },
 
+  // Nº de proyectos en estados ocultos (para etiquetar el toggle).
+  _hiddenProjCount() {
+    return D.ps().filter(p => this._PROJ_HIDDEN[p.estado]).length;
+  },
+
+  // Checkbox "Ver completados/abandonados" bajo un select de proyecto. Vacío si no hay ocultos.
+  _projToggle(selectId, withNew) {
+    const n = this._hiddenProjCount();
+    if (!n) return '';
+    return `<label style="margin-top:.4rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0;font-size:.78rem;color:var(--t3)">`
+      + `<input type="checkbox" onchange="App._toggleAllProj('${selectId}', this.checked, ${withNew ? 'true' : 'false'})" style="width:auto;accent-color:var(--t2)"> ${t('cal.showCompleted')} (${n})</label>`;
+  },
+
+  // Reconstruye las opciones de un select de proyecto al marcar/desmarcar el toggle,
+  // preservando la selección actual. withNew añade la opción "+ Crear nuevo proyecto".
+  _toggleAllProj(selectId, checked, withNew) {
+    const sel = document.getElementById(selectId);
+    if (!sel) return;
+    const cur = sel.value;
+    const selId = cur === '_new' ? '' : cur;
+    sel.innerHTML = this._projOptions(selId, checked) + (withNew ? `<option value="_new">${t('btn.createNewProject')}</option>` : '');
+    sel.value = cur;
+  },
+
   calAddHour(fecha, hora, duracion) {
     const ps = D.ps();
     const dur = duracion || 1;
     const projOpts = this._projOptions();
     this.om(`<div class="mt">${t('cal.addHour')}</div>`
-      + `<div class="fg"><label>${t('field.project')}</label><select id="chP" onchange="App._onCalProjChange(this.value)">${projOpts}<option value="_new">${t('btn.createNewProject')}</option></select></div>`
+      + `<div class="fg"><label>${t('field.project')}</label><select id="chP" onchange="App._onCalProjChange(this.value)">${projOpts}<option value="_new">${t('btn.createNewProject')}</option></select>${this._projToggle('chP', true)}</div>`
       + `<div id="chPNew" style="display:none;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);padding:.75rem;margin-bottom:.85rem">`
       +   `<div class="fg"><label>${t('field.projectName')}</label><input type="text" id="chPN" placeholder="${t('ph.newProjectName')}"></div>`
       +   `<div class="fg"><label>${t('field.client')}</label><select id="chPCl" onchange="document.getElementById('chPClNew').style.display=this.value==='_new'?'block':'none'"><option value="">${t('field.noClient')}</option>${D.cls().map(c => `<option value="${c.id}">${esc(c.nombre)}</option>`).join('')}<option value="_new">${t('btn.newClientOpt')}</option></select></div>`

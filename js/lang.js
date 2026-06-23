@@ -62,6 +62,7 @@ const LANGS = {
     'est.pausados': 'Pausados',
     'est.completados': 'Completados',
     'est.abandonados': 'Abandonados',
+    'cal.showCompleted': 'Ver completados/abandonados',
 
     /* ── Constantes: Categorías de gasto ── */
     'cat.herramientas': 'Herramientas',
@@ -684,6 +685,7 @@ const LANGS = {
     'est.pausados': 'Paused',
     'est.completados': 'Completed',
     'est.abandonados': 'Archived',
+    'cal.showCompleted': 'Show completed/archived',
 
     /* ── Constantes: Categorías de gasto ── */
     'cat.herramientas': 'Tools',
@@ -1298,6 +1300,7 @@ const LANGS = {
     'est.pausados': 'Pausats',
     'est.completados': 'Completats',
     'est.abandonados': 'Abandonats',
+    'cal.showCompleted': 'Veure completats/abandonats',
 
     /* ── Constants: Categories de despesa ── */
     'cat.herramientas': 'Eines',
