@@ -8,7 +8,7 @@
 Object.assign(App, {
 
   rCfg() {
-    const s = D.d.settings, em = s.emisor, tg = s.targets, cls = D.cls();
+    const s = D.d.settings, em = s.emisor, tg = s.targets, cls = D.cls(), fis = s.fiscal || {};
 
     document.getElementById('cfgC').innerHTML =
       this._cfgAccountSection()
@@ -30,6 +30,11 @@ Object.assign(App, {
       + `<div class="cfg-full fg"><label>${t('cfg.bankAccount')}</label><input type="text" id="cfgPago" placeholder="${t('ph.bankAccount')}" value="${esc(em.instruccionesPago || '')}"></div>`
       + `<div class="cfg-full fg"><label>${t('cfg.defaultSubject')}</label><input type="text" id="cfgConcepto" value="${esc(s.conceptoDefault || '')}" placeholder="${t('ph.defaultSubject')}"><label style="font-size:.82rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;margin-top:.45rem;text-transform:none;letter-spacing:0;color:var(--t2);white-space:nowrap"><input type="checkbox" id="cfgConceptoCl" style="margin:0;width:14px;height:14px;accent-color:var(--ac)" ${s.conceptoAppendCliente ? 'checked' : ''}>${t('cfg.appendClientName')}</label></div>`
       + `</div><div class="cfg-save"><button class="bt bt-p" onclick="App.saveDefaults()">${t('btn.save')}</button></div></div>`
+      + `<div class="cfg-section"><div class="cfg-section-title">${t('cfg.fiscalTitle')}</div><div class="cfg-grid">`
+      + `<div class="fg"><label>${t('cfg.rendAnterior')}</label><input type="number" id="cfgFRend" value="${fis.rendAnterior ?? ''}" min="0" step="100" placeholder="—"><div style="font-size:.72rem;color:var(--t3);margin-top:.35rem">${t('cfg.rendAnteriorHelp')}</div></div>`
+      + `<div class="fg"><label>${t('cfg.saldoIva')}</label><input type="number" id="cfgFSaldo" value="${fis.saldoIvaInicial || ''}" min="0" step="0.01" placeholder="0"><div style="font-size:.72rem;color:var(--t3);margin-top:.35rem">${t('cfg.saldoIvaHelp')}</div></div>`
+      + `<div class="cfg-full fg"><label style="font-size:.82rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0;color:var(--t2)"><input type="checkbox" id="cfgFEds" style="margin:0;width:14px;height:14px;accent-color:var(--ac)" ${fis.eds !== false ? 'checked' : ''}>${t('cfg.eds')}</label></div>`
+      + `</div><div class="cfg-save"><button class="bt bt-p" onclick="App.saveFiscal()">${t('btn.save')}</button></div></div>`
       + `<div class="cfg-section"><div class="cfg-section-title">${t('cfg.goals')}</div><div class="cfg-grid">`
       + `<div class="fg"><label>${t('cfg.hoursMonth')}</label><input type="number" id="cfgTHm" value="${tg.horasMes || ''}" min="0" step="1" placeholder="${t('ph.hoursMonth')}"></div>`
       + `<div class="fg"><label>${t('cfg.incomeMonth')}</label><input type="number" id="cfgTIm" value="${tg.ingresosMes || ''}" min="0" step="100" placeholder="${t('ph.incomeMonth')}"></div>`
@@ -254,6 +259,17 @@ Object.assign(App, {
         B.calc(p);
       });
     }
+    D.save();
+    Toast.ok(t('cfg.saved'));
+  },
+
+  saveFiscal() {
+    const s = D.d.settings;
+    if (!s.fiscal) s.fiscal = {};
+    const rend = document.getElementById('cfgFRend').value;
+    s.fiscal.rendAnterior = rend === '' ? null : (parseFloat(rend) || 0);
+    s.fiscal.saldoIvaInicial = parseFloat(document.getElementById('cfgFSaldo').value) || 0;
+    s.fiscal.eds = document.getElementById('cfgFEds').checked;
     D.save();
     Toast.ok(t('cfg.saved'));
   },

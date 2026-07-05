@@ -124,6 +124,13 @@ const D = {
     if (!s.idioma) s.idioma = 'es';
     if (s.calStartHour == null) s.calStartHour = 0;
 
+    /* Fiscal (modelos 130/303/renta — ver TODO/20-modelos-fiscales-casillas.md) */
+    if (!s.fiscal) s.fiscal = {
+      eds: true,             /* estimación directa simplificada → 5% difícil justificación */
+      rendAnterior: null,    /* rendimiento neto del año anterior (casilla 13 del 130) */
+      saldoIvaInicial: 0     /* IVA a compensar pendiente anterior al primer dato en TRACKR */
+    };
+
     /* Verifactu / SIF — solo opciones de usuario. SIF_ID y SOFTWARE_VERSION
        viven en js/verifactu.js como constantes del fabricante, no aquí. */
     if (!s.verifactu) s.verifactu = {

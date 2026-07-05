@@ -22,8 +22,19 @@
 
 ## Las dos modalidades de SIF
 
-- **SIF "no verificable"** — el software cumple integridad/trazabilidad/hash pero **no envía** facturas en tiempo real a la AEAT. **Esta es nuestra opción**: coherente con el ADN local-first, sigue funcionando offline, no requiere certificado del usuario.
-- **SIF "Veri*Factu" (verificable)** — además envía cada factura a la AEAT vía API en cuanto se emite. Requiere certificado digital del autónomo + integración con la API de la AEAT. **No vamos por ahí** por ahora.
+> ⚠️ **CORRECCIÓN (revisión 2026-07-05, FAQs oficiales AEAT):** la premisa de este doc estaba mal.
+> La modalidad **no verificable** es la EXIGENTE, no la fácil:
+> - Exige **firma XAdES (Enveloped) con certificado electrónico de CADA registro** (alta, anulación y eventos) — el hash encadenado solo NO basta.
+> - Exige **registro de eventos** firmado y encadenado (arranque/cierre como NO VERI*FACTU, detección de anomalías, exportaciones, resumen cada 6h de operación).
+> - Exige **conservación inalterable 4+ años** de los registros — localStorage (borrable/editable por el usuario) no puede sostener eso ante una inspección.
+> - La modalidad **Verifactu (remisión continua)** es la que encaja con local-first: remitir a AEAT **exime de firmar y de conservar** los registros (quedan en AEAT). Es justo por esto que la app gratuita de la propia AEAT es modalidad Verifactu.
+> - QR: en no verificable la URL de cotejo es **distinta** (`ValidarQRNoVerifactu`) y NO lleva la leyenda "VERI*FACTU"; encima del QR siempre va "QR tributario:". Tamaño 30×30–40×40 mm, ISO 18004, corrección M.
+> - Fuentes: FAQ firma AEAT, FAQ eventos, FAQ declaración responsable, spec QR v0.5.0 (URLs en TODO/20).
+>
+> **Consecuencia:** el WIP de `verifactu-wip` (hash SHA-256 + QR, sin firma XAdES ni eventos) NO cumpliría la modalidad no verificable tal cual. Opciones reales: (a) modalidad Verifactu con remisión vía Worker (requiere certificado del obligado o colaborador social — investigar), (b) quedar fuera del ámbito SIF (difícil: TRACKR calcula y emite facturas → es un SIF según el criterio AEAT sobre Excel "listos"), o (c) esperar; deadline autónomos 1-jul-2027, y como *fabricante* la obligación de comercializar solo SIF conformes rige desde 29-jul-2025 (sanción art. 201 bis: 150.000 €/ejercicio fabricante, 50.000 €/ejercicio usuario) — mientras sea beta no comercializada como software de facturación el riesgo es bajo, pero es decisión de producto antes del lanzamiento startup.
+
+- **SIF "no verificable"** — el software cumple integridad/trazabilidad/hash pero **no envía** facturas en tiempo real a la AEAT. ~~Esta es nuestra opción: coherente con el ADN local-first, sigue funcionando offline, no requiere certificado del usuario.~~ ← incorrecto, ver corrección arriba.
+- **SIF "Veri*Factu" (verificable)** — además envía cada factura a la AEAT vía API en cuanto se emite. Requiere certificado digital del autónomo + integración con la API de la AEAT.
 
 ---
 

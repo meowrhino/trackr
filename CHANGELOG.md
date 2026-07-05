@@ -5,6 +5,27 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-07-05 — Modelos fiscales reales: 130 acumulativo, 303 con numeración oficial y arrastre, renta D1
+
+Investigación previa con fuentes oficiales AEAT/BOE (referencia casilla por casilla en `TODO/20-modelos-fiscales-casillas.md`). El resumen fiscal pasa de aproximación a casillas exactas del formulario.
+
+### 🔴 Fixes (los números que copiabas estaban mal)
+- **Modelo 130 ahora es ACUMULATIVO** como el oficial: casillas 01/02/06 desde el 1 de enero, casilla 05 descuenta los pagos de trimestres anteriores (Σ07 positivas), y los negativos se arrastran vía 19→15 dentro del año. Antes cada trimestre se calculaba aislado → mal desde T2. _frontend_
+- **Numeración del 303 corregida**: el 21% va en las casillas **07/08/09** (antes 01-03, que son del 4%), y la cuota de IVA soportado corriente en la **29** (antes 30, que es bienes de inversión). _frontend_
+
+### ✨ Nuevo
+- **130**: 5% de gastos de difícil justificación (EDS, tope 2.000 €/año) y casilla 13 (minoración 100/75/50/25 € si el rendimiento del año anterior fue ≤ 12.000 €; configurable). El 130 sale ahora más BAJO para casi todo el mundo — antes TRACKR te hacía pagar de más.
+- **303**: arrastre de saldo a compensar entre trimestres y años (casillas 110/78/87, resultado 71/72), con saldo inicial pre-TRACKR configurable.
+- **Renta (Modelo 100, apartado D1)**: casillas reales 0171/0218/0221/0222/0224 + pagos a cuenta 0599 (retenciones) y 0604 (suma de los 130 del año).
+- **Configuración → Fiscal**: rendimiento neto del año anterior, saldo IVA previo, toggle EDS.
+- **Criterio unificado**: todo lo fiscal por devengo (fecha factura) y bases sin IVA — antes la renta anual iba por caja y con totales, y no cuadraba con la trimestral.
+
+### 📚 Docs
+- `TODO/20-modelos-fiscales-casillas.md` — referencia completa 130/303/renta con fórmulas y fuentes.
+- `TODO/15-verifactu.md` — corrección importante: la modalidad "no verificable" exige firma XAdES por registro + log de eventos (el hash encadenado solo no basta); la ruta realista para local-first es la modalidad Verifactu con remisión vía Worker. Deadline autónomos confirmado: 1-jul-2027 (RDL 15/2025).
+
+---
+
 ## 2026-06-11 — Repaso a fondo: fixes críticos + accesibilidad
 
 Revisión en profundidad (6 agentes de código en paralelo + recorrido UX/UI en vivo, desktop y móvil). Esta tanda implementa los quick wins críticos y la primera tanda de accesibilidad; el resto queda como backlog priorizado (ver memoria del proyecto).

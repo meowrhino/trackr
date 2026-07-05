@@ -281,130 +281,251 @@ Object.assign(App, {
 
   /* ══════════════════════════════════════
    *  RESUMEN TRIMESTRAL (Modelo 303/130)
+   *  Referencia de casillas: TODO/20-modelos-fiscales-casillas.md
    * ══════════════════════════════════════ */
-  _rDinTrim() {
-    const el = document.getElementById('dinTrim');
-    const y = this.dinY, m = this.dinM;
-    const type = this.dinPeriod;
 
-    /* En vista mes usamos trimestre actual para 303/130 */
-    const trimType = type === 'mes' ? 'trim' : type;
-    const ps = D.ps();
+  /** Config fiscal del usuario con defaults (schema en store.ensure) */
+  _fiscalCfg() {
+    const f = D.d.settings.fiscal || {};
+    return {
+      eds: f.eds !== false,
+      rendAnterior: (f.rendAnterior == null || f.rendAnterior === '') ? null : +f.rendAnterior,
+      saldoIvaInicial: +f.saldoIvaInicial || 0
+    };
+  },
 
-    /* 303: IVA repercutido agrupado por tipo {21: {base, cuota}, 10: ..., 4: ...} */
-    const ivaRep = {};
-    /* 303: IVA soportado agrupado por tipo */
-    const ivaSop = {};
-    /* 130: IRPF */
-    let ingresos130 = 0, gastos130 = 0, retenciones = 0;
-    /* Para warning: proyectos con facturación pero sin facturaFecha */
+  /**
+   * Datos fiscales brutos de un trimestre (q: 0-3).
+   * Criterio de devengo: fecha de emisión de factura, bases sin IVA.
+   * Las "deducciones" (cuota autónomos, etc.) cuentan como gasto.
+   */
+  _fiscalQ(y, q) {
+    const m = q * 3;
+    const ivaRep = {}, ivaSop = {};
+    let ingresos = 0, gastos = 0, retenciones = 0;
     const sinFecha = [];
-
-    ps.forEach(p => {
+    D.ps().forEach(p => {
       B.calc(p);
       const f = p.facturacion;
       p.horas.forEach(h => {
-        if (h.fecha && inPeriod(h.fecha, trimType, y, m)) {
-          if (h.monto) ingresos130 += h.monto;
-        }
+        if (h.fecha && inPeriod(h.fecha, 'trim', y, m) && h.monto) ingresos += h.monto;
       });
-      /* Devengo: usar fecha de factura, no fecha de cobro */
-      if (f.facturaFecha && inPeriod(f.facturaFecha, trimType, y, m) && f.baseImponible) {
+      if (f.facturaFecha && inPeriod(f.facturaFecha, 'trim', y, m) && f.baseImponible) {
         const tipo = f.iva || 0;
         if (!ivaRep[tipo]) ivaRep[tipo] = { base: 0, cuota: 0 };
         ivaRep[tipo].base += f.baseImponible || 0;
         ivaRep[tipo].cuota += f.importeIva || 0;
-        ingresos130 += f.baseImponible || 0;
+        ingresos += f.baseImponible || 0;
         retenciones += f.importeIrpf || 0;
       }
-      /* Detectar facturas potencialmente del trimestre que no tienen facturaFecha */
+      /* Facturas con importe pero sin fecha: no entran en ningún periodo */
       if (!f.facturaFecha && (f.baseImponible || 0) > 0 && f.modo !== 'gratis' && p.estado !== 'potencial') {
         sinFecha.push(p.nombre);
       }
     });
-
     D.gs().forEach(g => {
+      if (!g.desgravable) return;
       const tipo = g.tipoIva || 21;
       let baseSum = 0, ivaSum = 0;
       (g.entradas || []).forEach(e => {
-        if (e.fecha && inPeriod(e.fecha, trimType, y, m)) {
+        if (e.fecha && inPeriod(e.fecha, 'trim', y, m)) {
           baseSum += e.base || 0;
           ivaSum += e.iva || 0;
         }
       });
-      if (g.desgravable && (baseSum > 0 || ivaSum > 0)) {
+      if (baseSum > 0 || ivaSum > 0) {
         if (!ivaSop[tipo]) ivaSop[tipo] = { base: 0, cuota: 0 };
         ivaSop[tipo].base += baseSum;
         ivaSop[tipo].cuota += ivaSum;
-        gastos130 += baseSum;
+        gastos += baseSum;
       }
     });
+    const deds = D.deds().filter(d => d.fecha && inPeriod(d.fecha, 'trim', y, m));
+    gastos += deds.reduce((s, d) => s + (d.cantidad || 0), 0);
+    return { ivaRep, ivaSop, ingresos, gastos, retenciones, deds, sinFecha };
+  },
 
-    /* Deducciones del periodo */
-    const trimDeds = D.deds().filter(d => d.fecha && inPeriod(d.fecha, trimType, y, m));
-    const totalTrimDeds = trimDeds.reduce((s, d) => s + (d.cantidad || 0), 0);
-    gastos130 += totalTrimDeds;
+  /** Primer año con datos fiscales (para el arrastre de saldo IVA) */
+  _fiscalFirstYear() {
+    let min = null;
+    D.ps().forEach(p => {
+      const f = p.facturacion?.facturaFecha;
+      if (f) { const yy = +f.slice(0, 4); if (!min || yy < min) min = yy; }
+    });
+    D.gs().forEach(g => (g.entradas || []).forEach(e => {
+      if (e.fecha) { const yy = +e.fecha.slice(0, 4); if (!min || yy < min) min = yy; }
+    }));
+    return min;
+  },
 
-    const totRepCuota = Object.values(ivaRep).reduce((s, x) => s + x.cuota, 0);
-    const totSopCuota = Object.values(ivaSop).reduce((s, x) => s + x.cuota, 0);
-    const iva303 = totRepCuota - totSopCuota;
+  /**
+   * Modelo 130 del año y, trimestres 0..uptoQ — ACUMULATIVO como el modelo real:
+   * casillas 01/02/06 acumuladas desde el 1 de enero; 05 = Σ07 positivas anteriores;
+   * negativos de 19 se arrastran vía 15 dentro del año.
+   * No soportadas (= 0): 08-11 agrícolas, 16 vivienda pre-2013, 18 complementarias.
+   */
+  _calc130Year(y, uptoQ, qData) {
+    const cfg = this._fiscalCfg();
+    /* Casilla 13: minoración art. 110.3.c RIRPF según rendimiento neto del año anterior */
+    const rn = cfg.rendAnterior;
+    const minor = rn == null ? 0 : rn <= 9000 ? 100 : rn <= 10000 ? 75 : rn <= 11000 ? 50 : rn <= 12000 ? 25 : 0;
+    const out = [];
+    let acumIng = 0, acumGas = 0, acumRet = 0, pendNeg = 0;
+    for (let q = 0; q <= uptoQ; q++) {
+      const d = (qData && qData[q]) || this._fiscalQ(y, q);
+      acumIng += d.ingresos; acumGas += d.gastos; acumRet += d.retenciones;
+      const c01 = acumIng;
+      /* EDS: 5% de difícil justificación sobre la diferencia positiva, tope 2.000 €/año */
+      const dj = cfg.eds ? Math.min(0.05 * Math.max(c01 - acumGas, 0), 2000) : 0;
+      const c02 = acumGas + dj;
+      const c03 = c01 - c02;
+      const c04 = c03 > 0 ? c03 * 0.20 : 0;
+      const c05 = out.reduce((s, prev) => s + Math.max(prev.c07, 0), 0);
+      const c06 = acumRet;
+      const c07 = c04 - c05 - c06;
+      const c12 = Math.max(c07, 0);
+      const c13 = minor;
+      const c14 = c12 - c13;
+      let c15 = 0;
+      if (c14 > 0 && pendNeg > 0) { c15 = Math.min(pendNeg, c14); pendNeg -= c15; }
+      const c17 = c14 - c15;
+      const c19 = c17;
+      if (c19 < 0 && q < 3) pendNeg += -c19;
+      out.push({ q, c01, c02, dj, c03, c04, c05, c06, c07, c12, c13, c14, c15, c17, c19 });
+    }
+    return out;
+  },
 
-    const rNeto130 = ingresos130 - gastos130;
-    const pago130 = Math.max(rNeto130 * 0.20, 0);
-    const irpf130 = pago130 - retenciones;
+  /**
+   * Modelo 303 de (y, q) con arrastre de saldo a compensar (casillas 110/78/87)
+   * desde el primer dato registrado + saldo inicial configurable.
+   * Asume "a compensar" siempre (no modela solicitar devolución en 4T) ni caducidad (4 años).
+   */
+  _calc303(y, q, qDataOfY) {
+    const cfg = this._fiscalCfg();
+    let carry = cfg.saldoIvaInicial;
+    const first = this._fiscalFirstYear() ?? y;
+    let res = null;
+    for (let yy = Math.min(first, y); yy <= y; yy++) {
+      const lastQ = yy === y ? q : 3;
+      for (let qq = 0; qq <= lastQ; qq++) {
+        const d = (yy === y && qDataOfY && qDataOfY[qq]) || this._fiscalQ(yy, qq);
+        const repCuota = Object.values(d.ivaRep).reduce((s, x) => s + x.cuota, 0);
+        const sopCuota = Object.values(d.ivaSop).reduce((s, x) => s + x.cuota, 0);
+        const c46 = repCuota - sopCuota;
+        const c110 = carry;
+        const c78 = c46 > 0 ? Math.min(carry, c46) : 0;   /* compensación aplicada */
+        const c87 = c110 - c78;                            /* saldo viejo que sigue pendiente */
+        const c69 = c46 - c78;                             /* resultado (= c71 en nuestro perfil) */
+        carry = c87 + (c46 < 0 ? -c46 : 0);                /* el negativo nuevo alimenta el 110 siguiente */
+        res = { c46, c110, c78, c87, c69, c71: c69, carryNext: carry };
+      }
+    }
+    return res;
+  },
 
-    const qLabel = trimType === 'trim' ? `T${Math.floor(m / 3) + 1} ${y}` : `${y}`;
+  _rDinTrim() {
+    const el = document.getElementById('dinTrim');
+    const y = this.dinY, m = this.dinM;
+    const isYear = this.dinPeriod === 'año';
+    const q = isYear ? 3 : Math.floor(m / 3);
 
-    const dedsHtml = this._renderDedList(trimDeds);
+    /* Trimestres del año hasta el visible (el 130 es acumulativo) */
+    const qData = [];
+    for (let i = 0; i <= q; i++) qData.push(this._fiscalQ(y, i));
+    const dQ = qData[q];
+    const sinFecha = [...new Set(dQ.sinFecha)];
+
+    const r130 = this._calc130Year(y, q, qData);
+    const t130 = r130[q];
+    const t303 = this._calc303(y, q, qData);
+
+    /* Vista año: devengado/soportado agregados (informativo, estilo 390) */
+    let ivaRep, ivaSop;
+    if (isYear) {
+      ivaRep = {}; ivaSop = {};
+      qData.forEach(d => {
+        Object.entries(d.ivaRep).forEach(([tp, v]) => {
+          if (!ivaRep[tp]) ivaRep[tp] = { base: 0, cuota: 0 };
+          ivaRep[tp].base += v.base; ivaRep[tp].cuota += v.cuota;
+        });
+        Object.entries(d.ivaSop).forEach(([tp, v]) => {
+          if (!ivaSop[tp]) ivaSop[tp] = { base: 0, cuota: 0 };
+          ivaSop[tp].base += v.base; ivaSop[tp].cuota += v.cuota;
+        });
+      });
+    } else {
+      ivaRep = dQ.ivaRep; ivaSop = dQ.ivaSop;
+    }
+    const iva303Year = isYear ? qData.reduce((s, d) =>
+      s + Object.values(d.ivaRep).reduce((a, x) => a + x.cuota, 0)
+        - Object.values(d.ivaSop).reduce((a, x) => a + x.cuota, 0), 0) : 0;
+
+    const qLabel = isYear ? `${y}` : `T${q + 1} ${y}`;
+    const dedsShown = isYear ? qData.flatMap(d => d.deds) : dQ.deds;
+    const dedsHtml = this._renderDedList(dedsShown);
 
     /* Stash datos para botones copiar */
-    this._lastTrimData = {
-      label: qLabel, ivaRep, ivaSop, iva303,
-      ingresos130, gastos130, rNeto130, pago130, retenciones, irpf130
-    };
+    this._lastTrimData = { label: qLabel, isYear, q, ivaRep, ivaSop, iva303Year, t303, t130 };
 
-    /* Render casillas 303 */
+    /* Render casillas 303 — numeración oficial: 4% → 01-03, 10% → 04-06, 21% → 07-09, 0% → 150-152 */
+    const codes303 = { 4: ['01', '02', '03'], 10: ['04', '05', '06'], 21: ['07', '08', '09'], 0: ['150', '151', '152'] };
     const tiposRep = Object.keys(ivaRep).map(Number).sort((a, b) => b - a);
     let html303 = '';
-    if (!tiposRep.length) {
+    if (!tiposRep.length && !Object.keys(ivaSop).length && !(t303.c110 > 0)) {
       html303 = `<div style="font-size:.78rem;color:var(--t3);padding:.5rem 0">${t('din.noInvoicesThisPeriod')}</div>`;
     } else {
-      /* Casillas 01-03 (21%), 04-06 (10%), 07-09 (4%) — IVA repercutido */
-      const codes = { 21: ['01','02','03'], 10: ['04','05','06'], 4: ['07','08','09'], 0: ['—','—','—'] };
       tiposRep.forEach(tipo => {
-        const c = codes[tipo] || ['—','—','—'];
+        const c = codes303[tipo] || ['—', '—', '—'];
         const d = ivaRep[tipo];
         html303 += `<div class="casilla-row"><span class="casilla-num">${c[0]}</span><span class="casilla-label">${t('din.taxBase')} ${tipo}%</span><span class="casilla-val">${fmtMoney(d.base)}</span></div>`;
         html303 += `<div class="casilla-row"><span class="casilla-num">${c[1]}</span><span class="casilla-label">${t('din.vatRate')}</span><span class="casilla-val">${tipo} %</span></div>`;
         html303 += `<div class="casilla-row"><span class="casilla-num">${c[2]}</span><span class="casilla-label">${t('din.vatChargedAmt')}</span><span class="casilla-val">${fmtMoney(d.cuota)}</span></div>`;
       });
-      /* Casillas 28-30 — IVA soportado deducible (resumido) */
+      /* IVA soportado corriente: base 28, cuota 29 */
       const baseSopTot = Object.values(ivaSop).reduce((s, x) => s + x.base, 0);
+      const cuotaSopTot = Object.values(ivaSop).reduce((s, x) => s + x.cuota, 0);
       if (baseSopTot > 0) {
         html303 += `<div class="casilla-row casilla-sep"><span class="casilla-num">28</span><span class="casilla-label">${t('din.inputBase')}</span><span class="casilla-val">${fmtMoney(baseSopTot)}</span></div>`;
-        html303 += `<div class="casilla-row"><span class="casilla-num">30</span><span class="casilla-label">${t('din.inputVat')}</span><span class="casilla-val">${fmtMoney(totSopCuota)}</span></div>`;
+        html303 += `<div class="casilla-row"><span class="casilla-num">29</span><span class="casilla-label">${t('din.inputVat')}</span><span class="casilla-val">${fmtMoney(cuotaSopTot)}</span></div>`;
       }
-      /* Resultado 46/71 */
-      const codigo = iva303 >= 0 ? '46' : '71';
-      const label = iva303 >= 0 ? t('din.toPay') : t('din.toRefund');
-      const color = iva303 > 0 ? 'var(--warn)' : 'var(--ok)';
-      html303 += `<div class="casilla-row casilla-result"><span class="casilla-num">${codigo}</span><span class="casilla-label">${label}</span><span class="casilla-val" style="color:${color}">${fmtMoney(Math.abs(iva303))}</span></div>`;
+      if (isYear) {
+        html303 += `<div class="casilla-row casilla-result"><span class="casilla-num">&Sigma;46</span><span class="casilla-label">${t('din.result46')}</span><span class="casilla-val" style="color:${iva303Year > 0 ? 'var(--warn)' : 'var(--ok)'}">${fmtMoney(iva303Year)}</span></div>`;
+      } else {
+        html303 += `<div class="casilla-row casilla-sep"><span class="casilla-num">46</span><span class="casilla-label">${t('din.result46')}</span><span class="casilla-val">${fmtMoney(t303.c46)}</span></div>`;
+        if (t303.c110 > 0) {
+          html303 += `<div class="casilla-row"><span class="casilla-num">110</span><span class="casilla-label">${t('din.prevBalance')}</span><span class="casilla-val">${fmtMoney(t303.c110)}</span></div>`;
+          if (t303.c78 > 0) html303 += `<div class="casilla-row"><span class="casilla-num">78</span><span class="casilla-label">${t('din.compApplied')}</span><span class="casilla-val">&minus;${fmtMoney(t303.c78)}</span></div>`;
+          if (t303.c87 > 0) html303 += `<div class="casilla-row"><span class="casilla-num">87</span><span class="casilla-label">${t('din.compPending')}</span><span class="casilla-val">${fmtMoney(t303.c87)}</span></div>`;
+        }
+        if (t303.c71 >= 0) {
+          html303 += `<div class="casilla-row casilla-result"><span class="casilla-num">71</span><span class="casilla-label">${t('din.toPay')}</span><span class="casilla-val" style="color:${t303.c71 > 0 ? 'var(--warn)' : 'var(--ok)'}">${fmtMoney(t303.c71)}</span></div>`;
+        } else {
+          html303 += `<div class="casilla-row casilla-result"><span class="casilla-num">72</span><span class="casilla-label">${t('din.toCompensate')}</span><span class="casilla-val" style="color:var(--ok)">${fmtMoney(-t303.c71)}</span></div>`;
+        }
+      }
     }
 
-    /* Render casillas 130 */
+    /* Render casillas 130 — acumulativo del año */
     let html130 = '';
-    if (ingresos130 === 0 && gastos130 === 0) {
+    if (t130.c01 === 0 && t130.c02 === 0) {
       html130 = `<div style="font-size:.78rem;color:var(--t3);padding:.5rem 0">${t('din.noInvoicesThisPeriod')}</div>`;
     } else {
-      html130 += `<div class="casilla-row"><span class="casilla-num">01</span><span class="casilla-label">${t('din.income')}</span><span class="casilla-val">${fmtMoney(ingresos130)}</span></div>`;
-      html130 += `<div class="casilla-row"><span class="casilla-num">02</span><span class="casilla-label">${t('din.deductibleExp')}</span><span class="casilla-val">${fmtMoney(gastos130)}</span></div>`;
-      html130 += `<div class="casilla-row"><span class="casilla-num">03</span><span class="casilla-label">${t('din.netProfit')}</span><span class="casilla-val">${fmtMoney(rNeto130)}</span></div>`;
-      html130 += `<div class="casilla-row"><span class="casilla-num">04</span><span class="casilla-label">${t('din.twentyPercent')}</span><span class="casilla-val">${fmtMoney(pago130)}</span></div>`;
-      html130 += `<div class="casilla-row"><span class="casilla-num">06</span><span class="casilla-label">${t('din.withholdings')}</span><span class="casilla-val">${fmtMoney(retenciones)}</span></div>`;
-      const codigo = irpf130 >= 0 ? '07' : '14';
-      const label = irpf130 >= 0 ? t('din.toPay') : t('din.toRefund');
-      const color = irpf130 > 0 ? 'var(--warn)' : 'var(--ok)';
-      html130 += `<div class="casilla-row casilla-result"><span class="casilla-num">${codigo}</span><span class="casilla-label">${label}</span><span class="casilla-val" style="color:${color}">${fmtMoney(Math.abs(irpf130))}</span></div>`;
+      const row130 = (num, label, val, extra = '', style = '') =>
+        `<div class="casilla-row${extra}"><span class="casilla-num">${num}</span><span class="casilla-label">${label}</span><span class="casilla-val"${style}>${val}</span></div>`;
+      html130 += `<div style="font-size:.7rem;color:var(--t3);margin-bottom:.35rem">${t('din.cumulativeNote')}</div>`;
+      html130 += row130('01', t('din.income'), fmtMoney(t130.c01));
+      html130 += row130('02', t('din.deductibleExp'), fmtMoney(t130.c02));
+      if (t130.dj > 0) html130 += `<div style="font-size:.7rem;color:var(--t3);margin:-.15rem 0 .2rem">${t('din.hardToJustify', fmtMoney(t130.dj))}</div>`;
+      html130 += row130('03', t('din.netProfit'), fmtMoney(t130.c03));
+      html130 += row130('04', t('din.twentyPercent'), fmtMoney(t130.c04));
+      if (t130.c05 > 0) html130 += row130('05', t('din.prevPayments'), '&minus;' + fmtMoney(t130.c05));
+      html130 += row130('06', t('din.withholdings'), '&minus;' + fmtMoney(t130.c06));
+      if (t130.c13 > 0) html130 += row130('13', t('din.minoracion'), '&minus;' + fmtMoney(t130.c13));
+      if (t130.c15 > 0) html130 += row130('15', t('din.prevNegatives'), '&minus;' + fmtMoney(t130.c15));
+      const label19 = t130.c19 >= 0 ? t('din.toPay') : (q < 3 ? t('din.toDeduct') : t('din.negativeQ4'));
+      const color19 = t130.c19 > 0 ? 'var(--warn)' : 'var(--ok)';
+      html130 += row130('19', label19, fmtMoney(Math.abs(t130.c19)), ' casilla-result', ` style="color:${color19}"`);
     }
 
     const warnHtml = sinFecha.length
@@ -439,7 +560,7 @@ Object.assign(App, {
     const d = this._lastTrimData;
     if (!d) return;
     const lines = [`Modelo 303 — ${d.label}`];
-    const codes = { 21: ['01','02','03'], 10: ['04','05','06'], 4: ['07','08','09'], 0: ['—','—','—'] };
+    const codes = { 4: ['01','02','03'], 10: ['04','05','06'], 21: ['07','08','09'], 0: ['150','151','152'] };
     const tipos = Object.keys(d.ivaRep).map(Number).sort((a,b)=>b-a);
     tipos.forEach(tipo => {
       const c = codes[tipo] || ['—','—','—'];
@@ -452,10 +573,20 @@ Object.assign(App, {
     const cuoSop = Object.values(d.ivaSop).reduce((s,x)=>s+x.cuota,0);
     if (baseSop > 0) {
       lines.push(`28  Base IVA soportado: ${fmtMoney(baseSop)}`);
-      lines.push(`30  Cuota IVA soportado: ${fmtMoney(cuoSop)}`);
+      lines.push(`29  Cuota IVA soportado: ${fmtMoney(cuoSop)}`);
     }
-    const codigo = d.iva303 >= 0 ? '46' : '71';
-    lines.push(`${codigo}  ${d.iva303 >= 0 ? 'A ingresar' : 'A devolver'}: ${fmtMoney(Math.abs(d.iva303))}`);
+    if (d.isYear) {
+      lines.push(`Σ46 Resultado del año: ${fmtMoney(d.iva303Year)}`);
+    } else {
+      const t3 = d.t303;
+      lines.push(`46  Resultado régimen general: ${fmtMoney(t3.c46)}`);
+      if (t3.c110 > 0) {
+        lines.push(`110 Saldo de periodos anteriores: ${fmtMoney(t3.c110)}`);
+        if (t3.c78 > 0) lines.push(`78  Compensado este periodo: ${fmtMoney(t3.c78)}`);
+        if (t3.c87 > 0) lines.push(`87  Pendiente para periodos siguientes: ${fmtMoney(t3.c87)}`);
+      }
+      lines.push(t3.c71 >= 0 ? `71  A ingresar: ${fmtMoney(t3.c71)}` : `72  A compensar: ${fmtMoney(-t3.c71)}`);
+    }
     this._copyToClipboard(lines.join('\n'));
   },
 
@@ -463,15 +594,19 @@ Object.assign(App, {
   copyTrim130() {
     const d = this._lastTrimData;
     if (!d) return;
-    const lines = [`Modelo 130 — ${d.label}`,
-      `01  Ingresos: ${fmtMoney(d.ingresos130)}`,
-      `02  Gastos deducibles: ${fmtMoney(d.gastos130)}`,
-      `03  Rendimiento neto: ${fmtMoney(d.rNeto130)}`,
-      `04  20%: ${fmtMoney(d.pago130)}`,
-      `06  Retenciones: ${fmtMoney(d.retenciones)}`
+    const c = d.t130;
+    const lines = [`Modelo 130 — ${d.label} (acumulado desde el 1 de enero)`,
+      `01  Ingresos: ${fmtMoney(c.c01)}`,
+      `02  Gastos deducibles: ${fmtMoney(c.c02)}` + (c.dj > 0 ? ` (incluye ${fmtMoney(c.dj)} del 5% de difícil justificación)` : ''),
+      `03  Rendimiento neto: ${fmtMoney(c.c03)}`,
+      `04  20%: ${fmtMoney(c.c04)}`,
+      `05  Pagos fraccionados anteriores: ${fmtMoney(c.c05)}`,
+      `06  Retenciones: ${fmtMoney(c.c06)}`,
+      `07  Pago fraccionado previo: ${fmtMoney(c.c07)}`
     ];
-    const codigo = d.irpf130 >= 0 ? '07' : '14';
-    lines.push(`${codigo}  ${d.irpf130 >= 0 ? 'A ingresar' : 'A devolver'}: ${fmtMoney(Math.abs(d.irpf130))}`);
+    if (c.c13 > 0) lines.push(`13  Minoración rendimientos bajos: ${fmtMoney(c.c13)}`);
+    if (c.c15 > 0) lines.push(`15  Negativos de trimestres anteriores: ${fmtMoney(c.c15)}`);
+    lines.push(`19  ${c.c19 >= 0 ? 'A ingresar' : (d.q < 3 ? 'A deducir en próximos trimestres' : 'Negativa (se recupera en la Renta)')}: ${fmtMoney(Math.abs(c.c19))}`);
     this._copyToClipboard(lines.join('\n'));
   },
 
@@ -490,45 +625,27 @@ Object.assign(App, {
   },
 
   /* ══════════════════════════════════════
-   *  RENTA (Modelo 100)
+   *  RENTA (Modelo 100, apartado D1 — estimación directa)
+   *  Mismo criterio que el trimestral: devengo, bases sin IVA.
    * ══════════════════════════════════════ */
   _rDinRenta() {
     const el = document.getElementById('dinRenta');
     const y = this.dinY;
+    const cfg = this._fiscalCfg();
 
-    /* Annual income */
-    let ingresosAnual = 0;
-    D.ps().forEach(p => {
-      B.calc(p);
-      const f = p.facturacion;
-      p.horas.forEach(h => {
-        if (h.fecha && h.fecha.startsWith(String(y)) && h.monto) ingresosAnual += h.monto;
-      });
-      (f.cobros || []).forEach(c => {
-        if (c.fecha && c.fecha.startsWith(String(y))) {
-          const tf = f.totalFactura || 0;
-          const ratio = tf > 0 ? (c.cantidad / tf) : 0;
-          ingresosAnual += (f.baseImponible || 0) * ratio;
-        }
-      });
-    });
+    const qData = [0, 1, 2, 3].map(q => this._fiscalQ(y, q));
+    const ingresos = qData.reduce((s, d) => s + d.ingresos, 0);          /* → 0171/0180 */
+    const gastos = qData.reduce((s, d) => s + d.gastos, 0);              /* → 0218 (deducciones incluidas) */
+    const dif = ingresos - gastos;                                       /* 0221 */
+    const dj = cfg.eds ? Math.min(0.05 * Math.max(dif, 0), 2000) : 0;    /* 0222 */
+    const rendimiento = dif - dj;                                        /* 0224 */
+    const ret599 = qData.reduce((s, d) => s + d.retenciones, 0);         /* 0599 */
+    const pf604 = this._calc130Year(y, 3, qData)
+      .reduce((s, c) => s + Math.max(c.c19, 0), 0);                      /* 0604 */
+    const deds = qData.flatMap(d => d.deds);
 
-    /* Annual business expenses (only desgravable) */
-    let gastosAnual = 0;
-    D.gs().forEach(g => {
-      if (!g.desgravable) return;
-      (g.entradas || []).forEach(e => {
-        if (e.fecha && e.fecha.startsWith(String(y))) gastosAnual += e.total || e.cantidad || 0;
-      });
-    });
-
-    const rendimiento = ingresosAnual - gastosAnual;
-
-    /* Deducibles for this year */
-    const yStr = String(y);
-    const deds = D.deds().filter(d => d.fecha && d.fecha.startsWith(yStr));
-    const totalDeds = deds.reduce((s, d) => s + (d.cantidad || 0), 0);
-    const baseImponible = rendimiento - totalDeds;
+    const rowR = (num, label, val, total = false) =>
+      `<div class="din-tax-row${total ? ' din-tax-total' : ''}"><span><span class="casilla-num" style="margin-right:.4rem">${num}</span>${label}</span><span class="m">${val}</span></div>`;
 
     let html = `<div class="info-section">`
       + `<div class="din-gastos-header">`
@@ -536,18 +653,25 @@ Object.assign(App, {
       +   `<button class="bt bt-s" onclick="App.dedModal()">+ ${t('renta.addDeduction')}</button>`
       + `</div>`
       + `<div class="din-trim-card" style="margin-top:.75rem">`
-      +   `<div class="din-tax-row"><span>${t('renta.annualIncome')}</span><span class="m">${fmtMoney(ingresosAnual)}</span></div>`
-      +   `<div class="din-tax-row"><span>${t('renta.businessExpenses')}</span><span class="m">${fmtMoney(gastosAnual)}</span></div>`
-      +   `<div class="din-tax-row din-tax-total"><span>${t('renta.activityProfit')}</span><span class="m">${fmtMoney(rendimiento)}</span></div>`
+      +   `<div style="font-size:.7rem;color:var(--t3);margin-bottom:.35rem">${t('renta.devengoNote')}</div>`
+      +   rowR('0171', t('renta.annualIncome'), fmtMoney(ingresos))
+      +   rowR('0218', t('renta.businessExpenses'), fmtMoney(gastos))
+      +   rowR('0221', t('renta.diff'), fmtMoney(dif))
+      +   (dj > 0 ? rowR('0222', t('renta.dj'), '&minus;' + fmtMoney(dj)) : '')
+      +   rowR('0224', t('renta.activityProfit'), fmtMoney(rendimiento), true)
+      + `</div>`
+      + `<div class="din-trim-card" style="margin-top:.75rem">`
+      +   rowR('0599', t('renta.withhold599'), fmtMoney(ret599))
+      +   rowR('0604', t('renta.pf604'), fmtMoney(pf604))
       + `</div>`;
 
     const dedListHtml = this._renderDedList(deds);
-    html += dedListHtml || `<div class="din-empty" style="margin-top:.5rem">${t('renta.noDeductions')}</div>`;
-
-    html += `<div class="din-trim-card" style="margin-top:.75rem">`
-      + `<div class="din-tax-row"><span>${t('renta.totalDeductions')}</span><span class="m">${fmtMoney(totalDeds)}</span></div>`
-      + `<div class="din-tax-row din-tax-total"><span>${t('renta.taxableIncome')}</span><span class="m" style="color:${baseImponible >= 0 ? 'var(--ok)' : 'var(--warn)'}">${fmtMoney(baseImponible)}</span></div>`
-      + `</div></div>`;
+    if (dedListHtml) {
+      html += `<div style="font-size:.72rem;color:var(--t3);margin-top:.75rem">${t('renta.dedsIncluded')}</div>` + dedListHtml;
+    } else {
+      html += `<div class="din-empty" style="margin-top:.5rem">${t('renta.noDeductions')}</div>`;
+    }
+    html += `</div>`;
 
     el.innerHTML = html;
   },
