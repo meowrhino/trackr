@@ -115,6 +115,36 @@ natural para "remitir pendientes de mis clientes".
 
 ---
 
+## Pendientes conocidos tras la revisión (2026-07-16)
+
+Hallazgos reales de la revisión multi-agente que se dejaron para más adelante (no
+bloquean la beta con Diega, que es monodispositivo):
+
+- **Grant obsoleto en merge multidispositivo** (CONFIRMADO): `mergeData` funde
+  `settings` con "local gana" y `gestorGrant` vive ahí sin reconciliación por
+  tombstone. Si una persona usa dos dispositivos y revoca/vincula en uno, el otro
+  con estado viejo puede resucitar el grant revocado o borrar el nuevo al hacer
+  merge en un 409. Se autocura parcialmente (pushShadow recibe 404 del grant
+  revocado y lo limpia), pero el caso inverso no. Es el mismo límite de "sin
+  tombstones" ya documentado en account.js. Arreglo real: reconciliar `gestorGrant`
+  contra el servidor (`GET /v1/grants`) tras cada pull/merge. Prioridad media.
+- **Whitelist de alcance fiscal con deriva de esquema** (altitud): `buildShareData`
+  lista a mano los campos fiscales; si el store gana un array top-level nuevo, ni se
+  comparte ni se excluye conscientemente. Añadir un test que ligue la lista al
+  esquema de `store.js`, o un guard de campos desconocidos. Prioridad media.
+- **Rol por handler, no en el router** (altitud): cada endpoint de `gestor.js` llama
+  a `authRole(...)` con su rol; un endpoint nuevo (Etapa B) que lo olvide queda
+  abierto. Cuando se añada la escritura por operaciones, montar una tabla
+  ruta→rol comprobada en el router. Prioridad: al hacer Etapa B.
+- **`userSet` vs migración versionada** (altitud): el flag que fuerza
+  `verifactu.habilitado=false` es un sentinel paralelo al sistema de migración por
+  versión del store. Unificar cuando se toque la migración. Prioridad baja.
+- **i18n de app.gestor.js inline** (reuse): mover las cadenas a `lang.js` como el
+  resto de la app. Mecánico, bajo riesgo. Prioridad baja.
+- Menores: `lastInvoiceHash` global engañoso con multi-emisor (solo se muestra),
+  `size_bytes` sin consumidor, `verifyChain` secuencial (barato a N pequeño),
+  `_cfgVerifactuSection` reordena en cada render.
+
 ## Orden de construcción (estimación ~4-6 días + backend)
 
 1. Esquema D1 (role, gestor_keys, grants) + endpoints de grants.
