@@ -26,6 +26,9 @@
       confirmLogout: '¿Cerrar sesión? Tus datos locales se mantienen en este navegador.', adminBadge: 'admin',
       cfgPrompt: 'Inicia sesión o crea una cuenta para sincronizar tus datos cifrados en la nube y usarlos en varios dispositivos.',
       syncing: 'Sincronizando…', syncErrShort: 'Error de sync', pendingShort: 'Pendiente', locked2: 'Bloqueado',
+      roleLabel: 'Tipo de cuenta', rolePersona: 'Persona', rolePersonaDesc: 'Para llevar tu actividad: proyectos, horas, gastos, facturas.',
+      roleGestor: 'Gestoría', roleGestorDesc: 'Para ver los datos de tus clientes de TRACKR (con su consentimiento). La cuenta empieza vacía.',
+      gestorBadge: 'gestoría',
     },
     en: {
       title: 'Account & sync', zk: 'Your data is encrypted in your browser before upload. Neither we nor the server can read it (zero-knowledge).',
@@ -43,6 +46,9 @@
       confirmLogout: 'Log out? Your local data stays in this browser.', adminBadge: 'admin',
       cfgPrompt: 'Log in or create an account to sync your encrypted data to the cloud and use it across devices.',
       syncing: 'Syncing…', syncErrShort: 'Sync error', pendingShort: 'Pending', locked2: 'Locked',
+      roleLabel: 'Account type', rolePersona: 'Person', rolePersonaDesc: 'To run your business: projects, hours, expenses, invoices.',
+      roleGestor: 'Advisor', roleGestorDesc: 'To view your TRACKR clients\' data (with their consent). The account starts empty.',
+      gestorBadge: 'advisor',
     },
     ca: {
       title: 'Compte i sincronització', zk: 'Les teves dades es xifren al navegador abans de pujar-se. Ni nosaltres ni el servidor podem llegir-les (coneixement zero).',
@@ -60,6 +66,9 @@
       confirmLogout: 'Tancar sessió? Les dades locals es mantenen en aquest navegador.', adminBadge: 'admin',
       cfgPrompt: 'Inicia sessió o crea un compte per sincronitzar les teves dades xifrades al núvol i fer-les servir en diversos dispositius.',
       syncing: 'Sincronitzant…', syncErrShort: 'Error de sync', pendingShort: 'Pendent', locked2: 'Bloquejat',
+      roleLabel: 'Tipus de compte', rolePersona: 'Persona', rolePersonaDesc: 'Per portar la teva activitat: projectes, hores, despeses, factures.',
+      roleGestor: 'Gestoria', roleGestorDesc: 'Per veure les dades dels teus clients de TRACKR (amb el seu consentiment). El compte comença buit.',
+      gestorBadge: 'gestoria',
     },
   };
   const t = (k) => (TXT[L()] || TXT.es)[k] || k;
@@ -71,6 +80,10 @@
   function fieldsFor(m) {
     if (m === 'signup') {
       return `<form style="display:contents" onsubmit="App.accSignup();return false">`
+        + `<div class="fg"><label>${t('roleLabel')}</label>`
+        + `<label style="display:flex;align-items:flex-start;gap:.5rem;cursor:pointer;text-transform:none;letter-spacing:0;margin-top:.35rem"><input type="radio" name="accRole" value="persona" checked style="width:auto;margin-top:.2rem"><span><strong>${t('rolePersona')}</strong> <span style="color:var(--t3);font-size:.78rem;display:block">${t('rolePersonaDesc')}</span></span></label>`
+        + `<label style="display:flex;align-items:flex-start;gap:.5rem;cursor:pointer;text-transform:none;letter-spacing:0;margin-top:.45rem"><input type="radio" name="accRole" value="gestor" style="width:auto;margin-top:.2rem"><span><strong>${t('roleGestor')}</strong> <span style="color:var(--t3);font-size:.78rem;display:block">${t('roleGestorDesc')}</span></span></label>`
+        + `</div>`
         + `<div class="fg"><label>${t('email')}</label><input id="accEmail" name="email" type="email" autocomplete="username"></div>`
         + `<div class="fg"><label>${t('password')}</label><input id="accPw" name="password" type="password" autocomplete="new-password" oninput="App.accPwMeter(this.value)"><div id="accMeter" class="acc-meter"><span></span><span></span><span></span><span></span></div></div>`
         + `<div class="fg"><label>${t('password2')}</label><input id="accPw2" name="password2" type="password" autocomplete="new-password"></div>`
@@ -226,8 +239,10 @@
       if (!CA.checkPassword(pw).ok) return Toast.error(t('pwWeak'));
       if (pw !== pw2) return Toast.error(t('pwMismatch'));
       if (!document.getElementById('accLegal')?.checked) return Toast.error(t('legalReq'));
+      const role = document.querySelector('input[name="accRole"]:checked')?.value === 'gestor' ? 'gestor' : 'persona';
       try {
-        const r = await Acc.signup(email, pw, D.d);
+        // Cuenta gestor: empieza VACIA (no arrastra los datos locales de este navegador).
+        const r = await Acc.signup(email, pw, role === 'gestor' ? CA.emptyData() : D.d, role);
         if (r.ok && r.recoveryCode) {
           this._accShowRecovery(r.recoveryCode, () => { if (Acc.state === 'in' && Acc.status().active) Acc.setAutoSync(true); this._accInModal = false; this.refreshAccountNav(); this.go(this.cv); });
           if (r.pending) Toast.ok(t('pending'));
@@ -242,7 +257,7 @@
         const r = await Acc.login(email, pw);
         if (!r.ok) return Toast.error(r.error === 'inactive' ? t('pending') : (r.error || 'error'));
         Toast.ok(t('welcome'));
-        if (r.active) { if (typeof H !== 'undefined') H.snapshot(); await this._accPull(); Acc.setAutoSync(true); }
+        if (r.active) { if (typeof H !== 'undefined') H.snapshot(); await this._accPull(); Acc.setAutoSync(true); if (this._gestorPostLogin) await this._gestorPostLogin(); }
         this._accDone();
       } catch (e) { Toast.error(String(e.message || e)); }
     },
@@ -253,7 +268,7 @@
         const r = await Acc.unlock(pw);
         if (!r.ok) return Toast.error(r.error || 'error');
         Toast.ok(t('welcome'));
-        if (r.active) { if (typeof H !== 'undefined') H.snapshot(); await this._accPull(); Acc.setAutoSync(true); }
+        if (r.active) { if (typeof H !== 'undefined') H.snapshot(); await this._accPull(); Acc.setAutoSync(true); if (this._gestorPostLogin) await this._gestorPostLogin(); }
         this._accDone();
       } catch (e) { Toast.error(String(e.message || e)); }
     },

@@ -14,12 +14,12 @@ const Acc = (() => {
 
   // estado en memoria
   let S = { state: 'out', token: null, email: null, dek: null, credEpoch: 1, kdf: { mem: 65536, time: 3, par: 1 },
-            version: 0, active: false, isAdmin: false, userId: null };
+            version: 0, active: false, isAdmin: false, role: 'persona', userId: null };
 
   /* ── persistencia ── */
   function saveMeta() {
     try {
-      localStorage.setItem(MKEY, JSON.stringify({ email: S.email, kdf: S.kdf, credEpoch: S.credEpoch, version: S.version, active: S.active, isAdmin: S.isAdmin, userId: S.userId }));
+      localStorage.setItem(MKEY, JSON.stringify({ email: S.email, kdf: S.kdf, credEpoch: S.credEpoch, version: S.version, active: S.active, isAdmin: S.isAdmin, role: S.role, userId: S.userId }));
     } catch (e) { /* ignore */ }
   }
   function loadMeta() { try { return JSON.parse(localStorage.getItem(MKEY) || 'null'); } catch (e) { return null; } }
@@ -42,16 +42,25 @@ const Acc = (() => {
     return { status: res.status, data };
   }
 
-  function status() { return { state: S.state, email: S.email, active: S.active, isAdmin: S.isAdmin, version: S.version }; }
+  function status() { return { state: S.state, email: S.email, active: S.active, isAdmin: S.isAdmin, role: S.role, version: S.version }; }
   function isUnlocked() { return S.state === 'in' && !!S.dek; }
 
   /* ── SIGNUP ── */
-  async function signup(emailRaw, password, dataObj) {
+  async function signup(emailRaw, password, dataObj, role) {
     if (!CA.available()) throw new Error('crypto_unavailable');
+    role = role === 'gestor' ? 'gestor' : 'persona';
+    /* Cuenta gestor: genera su par ECDH aqui; la privada viaja DENTRO del blob inicial
+       (cifrado con su DEK). La publica se publica al primer login activo (gestorEnsureKey). */
+    if (role === 'gestor') {
+      dataObj = dataObj || CA.emptyData();
+      if (!dataObj.settings) dataObj.settings = {};
+      dataObj.settings.gestorKeypair = await CA.genShareKeypair();
+    }
     const su = await CA.buildSignup(emailRaw, password, dataObj);
+    su.payload.role = role;
     const r = await api('/v1/signup', { method: 'POST', body: su.payload });
     if (r.status === 201) {
-      S = { state: 'in', token: r.data.token, email: su.email, dek: su.dek, credEpoch: su.credEpoch, kdf: { mem: 65536, time: 3, par: 1 }, version: r.data.currentVersion || 1, active: !!r.data.active, isAdmin: !!r.data.isAdmin, userId: r.data.userId };
+      S = { state: 'in', token: r.data.token, email: su.email, dek: su.dek, credEpoch: su.credEpoch, kdf: { mem: 65536, time: 3, par: 1 }, version: r.data.currentVersion || 1, active: !!r.data.active, isAdmin: !!r.data.isAdmin, role, userId: r.data.userId };
       setToken(r.data.token); saveMeta();
       return { ok: true, recoveryCode: su.recoveryCode, active: S.active, isAdmin: S.isAdmin };
     }
@@ -75,16 +84,16 @@ const Acc = (() => {
     let dek;
     try { dek = await CA.unwrapLogin(wrapKeyPwd, lg.data.wrappedDEK_pwd, email, lg.data.credEpoch); }
     catch (e) { return { ok: false, error: 'unwrap_failed' }; } // contrasena ok pero envelope no abre (no deberia pasar)
-    S = { state: 'in', token: lg.data.token, email, dek, credEpoch: lg.data.credEpoch, kdf, version: lg.data.currentVersion || 0, active: !!lg.data.active, isAdmin: !!lg.data.isAdmin, userId: lg.data.userId };
+    S = { state: 'in', token: lg.data.token, email, dek, credEpoch: lg.data.credEpoch, kdf, version: lg.data.currentVersion || 0, active: !!lg.data.active, isAdmin: !!lg.data.isAdmin, role: lg.data.role || 'persona', userId: lg.data.userId };
     setToken(lg.data.token); saveMeta();
-    return { ok: true, active: S.active, isAdmin: S.isAdmin };
+    return { ok: true, active: S.active, isAdmin: S.isAdmin, role: S.role };
   }
 
   // Al recargar: si hay token+meta pero no DEK -> bloqueado. unlock() = re-login (re-deriva DEK).
   function detectLocked() {
     const t = getToken(); const m = loadMeta();
     if (t && m && m.email && !S.dek) {
-      S = { ...S, state: 'locked', token: t, email: m.email, kdf: m.kdf || S.kdf, credEpoch: m.credEpoch || 1, version: m.version || 0, active: !!m.active, isAdmin: !!m.isAdmin, userId: m.userId || null };
+      S = { ...S, state: 'locked', token: t, email: m.email, kdf: m.kdf || S.kdf, credEpoch: m.credEpoch || 1, version: m.version || 0, active: !!m.active, isAdmin: !!m.isAdmin, role: m.role || 'persona', userId: m.userId || null };
       return true;
     }
     return false;
@@ -237,7 +246,7 @@ const Acc = (() => {
     let res;
     try { res = await push(dataObj); }
     catch (e) { emitSync('error', { error: String(e && e.message || e) }); throw e; } // no dejar el indicador atascado en 'syncing'
-    if (res && res.ok) emitSync('synced', res);
+    if (res && res.ok) { emitSync('synced', res); pushShadow().catch(() => {}); } // blob sombra tras cada push OK (best-effort)
     else if (!res || res.error !== 'busy') emitSync('error', res || {}); // 'busy' = coalescado, el push en curso ya emitira
     return res;
   }
@@ -252,6 +261,102 @@ const Acc = (() => {
     _timer = setTimeout(() => { _timer = null; syncPush().catch(() => {}); }, 2500);
   }
 
+  /* ── Gestores (comparticion E2E, PROTOCOL §15) ── */
+
+  // Publica la clave publica del gestor si aun no lo esta (idempotente) y devuelve su codigo.
+  // Se llama al entrar una cuenta gestor activa. El par vive en D.d.settings.gestorKeypair.
+  async function gestorEnsureKey() {
+    if (!isUnlocked() || !S.active || S.role !== 'gestor') return { ok: false, error: 'not_ready' };
+    const kp = typeof D !== 'undefined' ? D.d?.settings?.gestorKeypair : null;
+    if (!kp || !kp.publicKey) return { ok: false, error: 'no_keypair' };
+    const r = await api('/v1/gestor/keys', { method: 'POST', auth: true, body: { publicKey: kp.publicKey } });
+    if (r.status === 201 || r.status === 200) return { ok: true, code: r.data.code, fingerprint: r.data.fingerprint };
+    return { ok: false, error: r.data?.error || 'publish_failed' };
+  }
+
+  async function gestorResolve(code) {
+    const r = await api('/v1/gestor/resolve?code=' + encodeURIComponent(code), { method: 'GET', auth: true });
+    return r.status === 200 ? { ok: true, ...r.data } : { ok: false, error: r.data?.error || 'not_found' };
+  }
+
+  // La persona crea el vinculo: genera shareKey, la envuelve hacia la publica del gestor
+  // y guarda el grant en settings (dentro del blob principal cifrado, como todo).
+  async function grantCreate(code, gestorPub, gestorEmail, scope) {
+    if (!isUnlocked() || !S.active) return { ok: false, error: 'not_ready' };
+    const shareKey = CA.genShareKey();
+    const wrappedKey = await CA.wrapShareKey(gestorPub, shareKey);
+    const r = await api('/v1/grants', { method: 'POST', auth: true, body: { code, wrappedKey, scope } });
+    if (r.status !== 201) return { ok: false, error: r.data?.error || 'grant_failed' };
+    D.d.settings.gestorGrant = {
+      grantId: r.data.grantId, shareKey: CA._.b64u(shareKey), scope,
+      gestorEmail, fingerprint: await CA.fingerprintOf(gestorPub),
+    };
+    D.save();
+    pushShadow().catch(() => {}); // primera foto sin esperar al proximo cambio
+    return { ok: true, grantId: r.data.grantId };
+  }
+
+  async function grantRevoke() {
+    const g = D.d?.settings?.gestorGrant;
+    if (!g) return { ok: true };
+    const r = await api('/v1/grants/' + encodeURIComponent(g.grantId), { method: 'DELETE', auth: true });
+    if (r.status === 204 || r.status === 404) { delete D.d.settings.gestorGrant; D.save(); return { ok: true }; }
+    return { ok: false, error: r.data?.error || 'revoke_failed' };
+  }
+
+  async function gestorClients() {
+    const r = await api('/v1/gestor/clients', { method: 'GET', auth: true });
+    return r.status === 200 ? { ok: true, clients: r.data.clients } : { ok: false, error: r.data?.error || 'list_failed' };
+  }
+
+  // El gestor baja y descifra el blob sombra de un cliente.
+  async function gestorOpenClient(grantId) {
+    if (!isUnlocked() || S.role !== 'gestor') return { ok: false, error: 'not_ready' };
+    const kp = D.d?.settings?.gestorKeypair;
+    if (!kp) return { ok: false, error: 'no_keypair' };
+    const r = await api('/v1/gestor/clients/' + encodeURIComponent(grantId) + '/blob', { method: 'GET', auth: true });
+    if (r.status === 404) return { ok: false, error: r.data?.error || 'no_blob' };
+    if (r.status !== 200) return { ok: false, error: r.data?.error || 'get_failed' };
+    try {
+      const shareKey = await CA.unwrapShareKey(kp.privateJwk, r.data.wrappedKey, kp.publicKey);
+      const data = await CA.decryptShare(shareKey, r.data.blob, grantId);
+      return { ok: true, data, scope: r.data.scope, updatedAt: r.data.updatedAt };
+    } catch (e) { return { ok: false, error: 'decrypt_failed' }; }
+  }
+
+  // Construye la copia a compartir segun el alcance. 'fiscal' excluye lo personal:
+  // horas y notas de los proyectos, y el journey completo.
+  function buildShareData(scope) {
+    const d = D.d;
+    if (scope === 'todo') return JSON.parse(JSON.stringify(d));
+    const s = d.settings || {};
+    return {
+      version: d.version,
+      clientes: d.clientes || [],
+      gastos: d.gastos || [],
+      deducibles: d.deducibles || [],
+      facturas: d.facturas || [],
+      projects: (d.projects || []).map(p => ({
+        id: p.id, nombre: p.nombre, estado: p.estado, clienteId: p.clienteId,
+        interno: p.interno, fechas: p.fechas, recurrente: p.recurrente, facturacion: p.facturacion,
+      })),
+      settings: { emisor: s.emisor, fiscal: s.fiscal, verifactu: s.verifactu, nextFacturaNum: s.nextFacturaNum, idioma: s.idioma },
+      _shareScope: 'fiscal',
+    };
+  }
+
+  // Sube el blob sombra si hay grant activo. Best-effort: un fallo no rompe el sync normal.
+  async function pushShadow() {
+    const g = typeof D !== 'undefined' ? D.d?.settings?.gestorGrant : null;
+    if (!g || !isUnlocked() || !S.active) return;
+    try {
+      const shareKey = CA._.b64uDec(g.shareKey);
+      const { blob, blobHash } = await CA.encryptShare(shareKey, buildShareData(g.scope), g.grantId);
+      const r = await api('/v1/grants/' + encodeURIComponent(g.grantId) + '/blob', { method: 'PUT', auth: true, body: { blob, blobHash } });
+      if (r.status === 404) { delete D.d.settings.gestorGrant; D.save(); } // revocado por el gestor
+    } catch (e) { console.warn('pushShadow failed:', e); }
+  }
+
   /* ── Admin (solo is_admin; el servidor reverifica) ── */
   async function adminListUsers() { const r = await api('/v1/admin/users', { auth: true }); return r.status === 200 ? r.data.users : null; }
   async function adminSetActive(id, active) { const r = await api(`/v1/admin/users/${encodeURIComponent(id)}/active`, { method: 'POST', auth: true, body: { active } }); return r.status === 200; }
@@ -260,6 +365,7 @@ const Acc = (() => {
 
   return {
     signup, login, unlock, logout, changePassword, recover, pull, push: syncPush,
+    gestorEnsureKey, gestorResolve, grantCreate, grantRevoke, gestorClients, gestorOpenClient, pushShadow, _buildShareData: buildShareData,
     adminListUsers, adminSetActive, adminSetPaid, adminDelete, _mergeData: mergeData,
     status, isUnlocked, detectLocked, setAutoSync, setSyncListener, notifyChange, setApiBase: (u) => { API_BASE = u; },
     get email() { return S.email; }, get version() { return S.version; }, get state() { return S.state; },

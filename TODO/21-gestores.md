@@ -1,7 +1,18 @@
 # 21 — Cuentas gestor (compartir con tu gestoría)
 
-## Estado: 🎯 diseño cerrado (2026-07-16) · pendiente de ejecución
-## Primer caso real: la amiga gestora de manu (beta del rol gestor)
+## Estado: ✅ v1 implementada (2026-07-16) · backend + frontend en ramas `gestores`
+## Primer caso real: Diega (beta del rol gestor) — pendiente solo desplegar y probar en producción
+
+> **Implementado y verificado E2E en local** (wrangler dev + navegador): toggle en signup,
+> cuenta gestora con par ECDH y código auto-publicado al entrar, activación por admin,
+> vínculo persona→gestora con confirmación de huella y alcance, blob sombra cifrado en cada
+> sync, cartera de la gestora con visor protegido (banner + restauración; el sync del gestor
+> se pausa para no contaminar su cuenta). Alcance fiscal verificado estanco (0 horas, 0 notas,
+> 0 journey). Tests: 29/29 unit + 22/22 E2E backend.
+> **Pendiente:** desplegar (migrate-gestores.sql en D1 prod + deploy + merge frontend),
+> Etapa A de autoría (audit[]), Etapa B (edición del gestor por operaciones), y verificar el
+> renderizado del modal de confirmación en un navegador real (posible artefacto de captura).
+> **Decisión v1:** un email por cuenta; segundo rol = email distinto o alias `+gestora@`.
 
 ---
 

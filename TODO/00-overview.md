@@ -21,7 +21,7 @@ Orden de implementación. Cada archivo tiene el detalle.
 | 15 | Verifactu / homologación SIF | `15-verifactu.md` | 🎯 diseño cerrado (16 jul 2026) — ejecutar antes 1 jul 2027 |
 | 16 | Microherramientas públicas /303 y /130 | `16-microherramientas.md` | ⏳ pendiente — Q2/Q3 2026 |
 | 17 | Cuentas + cloud (Pivot A) | `17-pivot-cloud.md` | ✅ hecho (jun 2026) — en producción, signups cerrados (`SIGNUPS_OPEN=false`) |
-| 21 | Cuentas gestor (compartir E2E con gestoría) | `21-gestores.md` | 🎯 diseño cerrado (16 jul 2026) — primera gestora como beta |
+| 21 | Cuentas gestor (compartir E2E con gestoría) | `21-gestores.md` | ✅ v1 en ramas `gestores` (16 jul 2026) — falta desplegar + beta con Diega |
 
 ---
 

@@ -264,6 +264,80 @@ const CA = (() => {
     };
   }
 
+  /* ════════════════ Compartición E2E persona → gestor (PROTOCOL §15) ════════════════
+   * El gestor tiene un par ECDH P-256 (privada dentro de su blob, pública publicada).
+   * La persona genera una shareKey AES-256, la envuelve hacia la pública del gestor
+   * (efímera + HKDF + AES-GCM) y cifra con ella el blob sombra. El servidor solo ve
+   * el envelope (wrapped_key) y el blob sombra, ambos opacos. */
+
+  const aadShareKey = (fingerprint) => `trackr|v1|sharekey|${fingerprint}`;
+  const aadShareBlob = (grantId) => `trackr|v1|shareblob|${grantId}`;
+
+  async function fingerprintOf(pubSpkiB64) {
+    return b64u(new Uint8Array(await crypto.subtle.digest('SHA-256', b64uDec(pubSpkiB64))));
+  }
+
+  // Par de claves del gestor. La privada se exporta como JWK para viajar DENTRO de su
+  // blob de cuenta (cifrado con su DEK); la pública como SPKI b64url para publicarse.
+  async function genShareKeypair() {
+    const kp = await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveBits']);
+    const pub = b64u(new Uint8Array(await crypto.subtle.exportKey('spki', kp.publicKey)));
+    const privateJwk = await crypto.subtle.exportKey('jwk', kp.privateKey);
+    return { publicKey: pub, privateJwk, fingerprint: await fingerprintOf(pub) };
+  }
+
+  function genShareKey() { return randBytes(32); }
+
+  async function _ecdhWrapKey(privKey, pubKey) {
+    const secret = new Uint8Array(await crypto.subtle.deriveBits({ name: 'ECDH', public: pubKey }, privKey, 256));
+    return await hkdf(secret, 'trackr|v1|shareWrap');
+  }
+
+  // Envelope: ver(1) | ephLen(1) | ephSPKI | iv(12) | ct(shareKey+tag = 48). b64url.
+  async function wrapShareKey(gestorPubB64, shareKey) {
+    const gestorPub = await crypto.subtle.importKey('spki', b64uDec(gestorPubB64), { name: 'ECDH', namedCurve: 'P-256' }, false, []);
+    const eph = await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveBits']);
+    const ephPub = new Uint8Array(await crypto.subtle.exportKey('spki', eph.publicKey));
+    const wrapKey = await _ecdhWrapKey(eph.privateKey, gestorPub);
+    const iv = randBytes(12);
+    const ct = await aesEnc(wrapKey, iv, shareKey, aadShareKey(await fingerprintOf(gestorPubB64)));
+    const out = new Uint8Array(2 + ephPub.length + 12 + ct.length);
+    out[0] = 0x01; out[1] = ephPub.length;
+    out.set(ephPub, 2); out.set(iv, 2 + ephPub.length); out.set(ct, 2 + ephPub.length + 12);
+    return b64u(out);
+  }
+
+  async function unwrapShareKey(privateJwk, envelopeB64, ownPubB64) {
+    const env = b64uDec(envelopeB64);
+    if (env[0] !== 0x01) throw new Error('bad_share_envelope');
+    const ephLen = env[1];
+    const ephPub = await crypto.subtle.importKey('spki', env.slice(2, 2 + ephLen), { name: 'ECDH', namedCurve: 'P-256' }, false, []);
+    const priv = await crypto.subtle.importKey('jwk', privateJwk, { name: 'ECDH', namedCurve: 'P-256' }, false, ['deriveBits']);
+    const wrapKey = await _ecdhWrapKey(priv, ephPub);
+    const iv = env.slice(2 + ephLen, 2 + ephLen + 12);
+    const ct = env.slice(2 + ephLen + 12);
+    return await aesDec(wrapKey, iv, ct, aadShareKey(await fingerprintOf(ownPubB64)));
+  }
+
+  // Blob sombra: mismo contenedor TKb que el blob principal, con AAD por grantId.
+  async function encryptShare(shareKey, obj, grantId) {
+    const gz = await gzip(enc.encode(JSON.stringify(obj)));
+    const iv = randBytes(12);
+    const ct = await aesEnc(shareKey, iv, gz, aadShareBlob(grantId));
+    const out = new Uint8Array(5 + 12 + ct.length);
+    out[0] = 0x54; out[1] = 0x4B; out[2] = 0x62; out[3] = 0x01; out[4] = 0x01;
+    out.set(iv, 5); out.set(ct, 17);
+    const hash = new Uint8Array(await crypto.subtle.digest('SHA-256', out));
+    return { blob: b64u(out), blobHash: b64u(hash) };
+  }
+  async function decryptShare(shareKey, blobB64, grantId) {
+    const blob = b64uDec(blobB64);
+    if (blob.length < 18 || blob[0] !== 0x54 || blob[1] !== 0x4B || blob[2] !== 0x62 || blob[3] !== 0x01) throw new Error('bad_blob');
+    const flags = blob[4];
+    const gz = await aesDec(shareKey, blob.slice(5, 17), blob.slice(17), aadShareBlob(grantId));
+    return JSON.parse(dec.decode((flags & 1) ? await gunzip(gz) : gz));
+  }
+
   // SYNC
   async function encryptForUpload(dek, dataObj, emailRaw, version) {
     const blob = await encryptBlob(dek, dataObj, reqEmail(emailRaw), version);
@@ -277,6 +351,7 @@ const CA = (() => {
   return {
     buildSignup, deriveForLogin, unwrapLogin, buildPasswordChange,
     buildRecoverProof, buildRecoverCommit, encryptForUpload, decryptDownload,
+    genShareKeypair, genShareKey, wrapShareKey, unwrapShareKey, encryptShare, decryptShare, fingerprintOf,
     genRecoveryCode, canonRecovery, isValidRecovery, checkPassword, canonEmail, available, emptyData,
     _: { argon2, hkdf, wrapDEK, unwrapDEK, encryptBlob, decryptBlob, deriveMaster, deriveRecovery, encode16, b64u, b64uDec, aadPwd, aadRec, aadBlob, clampKdf, MIN_KDF },
   };

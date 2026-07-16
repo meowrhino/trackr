@@ -14,6 +14,12 @@
       "port": 5502
     },
     {
+      "name": "trackr-api-dev",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["-c", "cd /Users/meowrhino/Documents/GitHub/trackr-api && npx wrangler dev --port 8787 --var ENVIRONMENT:dev --var SIGNUPS_OPEN:true --var ADMIN_EMAIL:admin@test.dev --var ENUM_SECRET:testsecret"],
+      "port": 8787
+    },
+    {
       "name": "blurberri",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["live-server", "/Users/manu/Documents/GitHub/blurberri", "--port=8080", "--no-browser"],

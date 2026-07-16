@@ -64,6 +64,7 @@ Object.assign(App, {
       + `<div style="color:var(--t3);font-size:.82rem;margin-bottom:.75rem">${t('cfg.importOldDesc')}</div>`
       + `<button class="bt bt-add" onclick="App.importOldInvoicesClick()">${t('cfg.importOldInvoices')}</button></div>`
       + this._cfgVerifactuSection()
+      + (this._cfgGestoresSection ? this._cfgGestoresSection() : '')
       + this._cfgHistorySection();
   },
 
