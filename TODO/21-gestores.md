@@ -197,6 +197,49 @@ bloquean la beta con Diega, que es monodispositivo):
 5. ✅ Vista de clientes del gestor (read-only) + Etapa A de autoría (`audit[]`).
 6. ✅ Etapa B: escritura por operaciones.
 
+## Hallazgos de la revisión multi-agente de la Etapa B (2026-07-17) — ARREGLAR ANTES DE DESPLEGAR
+
+8 ángulos + verificación independiente sobre los diffs de los dos repos. Confirmados:
+
+1. **La edición fiscal del gestor no funciona** (la capacidad anunciada en el consentimiento):
+   los `save*` de settings llaman `D._audit('editar','settings',null)` sin payload y
+   `GOps.sanitize` exige `payload.fiscal` → la op siempre se rechaza. Sin productor, la rama
+   `WRITABLE.settings` es código muerto. Arreglo: pasar el payload fiscal desde `saveFiscal`.
+2. **Deshacer un 'borrar proyecto' de la gestoría pierde las horas**: `undo()` reaplica el
+   inverso a través de `sanitize()`, que recorta `horas` aunque quien deshace es la persona
+   sobre sus propios datos. El undo no debe pasar por la whitelist del gestor.
+3. **El gestor puede borrar un proyecto entero, horas incluidas**, pese a la promesa "no puede
+   tocar tus horas": la deny list solo recorta claves en crear/editar. Decidir: denegar
+   'borrar proyecto' al gestor, o borrado lógico, o reescribir la promesa.
+4. **Ediciones fantasma en modo edición**: código que muta el objeto vivo antes del mutador
+   (`p.horas.push` + `D.up` en detalle/calendario) o escribe `D.d` directo + `D.save()`
+   (journey, varios settings) pinta el cambio en pantalla pero nunca lo emite como op.
+   Es el problema de fondo: la intercepción vive en los mutadores y no toda la app muta
+   por mutadores. Mitigación corta: deshabilitar en el visor las vistas no editables.
+5. **Auto-sync del gestor atascado**: si al cambiar de cliente A→B la apertura de B falla,
+   `_gstForceExit` ya quitó el banner y nadie vuelve a llamar `setAutoSync(true)`.
+6. **Ops huérfanas si falla el ack**: `pullOps` avanza `lastOpSeq` antes del ack; si el ack
+   falla, esas filas no se re-piden ni se re-confirman nunca y acumulan hasta el 409 del tope.
+   Arreglo: ack incondicional de `lastOpSeq` en cada pull (aunque no lleguen filas).
+7. **Regresión de orden en el router**: el rate-limit de `resolve` corría antes de la auth;
+   `dispatchGestor` autentica primero → flood sin token = un SELECT a D1 por petición.
+   Arreglo: flag `preAuth` en la fila de la tabla, o rate-limit global pre-dispatch.
+8. **`facturacion` no está en la deny list de proyecto**: el gestor puede editar cobros e
+   importes mientras la promesa dice "ni tus facturas". Decidir alcance (¿corregir IVA/IRPF
+   de un proyecto es trabajo legítimo de gestoría?) y alinear texto o whitelist.
+9. (PLAUSIBLE) **Índice de deshacer horneado en el onclick**: con el anillo a 500, un evento
+   nuevo desplaza índices y el botón viejo desharía otra entrada. Usar id/ts de la entrada.
+10. (menor) **TOCTOU en el tope de ops pendientes** del backend: dos POST concurrentes lo
+    superan (~219 máx). Acotado e inocuo, pero el tope no es invariante.
+
+Limpiezas menores detectadas (no bloquean): `fmtTs`/locale duplicados en app.config.js (existe
+`currentLocale()` en lang.js); cifrado/descifrado de ops secuencial (Promise.all trivial);
+fallback de `crypto.randomUUID` inválido (uid()+uid() = 29 chars, el server exige 36 — solo
+alcanzable en contextos no seguros); `auditLog()` copia el anillo entero por render; contador
+`rejected` sin lector; comentario de `_ctx` promete un campo `actor` que no existe (y que el
+modelo prohíbe); `nameOf()` escanea listas por fila; los inversos de undo viajan dentro del
+blob sincronizado (hasta 4 KB × entrada — vigilar el 256 KB).
+
 ## Pendientes de la Etapa B (para cuando Diega la use de verdad)
 
 - **La UI del visor no cambia entre mirar y editar.** Los botones de editar están siempre ahí
