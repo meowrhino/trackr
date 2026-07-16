@@ -276,6 +276,10 @@ const CA = (() => {
 
   const aadShareKey = (fingerprint) => `trackr|v1|sharekey|${fingerprint}`;
   const aadShareBlob = (grantId) => `trackr|v1|shareblob|${grantId}`;
+  /* Dominio propio para las ops (Etapa B): comparten clave y grant con el blob sombra,
+     asi que sin separar la AAD un blob sombra descifraria como op (y al reves). No es
+     un ataque grave — la validacion de la op lo tiraria — pero cada cosa a lo suyo. */
+  const aadShareOp = (grantId) => `trackr|v1|shareop|${grantId}`;
 
   async function fingerprintOf(pubSpkiB64) {
     return b64u(new Uint8Array(await crypto.subtle.digest('SHA-256', b64uDec(pubSpkiB64))));
@@ -333,6 +337,14 @@ const CA = (() => {
     return await unpackContainer(shareKey, b64uDec(blobB64), aadShareBlob(grantId));
   }
 
+  // Op del gestor (Etapa B): mismo contenedor y misma shareKey, AAD propia.
+  async function encryptOp(shareKey, op, grantId) {
+    return b64u(await packContainer(shareKey, op, aadShareOp(grantId)));
+  }
+  async function decryptOp(shareKey, payloadB64, grantId) {
+    return await unpackContainer(shareKey, b64uDec(payloadB64), aadShareOp(grantId));
+  }
+
   // SYNC
   async function encryptForUpload(dek, dataObj, emailRaw, version) {
     const blob = await encryptBlob(dek, dataObj, reqEmail(emailRaw), version);
@@ -346,7 +358,7 @@ const CA = (() => {
   return {
     buildSignup, deriveForLogin, unwrapLogin, buildPasswordChange,
     buildRecoverProof, buildRecoverCommit, encryptForUpload, decryptDownload,
-    genShareKeypair, genShareKey, wrapShareKey, unwrapShareKey, encryptShare, decryptShare, fingerprintOf,
+    genShareKeypair, genShareKey, wrapShareKey, unwrapShareKey, encryptShare, decryptShare, encryptOp, decryptOp, fingerprintOf,
     genRecoveryCode, canonRecovery, isValidRecovery, checkPassword, canonEmail, available, emptyData,
     _: { argon2, hkdf, wrapDEK, unwrapDEK, encryptBlob, decryptBlob, deriveMaster, deriveRecovery, encode16, b64u, b64uDec, aadPwd, aadRec, aadBlob, clampKdf, MIN_KDF },
   };

@@ -77,6 +77,7 @@ Object.assign(App, {
       es: {
         title: 'Historial de cambios', desc: 'Quién ha cambiado qué y cuándo. Se guardan los últimos 500 cambios junto a tus datos, cifrados como el resto.',
         none: 'Todavía no hay cambios registrados.', local: 'este dispositivo', showing: 'Mostrando los últimos {0} de {1} cambios.',
+        undo: 'Deshacer', undone: 'deshecho',
         crear: 'creó', editar: 'editó', borrar: 'borró',
         proyecto: 'proyecto', cliente: 'cliente', gasto: 'gasto', deducible: 'deducible', factura: 'factura', settings: 'la configuración',
         persona: 'persona', gestor: 'gestoría'
@@ -84,6 +85,7 @@ Object.assign(App, {
       en: {
         title: 'Change history', desc: 'Who changed what, and when. The last 500 changes are stored alongside your data, encrypted like everything else.',
         none: 'No changes recorded yet.', local: 'this device', showing: 'Showing the last {0} of {1} changes.',
+        undo: 'Undo', undone: 'undone',
         crear: 'created', editar: 'edited', borrar: 'deleted',
         proyecto: 'project', cliente: 'client', gasto: 'expense', deducible: 'deductible', factura: 'invoice', settings: 'the settings',
         persona: 'person', gestor: 'advisor'
@@ -91,6 +93,7 @@ Object.assign(App, {
       ca: {
         title: 'Historial de canvis', desc: 'Qui ha canviat què i quan. Es desen els últims 500 canvis al costat de les teves dades, xifrats com la resta.',
         none: 'Encara no hi ha canvis registrats.', local: 'aquest dispositiu', showing: 'Mostrant els últims {0} de {1} canvis.',
+        undo: 'Desfer', undone: 'desfet',
         crear: 'va crear', editar: 'va editar', borrar: 'va esborrar',
         proyecto: 'projecte', cliente: 'client', gasto: 'despesa', deducible: 'deduïble', factura: 'factura', settings: 'la configuració',
         persona: 'persona', gestor: 'gestoria'
@@ -122,16 +125,22 @@ Object.assign(App, {
     };
 
     const N = 30;
-    const total = (D.d.audit || []).length;
+    const audit = D.d.audit || [];
+    const total = audit.length;
     const log = D.auditLog(N);
     let listHtml;
     if (log.length) {
-      listHtml = `<div class="cl-list" style="margin-top:.75rem">` + log.map(e => {
+      listHtml = `<div class="cl-list" style="margin-top:.75rem">` + log.map((e, i) => {
+        const idx = total - 1 - i;   // índice real en D.d.audit (auditLog va del más nuevo al más viejo)
         const nombre = nameOf(e.entidad, e.entidadId);
         const accion = `${tx(e.accion)} ${tx(e.entidad)}${nombre ? ` <strong>${esc(nombre)}</strong>` : ''}`;
-        return `<div class="cl-item">`
-          + `<span class="cl-name" style="font-size:.82rem">${esc(actorTxt(e.actor))} ${accion}</span>`
+        /* Deshacer solo donde hay inverso guardado: hoy, los cambios que vinieron de la
+           gestoría (los propios ya tienen las copias de seguridad y el propio hacer). */
+        const undoBtn = e.undo ? `<button class="cl-btn" onclick="App.auditUndo(${idx})" title="${tx('undo')}">&#8630;</button>` : '';
+        return `<div class="cl-item"${e.undone ? ' style="opacity:.55"' : ''}>`
+          + `<span class="cl-name" style="font-size:.82rem">${esc(actorTxt(e.actor))} ${accion}${e.undone ? ` <em style="color:var(--t3);font-style:normal">· ${tx('undone')}</em>` : ''}</span>`
           + `<span class="cl-nif" style="font-size:.72rem;color:var(--t3)">${fmtTs(e.ts)}</span>`
+          + (undoBtn ? `<div class="cl-actions">${undoBtn}</div>` : '')
           + `</div>`;
       }).join('') + `</div>`;
       if (total > N) {
@@ -182,6 +191,16 @@ Object.assign(App, {
       + `<button class="bt bt-add" onclick="App.histSnapshot()">${tx('saveNow')}</button>`
       + listHtml
       + `</div>`;
+  },
+
+  /** Deshace un cambio del historial aplicando su inverso (hoy: ops de la gestoría). */
+  auditUndo(idx) {
+    const e = (D.d.audit || [])[idx];
+    if (!e || !e.undo || typeof GOps === 'undefined') return;
+    const r = GOps.undo(e);
+    if (!r.ok) { Toast.error(_lang === 'en' ? 'Could not undo' : (_lang === 'ca' ? 'No s\'ha pogut desfer' : 'No se pudo deshacer')); return; }
+    Toast.ok(_lang === 'en' ? 'Change undone' : (_lang === 'ca' ? 'Canvi desfet' : 'Cambio deshecho'));
+    this.rCfg();
   },
 
   histSnapshot() {

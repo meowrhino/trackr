@@ -333,16 +333,38 @@ const D = {
 
   /**
    * Registra una mutación en el anillo `d.audit`. Llamar SIEMPRE antes de save().
-   * En modo visor no anota nada: save() está bloqueado, así que el evento no se
-   * persistiría y además ensuciaría los datos del cliente que el gestor tiene en pantalla.
+   *
+   * En modo visor (gestoría mirando a un cliente) no anota: save() está bloqueado, así
+   * que el evento no se persistiría y encima ensuciaría los datos del cliente en pantalla.
+   * Si además hay edición activa (Etapa B), la mutación sale de aquí como OPERACIÓN hacia
+   * la persona — quien la anotará en SU audit[] al aplicarla, que es donde debe constar.
+   * Por eso `payload`: el audit local no lo usa, la op sí (qué crear/qué cambiar).
+   *
    * @param {'crear'|'editar'|'borrar'} accion
    * @param {string} entidad  'proyecto'|'cliente'|'gasto'|'deducible'|'factura'|'settings'
    * @param {string|null} entidadId  id del objeto tocado (null para settings)
+   * @param {object} [payload]  objeto creado / cambios parciales; solo viaja en la op
    */
-  _audit(accion, entidad, entidadId) {
+  _audit(accion, entidad, entidadId, payload) {
+    if (!this.d) return;
+    if (this._readOnly) {
+      if (typeof GOps !== 'undefined' && GOps.emitting()) GOps.emit(accion, entidad, entidadId, payload);
+      return;
+    }
+    this._auditAs(this._actor(), accion, entidad, entidadId);
+  },
+
+  /**
+   * Anota con un actor explícito. Lo usa la aplicación de ops del gestor: el evento debe
+   * decir que lo hizo la gestoría, no quien tiene la sesión abierta (que es la persona).
+   * @param {object} [undo]  inverso de la operación, para deshacerla desde el historial
+   */
+  _auditAs(actor, accion, entidad, entidadId, undo) {
     if (this._readOnly || !this.d) return;
     if (!Array.isArray(this.d.audit)) this.d.audit = [];
-    this.d.audit.push({ ts: Date.now(), actor: this._actor(), accion, entidad, entidadId: entidadId || null });
+    const e = { ts: Date.now(), actor, accion, entidad, entidadId: entidadId || null };
+    if (undo) e.undo = undo;
+    this.d.audit.push(e);
     const over = this.d.audit.length - this.AUDIT_MAX;
     if (over > 0) this.d.audit.splice(0, over);
   },
@@ -384,12 +406,12 @@ const D = {
   p(id) { return this.d.projects.find(p => p.id === id); },
 
   /** Añade un proyecto */
-  add(p) { this.d.projects.push(p); this._audit('crear', 'proyecto', p.id); this.save(); },
+  add(p) { this.d.projects.push(p); this._audit('crear', 'proyecto', p.id, p); this.save(); },
 
   /** Actualiza un proyecto por ID (merge parcial) */
   up(id, u) {
     const i = this.d.projects.findIndex(p => p.id === id);
-    if (i !== -1) { Object.assign(this.d.projects[i], u); this._audit('editar', 'proyecto', id); this.save(); }
+    if (i !== -1) { Object.assign(this.d.projects[i], u); this._audit('editar', 'proyecto', id, u); this.save(); }
   },
 
   /** Elimina un proyecto por ID */
@@ -410,12 +432,12 @@ const D = {
   cl(id) { return this.d.clientes.find(c => c.id === id); },
 
   /** Añade un cliente. Devuelve el cliente creado. */
-  addCl(c) { this.d.clientes.push(c); this._audit('crear', 'cliente', c.id); this.save(); return c; },
+  addCl(c) { this.d.clientes.push(c); this._audit('crear', 'cliente', c.id, c); this.save(); return c; },
 
   /** Actualiza un cliente por ID */
   upCl(id, u) {
     const i = this.d.clientes.findIndex(c => c.id === id);
-    if (i !== -1) { Object.assign(this.d.clientes[i], u); this._audit('editar', 'cliente', id); this.save(); }
+    if (i !== -1) { Object.assign(this.d.clientes[i], u); this._audit('editar', 'cliente', id, u); this.save(); }
   },
 
   /** Elimina un cliente por ID */
@@ -436,12 +458,12 @@ const D = {
   g(id) { return this.d.gastos.find(g => g.id === id); },
 
   /** Añade un gasto */
-  addG(g) { this.d.gastos.push(g); this._audit('crear', 'gasto', g.id); this.save(); },
+  addG(g) { this.d.gastos.push(g); this._audit('crear', 'gasto', g.id, g); this.save(); },
 
   /** Actualiza un gasto por ID */
   upG(id, u) {
     const i = this.d.gastos.findIndex(g => g.id === id);
-    if (i !== -1) { Object.assign(this.d.gastos[i], u); this._audit('editar', 'gasto', id); this.save(); }
+    if (i !== -1) { Object.assign(this.d.gastos[i], u); this._audit('editar', 'gasto', id, u); this.save(); }
   },
 
   /** Elimina un gasto por ID */
@@ -457,10 +479,10 @@ const D = {
 
   deds() { return this.d.deducibles; },
   ded(id) { return this.d.deducibles.find(d => d.id === id); },
-  addDed(d) { this.d.deducibles.push(d); this._audit('crear', 'deducible', d.id); this.save(); },
+  addDed(d) { this.d.deducibles.push(d); this._audit('crear', 'deducible', d.id, d); this.save(); },
   upDed(id, u) {
     const i = this.d.deducibles.findIndex(d => d.id === id);
-    if (i !== -1) { Object.assign(this.d.deducibles[i], u); this._audit('editar', 'deducible', id); this.save(); }
+    if (i !== -1) { Object.assign(this.d.deducibles[i], u); this._audit('editar', 'deducible', id, u); this.save(); }
   },
   delDed(id) {
     this.d.deducibles = this.d.deducibles.filter(d => d.id !== id);

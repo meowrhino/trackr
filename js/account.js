@@ -246,7 +246,10 @@ const Acc = (() => {
     let res;
     try { res = await push(dataObj); }
     catch (e) { emitSync('error', { error: String(e && e.message || e) }); throw e; } // no dejar el indicador atascado en 'syncing'
-    if (res && res.ok) { emitSync('synced', res); pushShadow().catch(() => {}); } // blob sombra tras cada push OK (best-effort)
+    // Tras un push OK: espejo para la gestoria y, si nos dejo editar, recoger sus cambios.
+    // pullOps aplica -> D.save -> notifyChange -> otro push; converge porque la segunda
+    // vuelta ya no encuentra ops. Los dos son best-effort: no rompen el sync normal.
+    if (res && res.ok) { emitSync('synced', res); pushShadow().catch(() => {}); pullOps().catch(() => {}); }
     else if (!res || res.error !== 'busy') emitSync('error', res || {}); // 'busy' = coalescado, el push en curso ya emitira
     return res;
   }
@@ -281,19 +284,31 @@ const Acc = (() => {
 
   // La persona crea el vinculo: genera shareKey, la envuelve hacia la publica del gestor
   // y guarda el grant en settings (dentro del blob principal cifrado, como todo).
-  async function grantCreate(code, gestorPub, gestorEmail, scope) {
+  async function grantCreate(code, gestorPub, gestorEmail, scope, canEdit) {
     if (!isUnlocked() || !S.active) return { ok: false, error: 'not_ready' };
     const shareKey = CA.genShareKey();
     const wrappedKey = await CA.wrapShareKey(gestorPub, shareKey);
-    const r = await api('/v1/grants', { method: 'POST', auth: true, body: { code, wrappedKey, scope } });
+    const r = await api('/v1/grants', { method: 'POST', auth: true, body: { code, wrappedKey, scope, canEdit: !!canEdit } });
     if (r.status !== 201) return { ok: false, error: r.data?.error || 'grant_failed' };
     D.d.settings.gestorGrant = {
-      grantId: r.data.grantId, shareKey: CA._.b64u(shareKey), scope,
+      grantId: r.data.grantId, shareKey: CA._.b64u(shareKey), scope, canEdit: !!canEdit,
       gestorEmail, fingerprint: await CA.fingerprintOf(gestorPub),
+      lastOpSeq: 0,   // hasta donde se han aplicado ops de este gestor (Etapa B)
     };
     D.save();
     pushShadow().catch(() => {}); // primera foto sin esperar al proximo cambio
     return { ok: true, grantId: r.data.grantId };
+  }
+
+  /* ── Etapa B: permiso de edicion (opt-in de la persona) ── */
+  async function grantSetCanEdit(canEdit) {
+    const g = D.d?.settings?.gestorGrant;
+    if (!g) return { ok: false, error: 'no_grant' };
+    const r = await api('/v1/grants/' + encodeURIComponent(g.grantId), { method: 'PATCH', auth: true, body: { canEdit: !!canEdit } });
+    if (r.status !== 200) return { ok: false, error: r.data?.error || 'patch_failed' };
+    g.canEdit = !!r.data.canEdit;
+    D.save();
+    return { ok: true, canEdit: g.canEdit };
   }
 
   async function grantRevoke() {
@@ -309,7 +324,8 @@ const Acc = (() => {
     return r.status === 200 ? { ok: true, clients: r.data.clients } : { ok: false, error: r.data?.error || 'list_failed' };
   }
 
-  // El gestor baja y descifra el blob sombra de un cliente.
+  // El gestor baja y descifra el blob sombra de un cliente. Devuelve tambien la shareKey:
+  // la necesita GOps para cifrar las ops si la persona le dejo editar (Etapa B).
   async function gestorOpenClient(grantId) {
     if (!isUnlocked() || S.role !== 'gestor') return { ok: false, error: 'not_ready' };
     const kp = D.d?.settings?.gestorKeypair;
@@ -320,9 +336,65 @@ const Acc = (() => {
     try {
       const shareKey = await CA.unwrapShareKey(kp.privateJwk, r.data.wrappedKey, kp.publicKey);
       const data = await CA.decryptShare(shareKey, r.data.blob, grantId);
-      return { ok: true, data, scope: r.data.scope, updatedAt: r.data.updatedAt };
+      return { ok: true, data, scope: r.data.scope, canEdit: !!r.data.canEdit, shareKey, updatedAt: r.data.updatedAt };
     } catch (e) { return { ok: false, error: 'decrypt_failed' }; }
   }
+
+  /* ── Etapa B: cola de ops ── */
+
+  // El gestor sube ops cifradas (las cifra GOps; aqui solo viajan).
+  async function opsPush(grantId, ops) {
+    if (!isUnlocked() || !S.active || S.role !== 'gestor') return { ok: false, error: 'not_ready' };
+    const r = await api('/v1/grants/' + encodeURIComponent(grantId) + '/ops', { method: 'POST', auth: true, body: { ops } });
+    if (r.status === 201) return { ok: true, accepted: r.data.accepted };
+    return { ok: false, error: r.data?.error || 'ops_failed' };
+  }
+
+  // La persona baja, VALIDA, aplica y confirma las ops de su gestoria.
+  // Best-effort: si algo falla, sus datos se quedan como estaban y se reintenta al proximo sync.
+  let _pullingOps = false;
+  async function pullOps() {
+    const g = D.d?.settings?.gestorGrant;
+    if (!g || !g.canEdit || !isUnlocked() || !S.active || S.role !== 'persona') return { ok: false, error: 'not_ready' };
+    if (typeof D !== 'undefined' && D._readOnly) return { ok: false, error: 'readonly' };
+    if (_pullingOps) return { ok: false, error: 'busy' };
+    _pullingOps = true;
+    try {
+      const since = g.lastOpSeq || 0;
+      const r = await api(`/v1/grants/${encodeURIComponent(g.grantId)}/ops?since=${since}`, { method: 'GET', auth: true });
+      if (r.status === 404) { delete D.d.settings.gestorGrant; D.save(); return { ok: false, error: 'not_found' }; } // revocado
+      if (r.status !== 200) return { ok: false, error: r.data?.error || 'get_failed' };
+      const rows = r.data.ops || [];
+      if (!rows.length) return { ok: true, applied: 0 };
+
+      if (typeof H !== 'undefined' && H.snapshot) H.snapshot(); // red de seguridad antes de tocar datos ajenos a la sesion
+      const shareKey = CA._.b64uDec(g.shareKey);
+      let applied = 0, rejected = 0, maxSeq = since;
+      for (const row of rows) {
+        if (row.seq > maxSeq) maxSeq = row.seq;
+        let op = null;
+        try { op = await CA.decryptOp(shareKey, row.payload, g.grantId); }
+        catch (e) { rejected++; console.warn('op ilegible, descartada (seq ' + row.seq + ')'); continue; }
+        const res = GOps.apply(op);
+        if (!res.ok) { rejected++; console.warn('op rechazada (seq ' + row.seq + '):', res.why); continue; }
+        /* El actor sale del GRANT LOCAL, no de la op: quien la escribio podria haber puesto
+           cualquier email dentro. El grant es 1:1 con una gestoria, asi que aqui esta la verdad. */
+        const actor = { email: g.gestorEmail, role: 'gestor' };
+        D._auditAs(actor, op.accion, op.entidad, op.entidadId, GOps.undoFits(res.undo) ? res.undo : null);
+        applied++;
+      }
+      g.lastOpSeq = maxSeq;
+      D.save();  // dispara el auto-sync: lo aplicado sube en el proximo push
+      // Confirmar (el server las borra). Si esto falla, lastOpSeq ya evita re-aplicarlas.
+      await api(`/v1/grants/${encodeURIComponent(g.grantId)}/ops/ack`, { method: 'POST', auth: true, body: { upTo: maxSeq } });
+      if (applied && _onOps) { try { _onOps({ applied, rejected, gestorEmail: g.gestorEmail }); } catch (e) { /* */ } }
+      return { ok: true, applied, rejected };
+    } finally { _pullingOps = false; }
+  }
+
+  // Aviso a la UI de que la gestoria ha hecho cambios (para refrescar la vista + toast).
+  let _onOps = null;
+  function setOpsListener(fn) { _onOps = fn; }
 
   // Construye la copia a compartir segun el alcance. 'fiscal' excluye lo personal:
   // horas y notas de los proyectos, y el journey completo. Para 'todo' se devuelve D.d
@@ -377,6 +449,7 @@ const Acc = (() => {
   return {
     signup, login, unlock, logout, changePassword, recover, pull, push: syncPush,
     gestorEnsureKey, gestorResolve, grantCreate, grantRevoke, gestorClients, gestorOpenClient, pushShadow, _buildShareData: buildShareData,
+    grantSetCanEdit, opsPush, pullOps, setOpsListener,
     adminListUsers, adminSetActive, adminSetPaid, adminDelete, _mergeData: mergeData,
     status, isUnlocked, detectLocked, setAutoSync, setSyncListener, notifyChange, setApiBase: (u) => { API_BASE = u; },
     get email() { return S.email; }, get version() { return S.version; }, get state() { return S.state; },
