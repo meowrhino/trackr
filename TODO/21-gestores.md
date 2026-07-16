@@ -10,8 +10,9 @@
 > se pausa para no contaminar su cuenta). Alcance fiscal verificado estanco (0 horas, 0 notas,
 > 0 journey). Tests: 29/29 unit + 22/22 E2E backend.
 > **Pendiente:** desplegar (migrate-gestores.sql en D1 prod + deploy + merge frontend),
-> Etapa A de autoría (audit[]), Etapa B (edición del gestor por operaciones), y verificar el
-> renderizado del modal de confirmación en un navegador real (posible artefacto de captura).
+> Etapa B (edición del gestor por operaciones), y verificar el renderizado del modal de
+> confirmación en un navegador real (posible artefacto de captura).
+> **Etapa A de autoría (`audit[]`): ✅ hecha (2026-07-16, rama `audit-etapa-a`).**
 > **Decisión v1:** un email por cuenta; segundo rol = email distinto o alias `+gestora@`.
 
 ---
@@ -89,9 +90,25 @@ Hoy NO se registra quién hace cada cambio (D.save() persiste estado, sin actor)
 de versiones no es el problema (~9 KB/blob, solo se sube si cambió, máx. 10 versiones); lo que
 aporta un log de operaciones es **autoría, deshacer fino y fusión multi-escritor**, no ahorro.
 
-- **Etapa A (con el read-only):** array `audit[]` dentro del JSON: cada mutación apunta
-  `{ts, actor, accion, entidad}`. El actor sale de la sesión de cuenta. Historial visible con
-  nombres. Snapshots se quedan como red de seguridad.
+- **Etapa A (con el read-only): ✅ hecha (2026-07-16).** Array `audit[]` dentro del JSON: cada
+  mutación apunta `{ts, actor, accion, entidad, entidadId}`. El actor sale de la sesión de cuenta
+  (`{email, role}` de `Acc.status()`, o `'local'` sin sesión). Snapshots se quedan como red de
+  seguridad. Cómo quedó:
+  - `D._audit(accion, entidad, entidadId)` en store.js, llamado antes de `save()` por los
+    mutadores de proyectos, clientes, gastos, deducibles y facturas; los `save*` de settings en
+    app.config.js lo llaman con `('editar', 'settings', null)`.
+  - No audita en modo visor (`D._readOnly`): ahí `save()` está bloqueado y el evento ni se
+    persistiría ni debe ensuciar los datos del cliente en pantalla.
+  - Anillo de `D.AUDIT_MAX` (500) eventos. Medido: 500 eventos ≈ 79 KB sin cifrar; sobre una
+    cuenta de ejemplo de 88 KB da ~167 KB, por debajo del límite de 256 KB del blob pero sin
+    holgura enorme. Si una cuenta real grande se acerca al límite, bajar `AUDIT_MAX` (es una
+    constante suelta).
+  - Sin auditar a propósito: tema/idioma (preferencias cosméticas que inundarían el log),
+    journey (arrastrar tarjetas dispararía un evento por gesto) y `D.load()` (importar o
+    restaurar reemplaza todo; el evento no diría nada útil).
+  - UI: `App._cfgAuditSection()` en Configuración (últimos 30, i18n inline es/en/ca como
+    `_cfgHistorySection`). Resuelve el nombre de la entidad si sigue viva; en un borrado
+    muestra solo el tipo.
 - **Etapa B (gestor con escritura):** las ediciones del gestor viajan como **operaciones**
   ("añadido gasto X"), no como blob: el blob solo lo escribe la persona; las ops del gestor se
   aplican encima. Autoría perfecta, deshacer por operación, sin guerra de merges. Como producto
@@ -151,5 +168,5 @@ bloquean la beta con Diega, que es monodispositivo):
 2. Par de claves ECDH + código de gestor en el signup/cuenta gestor.
 3. Config persona → "Mi gestor" (vincular/alcance/revocar).
 4. Blob sombra en el sync push.
-5. Vista de clientes del gestor (read-only) + Etapa A de autoría (`audit[]`).
+5. ✅ Vista de clientes del gestor (read-only) + Etapa A de autoría (`audit[]`).
 6. (después) Etapa B: escritura por operaciones.

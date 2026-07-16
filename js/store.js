@@ -10,6 +10,9 @@ const D = {
   d: null,
   lastSaved: null,   /* timestamp (ms) del último guardado; persiste en trackr_saved_at */
 
+  /** Tope del anillo de auditoría: el array viaja dentro del blob cifrado (límite 256 KB). */
+  AUDIT_MAX: 500,
+
   /* ── Inicialización ── */
 
   /** Carga datos de localStorage. Devuelve true si había datos. */
@@ -54,6 +57,7 @@ const D = {
       clientes: [],
       projects: [],
       gastos: [],
+      audit: [],
       journey: this._seedJourney(),
       settings: {
         emisor: { nombre: '', direccion1: '', direccion2: '', nif: '' },
@@ -85,6 +89,8 @@ const D = {
     if (!d.gastos) d.gastos = [];
     if (!d.projects) d.projects = [];
     if (!d.deducibles) d.deducibles = [];
+    /* Autoría (TODO/21, Etapa A): quién tocó qué y cuándo. Anillo de AUDIT_MAX eventos. */
+    if (!Array.isArray(d.audit)) d.audit = [];
     /* VeriFactu: registro inmutable de registros de facturación (altas + anulaciones,
        huella oficial AEAT encadenada por emisor). La remisión a AEAT es Fase 3 (trackr-api). */
     if (!d.facturas) d.facturas = [];
@@ -308,6 +314,46 @@ const D = {
     d.version = 4;
   },
 
+  /* ══════════════════════════════════════════════
+   *  AUDITORÍA (TODO/21, Etapa A)
+   * ══════════════════════════════════════════════ */
+
+  /**
+   * Identidad de quien hace el cambio: {email, role} si hay sesión abierta,
+   * 'local' si se usa TRACKR sin cuenta (o la sesión está bloqueada).
+   */
+  _actor() {
+    try {
+      if (typeof Acc === 'undefined') return 'local';
+      const st = Acc.status();
+      if (st.state !== 'in' || !st.email) return 'local';
+      return { email: st.email, role: st.role || 'persona' };
+    } catch (e) { return 'local'; }
+  },
+
+  /**
+   * Registra una mutación en el anillo `d.audit`. Llamar SIEMPRE antes de save().
+   * En modo visor no anota nada: save() está bloqueado, así que el evento no se
+   * persistiría y además ensuciaría los datos del cliente que el gestor tiene en pantalla.
+   * @param {'crear'|'editar'|'borrar'} accion
+   * @param {string} entidad  'proyecto'|'cliente'|'gasto'|'deducible'|'factura'|'settings'
+   * @param {string|null} entidadId  id del objeto tocado (null para settings)
+   */
+  _audit(accion, entidad, entidadId) {
+    if (this._readOnly || !this.d) return;
+    if (!Array.isArray(this.d.audit)) this.d.audit = [];
+    this.d.audit.push({ ts: Date.now(), actor: this._actor(), accion, entidad, entidadId: entidadId || null });
+    const over = this.d.audit.length - this.AUDIT_MAX;
+    if (over > 0) this.d.audit.splice(0, over);
+  },
+
+  /** Últimos eventos de auditoría, del más reciente al más antiguo. */
+  auditLog(limit) {
+    const a = Array.isArray(this.d?.audit) ? this.d.audit : [];
+    const out = [...a].reverse();
+    return limit ? out.slice(0, limit) : out;
+  },
+
   /** Persiste en localStorage */
   save() {
     /* Modo visor (gestoría viendo datos de un cliente): NADA se persiste ni se
@@ -338,17 +384,18 @@ const D = {
   p(id) { return this.d.projects.find(p => p.id === id); },
 
   /** Añade un proyecto */
-  add(p) { this.d.projects.push(p); this.save(); },
+  add(p) { this.d.projects.push(p); this._audit('crear', 'proyecto', p.id); this.save(); },
 
   /** Actualiza un proyecto por ID (merge parcial) */
   up(id, u) {
     const i = this.d.projects.findIndex(p => p.id === id);
-    if (i !== -1) { Object.assign(this.d.projects[i], u); this.save(); }
+    if (i !== -1) { Object.assign(this.d.projects[i], u); this._audit('editar', 'proyecto', id); this.save(); }
   },
 
   /** Elimina un proyecto por ID */
   del(id) {
     this.d.projects = this.d.projects.filter(p => p.id !== id);
+    this._audit('borrar', 'proyecto', id);
     this.save();
   },
 
@@ -363,17 +410,18 @@ const D = {
   cl(id) { return this.d.clientes.find(c => c.id === id); },
 
   /** Añade un cliente. Devuelve el cliente creado. */
-  addCl(c) { this.d.clientes.push(c); this.save(); return c; },
+  addCl(c) { this.d.clientes.push(c); this._audit('crear', 'cliente', c.id); this.save(); return c; },
 
   /** Actualiza un cliente por ID */
   upCl(id, u) {
     const i = this.d.clientes.findIndex(c => c.id === id);
-    if (i !== -1) { Object.assign(this.d.clientes[i], u); this.save(); }
+    if (i !== -1) { Object.assign(this.d.clientes[i], u); this._audit('editar', 'cliente', id); this.save(); }
   },
 
   /** Elimina un cliente por ID */
   delCl(id) {
     this.d.clientes = this.d.clientes.filter(c => c.id !== id);
+    this._audit('borrar', 'cliente', id);
     this.save();
   },
 
@@ -388,17 +436,18 @@ const D = {
   g(id) { return this.d.gastos.find(g => g.id === id); },
 
   /** Añade un gasto */
-  addG(g) { this.d.gastos.push(g); this.save(); },
+  addG(g) { this.d.gastos.push(g); this._audit('crear', 'gasto', g.id); this.save(); },
 
   /** Actualiza un gasto por ID */
   upG(id, u) {
     const i = this.d.gastos.findIndex(g => g.id === id);
-    if (i !== -1) { Object.assign(this.d.gastos[i], u); this.save(); }
+    if (i !== -1) { Object.assign(this.d.gastos[i], u); this._audit('editar', 'gasto', id); this.save(); }
   },
 
   /** Elimina un gasto por ID */
   delG(id) {
     this.d.gastos = this.d.gastos.filter(g => g.id !== id);
+    this._audit('borrar', 'gasto', id);
     this.save();
   },
 
@@ -408,13 +457,14 @@ const D = {
 
   deds() { return this.d.deducibles; },
   ded(id) { return this.d.deducibles.find(d => d.id === id); },
-  addDed(d) { this.d.deducibles.push(d); this.save(); },
+  addDed(d) { this.d.deducibles.push(d); this._audit('crear', 'deducible', d.id); this.save(); },
   upDed(id, u) {
     const i = this.d.deducibles.findIndex(d => d.id === id);
-    if (i !== -1) { Object.assign(this.d.deducibles[i], u); this.save(); }
+    if (i !== -1) { Object.assign(this.d.deducibles[i], u); this._audit('editar', 'deducible', id); this.save(); }
   },
   delDed(id) {
     this.d.deducibles = this.d.deducibles.filter(d => d.id !== id);
+    this._audit('borrar', 'deducible', id);
     this.save();
   },
 
@@ -453,6 +503,7 @@ const D = {
     /* Actualizar lastInvoiceHash en settings.verifactu */
     if (!this.d.settings.verifactu) this.d.settings.verifactu = {};
     this.d.settings.verifactu.lastInvoiceHash = f.hash;
+    this._audit('crear', 'factura', f.id);
     this.save();
   },
 
@@ -465,6 +516,7 @@ const D = {
     if (i !== -1) {
       if (!this.d.facturas[i].eventos) this.d.facturas[i].eventos = [];
       this.d.facturas[i].eventos.push(evento);
+      this._audit('editar', 'factura', factId);
       this.save();
     }
   },

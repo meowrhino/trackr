@@ -65,7 +65,85 @@ Object.assign(App, {
       + `<button class="bt bt-add" onclick="App.importOldInvoicesClick()">${t('cfg.importOldInvoices')}</button></div>`
       + this._cfgVerifactuSection()
       + (this._cfgGestoresSection ? this._cfgGestoresSection() : '')
+      + this._cfgAuditSection()
       + this._cfgHistorySection();
+  },
+
+  /** Sección Historial de cambios: quién tocó qué y cuándo (TODO/21, Etapa A).
+   *  Textos i18n inline (es/en/ca), como _cfgHistorySection. */
+  _cfgAuditSection() {
+    const lang = (typeof _lang !== 'undefined' ? _lang : 'es');
+    const TX = ({
+      es: {
+        title: 'Historial de cambios', desc: 'Quién ha cambiado qué y cuándo. Se guardan los últimos 500 cambios junto a tus datos, cifrados como el resto.',
+        none: 'Todavía no hay cambios registrados.', local: 'este dispositivo', showing: 'Mostrando los últimos {0} de {1} cambios.',
+        crear: 'creó', editar: 'editó', borrar: 'borró',
+        proyecto: 'proyecto', cliente: 'cliente', gasto: 'gasto', deducible: 'deducible', factura: 'factura', settings: 'la configuración',
+        persona: 'persona', gestor: 'gestoría'
+      },
+      en: {
+        title: 'Change history', desc: 'Who changed what, and when. The last 500 changes are stored alongside your data, encrypted like everything else.',
+        none: 'No changes recorded yet.', local: 'this device', showing: 'Showing the last {0} of {1} changes.',
+        crear: 'created', editar: 'edited', borrar: 'deleted',
+        proyecto: 'project', cliente: 'client', gasto: 'expense', deducible: 'deductible', factura: 'invoice', settings: 'the settings',
+        persona: 'person', gestor: 'advisor'
+      },
+      ca: {
+        title: 'Historial de canvis', desc: 'Qui ha canviat què i quan. Es desen els últims 500 canvis al costat de les teves dades, xifrats com la resta.',
+        none: 'Encara no hi ha canvis registrats.', local: 'aquest dispositiu', showing: 'Mostrant els últims {0} de {1} canvis.',
+        crear: 'va crear', editar: 'va editar', borrar: 'va esborrar',
+        proyecto: 'projecte', cliente: 'client', gasto: 'despesa', deducible: 'deduïble', factura: 'factura', settings: 'la configuració',
+        persona: 'persona', gestor: 'gestoria'
+      }
+    })[lang] || {};
+    const tx = k => TX[k] || k;
+    const locale = lang === 'en' ? 'en-GB' : (lang === 'ca' ? 'ca-ES' : 'es-ES');
+    const fmtTs = ts => {
+      try { return new Date(ts).toLocaleString(locale, { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+      catch { return String(ts); }
+    };
+    const actorTxt = a => {
+      if (!a || a === 'local') return tx('local');
+      const role = a.role ? ` · ${tx(a.role)}` : '';
+      return `${a.email || tx('local')}${role}`;
+    };
+    /* El nombre solo se resuelve si la entidad sigue viva: en un borrado ya no existe
+       (y el id no le dice nada a nadie), así que ahí se muestra solo el tipo. */
+    const nameOf = (entidad, id) => {
+      if (!id) return '';
+      const o = entidad === 'proyecto' ? D.p(id)
+        : entidad === 'cliente' ? D.cl(id)
+        : entidad === 'gasto' ? D.g(id)
+        : entidad === 'deducible' ? D.ded(id)
+        : entidad === 'factura' ? (D.fs() || []).find(f => f.id === id)
+        : null;
+      if (!o) return '';
+      return o.nombre || o.numero || o.concepto || '';
+    };
+
+    const N = 30;
+    const total = (D.d.audit || []).length;
+    const log = D.auditLog(N);
+    let listHtml;
+    if (log.length) {
+      listHtml = `<div class="cl-list" style="margin-top:.75rem">` + log.map(e => {
+        const nombre = nameOf(e.entidad, e.entidadId);
+        const accion = `${tx(e.accion)} ${tx(e.entidad)}${nombre ? ` <strong>${esc(nombre)}</strong>` : ''}`;
+        return `<div class="cl-item">`
+          + `<span class="cl-name" style="font-size:.82rem">${esc(actorTxt(e.actor))} ${accion}</span>`
+          + `<span class="cl-nif" style="font-size:.72rem;color:var(--t3)">${fmtTs(e.ts)}</span>`
+          + `</div>`;
+      }).join('') + `</div>`;
+      if (total > N) {
+        listHtml += `<p class="small" style="margin-top:.5rem;color:var(--t3)">${tx('showing').replace('{0}', N).replace('{1}', total)}</p>`;
+      }
+    } else {
+      listHtml = `<div style="color:var(--t3);font-size:.82rem;margin-top:.5rem">${tx('none')}</div>`;
+    }
+    return `<div class="cfg-section" style="margin-top:2.5rem"><div class="cfg-section-title">${tx('title')}</div>`
+      + `<div style="color:var(--t3);font-size:.82rem">${tx('desc')}</div>`
+      + listHtml
+      + `</div>`;
   },
 
   /** Sección Historial: copias locales (saves) — crear / restaurar / descargar.
@@ -201,6 +279,7 @@ Object.assign(App, {
     v.habilitado = document.getElementById('cfgVfEnabled').checked;
     v.userSet = true; /* elección explícita: la migración de defaults ya no la pisa */
     D.d.settings.verifactu = v;
+    D._audit('editar', 'settings', null);
     D.save();
     Toast.ok(t('cfg.saved'));
   },
@@ -287,6 +366,7 @@ Object.assign(App, {
     em.direccion1 = document.getElementById('cfgED1').value.trim();
     em.direccion2 = document.getElementById('cfgED2').value.trim();
     em.nif = document.getElementById('cfgENif').value.trim();
+    D._audit('editar', 'settings', null);
     D.save();
     Toast.ok(t('cfg.saved'));
   },
@@ -314,6 +394,7 @@ Object.assign(App, {
         B.calc(p);
       });
     }
+    D._audit('editar', 'settings', null);
     D.save();
     Toast.ok(t('cfg.saved'));
   },
@@ -325,6 +406,7 @@ Object.assign(App, {
     s.fiscal.rendAnterior = rend === '' ? null : (parseFloat(rend) || 0);
     s.fiscal.saldoIvaInicial = parseFloat(document.getElementById('cfgFSaldo').value) || 0;
     s.fiscal.eds = document.getElementById('cfgFEds').checked;
+    D._audit('editar', 'settings', null);
     D.save();
     Toast.ok(t('cfg.saved'));
   },
@@ -334,6 +416,7 @@ Object.assign(App, {
     tg.horasMes = parseFloat(document.getElementById('cfgTHm').value) || null;
     tg.ingresosMes = parseFloat(document.getElementById('cfgTIm').value) || null;
     tg.horasSemana = parseFloat(document.getElementById('cfgTHs').value) || null;
+    D._audit('editar', 'settings', null);
     D.save();
     Toast.ok(t('cfg.saved'));
   },
@@ -341,6 +424,7 @@ Object.assign(App, {
   saveCalSettings() {
     const v = parseInt(document.getElementById('cfgCalStart').value, 10);
     D.d.settings.calStartHour = (v >= 0 && v <= 23) ? v : 0;
+    D._audit('editar', 'settings', null);
     D.save();
     Toast.ok(t('cfg.saved'));
     if (this.cv === 'cal') this.rCal();

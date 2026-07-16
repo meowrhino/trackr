@@ -331,6 +331,9 @@ const Acc = (() => {
     const d = D.d;
     if (scope === 'todo') return d;
     const s = d.settings || {};
+    /* `audit` queda FUERA del alcance fiscal a proposito: el log lleva la actividad completa
+       de la persona (incluidas entidades fuera del alcance) y el gestor no lo necesita para
+       lo fiscal. En scope 'todo' viaja entero, que es donde tiene sentido. */
     return {
       version: d.version,
       clientes: d.clientes || [],
