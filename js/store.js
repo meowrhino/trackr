@@ -310,6 +310,11 @@ const D = {
 
   /** Persiste en localStorage */
   save() {
+    /* Modo visor (gestoría viendo datos de un cliente): NADA se persiste ni se
+       sincroniza. Todos los mutadores pasan por save(), así que este guard es la
+       barrera única que impide que los datos del cliente contaminen la cuenta del
+       gestor (localStorage propio, historial, blob en la nube). Ver App.gstOpenClient. */
+    if (this._readOnly) return;
     try {
       localStorage.setItem('trackr_data', JSON.stringify(this.d));
       this.lastSaved = Date.now();
@@ -420,12 +425,17 @@ const D = {
   /** Todas las facturas firmadas (registro Verifactu) */
   fs() { return this.d.facturas; },
 
-  /** Facturas de un emisor (filtradas por NIF) ordenadas por timestamp ASC */
+  /** Facturas de un emisor (filtradas por NIF) en orden de la cadena.
+   *  Ordena por `seq` (epoch ms monótono guardado al firmar), NO por el string
+   *  del timestamp con huso: en el cambio de hora de otoño dos registros a la misma
+   *  hora local llevan offsets +02:00 y +01:00 y el orden lexicográfico los invertía,
+   *  rompiendo la cadena en falso. El epoch ms es monótono y sin ambigüedad. */
   fsBy(nif) {
     const n = (nif || '').replace(/[\s-]/g, '').toUpperCase();
+    const key = f => (f.seq != null ? f.seq : Date.parse(f.timestamp) || 0);
     return this.d.facturas
       .filter(f => (f.emisorNif || '').toUpperCase() === n)
-      .sort((a, b) => (a.timestamp || '').localeCompare(b.timestamp || ''));
+      .sort((a, b) => key(a) - key(b));
   },
 
   /** Hash de la última factura del emisor (para encadenar la siguiente) */
@@ -512,5 +522,22 @@ const D = {
     this.d = j;
     this.ensure();
     this.save();
+  },
+
+  /** Carga efímera para el modo visor: normaliza y muestra en memoria, SIN persistir
+   *  ni sincronizar (this._readOnly bloquea save()). El localStorage y la nube del
+   *  gestor quedan intactos con SUS datos. exitView() lo revierte. */
+  loadView(j) {
+    this._readOnly = true;
+    this.d = j;
+    this.ensure();
+  },
+
+  /** Sale del modo visor: recupera los datos propios (que nunca se sobrescribieron
+   *  en localStorage porque save() estaba bloqueado) y reanuda la persistencia. */
+  exitView() {
+    this._readOnly = false;
+    try { this.d = JSON.parse(localStorage.getItem('trackr_data') || 'null') || this.d; } catch (e) { /* conserva lo que haya */ }
+    this.ensure();
   }
 };

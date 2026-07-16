@@ -243,8 +243,8 @@ Object.assign(App, {
         refFactura: f.id,
         hash,
         hashPrev: hashPrev || null,
-        primerRegistro: !hashPrev,
         timestamp: fechaHoraHuso,
+        seq: Date.now(),
         eventos: []
       });
       D.addFactEvent(f.id, { tipo: 'anulada', fecha: fechaHoraHuso });

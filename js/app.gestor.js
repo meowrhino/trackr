@@ -21,7 +21,7 @@
   const TXT = {
     es: {
       miTitle: 'Mi gestoría', miDesc: 'Comparte tus datos con tu gestoría de forma cifrada. Solo tu gestoría puede leerlos (ni TRACKR ni el servidor). Puedes revocar el acceso cuando quieras.',
-      codePh: 'Código de tu gestoría (TRK-G-…)', link: 'Vincular', badCode: 'Código no válido', notFound: 'No se encontró esa gestoría',
+      codePh: 'Código de tu gestoría (TRK-G-…)', link: 'Vincular', badCode: 'Código no válido', notFound: 'No se encontró esa gestoría', rateLimited: 'Demasiados intentos, espera unos minutos',
       confirmTitle: 'Confirmar gestoría', confirmDesc: 'Vas a compartir tus datos con:', fingerprint: 'Huella de clave',
       scope: 'Qué compartir', scopeFiscal: 'Solo lo fiscal (facturas, gastos, clientes, proyectos sin horas ni notas)', scopeTodo: 'Todo (incluye horas y notas)',
       confirmBtn: 'Compartir', cancel: 'Cancelar', linked: 'Vinculado con', revoke: 'Revocar acceso', revokeConfirm: '¿Revocar el acceso de tu gestoría? Dejará de ver tus datos inmediatamente.', revoked: 'Acceso revocado', lastShared: 'última copia',
@@ -32,7 +32,7 @@
     },
     en: {
       miTitle: 'My advisor', miDesc: 'Share your data with your advisor, encrypted end-to-end. Only your advisor can read it (not TRACKR, not the server). You can revoke access anytime.',
-      codePh: 'Your advisor\'s code (TRK-G-…)', link: 'Link', badCode: 'Invalid code', notFound: 'Advisor not found',
+      codePh: 'Your advisor\'s code (TRK-G-…)', link: 'Link', badCode: 'Invalid code', notFound: 'Advisor not found', rateLimited: 'Too many attempts, wait a few minutes',
       confirmTitle: 'Confirm advisor', confirmDesc: 'You are about to share your data with:', fingerprint: 'Key fingerprint',
       scope: 'What to share', scopeFiscal: 'Fiscal only (invoices, expenses, clients, projects without hours or notes)', scopeTodo: 'Everything (includes hours and notes)',
       confirmBtn: 'Share', cancel: 'Cancel', linked: 'Linked with', revoke: 'Revoke access', revokeConfirm: 'Revoke your advisor\'s access? They will stop seeing your data immediately.', revoked: 'Access revoked', lastShared: 'last copy',
@@ -43,7 +43,7 @@
     },
     ca: {
       miTitle: 'La meva gestoria', miDesc: 'Comparteix les teves dades amb la teva gestoria de forma xifrada. Només la teva gestoria pot llegir-les (ni TRACKR ni el servidor). Pots revocar l\'accés quan vulguis.',
-      codePh: 'Codi de la teva gestoria (TRK-G-…)', link: 'Vincular', badCode: 'Codi no vàlid', notFound: 'No s\'ha trobat aquesta gestoria',
+      codePh: 'Codi de la teva gestoria (TRK-G-…)', link: 'Vincular', badCode: 'Codi no vàlid', notFound: 'No s\'ha trobat aquesta gestoria', rateLimited: 'Massa intents, espera uns minuts',
       confirmTitle: 'Confirmar gestoria', confirmDesc: 'Compartiràs les teves dades amb:', fingerprint: 'Empremta de clau',
       scope: 'Què compartir', scopeFiscal: 'Només el fiscal (factures, despeses, clients, projectes sense hores ni notes)', scopeTodo: 'Tot (inclou hores i notes)',
       confirmBtn: 'Compartir', cancel: 'Cancel·lar', linked: 'Vinculat amb', revoke: 'Revocar accés', revokeConfirm: 'Revocar l\'accés de la teva gestoria? Deixarà de veure les teves dades immediatament.', revoked: 'Accés revocat', lastShared: 'última còpia',
@@ -56,8 +56,7 @@
   const t = (k) => (TXT[L()] || TXT.es)[k] || k;
   const esc2 = (s) => (typeof esc === 'function' ? esc(s) : String(s));
   const fpShort = (fp) => (fp || '').slice(0, 12);
-  const VIEW_KEY = 'trackr_gestor_view';   // flag {clientEmail, grantId} — modo visor activo
-  const OWN_KEY = 'trackr_gestor_own';     // copia JSON de los datos propios del gestor
+  const VIEW_KEY = 'trackr_gestor_view';   // marca {clientEmail, grantId} — solo para el banner al recargar
 
   Object.assign(App, {
 
@@ -108,9 +107,16 @@
     /* ── flujo persona: vincular ── */
     async gstLink() {
       const code = (document.getElementById('gstCode')?.value || '').trim().toUpperCase();
-      if (!/^TRK-G-[A-Z2-9]{10}$/.test(code)) return Toast.error(t('badCode'));
+      // Mismo alfabeto que el servidor (sin I/L/O ambiguos): así una I tecleada se rechaza
+      // aquí con mensaje claro en vez de llegar al backend y volver como 'bad_request' crudo.
+      if (!/^TRK-G-[A-HJ-NP-Z2-9]{10}$/.test(code)) return Toast.error(t('badCode'));
       const r = await Acc.gestorResolve(code);
-      if (!r.ok) return Toast.error(r.error === 'not_found' ? t('notFound') : (r.error || 'error'));
+      if (!r.ok) {
+        const msg = r.error === 'not_found' ? t('notFound')
+          : r.error === 'rate_limited' ? t('rateLimited')
+          : r.error === 'bad_request' ? t('badCode') : (r.error || 'error');
+        return Toast.error(msg);
+      }
       this._gstPending = { code, publicKey: r.publicKey, email: r.gestorEmail, fingerprint: r.fingerprint };
       this.om(`<div class="mt">${t('confirmTitle')}</div>`
         + `<p style="font-size:.86rem">${t('confirmDesc')}</p>`
@@ -167,37 +173,53 @@
       const r = await Acc.gestorClients();
       if (!r.ok) { el.innerHTML = `<div class="acc-warn">${esc2(r.error || 'error')}</div>`; return; }
       if (!r.clients.length) { el.innerHTML = `<div style="color:var(--t3);font-size:.82rem">${t('noClients')}</div>`; return; }
+      /* Cache por grantId: el email (dato de usuario) NUNCA se interpola en un onclick.
+         En un atributo, el navegador decodifica las entidades de esc() antes de que el
+         parser JS lea la cadena, así que un email con comilla escaparía del literal (XSS).
+         Solo el grantId (UUID de formato fijo) viaja en el onclick; el email se busca aquí. */
+      this._gstClients = {};
       el.innerHTML = `<div class="cl-list">` + r.clients.map(c => {
+        this._gstClients[c.grantId] = c;
         const upd = c.blobUpdatedAt ? new Date(c.blobUpdatedAt * 1000).toLocaleDateString() : null;
         return `<div class="cl-item">`
           + `<span class="cl-name" style="font-size:.84rem">${esc2(c.personaEmail)}</span>`
           + `<span class="cl-nif" style="font-size:.72rem">${esc2(c.scope)}</span>`
           + `<span class="cl-nif" style="font-size:.72rem;color:var(--t3)">${upd ? `${t('updated')} ${upd}` : t('noBlob')}</span>`
-          + (c.blobHash ? `<button class="bt" style="font-size:.72rem;padding:.2rem .6rem" onclick="App.gstOpenClient('${c.grantId}','${esc2(c.personaEmail)}')">${t('open')}</button>` : '')
+          + (c.blobHash ? `<button class="bt" style="font-size:.72rem;padding:.2rem .6rem" onclick="App.gstOpenClient('${esc2(c.grantId)}')">${t('open')}</button>` : '')
           + `</div>`;
       }).join('') + `</div>`;
     },
 
-    async gstOpenClient(grantId, email) {
+    async gstOpenClient(grantId) {
+      const email = this._gstClients?.[grantId]?.personaEmail || '';
+      // Guard de reentrada: si ya se está viendo un cliente, salir primero para no
+      // machacar el estado propio (D.exitView recupera los datos reales del gestor).
+      if (D._readOnly) D.exitView();
       const r = await Acc.gestorOpenClient(grantId);
       if (!r.ok) return Toast.error(`${t('openErr')} (${r.error || '?'})`);
-      // Snapshot de los datos PROPIOS + pausa total del sync antes de cargar al cliente.
-      try { localStorage.setItem(OWN_KEY, JSON.stringify(D.d)); } catch (e) { return Toast.error('storage'); }
+      // Marca de visor solo para re-mostrar el banner si se recarga la pestaña. NO guarda
+      // datos: D.loadView carga en memoria sin persistir, así el localStorage/nube del
+      // gestor conservan SUS datos y una recarga los muestra sin más (D.save bloqueado).
       localStorage.setItem(VIEW_KEY, JSON.stringify({ clientEmail: email, grantId }));
       Acc.setAutoSync(false);
-      if (typeof H !== 'undefined' && H.snapshot) H.snapshot();
-      D.load(r.data);
+      D.loadView(r.data);
       this._gstShowBanner(email);
       this.go('info');
     },
 
-    gstExitView() {
-      const own = localStorage.getItem(OWN_KEY);
+    // Desmonta el modo visor sin efectos de navegación. Idempotente y seguro de llamar
+    // desde cualquier flujo de auth (logout/login/unlock) para no dejar el visor colgado.
+    _gstForceExit() {
+      const wasView = !!(typeof D !== 'undefined' && D._readOnly) || !!localStorage.getItem(VIEW_KEY);
       localStorage.removeItem(VIEW_KEY);
-      localStorage.removeItem(OWN_KEY);
-      if (own) { try { D.load(JSON.parse(own)); } catch (e) { /* la copia H.snapshot sigue ahi */ } }
+      if (typeof D !== 'undefined' && D._readOnly) D.exitView();
       const b = document.getElementById('gstBanner'); if (b) b.remove();
       document.body.style.paddingTop = '';
+      return wasView;
+    },
+
+    gstExitView() {
+      this._gstForceExit();
       Acc.setAutoSync(true);
       Toast.ok(t('backOk'));
       this.go('cfg');
@@ -214,13 +236,8 @@
     },
   });
 
-  // ── Arranque: si la pestaña se cerró en modo visor, re-mostrar el banner (los datos
-  // del cliente siguen en localStorage; los propios están a salvo en OWN_KEY y en la nube).
-  try {
-    const v = JSON.parse(localStorage.getItem(VIEW_KEY) || 'null');
-    if (v && v.clientEmail) {
-      if (typeof Acc !== 'undefined') Acc.setAutoSync(false);
-      setTimeout(() => { try { App._gstShowBanner(v.clientEmail); } catch (e) { /* */ } }, 200);
-    }
-  } catch (e) { /* */ }
+  // ── Arranque: si la pestaña se cerró en modo visor, la marca VIEW_KEY quedó, pero los
+  // datos del cliente NUNCA se persistieron (D.loadView no guarda), así que localStorage ya
+  // tiene los datos propios del gestor. Basta limpiar la marca: se recupera solo, sin fugas.
+  try { localStorage.removeItem(VIEW_KEY); } catch (e) { /* */ }
 })();

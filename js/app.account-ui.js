@@ -253,6 +253,7 @@
     async accLogin() {
       const email = val('accEmail'), pw = val('accPw');
       if (!email) return Toast.error(t('emailBad'));
+      if (this._gstForceExit) this._gstForceExit(); // un re-login no debe reactivar sync sobre datos de un cliente en visor
       try {
         const r = await Acc.login(email, pw);
         if (!r.ok) return Toast.error(r.error === 'inactive' ? t('pending') : (r.error || 'error'));
@@ -264,6 +265,7 @@
 
     async accUnlock() {
       const pw = val('accPw'); if (!pw) return;
+      if (this._gstForceExit) this._gstForceExit(); // idem: desbloquear en visor no debe subir datos del cliente
       try {
         const r = await Acc.unlock(pw);
         if (!r.ok) return Toast.error(r.error || 'error');
@@ -275,6 +277,7 @@
 
     async accLogout() {
       if (!confirm(t('confirmLogout'))) return;
+      if (this._gstForceExit) this._gstForceExit(); // no dejar el modo visor colgado al salir
       Acc.setAutoSync(false);
       await Acc.logout();
       Toast.ok(t('loggedOut'));

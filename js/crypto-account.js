@@ -126,25 +126,29 @@ const CA = (() => {
     return await aesDec(wrapKey, envBytes.slice(4, 16), envBytes.slice(16, 64), aadStr);
   }
 
-  /* ── Blob: "TKb"(3)+ver(1)+flags(1)+iv(12)+ct+tag (§3.3) ── */
-  async function encryptBlob(dek, obj, email, version) {
+  /* ── Contenedor "TKb"(3)+ver(1)+flags(1)+iv(12)+ct+tag (§3.3) ──
+   * Formato común del blob principal (clave DEK) y del blob sombra de gestoría
+   * (clave de compartición). Solo cambian la clave y el AAD; el marco es idéntico,
+   * así que vive en un único par pack/unpack para no divergir. */
+  async function packContainer(key, obj, aadStr) {
     const gz = await gzip(enc.encode(JSON.stringify(obj)));
     const iv = randBytes(12);
-    const ct = await aesEnc(dek, iv, gz, aadBlob(email, version));
+    const ct = await aesEnc(key, iv, gz, aadStr);
     const out = new Uint8Array(5 + 12 + ct.length);
     out[0] = 0x54; out[1] = 0x4B; out[2] = 0x62; out[3] = 0x01; out[4] = 0x01;
     out.set(iv, 5); out.set(ct, 17);
     return out;
   }
-  async function decryptBlob(dek, blob, email, version) {
-    if (blob.length < 18 || blob[0] !== 0x54 || blob[1] !== 0x4B || blob[2] !== 0x62 || blob[3] !== 0x01) {
+  async function unpackContainer(key, bytes, aadStr) {
+    if (bytes.length < 18 || bytes[0] !== 0x54 || bytes[1] !== 0x4B || bytes[2] !== 0x62 || bytes[3] !== 0x01) {
       throw new Error('bad_blob');
     }
-    const flags = blob[4];
-    const gz = await aesDec(dek, blob.slice(5, 17), blob.slice(17), aadBlob(email, version));
-    const json = (flags & 1) ? await gunzip(gz) : gz;
-    return JSON.parse(dec.decode(json));
+    const flags = bytes[4];
+    const gz = await aesDec(key, bytes.slice(5, 17), bytes.slice(17), aadStr);
+    return JSON.parse(dec.decode((flags & 1) ? await gunzip(gz) : gz));
   }
+  const encryptBlob = (dek, obj, email, version) => packContainer(dek, obj, aadBlob(email, version));
+  const decryptBlob = (dek, blob, email, version) => unpackContainer(dek, blob, aadBlob(email, version));
 
   /* ── Derivaciones ── */
   async function deriveMaster(password, kdfSalt, kdf) {
@@ -321,21 +325,12 @@ const CA = (() => {
 
   // Blob sombra: mismo contenedor TKb que el blob principal, con AAD por grantId.
   async function encryptShare(shareKey, obj, grantId) {
-    const gz = await gzip(enc.encode(JSON.stringify(obj)));
-    const iv = randBytes(12);
-    const ct = await aesEnc(shareKey, iv, gz, aadShareBlob(grantId));
-    const out = new Uint8Array(5 + 12 + ct.length);
-    out[0] = 0x54; out[1] = 0x4B; out[2] = 0x62; out[3] = 0x01; out[4] = 0x01;
-    out.set(iv, 5); out.set(ct, 17);
+    const out = await packContainer(shareKey, obj, aadShareBlob(grantId));
     const hash = new Uint8Array(await crypto.subtle.digest('SHA-256', out));
     return { blob: b64u(out), blobHash: b64u(hash) };
   }
   async function decryptShare(shareKey, blobB64, grantId) {
-    const blob = b64uDec(blobB64);
-    if (blob.length < 18 || blob[0] !== 0x54 || blob[1] !== 0x4B || blob[2] !== 0x62 || blob[3] !== 0x01) throw new Error('bad_blob');
-    const flags = blob[4];
-    const gz = await aesDec(shareKey, blob.slice(5, 17), blob.slice(17), aadShareBlob(grantId));
-    return JSON.parse(dec.decode((flags & 1) ? await gunzip(gz) : gz));
+    return await unpackContainer(shareKey, b64uDec(blobB64), aadShareBlob(grantId));
   }
 
   // SYNC

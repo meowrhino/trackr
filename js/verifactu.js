@@ -127,7 +127,12 @@ const V = {
   async verifyChain(registros) {
     const broken = [];
     let prevHuella = '';
+    /* Guard de esquema legacy: la rama verifactu-wip (nunca en producción) firmaba en
+       base64. Un hash almacenado que no sea hex-64 no es de este algoritmo: se marca como
+       'esquema_legacy' en vez de reportar toda la cadena como manipulada en falso. */
+    const esHex64 = h => typeof h === 'string' && /^[0-9A-F]{64}$/.test(h);
     for (const f of registros) {
+      if (!esHex64(f.hash)) { broken.push({ id: f.id, numero: f.numero, motivo: 'esquema_legacy', found: f.hash }); prevHuella = f.hash; continue; }
       const r = {
         emisorNif: f.emisorNif,
         numSerie: f.numero,

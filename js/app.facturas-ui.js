@@ -75,7 +75,9 @@ Object.assign(App, {
   },
 
   async genFactura(pid) {
-    const fecha = document.getElementById('facDate').value;
+    /* Normalizar la fecha aquí para que el PDF, el QR y el registro Verifactu usen
+       EXACTAMENTE la misma (Fac.download también cae a todayStr() si va vacía). */
+    const fecha = document.getElementById('facDate').value || todayStr();
     const asunto = document.getElementById('facAsunto').value.trim();
     const num = parseInt(document.getElementById('facNum').value) || null;
     const p = D.p(pid);
@@ -99,8 +101,8 @@ Object.assign(App, {
     let verifactu = null;
     if (verifactuOn) {
       const numStr = String(num || f.facturaNum || s.nextFacturaNum || 1);
-      /* NumSerieFactura = numero tal cual se imprime en el PDF: NNNN/YY */
-      const numSerie = `${numStr}/${(fecha || '').slice(2, 4)}`;
+      /* NumSerieFactura = numero tal cual se imprime en el PDF: NNNN/YY (yearShort, como el PDF) */
+      const numSerie = `${numStr}/${yearShort(fecha)}`;
       const cl = p.clienteId ? D.cl(p.clienteId) : null;
       const emisorNif = s.emisor.nif.replace(/[\s-]/g, '').toUpperCase();
       const hashPrev = D.lastHashFor(emisorNif);
@@ -130,7 +132,10 @@ Object.assign(App, {
           hash,
           publicUrl: V.PUBLIC_URL
         };
-        /* Persistir el registro de alta en el registro inmutable */
+        /* Persistir el registro de alta en el registro inmutable. seq = epoch ms
+           monótono para ordenar la cadena sin ambigüedad de huso (ver D.fsBy).
+           sifId/softwareVersion no se guardan por registro: son constantes de V y
+           congelarlas mentiría sobre la versión con la que se firmó. */
         D.addFact({
           id: uid(),
           tipoRegistro: 'alta',
@@ -153,11 +158,9 @@ Object.assign(App, {
           proyectoId: pid,
           hash,
           hashPrev: hashPrev || null,
-          primerRegistro: !hashPrev,
           timestamp: fechaHoraHuso,
+          seq: Date.now(),
           qrPayload,
-          sifId: V.SIF_ID,
-          softwareVersion: V.SOFTWARE_VERSION,
           eventos: []
         });
       } catch (err) {

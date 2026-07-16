@@ -325,10 +325,11 @@ const Acc = (() => {
   }
 
   // Construye la copia a compartir segun el alcance. 'fiscal' excluye lo personal:
-  // horas y notas de los proyectos, y el journey completo.
+  // horas y notas de los proyectos, y el journey completo. Para 'todo' se devuelve D.d
+  // directamente (encryptShare ya lo serializa; clonar seria trabajo tirado).
   function buildShareData(scope) {
     const d = D.d;
-    if (scope === 'todo') return JSON.parse(JSON.stringify(d));
+    if (scope === 'todo') return d;
     const s = d.settings || {};
     return {
       version: d.version,
@@ -341,19 +342,26 @@ const Acc = (() => {
         interno: p.interno, fechas: p.fechas, recurrente: p.recurrente, facturacion: p.facturacion,
       })),
       settings: { emisor: s.emisor, fiscal: s.fiscal, verifactu: s.verifactu, nextFacturaNum: s.nextFacturaNum, idioma: s.idioma },
-      _shareScope: 'fiscal',
     };
   }
 
   // Sube el blob sombra si hay grant activo. Best-effort: un fallo no rompe el sync normal.
+  // Dirty-check por hash del texto plano: como encryptShare usa IV aleatorio, el ciphertext
+  // cambia siempre y la idempotencia por content-hash del servidor nunca dispararia; comparar
+  // el plano evita re-cifrar y re-subir cuando el subconjunto compartido no ha cambiado.
+  let _lastShadowHash = null;
   async function pushShadow() {
     const g = typeof D !== 'undefined' ? D.d?.settings?.gestorGrant : null;
     if (!g || !isUnlocked() || !S.active) return;
     try {
+      const plain = JSON.stringify(buildShareData(g.scope));
+      const planoHash = CA._.b64u(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(g.grantId + '|' + plain))));
+      if (planoHash === _lastShadowHash) return; // subconjunto compartido sin cambios
       const shareKey = CA._.b64uDec(g.shareKey);
-      const { blob, blobHash } = await CA.encryptShare(shareKey, buildShareData(g.scope), g.grantId);
+      const { blob, blobHash } = await CA.encryptShare(shareKey, JSON.parse(plain), g.grantId);
       const r = await api('/v1/grants/' + encodeURIComponent(g.grantId) + '/blob', { method: 'PUT', auth: true, body: { blob, blobHash } });
-      if (r.status === 404) { delete D.d.settings.gestorGrant; D.save(); } // revocado por el gestor
+      if (r.status === 404) { delete D.d.settings.gestorGrant; _lastShadowHash = null; D.save(); } // revocado por el gestor
+      else if (r.status === 200) _lastShadowHash = planoHash;
     } catch (e) { console.warn('pushShadow failed:', e); }
   }
 
