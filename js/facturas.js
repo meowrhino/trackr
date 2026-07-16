@@ -224,6 +224,43 @@ const Fac = {
       doc.text(lines, labelX, totalsY);
     }
 
+    /* ── Bloque VeriFactu (esquina inferior izquierda): QR tributario + leyenda ── */
+    if (data.verifactu && data.verifactu.qrPayload && typeof V !== 'undefined' && typeof qrcode === 'function') {
+      try {
+        const qrSize = 30;              /* mm — spec AEAT: 30×30 a 40×40 */
+        const qrX = mg;
+        const qrY = pageH - mg - qrSize;
+
+        doc.setFontSize(7);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(60);
+        doc.text(V.QR_LABEL, qrX, qrY - 1.5);
+
+        /* QR vectorial: jsPDF no soporta GIF (formato de qrcode-generator),
+           asi que pintamos los modulos como rects. Correccion de errores M. */
+        const qr = qrcode(0, 'M');
+        qr.addData(data.verifactu.qrPayload);
+        qr.make();
+        const n = qr.getModuleCount();
+        const cell = qrSize / n;
+        doc.setFillColor(0, 0, 0);
+        for (let r = 0; r < n; r++) {
+          for (let c = 0; c < n; c++) {
+            if (qr.isDark(r, c)) doc.rect(qrX + c * cell, qrY + r * cell, cell, cell, 'F');
+          }
+        }
+
+        /* Leyenda oficial + identificacion SIF a la derecha del QR */
+        const txX = qrX + qrSize + 4;
+        doc.setFontSize(8);
+        doc.setTextColor(60);
+        doc.text(doc.splitTextToSize(V.LEGEND, 60), txX, qrY + qrSize / 2 - 3);
+        doc.setFontSize(6.5);
+        doc.setTextColor(120);
+        doc.text(`SIF ${data.verifactu.sifId} · TRACKR v${data.verifactu.softwareVersion} · ${data.verifactu.publicUrl}`, txX, qrY + qrSize / 2 + 4);
+      } catch (e) { console.warn('Verifactu QR render failed:', e); }
+    }
+
     return doc;
   },
 
@@ -272,7 +309,8 @@ const Fac = {
         ivaExcepcion: f.ivaExcepcion || ''
       },
       beneficiarioPago: s.emisor.beneficiarioPago || '',
-      instruccionesPago: s.emisor.instruccionesPago || ''
+      instruccionesPago: s.emisor.instruccionesPago || '',
+      verifactu: opts.verifactu || null
     };
 
     /* Generar y descargar */

@@ -1,189 +1,172 @@
-# 15 — Verifactu / homologación SIF
+# 15 — VeriFactu / SIF
 
-## Estado: ⏳ pendiente · deadline 1 jul 2027
+## Estado: 🎯 diseño cerrado (investigación 2026-07-16) · pendiente de ejecución
+## Deadline: 1 ene 2027 (sociedades) · **1 jul 2027 (autónomos)** — RDL 15/2025 (BOE 03/12/2025)
 
-### Contexto normativo
-
-- **Real Decreto 1007/2023** establece el reglamento del Sistema Informático de Facturación (SIF) "Verifactu".
-- **Orden HAC/1177/2024** desarrolla los requisitos técnicos.
-- **Real Decreto-ley 15/2025** (BOE 03/12/2025) aplaza las fechas:
-  - **1 enero 2027** → sociedades obligadas.
-  - **1 julio 2027** → autónomos en estimación directa.
-- La AEAT **no homologa** software; los fabricantes auto-certifican mediante **declaración responsable** firmada y publicada en URL abierta del dominio.
-- Sanciones: hasta **50.000 €/ejercicio** por uso de software no homologado.
-
-### Estado de la competencia
-
-- **Quipu**: declaración firmada 29 jul 2025, publicada en URL pública (`getquipu.com/es/verifactu-declaracion-responsable.html`). Código SIF `1Q`. El más transparente — referencia para nuestra implementación.
-- **Holded**: activo, accesible solo dentro del producto.
-- **Contasimple**: declaración firmada 29 jul 2025, accesible solo dentro del producto.
+> Historia: el plan original (mayo 2026) apostaba por la modalidad "no verificable" creyendo que era
+> la fácil. La revisión de 2026-07-05 contra las FAQs oficiales AEAT demostró lo contrario: la no
+> verificable exige firma XAdES por registro + log de eventos firmado + conservación inalterable 4+
+> años (inviable con localStorage). La investigación de 2026-07-16 cierra el diseño por la otra vía.
 
 ---
 
-## Las dos modalidades de SIF
+## Decisión de arquitectura: modalidad VERI*FACTU (remisión continua)
 
-> ⚠️ **CORRECCIÓN (revisión 2026-07-05, FAQs oficiales AEAT):** la premisa de este doc estaba mal.
-> La modalidad **no verificable** es la EXIGENTE, no la fácil:
-> - Exige **firma XAdES (Enveloped) con certificado electrónico de CADA registro** (alta, anulación y eventos) — el hash encadenado solo NO basta.
-> - Exige **registro de eventos** firmado y encadenado (arranque/cierre como NO VERI*FACTU, detección de anomalías, exportaciones, resumen cada 6h de operación).
-> - Exige **conservación inalterable 4+ años** de los registros — localStorage (borrable/editable por el usuario) no puede sostener eso ante una inspección.
-> - La modalidad **Verifactu (remisión continua)** es la que encaja con local-first: remitir a AEAT **exime de firmar y de conservar** los registros (quedan en AEAT). Es justo por esto que la app gratuita de la propia AEAT es modalidad Verifactu.
-> - QR: en no verificable la URL de cotejo es **distinta** (`ValidarQRNoVerifactu`) y NO lleva la leyenda "VERI*FACTU"; encima del QR siempre va "QR tributario:". Tamaño 30×30–40×40 mm, ISO 18004, corrección M.
-> - Fuentes: FAQ firma AEAT, FAQ eventos, FAQ declaración responsable, spec QR v0.5.0 (URLs en TODO/20).
->
-> **Consecuencia:** el WIP de `verifactu-wip` (hash SHA-256 + QR, sin firma XAdES ni eventos) NO cumpliría la modalidad no verificable tal cual. Opciones reales: (a) modalidad Verifactu con remisión vía Worker (requiere certificado del obligado o colaborador social — investigar), (b) quedar fuera del ámbito SIF (difícil: TRACKR calcula y emite facturas → es un SIF según el criterio AEAT sobre Excel "listos"), o (c) esperar; deadline autónomos 1-jul-2027, y como *fabricante* la obligación de comercializar solo SIF conformes rige desde 29-jul-2025 (sanción art. 201 bis: 150.000 €/ejercicio fabricante, 50.000 €/ejercicio usuario) — mientras sea beta no comercializada como software de facturación el riesgo es bajo, pero es decisión de producto antes del lanzamiento startup.
+**Por qué es la buena para TRACKR:**
 
-- **SIF "no verificable"** — el software cumple integridad/trazabilidad/hash pero **no envía** facturas en tiempo real a la AEAT. ~~Esta es nuestra opción: coherente con el ADN local-first, sigue funcionando offline, no requiere certificado del usuario.~~ ← incorrecto, ver corrección arriba.
-- **SIF "Veri*Factu" (verificable)** — además envía cada factura a la AEAT vía API en cuanto se emite. Requiere certificado digital del autónomo + integración con la API de la AEAT.
+- Remitir a AEAT **exime de firmar (XAdES) y de conservar** los registros — quedan en AEAT. Es la
+  modalidad de la propia app gratuita de la AEAT.
+- **Compatible con local-first** (confirmado en FAQ oficial): si no hay conexión, luz, o la sede AEAT
+  está caída, **se sigue facturando sin interrupción**. Los registros pendientes se reenvían
+  periódicamente con flag de **incidencia** en la cabecera, y **no hay plazo máximo fijado** para
+  esos reintentos. Emitir offline + cola de remisión = legal.
+- El inicio es **tácito** (empezar a remitir; no hay que presentar 036). Una vez dentro, permanencia
+  mínima **hasta fin del año natural** (solo se puede salir en enero del año siguiente).
+- Multi-emisor: cada lote de remisión debe contener registros de **un solo obligado** — los envíos
+  se separan por usuario.
+
+Fuente: [FAQ Sistemas VERI*FACTU (AEAT)](https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/preguntas-frecuentes/sistemas-verifactu.html)
 
 ---
 
-## Requisitos técnicos a implementar (SIF no verificable)
+## La vía de remisión: colaboración social (acuerdo tipo 017)
 
-### 1. Hash encadenado por emisor
+Confirmado en [FAQ Colaboración social (AEAT)](https://sede.agenciatributaria.gob.es/Sede/iva/sistemas-informaticos-facturacion-verifactu/preguntas-frecuentes/colaboracion-social.html):
 
-Cada factura emitida lleva un **SHA-256** que se calcula sobre:
-- Datos canónicos de la factura (NIF emisor, número, fecha, importe total, NIF cliente).
-- Más el **hash de la factura anterior** del mismo emisor (encadenamiento tipo blockchain mini).
+- Las **empresas desarrolladoras de software** pueden suscribir el **acuerdo de colaboración social
+  tipo 017** para remitir registros de facturación en nombre de sus usuarios.
+  Contacto AEAT: `comunicacion.sepri@correo.aeat.es`.
+- La remisión se hace con el **certificado del colaborador social** (no hace falta certificado de
+  cada usuario). Alternativas admitidas: certificado del propio obligado, o apoderamiento.
+- ⚠️ **Cada usuario debe otorgar representación mediante documento normalizado** (Resolución de 18
+  de diciembre de 2024), firmado **a mano + copia de DNI** o con **firma electrónica**
+  (cualificada o avanzada eIDAS). La AEAT **rechaza explícitamente** que "aceptar las condiciones
+  del servicio" valga como apoderamiento. → Esto es fricción de onboarding: hay que diseñar el
+  flujo (plantilla del documento + subida firmada, o firma electrónica).
 
-Si cualquier factura se modifica a posteriori, la cadena se rompe y se detecta.
+**Preguntas abiertas para el email a la AEAT (sepri):**
+1. ¿Puede un **autónomo persona física** (fabricante de software) suscribir el acuerdo 017, o exige
+   persona jurídica?
+2. Detalle del alta: plazos, documentación, y si el acuerdo cubre también la consulta de registros.
+3. ¿Vale el certificado FNMT de persona física para la remisión como colaborador, o piden sello?
 
-**Cómo lo implementamos:**
-- Nuevo objeto top-level en el JSON: `D.d.facturas[]`, lista inmutable de facturas firmadas.
-- Cada entrada: `{ id, numero, fecha, emisorNif, clienteNif, totalFactura, hash, hashPrev, timestamp, qrPayload, eventos: [] }`.
-- Función `signInvoice(data, hashPrev)` en `js/verifactu.js` que devuelve el hash.
-- Usamos `crypto.subtle.digest('SHA-256', ...)` (nativo del navegador, async).
-- Al emitir factura: buscar el último hash del mismo emisor, calcular el nuevo, persistir.
+**Plan B si el 017 no es viable como persona física:** cada usuario aporta su propio certificado
+(peor UX; el certificado tendría que usarse desde el navegador del usuario o custodiarse — ambas
+opciones malas) o TRACKR se constituye como SL antes del lanzamiento (decisión de negocio).
 
-### 2. Código QR en el PDF
+---
 
-Cada PDF de factura debe llevar un QR con el payload exacto definido por la AEAT:
+## Especificaciones técnicas confirmadas
+
+### Huella SHA-256 (encadenada)
+
+Cadena `campo1=valor1&campo2=valor2&…` → SHA-256 sobre UTF-8 → **64 hex MAYÚSCULAS**.
+Valores sin espacios; campo vacío = `campo=`; decimales normalizados (123.1 ≡ 123.10).
+
+**Registro de alta**, campos en este orden:
+`IDEmisorFactura`, `NumSerieFactura`, `FechaExpedicionFactura`, `TipoFactura`, `CuotaTotal`,
+`ImporteTotal`, `Huella` (la del registro anterior; vacía en el primero), `FechaHoraHusoGenRegistro`.
+
+**Registro de anulación**: `IDEmisorFacturaAnulada`, `NumSerieFacturaAnulada`,
+`FechaExpedicionFacturaAnulada`, `Huella`, `FechaHoraHusoGenRegistro`.
+
+⚠️ Al implementar, validar contra el PDF oficial **"Detalle de las especificaciones técnicas para
+la generación de la huella o hash de los registros"** (web de desarrolladores AEAT) — lo de arriba
+viene de fuentes secundarias solventes, pero el byte a byte se confirma contra el oficial.
+
+### QR de cotejo
+
+- **Producción**: `https://www2.agenciatributaria.es/wlpl/TIKE-CONT/ValidarQR?nif=…&numserie=…&fecha=DD-MM-YYYY&importe=N.NN`
+- **Pruebas**: `https://prewww2.aeat.es/wlpl/TIKE-CONT/ValidarQR?…` (mismos parámetros)
+- 4 parámetros: `nif`, `numserie` (admite barras y alfanuméricos), `fecha` (DD-MM-YYYY),
+  `importe` (punto decimal).
+- Formato: ISO/IEC 18004, corrección de errores **M**, tamaño **30×30–40×40 mm** en el PDF.
+- Leyendas: encima del QR siempre `QR tributario:`; en modalidad VERI*FACTU además la leyenda
+  `Factura verificable en la sede electrónica de la AEAT` o `VERI*FACTU`.
+
+### Servicio de remisión (SOAP)
+
+- WSDL `SistemaFacturacion.wsdl`; esquemas `SuministroLR.xsd`, `SuministroInformacion.xsd`,
+  `RespuestaSuministro.xsd`. Mirror cómodo: [hectorsipe/aeat-verifactu](https://github.com/hectorsipe/aeat-verifactu)
+  (también [mdiago/VeriFactu](https://github.com/mdiago/VeriFactu) y
+  [JoseRGWeb/Veri-factuSender](https://github.com/JoseRGWeb/Veri-factuSender) como referencia de implementación).
+- **Entorno de pruebas**: `https://prewww1.aeat.es/wlpl/TIKE-CONT/ws/SistemaFacturacion/VerifactuSOAP`
+  (certificado persona física/representante) · `prewww10.aeat.es` (certificado de sello).
+- Autenticación: **mTLS con certificado electrónico** (no Cl@ve para procesos automatizados).
+- **Control de flujo**: la respuesta de cada envío fija el tiempo de espera mínimo antes del
+  siguiente lote (típicamente 60 s). Los registros se agrupan por obligado.
+- Registro de alta XML: `TipoFactura` (**F1** completa / **F2** simplificada), desglose de IVA por
+  tipo impositivo, encadenamiento (huella anterior), `FechaHoraHusoGenRegistro` con huso.
+- La respuesta AEAT devuelve estado por registro (aceptado / aceptado con errores / rechazado) —
+  hay que persistir el resultado y gestionar reintentos idempotentes.
+
+---
+
+## Arquitectura TRACKR
 
 ```
-NIF_EMISOR | NUMERO_SERIE | FECHA_EMISION | IMPORTE_TOTAL | HASH
+[navegador]                            [trackr-api]                    [AEAT]
+emitir factura                         POST /v1/verifactu/registros    SOAP VerifactuSOAP
+ ├─ calcular huella oficial      ──►    ├─ valida + encola (D1)   ──►   ├─ mTLS cert colaborador
+ ├─ persistir en D.d.facturas[]         ├─ agrupa por obligado          ├─ control de flujo 60s
+ ├─ pintar QR en el PDF                 ├─ cron/alarm remite            └─ respuesta por registro
+ └─ cola local si no hay red            └─ guarda estado/CSV
 ```
 
-(Formato real lo confirmamos contra la Orden HAC/1177/2024 al implementar.)
-
-**Cómo lo implementamos:**
-- Librería: `qrcode-generator` (small, ~10 KB, sin dependencias, soporta UTF-8). La metemos en el repo vía `js/lib/qrcode.js` o CDN.
-- En `Fac.download`, generar el QR antes del jsPDF render, añadirlo como imagen en una esquina inferior derecha (estándar AEAT).
-
-### 3. Sello de tiempo
-
-ISO 8601 local del momento de la firma. Para SIF **no verificable** basta con `new Date().toISOString()`. No requiere TSA externa.
-
-### 4. Registro de eventos (modificaciones)
-
-Si una factura se anula o rectifica, queda en un log inalterable. Nunca borramos una factura del array `facturas[]`.
-
-**Estructura del evento:**
-```js
-{ tipo: 'anulada' | 'rectificada', fecha: '2027-...', motivo: '...', refFactura: 'fact-2026-0042' }
-```
-
-Se añade al array `eventos[]` de la factura original. Si es rectificación, se crea una nueva factura con `tipoFactura: 'rectificativa'` y `refOriginal: 'fact-2026-0042'`.
-
-### 5. Identificador SIF en el PDF
-
-En el pie de cada factura PDF:
-```
-SIF: 1T · TRACKR v0.4.x · Cumple RD 1007/2023, Orden HAC/1177/2024
-URL: https://tr4ckr.com/verifactu
-```
-
-- **Identificador SIF**: a decidir. Sugerencia: `1T` (Quipu usa `1Q`).
-- **Versión del software**: a fijar el día de la firma de la declaración.
-
-### 6. Declaración responsable pública
-
-Documento (PDF firmado + página HTML) en `tr4ckr.com/verifactu` con:
-- Identidad del fabricante (TÚ: nombre, NIF, domicilio fiscal, contacto).
-- Producto: TRACKR, versión X.Y.Z, fecha de la versión.
-- Declaración explícita de que cumple RD 1007/2023, Orden HAC/1177/2024.
-- Firma digital o manuscrita escaneada.
-- Sin requerir login.
-
-Modelo a copiar (textualmente): `getquipu.com/es/verifactu-declaracion-responsable.html`.
+- **Frontend** (funciona 100% offline): huella + QR se calculan al emitir; el registro se persiste
+  en `D.d.facturas[]` (ya existe en main: `addFact`/`addFactEvent`/`lastHashFor` en `store.js`).
+  Cola local de registros pendientes de remitir.
+- **Canal en claro**: los registros VeriFactu viajan a `trackr-api` **fuera del blob cifrado**
+  (van a AEAT igualmente). ⚠️ Matiz de copy: el zero-knowledge sigue siendo cierto para todo lo
+  demás; hay que decirlo honesto — "tus registros de facturación se remiten a la AEAT si activas
+  VERI*FACTU".
+- **Backend**: tabla `verifactu_queue` en D1, remisión agrupada por obligado desde un cron (o
+  Durable Object alarm), certificado en Secrets Store, respeto del control de flujo, persistencia
+  de respuestas y reintentos con `Incidencia=S`.
+- Requiere cuenta TRACKR **activa** para VeriFactu (el modo sin cuenta sigue existiendo, pero sin
+  remisión → esas facturas no serían VERI*FACTU).
 
 ---
 
-## Schema del JSON tras la implementación
+## Plan de ejecución
 
-```js
-// Top-level nuevo (al lado de projects, clientes, gastos, settings):
-"facturas": [
-  {
-    "id": "fact-2026-0042",                  // ID interno (uid)
-    "numero": "0042/26",                      // Número serie tal cual aparece en PDF
-    "fecha": "2026-12-15",                    // Fecha de emisión (devengo)
-    "emisorNif": "12345678A",
-    "clienteNif": "B11111111",
-    "clienteNombre": "Acme SL",
-    "baseImponible": 1000.00,
-    "iva": 21,
-    "importeIva": 210.00,
-    "irpf": 15,
-    "importeIrpf": 150.00,
-    "totalFactura": 1060.00,
-    "proyectoId": "pj-...",                   // Ref al proyecto que la generó
-    "hash": "abc123...",                      // SHA-256 base64
-    "hashPrev": "def456..." | null,           // Hash de la anterior del mismo emisor
-    "timestamp": "2026-12-15T18:34:22.123Z",
-    "qrPayload": "12345678A|0042/26|2026-12-15|1060.00|abc123...",
-    "tipoFactura": "ordinaria" | "rectificativa",
-    "refOriginal": "fact-2026-0040" | null,   // Solo si rectificativa
-    "eventos": []                              // [{ tipo, fecha, motivo, ... }]
-  }
-]
+| Fase | Quién | Qué | Estimación |
+|------|-------|-----|-----------|
+| **1. Código local** | Claude | Retomar `verifactu-wip`: huella con formato oficial, QR con URL oficial, registro de alta completo (F1/F2 + desglose IVA), anulación/rectificativa, vista auditoría "Verificar integridad". Sin certificado, testeable ya. | 3-4 días |
+| **2. Gestiones** | Manu | Localizar certificado FNMT · email a `comunicacion.sepri@correo.aeat.es` (preguntas de arriba) · acceso al portal de pruebas AEAT. | 1-2 h + espera respuesta |
+| **3. Backend remisión** | Claude | `POST /v1/verifactu/registros` + cola D1 + cliente SOAP contra **preproducción** + gestión de respuestas/reintentos. Bloqueado por Fase 2 (certificado). | 4-6 días |
+| **4. Legal/producto** | Manu (+textos de Claude) | Flujo de representación normalizada por usuario · declaración responsable pública (base en `verifactu.html` de la rama) · elegir ID SIF (propuesta: `1T`) · ajustar copy zero-knowledge. | 2-3 días |
+| **5. Ensayo general** | ambos | Cadena de 10+ facturas contra preproducción, anulación, corte de red simulado, verificación QR. | 1-2 días |
 
-// settings nuevo:
-"settings": {
-  ...
-  "verifactu": {
-    "sifId": "1T",
-    "softwareVersion": "0.4.0",
-    "habilitado": true,                      // Toggle por si alguien quiere PDFs sin Verifactu
-    "lastInvoiceHash": "abc123..."           // Para encadenar la próxima
-  }
-}
-```
+**Cuándo:** la Fase 1 puede arrancar ya. El email de la Fase 2 conviene mandarlo **esta semana**
+(la respuesta de AEAT puede tardar y es el camino crítico). Objetivo razonable: remisión funcionando
+en preproducción antes de fin de 2026, margen de 6 meses sobre el deadline.
 
 ---
 
-## Plan de ejecución concreto
+## Identificador SIF y declaración responsable
 
-| Fase | Tiempo | Acción |
-|------|--------|--------|
-| 1. Estudio | 4-6 h | Leer Orden HAC/1177/2024 + inspeccionar la página pública de Quipu. Confirmar el formato exacto del payload del QR y los campos canónicos del hash. |
-| 2. Módulo `js/verifactu.js` | 4-6 h | Funciones `signInvoice`, `buildQRPayload`, `verifyChain`. Tests manuales. |
-| 3. Schema + migración | 2-3 h | Añadir `D.d.facturas[]` y `settings.verifactu` al store, migrar facturas existentes (sin hash, marcadas como pre-Verifactu). |
-| 4. Integración `Fac.download` y `App.genFactura` | 4-6 h | Calcular hash + QR antes de generar PDF. Insertar QR + identificador SIF en el PDF. Persistir factura firmada. |
-| 5. Librería QR | 1 h | Añadir `js/lib/qrcode.js` (qrcode-generator). |
-| 6. Vista de auditoría | 2-3 h | Sección en Configuración con lista de facturas firmadas + verificación de cadena (botón "Verificar integridad"). |
-| 7. Landing `tr4ckr.com/verifactu` | 2-3 h | HTML estático con la declaración responsable + identificador + versión. |
-| 8. Redactar y firmar la declaración | 1-2 h | Texto legal + firma manuscrita escaneada o e-firma. |
-| 9. Tests E2E + ensayos en preview | 3-4 h | Generar 5-10 facturas en cadena, verificar integridad, modificar una a mano y comprobar que se detecta. |
-| **Total** | **23-34 h** | **~3-4 jornadas a tiempo completo** o **6-8 semanas a ratos sueltos**. |
+- **ID SIF propuesto**: `1T` (Quipu usa `1Q`). Se fija el día de la firma.
+- Declaración responsable: PDF firmado + HTML público sin login en el dominio de producción
+  (`trackr.meowrhino.studio/verifactu` — decidir si tr4ckr.com es el canónico). Identidad del
+  fabricante, producto+versión, declaración de conformidad RD 1007/2023 + Orden HAC/1177/2024.
+  Modelo de referencia: Quipu (`getquipu.com/es/verifactu-declaracion-responsable.html`); la AEAT
+  publica ejemplos en la web de desarrolladores.
+- Como **fabricante**, la obligación de comercializar solo SIF conformes rige desde 29-jul-2025
+  (art. 201 bis: 150.000 €/ejercicio fabricante). Mientras TRACKR sea beta no comercializada como
+  software de facturación el riesgo es bajo, pero **hay que estar conforme antes de cobrar a nadie**.
 
 ---
 
-## Decisión cuándo empezar
+## Fuera de alcance
 
-- Plan oficial: **Q1 2027**.
-- Recomendación: arrancar **a más tardar en diciembre 2026** para tener 4-5 meses de margen.
-- Si TRACKR coge tracción este verano (≥20 beta testers reales) → adelantar a **octubre 2026**.
-
----
-
-## Decisión sobre TicketBAI (País Vasco, Navarra)
-
-**No entrar** a corto plazo. Las especificaciones forales (Bizkaia, Gipuzkoa, Araba, Navarra) son distintas y requieren análisis específico. Si un beta tester del PV/NV lo pide, evaluar entonces.
-
----
+- **TicketBAI** (País Vasco/Navarra): specs forales distintas; solo si un beta tester lo pide.
+- **Modalidad no verificable**: descartada (XAdES por registro + eventos + conservación 4 años).
 
 ## Riesgos
 
-- **Si TRACKR no se homologa antes del 1 jul 2027**: los usuarios autónomos no pueden emitir facturas legales con la app → pérdida total del mercado principal. Mitigación: este TODO es prioridad alta en Q1 2027.
-- **Bug en el hash encadenado en producción**: si un usuario tiene la cadena rota por un bug nuestro, su contabilidad queda en duda ante una inspección. Mitigación: tests exhaustivos antes de release + función "Verificar integridad" visible al usuario.
-- **Cambios normativos antes del 1 jul 2027**: improbable, pero posible. Mitigación: revisar BOE cada 3 meses durante 2026-27.
+- **Respuesta lenta/negativa de AEAT al 017 como persona física** → camino crítico; plan B arriba.
+- **Bug en la huella en producción**: cadena rota = contabilidad del usuario en duda. Mitigación:
+  validar contra el documento oficial + vectores de test + "Verificar integridad" visible.
+- **Fricción del apoderamiento por usuario**: puede frenar la adopción; diseñar el flujo con mimo.
+- Cambios normativos: revisar BOE/FAQs AEAT cada 3 meses hasta jul 2027.

@@ -8,6 +8,12 @@
       "port": 5501
     },
     {
+      "name": "trackr-dev-b",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["-c", "export PATH=/Users/manu/.nvm/versions/node/v22.15.0/bin:$PATH && npx live-server --port=5502 --no-browser"],
+      "port": 5502
+    },
+    {
       "name": "blurberri",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["live-server", "/Users/manu/Documents/GitHub/blurberri", "--port=8080", "--no-browser"],

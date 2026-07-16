@@ -85,7 +85,8 @@ const D = {
     if (!d.gastos) d.gastos = [];
     if (!d.projects) d.projects = [];
     if (!d.deducibles) d.deducibles = [];
-    /* Verifactu (SIF no verificable): registro inmutable de facturas firmadas */
+    /* VeriFactu: registro inmutable de registros de facturación (altas + anulaciones,
+       huella oficial AEAT encadenada por emisor). La remisión a AEAT es Fase 3 (trackr-api). */
     if (!d.facturas) d.facturas = [];
     /* Customer journey (tablero kanban). Se siembra una sola vez; editable. */
     if (!d.journey || typeof d.journey !== 'object') d.journey = this._seedJourney();
@@ -134,10 +135,14 @@ const D = {
     /* Verifactu / SIF — solo opciones de usuario. SIF_ID y SOFTWARE_VERSION
        viven en js/verifactu.js como constantes del fabricante, no aquí. */
     if (!s.verifactu) s.verifactu = {
-      habilitado: true,            /* Toggle para deshabilitar Verifactu en facturas */
+      habilitado: false,           /* Apagado por defecto hasta que la remisión a AEAT (Fase 3)
+                                      esté viva: el QR promete cotejo en la sede y aún no remitimos. */
       lastInvoiceHash: null,       /* Hash de la última factura firmada (cadena por emisor) */
       env: 'prod'                  /* 'prod' o 'test' — endpoint AEAT en el QR */
     };
+    /* Migración: settings antiguos traían habilitado:true de fábrica, pero ningún usuario pudo
+       elegirlo (la sección estaba oculta sin verifactu.js). Forzar off salvo elección explícita. */
+    if (!s.verifactu.userSet) s.verifactu.habilitado = false;
     /* Limpieza: si quedan campos legacy del fabricante en el settings de un user, descartarlos */
     if (s.verifactu) {
       delete s.verifactu.sifId;

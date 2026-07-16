@@ -152,11 +152,18 @@ Object.assign(App, {
         + sorted.slice(0, 50).map(f => {
           const hashShort = (f.hash || '').slice(0, 14) + '…';
           const fechaShort = (f.fecha || '').slice(0, 10);
+          const esAnul = f.tipoRegistro === 'anulacion';
+          const anulada = !esAnul && (f.eventos || []).some(e => e.tipo === 'anulada');
+          let estado = '';
+          if (esAnul) estado = `<span class="cl-nif" style="font-size:.68rem;color:var(--t3)">${t('cfg.vfTipoAnulacion')}</span>`;
+          else if (anulada) estado = `<span class="cl-nif" style="font-size:.68rem;color:var(--red,#e5476d)">${t('cfg.vfAnulada')}</span>`;
+          else estado = `<button class="bt" style="font-size:.68rem;padding:.15rem .5rem" onclick="App.anularFactura('${f.id}')">${t('cfg.vfAnular')}</button>`;
           return `<div class="cl-item">`
-            + `<span class="cl-name" style="font-family:'DM Mono',monospace;font-size:.78rem">${esc(f.numero)}</span>`
+            + `<span class="cl-name" style="font-family:'DM Mono',monospace;font-size:.78rem${esAnul || anulada ? ';text-decoration:line-through;opacity:.6' : ''}">${esc(f.numero)}</span>`
             + `<span class="cl-nif" style="font-size:.72rem">${fechaShort}</span>`
-            + `<span class="cl-nif" style="font-size:.72rem">${fmtMoney(f.totalFactura || 0)}</span>`
+            + `<span class="cl-nif" style="font-size:.72rem">${esAnul ? '—' : fmtMoney(f.totalFactura || 0)}</span>`
             + `<span class="cl-nif" style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--t3)">${hashShort}</span>`
+            + estado
             + `</div>`;
         }).join('')
         + `</div>`;
@@ -174,11 +181,12 @@ Object.assign(App, {
       + `</div>`
       + `<div class="cfg-grid">`
       + `<div class="fg"><label>${t('cfg.vfEnv')}</label><select id="cfgVfEnv"><option value="prod" ${v.env !== 'test' ? 'selected' : ''}>${t('cfg.vfEnvProd')}</option><option value="test" ${v.env === 'test' ? 'selected' : ''}>${t('cfg.vfEnvTest')}</option></select></div>`
-      + `<div class="fg"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="cfgVfEnabled" ${v.habilitado !== false ? 'checked' : ''}> ${t('cfg.vfEnabled')}</label></div>`
+      + `<div class="fg"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="cfgVfEnabled" ${v.habilitado === true ? 'checked' : ''}> ${t('cfg.vfEnabled')}</label></div>`
       + `</div>`
       + `<p class="small" style="color:var(--t3);margin-top:.5rem">${t('cfg.vfLastHash')}: <code class="mono" style="font-size:.72rem">${esc(lastH)}</code> · ${t('cfg.vfTotalSigned', facts.length)} · ${t('cfg.vfEmisor')}: ${esc(emisor || t('cfg.vfNoEmisor'))}</p>`
       + `<div class="cfg-save" style="gap:.5rem;display:flex"><button class="bt bt-p" onclick="App.saveVerifactu()">${t('btn.save')}</button>`
-      + `<button class="bt" onclick="App.verifyChain()">&#128274; ${t('cfg.vfVerifyChain')}</button></div>`
+      + `<button class="bt" onclick="App.verifyChain()">&#128274; ${t('cfg.vfVerifyChain')}</button>`
+      + `<button class="bt" onclick="App.vfSelfTest()">${t('cfg.vfSelfTest')}</button></div>`
       + `<div style="margin-top:1.25rem"><div class="cfg-section-title" style="font-size:.85rem;margin-bottom:.5rem">${t('cfg.vfRegistry')}</div>`
       + listHtml
       + `</div>`
@@ -190,6 +198,7 @@ Object.assign(App, {
     /* sifId y softwareVersion son constantes en js/verifactu.js, no aquí */
     v.env = document.getElementById('cfgVfEnv').value === 'test' ? 'test' : 'prod';
     v.habilitado = document.getElementById('cfgVfEnabled').checked;
+    v.userSet = true; /* elección explícita: la migración de defaults ya no la pisa */
     D.d.settings.verifactu = v;
     D.save();
     Toast.ok(t('cfg.saved'));
@@ -207,6 +216,51 @@ Object.assign(App, {
       Toast.error(t('cfg.vfChainBroken', res.broken.length, res.total));
       console.warn('Verifactu cadena rota:', res.broken);
     }
+  },
+
+  /** Anula una factura: registro de anulacion encadenado + evento en la original. */
+  async anularFactura(id) {
+    const f = (D.fs() || []).find(x => x.id === id);
+    if (!f || typeof V === 'undefined') return;
+    if (!confirm(t('cfg.vfAnularConfirm', f.numero))) return;
+    const hashPrev = D.lastHashFor(f.emisorNif);
+    const fechaHoraHuso = V.nowHuso();
+    try {
+      const hash = await V.huellaAnulacion({
+        emisorNif: f.emisorNif,
+        numSerie: f.numero,
+        fecha: f.fecha,
+        huellaPrev: hashPrev || '',
+        fechaHoraHuso
+      });
+      D.addFact({
+        id: uid(),
+        tipoRegistro: 'anulacion',
+        numero: f.numero,
+        fecha: f.fecha,
+        emisorNif: f.emisorNif,
+        refFactura: f.id,
+        hash,
+        hashPrev: hashPrev || null,
+        primerRegistro: !hashPrev,
+        timestamp: fechaHoraHuso,
+        eventos: []
+      });
+      D.addFactEvent(f.id, { tipo: 'anulada', fecha: fechaHoraHuso });
+      Toast.ok(t('cfg.vfAnulacionOk', f.numero));
+      this.rCfg();
+    } catch (err) {
+      console.warn('Verifactu anulacion failed:', err);
+      Toast.error(t('cfg.vfChainBroken', 1, 1));
+    }
+  },
+
+  /** Valida el algoritmo de huella contra los vectores oficiales AEAT (doc v0.1.2 §6). */
+  async vfSelfTest() {
+    if (typeof V === 'undefined') return;
+    const r = await V.selfTest();
+    if (r.ok) Toast.ok(t('cfg.vfSelfTestOk', r.casos));
+    else { Toast.error(t('cfg.vfSelfTestBad')); console.warn('Verifactu self-test:', r); }
   },
 
   setLanguage(code) {

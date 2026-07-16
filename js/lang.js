@@ -372,6 +372,14 @@ const LANGS = {
     'cfg.vfRegistry': 'Registro de facturas firmadas',
     'cfg.vfShowingFirst': 'Mostrando {0} de {1}',
     'cfg.vfNoneYet': 'Sin facturas firmadas todavía. Genera una factura para empezar.',
+    'cfg.vfAnular': 'Anular',
+    'cfg.vfAnularConfirm': '¿Anular la factura {0}? Se añadirá un registro de anulación encadenado; la factura original no se borra del registro.',
+    'cfg.vfAnulada': 'ANULADA',
+    'cfg.vfTipoAnulacion': 'Anulación',
+    'cfg.vfAnulacionOk': 'Registro de anulación de {0} añadido',
+    'cfg.vfSelfTest': 'Probar algoritmo (vectores AEAT)',
+    'cfg.vfSelfTestOk': 'Huella validada contra los {0} vectores oficiales AEAT',
+    'cfg.vfSelfTestBad': '⚠ El algoritmo NO coincide con los vectores oficiales — revisa la consola',
 
     /* ── Dinero ── */
     'din.gross': 'Cobrado',
@@ -1019,6 +1027,14 @@ const LANGS = {
     'cfg.vfRegistry': 'Signed invoice registry',
     'cfg.vfShowingFirst': 'Showing {0} of {1}',
     'cfg.vfNoneYet': 'No invoices signed yet. Generate one to start.',
+    'cfg.vfAnular': 'Void',
+    'cfg.vfAnularConfirm': 'Void invoice {0}? A chained cancellation record will be added; the original invoice is never deleted from the registry.',
+    'cfg.vfAnulada': 'VOIDED',
+    'cfg.vfTipoAnulacion': 'Cancellation',
+    'cfg.vfAnulacionOk': 'Cancellation record for {0} added',
+    'cfg.vfSelfTest': 'Test algorithm (AEAT vectors)',
+    'cfg.vfSelfTestOk': 'Hash validated against the {0} official AEAT vectors',
+    'cfg.vfSelfTestBad': '⚠ Algorithm does NOT match the official vectors — check the console',
 
     /* ── Dinero ── */
     'din.gross': 'Received',
@@ -1658,6 +1674,14 @@ const LANGS = {
     'cfg.vfRegistry': 'Registre de factures firmades',
     'cfg.vfShowingFirst': 'Mostrant {0} de {1}',
     'cfg.vfNoneYet': 'Cap factura firmada encara. Genera una per començar.',
+    'cfg.vfAnular': 'Anul·lar',
+    'cfg.vfAnularConfirm': 'Anul·lar la factura {0}? S\'afegirà un registre d\'anul·lació encadenat; la factura original no s\'esborra del registre.',
+    'cfg.vfAnulada': 'ANUL·LADA',
+    'cfg.vfTipoAnulacion': 'Anul·lació',
+    'cfg.vfAnulacionOk': 'Registre d\'anul·lació de {0} afegit',
+    'cfg.vfSelfTest': 'Provar l\'algorisme (vectors AEAT)',
+    'cfg.vfSelfTestOk': 'Empremta validada contra els {0} vectors oficials AEAT',
+    'cfg.vfSelfTestBad': '⚠ L\'algorisme NO coincideix amb els vectors oficials — revisa la consola',
 
     /* ── Diners ── */
     'din.gross': 'Cobrat',

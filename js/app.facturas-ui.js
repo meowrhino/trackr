@@ -92,56 +92,72 @@ Object.assign(App, {
     const s = D.d.settings;
     const f = p.facturacion;
     const vCfg = s.verifactu || {};
-    // Guard: la rama Verifactu solo corre si verifactu.js (global V) esta cargado. En main NO
-    // lo esta (Verifactu aparcado), asi se evita el warning "no se pudo firmar" en cada factura.
-    const verifactuOn = typeof V !== 'undefined' && vCfg.habilitado !== false && s.emisor?.nif;
+    // Guard: la rama Verifactu solo corre si verifactu.js (global V) esta cargado,
+    // asi un deploy parcial no rompe la generacion de facturas.
+    const verifactuOn = typeof V !== 'undefined' && vCfg.habilitado === true && s.emisor?.nif;
 
     let verifactu = null;
     if (verifactuOn) {
       const numStr = String(num || f.facturaNum || s.nextFacturaNum || 1);
+      /* NumSerieFactura = numero tal cual se imprime en el PDF: NNNN/YY */
+      const numSerie = `${numStr}/${(fecha || '').slice(2, 4)}`;
       const cl = p.clienteId ? D.cl(p.clienteId) : null;
-      const hashPrev = D.lastHashFor(s.emisor.nif);
+      const emisorNif = s.emisor.nif.replace(/[\s-]/g, '').toUpperCase();
+      const hashPrev = D.lastHashFor(emisorNif);
+      const fechaHoraHuso = V.nowHuso();
+      /* F1 completa (destinatario con NIF) / F2 simplificada (sin identificar) */
+      const tipoFactura = cl?.nif ? 'F1' : 'F2';
+      const cuotaTotal = f.importeIva || 0;
+      /* ImporteTotal AEAT = base + cuota IVA, SIN restar la retencion de IRPF
+         (criterio SII/VeriFactu); el total a pagar (totalFactura) es otro campo. */
+      const importeTotal = (f.baseImponible || 0) + (f.importeIva || 0);
       try {
-        const hash = await V.signInvoice({
-          nifEmisor: s.emisor.nif,
-          numSerie: numStr,
-          fechaISO: fecha,
-          baseImponible: f.baseImponible || 0,
-          totalFactura: f.totalFactura || 0
-        }, hashPrev);
-        const qrPayload = V.buildQRPayload(
-          s.emisor.nif, numStr, fecha, f.totalFactura || 0, vCfg.env === 'test'
-        );
+        const hash = await V.huellaAlta({
+          emisorNif,
+          numSerie,
+          fecha,
+          tipoFactura,
+          cuotaTotal,
+          importeTotal,
+          huellaPrev: hashPrev || '',
+          fechaHoraHuso
+        });
+        const qrPayload = V.buildQRPayload(emisorNif, numSerie, fecha, importeTotal, vCfg.env === 'test');
         verifactu = {
           sifId: V.SIF_ID,
           softwareVersion: V.SOFTWARE_VERSION,
           qrPayload,
           hash,
-          publicUrl: 'tr4ckr.com/verifactu'
+          publicUrl: V.PUBLIC_URL
         };
-        /* Persistir factura firmada en el registro inmutable */
+        /* Persistir el registro de alta en el registro inmutable */
         D.addFact({
           id: uid(),
-          numero: numStr,
+          tipoRegistro: 'alta',
+          numero: numSerie,
           fecha,
-          emisorNif: s.emisor.nif,
+          emisorNif,
           emisorNombre: s.emisor.nombre || '',
           clienteNif: cl?.nif || '',
           clienteNombre: cl?.nombreCompleto || cl?.nombre || '',
+          tipoFactura,
           baseImponible: f.baseImponible || 0,
           iva: f.iva || 0,
           importeIva: f.importeIva || 0,
           irpf: f.irpf || 0,
           importeIrpf: f.importeIrpf || 0,
+          cuotaTotal,
+          importeTotal,
           totalFactura: f.totalFactura || 0,
+          desglose: [{ impuesto: 'IVA', tipoImpositivo: f.iva || 0, base: f.baseImponible || 0, cuota: f.importeIva || 0 }],
           proyectoId: pid,
           hash,
           hashPrev: hashPrev || null,
-          timestamp: new Date().toISOString(),
+          primerRegistro: !hashPrev,
+          timestamp: fechaHoraHuso,
           qrPayload,
           sifId: V.SIF_ID,
           softwareVersion: V.SOFTWARE_VERSION,
-          tipoFactura: 'ordinaria',
           eventos: []
         });
       } catch (err) {

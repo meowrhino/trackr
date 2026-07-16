@@ -18,9 +18,10 @@ Orden de implementación. Cada archivo tiene el detalle.
 | 12 | Gastos recurrentes avanzados | `12-gastos-recurrentes.md` | ✅ hecho (12 may 2026) |
 | 13 | Asistente trimestral (303+130) | `13-asistente-trimestral.md` | ✅ hecho (12 may 2026) |
 | 14 | Plan de marketing v1 (deck 25 slides) | `14-marketing-plan.md` | ✅ hecho (12 may 2026) |
-| 15 | Verifactu / homologación SIF | `15-verifactu.md` | ⏳ pendiente — antes 1 jul 2027 |
+| 15 | Verifactu / homologación SIF | `15-verifactu.md` | 🎯 diseño cerrado (16 jul 2026) — ejecutar antes 1 jul 2027 |
 | 16 | Microherramientas públicas /303 y /130 | `16-microherramientas.md` | ⏳ pendiente — Q2/Q3 2026 |
-| 17 | Cuentas + cloud (Pivot A) | `17-pivot-cloud.md` | ⏳ pendiente — Q4 2026 / Q1 2027 |
+| 17 | Cuentas + cloud (Pivot A) | `17-pivot-cloud.md` | ✅ hecho (jun 2026) — en producción, signups cerrados (`SIGNUPS_OPEN=false`) |
+| 21 | Cuentas gestor (compartir E2E con gestoría) | `21-gestores.md` | 🎯 diseño cerrado (16 jul 2026) — primera gestora como beta |
 
 ---
 
