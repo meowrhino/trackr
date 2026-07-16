@@ -293,7 +293,8 @@ const Acc = (() => {
     D.d.settings.gestorGrant = {
       grantId: r.data.grantId, shareKey: CA._.b64u(shareKey), scope, canEdit: !!canEdit,
       gestorEmail, fingerprint: await CA.fingerprintOf(gestorPub),
-      lastOpSeq: 0,   // hasta donde se han aplicado ops de este gestor (Etapa B)
+      lastOpSeq: 0,   // hasta donde se han APLICADO ops de este gestor (Etapa B)
+      ackedSeq: 0,    // hasta donde se ha CONFIRMADO al server (puede ir por detras si un ack fallo)
     };
     D.save();
     pushShadow().catch(() => {}); // primera foto sin esperar al proximo cambio
@@ -365,31 +366,47 @@ const Acc = (() => {
       if (r.status === 404) { delete D.d.settings.gestorGrant; D.save(); return { ok: false, error: 'not_found' }; } // revocado
       if (r.status !== 200) return { ok: false, error: r.data?.error || 'get_failed' };
       const rows = r.data.ops || [];
-      if (!rows.length) return { ok: true, applied: 0 };
+      if (!rows.length) {
+        // Ack de recuperacion: si el ack de una pasada anterior fallo, esas ops ya aplicadas
+        // siguen en el server (nunca se re-piden: since ya las salta) y acumulan contra el
+        // tope hasta bloquear la escritura del gestor con 409. Reintentar aqui las purga.
+        if ((g.ackedSeq || 0) < since) await _ackOps(g, since);
+        return { ok: true, applied: 0 };
+      }
 
       if (typeof H !== 'undefined' && H.snapshot) H.snapshot(); // red de seguridad antes de tocar datos ajenos a la sesion
       const shareKey = CA._.b64uDec(g.shareKey);
+      // Descifrado en paralelo (independiente por fila); aplicar, en cambio, es secuencial
+      // y en orden de seq — el orden de las ops es parte del contrato.
+      const opened = await Promise.all(rows.map(row =>
+        CA.decryptOp(shareKey, row.payload, g.grantId).catch(() => null)
+      ));
       let applied = 0, rejected = 0, maxSeq = since;
-      for (const row of rows) {
+      rows.forEach((row, i) => {
         if (row.seq > maxSeq) maxSeq = row.seq;
-        let op = null;
-        try { op = await CA.decryptOp(shareKey, row.payload, g.grantId); }
-        catch (e) { rejected++; console.warn('op ilegible, descartada (seq ' + row.seq + ')'); continue; }
+        const op = opened[i];
+        if (!op) { rejected++; console.warn('op ilegible, descartada (seq ' + row.seq + ')'); return; }
         const res = GOps.apply(op);
-        if (!res.ok) { rejected++; console.warn('op rechazada (seq ' + row.seq + '):', res.why); continue; }
+        if (!res.ok) { rejected++; console.warn('op rechazada (seq ' + row.seq + '):', res.why); return; }
         /* El actor sale del GRANT LOCAL, no de la op: quien la escribio podria haber puesto
            cualquier email dentro. El grant es 1:1 con una gestoria, asi que aqui esta la verdad. */
         const actor = { email: g.gestorEmail, role: 'gestor' };
         D._auditAs(actor, op.accion, op.entidad, op.entidadId, GOps.undoFits(res.undo) ? res.undo : null);
         applied++;
-      }
+      });
       g.lastOpSeq = maxSeq;
       D.save();  // dispara el auto-sync: lo aplicado sube en el proximo push
-      // Confirmar (el server las borra). Si esto falla, lastOpSeq ya evita re-aplicarlas.
-      await api(`/v1/grants/${encodeURIComponent(g.grantId)}/ops/ack`, { method: 'POST', auth: true, body: { upTo: maxSeq } });
-      if (applied && _onOps) { try { _onOps({ applied, rejected, gestorEmail: g.gestorEmail }); } catch (e) { /* */ } }
+      await _ackOps(g, maxSeq); // confirmar (el server las borra); si falla, el ack de recuperacion lo reintenta
+      if (applied && _onOps) { try { _onOps({ applied, gestorEmail: g.gestorEmail }); } catch (e) { /* */ } }
       return { ok: true, applied, rejected };
     } finally { _pullingOps = false; }
+  }
+
+  // Confirma ops hasta `upTo` y apunta hasta donde se confirmo (ackedSeq), para que el
+  // ack de recuperacion sepa si quedo trabajo pendiente. Best-effort: un fallo no rompe nada.
+  async function _ackOps(g, upTo) {
+    const r = await api(`/v1/grants/${encodeURIComponent(g.grantId)}/ops/ack`, { method: 'POST', auth: true, body: { upTo } });
+    if (r.status === 200) { g.ackedSeq = upTo; D.save(); }
   }
 
   // Aviso a la UI de que la gestoria ha hecho cambios (para refrescar la vista + toast).

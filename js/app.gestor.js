@@ -30,7 +30,7 @@
       viewing: 'Viendo los datos de', viewingRO: '(solo lectura: los cambios NO se guardan ni se suben)', back: '← Volver a mis datos', backOk: 'De vuelta a tus datos', openErr: 'No se pudieron descifrar los datos',
       keyPublished: 'Clave de gestoría publicada', keyErr: 'No se pudo publicar la clave de gestoría',
       /* Etapa B */
-      canEdit: 'Dejar que edite mis datos', canEditHelp: 'Podrá corregir gastos, clientes, proyectos, deducibles y tus casillas fiscales. No puede tocar tus horas ni tus facturas. Cada cambio queda firmado con su nombre en el historial y lo puedes deshacer.',
+      canEdit: 'Dejar que edite mis datos', canEditHelp: 'Podrá corregir gastos, clientes, proyectos (incluida su facturación), deducibles y tus casillas fiscales. No puede tocar tus horas, ni borrar proyectos, ni tocar tus facturas firmadas. Cada cambio queda firmado con su nombre en el historial y lo puedes deshacer.',
       editOn: 'Puede editar', editOff: 'Solo lectura', allowEdit: 'Permitir edición', denyEdit: 'Quitar edición', permSaved: 'Permiso actualizado',
       edit: 'Editar', editing: 'EDITANDO', stopEdit: 'Dejar de editar', editNotAllowed: 'Esta persona no te ha dado permiso de edición',
       pendingOps: (n) => `${n} cambio${n === 1 ? '' : 's'} sin enviar`, allSent: 'Cambios enviados', sendErr: 'No se pudieron enviar los cambios',
@@ -49,7 +49,7 @@
       viewing: 'Viewing data of', viewingRO: '(read-only: changes are NOT saved or uploaded)', back: '← Back to my data', backOk: 'Back to your data', openErr: 'Could not decrypt the data',
       keyPublished: 'Advisor key published', keyErr: 'Could not publish advisor key',
       /* Etapa B */
-      canEdit: 'Let them edit my data', canEditHelp: 'They will be able to fix expenses, clients, projects, deductibles and your tax fields. They cannot touch your hours or your invoices. Every change is signed with their name in the history and you can undo it.',
+      canEdit: 'Let them edit my data', canEditHelp: 'They will be able to fix expenses, clients, projects (including their billing), deductibles and your tax fields. They cannot touch your hours, delete projects, or touch your signed invoices. Every change is signed with their name in the history and you can undo it.',
       editOn: 'Can edit', editOff: 'Read-only', allowEdit: 'Allow editing', denyEdit: 'Remove editing', permSaved: 'Permission updated',
       edit: 'Edit', editing: 'EDITING', stopEdit: 'Stop editing', editNotAllowed: 'This person has not given you edit permission',
       pendingOps: (n) => `${n} change${n === 1 ? '' : 's'} not sent`, allSent: 'Changes sent', sendErr: 'Could not send the changes',
@@ -68,7 +68,7 @@
       viewing: 'Veient les dades de', viewingRO: '(només lectura: els canvis NO es desen ni es pugen)', back: '← Tornar a les meves dades', backOk: 'De tornada a les teves dades', openErr: 'No s\'han pogut desxifrar les dades',
       keyPublished: 'Clau de gestoria publicada', keyErr: 'No s\'ha pogut publicar la clau de gestoria',
       /* Etapa B */
-      canEdit: 'Deixar que editi les meves dades', canEditHelp: 'Podrà corregir despeses, clients, projectes, deduïbles i les teves caselles fiscals. No pot tocar les teves hores ni les teves factures. Cada canvi queda signat amb el seu nom a l\'historial i el pots desfer.',
+      canEdit: 'Deixar que editi les meves dades', canEditHelp: 'Podrà corregir despeses, clients, projectes (inclosa la seva facturació), deduïbles i les teves caselles fiscals. No pot tocar les teves hores, ni esborrar projectes, ni tocar les teves factures signades. Cada canvi queda signat amb el seu nom a l\'historial i el pots desfer.',
       editOn: 'Pot editar', editOff: 'Només lectura', allowEdit: 'Permetre edició', denyEdit: 'Treure edició', permSaved: 'Permís actualitzat',
       edit: 'Editar', editing: 'EDITANT', stopEdit: 'Deixar d\'editar', editNotAllowed: 'Aquesta persona no t\'ha donat permís d\'edició',
       pendingOps: (n) => `${n} canvi${n === 1 ? '' : 's'} sense enviar`, allSent: 'Canvis enviats', sendErr: 'No s\'han pogut enviar els canvis',
@@ -246,7 +246,13 @@
       // machacar el estado propio (D.exitView recupera los datos reales del gestor).
       if (D._readOnly) this._gstForceExit();
       const r = await Acc.gestorOpenClient(grantId);
-      if (!r.ok) return Toast.error(`${t('openErr')} (${r.error || '?'})`);
+      if (!r.ok) {
+        // El guard de arriba pudo dejarnos EN los datos propios con el auto-sync aún
+        // pausado (y sin banner que lo reactive): reanudarlo antes de rendirse, o las
+        // ediciones propias del gestor dejarían de subir en silencio (revisión #5).
+        Acc.setAutoSync(true);
+        return Toast.error(`${t('openErr')} (${r.error || '?'})`);
+      }
       // Marca de visor solo para re-mostrar el banner si se recarga la pestaña. NO guarda
       // datos: D.loadView carga en memoria sin persistir, así el localStorage/nube del
       // gestor conservan SUS datos y una recarga los muestra sin más (D.save bloqueado).
@@ -271,6 +277,17 @@
       // El banner es el único sitio que dice la verdad sobre lo que pasa con los cambios
       // (pendientes, edición cortada por el servidor...), así que se repinta con cada aviso.
       GOps.onChange(() => this._gstShowBanner(v.email));
+      /* La pantalla debe contar la verdad. Los mutadores mutan ANTES de emitir, así que
+         una op rechazada (horas, borrar proyecto...) ya está pintada aunque jamás viajará.
+         Baseline = último estado cuyas mutaciones fueron todas encoladas; al rechazar,
+         se restaura y se repinta. (Las rutas que no pasan por mutadores —journey, algunos
+         settings— siguen pudiendo pintar fantasmas: documentado en TODO/21.) */
+      this._gstBaseline = JSON.stringify(D.d);
+      GOps.onEmit((ok) => {
+        if (ok) { this._gstBaseline = JSON.stringify(D.d); return; }
+        try { D.loadView(JSON.parse(this._gstBaseline)); } catch (e) { return; }
+        this.go(this.cv);
+      });
       this._gstShowBanner(v.email);
     },
 
@@ -288,6 +305,7 @@
       localStorage.removeItem(VIEW_KEY);
       if (typeof GOps !== 'undefined') GOps.stopEditing();   // tira la cola en memoria y corta la emisión
       this._gstView = null;
+      this._gstBaseline = null;
       if (typeof D !== 'undefined' && D._readOnly) D.exitView();
       const b = document.getElementById('gstBanner'); if (b) b.remove();
       document.body.style.paddingTop = '';

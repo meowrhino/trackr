@@ -197,9 +197,16 @@ bloquean la beta con Diega, que es monodispositivo):
 5. ✅ Vista de clientes del gestor (read-only) + Etapa A de autoría (`audit[]`).
 6. ✅ Etapa B: escritura por operaciones.
 
-## Hallazgos de la revisión multi-agente de la Etapa B (2026-07-17) — ARREGLAR ANTES DE DESPLEGAR
+## Hallazgos de la revisión multi-agente de la Etapa B (2026-07-17)
 
-8 ángulos + verificación independiente sobre los diffs de los dos repos. Confirmados:
+8 ángulos + verificación independiente sobre los diffs de los dos repos.
+**Arreglados el mismo día (1–8 y parte de las limpiezas) y verificados en navegador**; el
+detalle de cada arreglo está en el commit correspondiente. Quedan vivos el 9 en su forma
+general (se mitigó validando por ts), el 10 (TOCTOU acotado, asumido) y las limpiezas
+de duplicación (fmtTs/currentLocale, i18n por módulo). Residual conocido del #4: las rutas
+que NO pasan por mutadores (journey, settings no fiscales) aún pueden pintar un cambio
+fantasma en el visor con edición — la solución de fondo es mover la frontera de
+intercepción, apuntada abajo. Confirmados:
 
 1. **La edición fiscal del gestor no funciona** (la capacidad anunciada en el consentimiento):
    los `save*` de settings llaman `D._audit('editar','settings',null)` sin payload y

@@ -136,7 +136,7 @@ Object.assign(App, {
         const accion = `${tx(e.accion)} ${tx(e.entidad)}${nombre ? ` <strong>${esc(nombre)}</strong>` : ''}`;
         /* Deshacer solo donde hay inverso guardado: hoy, los cambios que vinieron de la
            gestoría (los propios ya tienen las copias de seguridad y el propio hacer). */
-        const undoBtn = e.undo ? `<button class="cl-btn" onclick="App.auditUndo(${idx})" title="${tx('undo')}">&#8630;</button>` : '';
+        const undoBtn = e.undo ? `<button class="cl-btn" onclick="App.auditUndo(${idx},${e.ts})" title="${tx('undo')}">&#8630;</button>` : '';
         return `<div class="cl-item"${e.undone ? ' style="opacity:.55"' : ''}>`
           + `<span class="cl-name" style="font-size:.82rem">${esc(actorTxt(e.actor))} ${accion}${e.undone ? ` <em style="color:var(--t3);font-style:normal">· ${tx('undone')}</em>` : ''}</span>`
           + `<span class="cl-nif" style="font-size:.72rem;color:var(--t3)">${fmtTs(e.ts)}</span>`
@@ -193,10 +193,14 @@ Object.assign(App, {
       + `</div>`;
   },
 
-  /** Deshace un cambio del historial aplicando su inverso (hoy: ops de la gestoría). */
-  auditUndo(idx) {
-    const e = (D.d.audit || [])[idx];
-    if (!e || !e.undo || typeof GOps === 'undefined') return;
+  /** Deshace un cambio del historial aplicando su inverso (hoy: ops de la gestoría).
+   *  El idx se horneó en el onclick al renderizar y el anillo puede haberse desplazado
+   *  desde entonces (splice del frente al llegar a AUDIT_MAX): el ts desambigua. */
+  auditUndo(idx, ts) {
+    const a = D.d.audit || [];
+    let e = a[idx];
+    if (ts != null && (!e || e.ts !== ts)) e = a.find(x => x.ts === ts && x.undo);
+    if (!e || !e.undo || typeof GOps === 'undefined') { this.rCfg(); return; }
     const r = GOps.undo(e);
     if (!r.ok) { Toast.error(_lang === 'en' ? 'Could not undo' : (_lang === 'ca' ? 'No s\'ha pogut desfer' : 'No se pudo deshacer')); return; }
     Toast.ok(_lang === 'en' ? 'Change undone' : (_lang === 'ca' ? 'Canvi desfet' : 'Cambio deshecho'));
@@ -425,7 +429,11 @@ Object.assign(App, {
     s.fiscal.rendAnterior = rend === '' ? null : (parseFloat(rend) || 0);
     s.fiscal.saldoIvaInicial = parseFloat(document.getElementById('cfgFSaldo').value) || 0;
     s.fiscal.eds = document.getElementById('cfgFEds').checked;
-    D._audit('editar', 'settings', null);
+    /* Payload SOLO aquí: fiscal es lo único de settings que el gestor puede editar
+       (GOps.WRITABLE), y sin el payload la op no puede construirse (hallazgo #1 de la
+       revisión: la capacidad anunciada era inalcanzable). Los demás save* de settings
+       no lo pasan a propósito — el gestor no puede tocarlos. */
+    D._audit('editar', 'settings', null, { fiscal: { eds: s.fiscal.eds, rendAnterior: s.fiscal.rendAnterior, saldoIvaInicial: s.fiscal.saldoIvaInicial } });
     D.save();
     Toast.ok(t('cfg.saved'));
   },
