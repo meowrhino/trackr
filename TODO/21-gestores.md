@@ -1,16 +1,20 @@
 # 21 — Cuentas gestor (compartir con tu gestoría)
 
-## Estado: ✅ v1 implementada (2026-07-16) · backend + frontend en ramas `gestores`
-## Primer caso real: Diega (beta del rol gestor) — pendiente solo desplegar y probar en producción
+## Estado: ✅ DESPLEGADO EN PRODUCCIÓN (2026-07-17) — v1 + Etapa A (autoría) + Etapa B (edición del gestor)
+## Primer caso real: Diega (beta del rol gestor) — todo listo, falta solo probar con ella
 
-> **Implementado y verificado E2E en local** (wrangler dev + navegador): toggle en signup,
+> **En producción desde 2026-07-17**: migrate-ops.sql aplicado en D1 prod (can_edit +
+> grant_ops; migrate-gestores.sql ya estaba de la v1), worker desplegado (verificado: PATCH
+> /v1/grants responde 401 sin token y CORS anuncia PATCH) y frontend en main → Pages
+> (verificado: gestor-ops.js servido y referenciado en el index).
+>
+> **Implementado y verificado E2E** (wrangler dev + navegador): toggle en signup,
 > cuenta gestora con par ECDH y código auto-publicado al entrar, activación por admin,
 > vínculo persona→gestora con confirmación de huella y alcance, blob sombra cifrado en cada
 > sync, cartera de la gestora con visor protegido (banner + restauración; el sync del gestor
 > se pausa para no contaminar su cuenta). Alcance fiscal verificado estanco (0 horas, 0 notas,
-> 0 journey). Tests: 29/29 unit + 22/22 E2E backend.
-> **Pendiente:** desplegar (migrate-gestores.sql **+ migrate-ops.sql** en D1 prod + deploy +
-> merge frontend), y verificar el renderizado del modal de confirmación en un navegador real
+> 0 journey). Tests: 62/62 unit + 37/37 E2E backend.
+> **Pendiente:** verificar el renderizado del modal de confirmación en un navegador real
 > (posible artefacto de captura).
 > **Etapas A y B: ✅ hechas (2026-07-16, rama `audit-etapa-a` en los dos repos).** Verificadas
 > E2E en navegador con dos cuentas reales (persona en :5501, gestora en :5502) contra wrangler
