@@ -167,27 +167,27 @@ natural para "remitir pendientes de mis clientes".
 Hallazgos reales de la revisión multi-agente que se dejaron para más adelante (no
 bloquean la beta con Diega, que es monodispositivo):
 
-- **Grant obsoleto en merge multidispositivo** (CONFIRMADO): `mergeData` funde
-  `settings` con "local gana" y `gestorGrant` vive ahí sin reconciliación por
-  tombstone. Si una persona usa dos dispositivos y revoca/vincula en uno, el otro
-  con estado viejo puede resucitar el grant revocado o borrar el nuevo al hacer
-  merge en un 409. Se autocura parcialmente (pushShadow recibe 404 del grant
-  revocado y lo limpia), pero el caso inverso no. Es el mismo límite de "sin
-  tombstones" ya documentado en account.js. Arreglo real: reconciliar `gestorGrant`
-  contra el servidor (`GET /v1/grants`) tras cada pull/merge. Prioridad media.
-- **Whitelist de alcance fiscal con deriva de esquema** (altitud): `buildShareData`
-  lista a mano los campos fiscales; si el store gana un array top-level nuevo, ni se
-  comparte ni se excluye conscientemente. Añadir un test que ligue la lista al
-  esquema de `store.js`, o un guard de campos desconocidos. Prioridad media.
-  (Ya picó una vez: `audit[]` cayó fuera del alcance fiscal por omisión al hacer la Etapa A;
-  ahora la exclusión está comentada a propósito, pero el guard sigue sin existir.)
+- ~~**Grant obsoleto en merge multidispositivo**~~ ✅ resuelto (2026-07-18):
+  `reconcileGrant()` en account.js valida el `gestorGrant` local contra
+  `GET /v1/grants` tras cada sync OK (throttle 60 s) y tras cada pull (forzado).
+  Grant revocado en el server → se descarta el local; `canEdit` divergente → manda
+  el server. Verificado E2E contra wrangler dev (3 casos: vivo, canEdit viejo,
+  resucitado). El caso inverso (grant vivo en server que el blob local no conoce)
+  sigue sin ser recuperable desde aquí: la shareKey solo viaja en el blob — lo trae
+  el push del dispositivo que creó el vínculo.
+- ~~**Whitelist de alcance fiscal con deriva de esquema**~~ ✅ resuelto (2026-07-18):
+  guard en `buildShareData` — un campo raíz desconocido NO se comparte (privado por
+  defecto) y avisa por consola para que el próximo cambio de esquema pase por la
+  whitelist conscientemente. Verificado en navegador con un campo inventado.
 - ~~**Rol por handler, no en el router**~~ ✅ resuelto al hacer la Etapa B: `GESTOR_ROUTES`
   + `dispatchGestor` en `gestor.js`; los handlers ya no comprueban rol (lo reciben hecho).
 - **`userSet` vs migración versionada** (altitud): el flag que fuerza
   `verifactu.habilitado=false` es un sentinel paralelo al sistema de migración por
   versión del store. Unificar cuando se toque la migración. Prioridad baja.
 - **i18n de app.gestor.js inline** (reuse): mover las cadenas a `lang.js` como el
-  resto de la app. Mecánico, bajo riesgo. Prioridad baja.
+  resto de la app. Mecánico, bajo riesgo. Prioridad baja. (2026-07-18: aplazado a
+  propósito — tocar el visor entero la víspera de la beta con Diega es riesgo sin
+  beneficio; además el patrón inline es el mismo que usa app.account-ui.js.)
 - Menores: `lastInvoiceHash` global engañoso con multi-emisor (solo se muestra),
   `size_bytes` sin consumidor, `verifyChain` secuencial (barato a N pequeño),
   `_cfgVerifactuSection` reordena en cada render.

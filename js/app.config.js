@@ -100,9 +100,8 @@ Object.assign(App, {
       }
     })[lang] || {};
     const tx = k => TX[k] || k;
-    const locale = lang === 'en' ? 'en-GB' : (lang === 'ca' ? 'ca-ES' : 'es-ES');
     const fmtTs = ts => {
-      try { return new Date(ts).toLocaleString(locale, { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+      try { return new Date(ts).toLocaleString(currentLocale(), { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
       catch { return String(ts); }
     };
     const actorTxt = a => {
@@ -164,10 +163,9 @@ Object.assign(App, {
       ca: { title: 'Còpies de seguretat', desc: 'TRACKR desa fins a 10 còpies locals de les teves dades (una al dia, més les que creïs tu). Són la teva xarxa de seguretat: descarrega-les o restaura-les quan vulguis. Res d\'això surt del teu navegador.', saveNow: 'Desar còpia ara', none: 'Encara no hi ha còpies. Se\'n crearà una automàticament en fer servir l\'app.', current: 'ACTUAL', auto: 'auto', load: 'Carregar', download: 'Descarregar' }
     })[typeof _lang !== 'undefined' ? _lang : 'es'] || {};
     const tx = k => TX[k] || k;
-    const locale = (typeof _lang !== 'undefined' && _lang === 'en') ? 'en-GB' : (typeof _lang !== 'undefined' && _lang === 'ca' ? 'ca-ES' : 'es-ES');
     const fmtTs = iso => {
       if (!iso) return '—';
-      try { return new Date(iso).toLocaleString(locale, { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+      try { return new Date(iso).toLocaleString(currentLocale(), { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
       catch { return iso.slice(0, 16).replace('T', ' '); }
     };
     const saves = (typeof H !== 'undefined') ? H.list() : [];

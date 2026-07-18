@@ -5,6 +5,20 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-07-18 — Gestores: reconciliación del vínculo multidispositivo + guard de esquema
+
+Dos pendientes medios de la revisión de la Etapa B (TODO/21), cerrados antes de la beta.
+
+### 🔴 Fixes
+- **El vínculo con la gestoría ya no puede "resucitar" tras un merge multidispositivo**: `reconcileGrant()` valida el grant local contra el servidor tras cada sync (y tras cada pull). Si se revocó desde otro dispositivo se descarta; si el permiso de edición cambió, manda el servidor. Verificado E2E contra el worker real (wrangler dev). _frontend_
+- **Guard de deriva de esquema en el alcance fiscal**: si el store gana un campo raíz nuevo, NO se comparte con la gestoría (privado por defecto) y se avisa por consola — quedar fuera de la whitelist pasa a ser una decisión, no una omisión (como le pasó a `audit[]` en su día). _frontend_
+
+### 🧹 Limpieza
+- `fmtTs` de Configuración usa `currentLocale()` de lang.js (estaba duplicado el mapeo de locales en dos sitios).
+- El traslado del i18n inline de app.gestor.js a lang.js queda aplazado a propósito (víspera de beta; mismo patrón que app.account-ui.js).
+
+---
+
 ## 2026-07-18 — Microherramientas públicas: calculadoras /303 y /130 (SEO)
 
 El canal SEO del plan de marketing (TODO/16): dos calculadoras gratuitas sin registro.

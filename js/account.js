@@ -161,6 +161,8 @@ const Acc = (() => {
     catch (e) { return { ok: false, error: 'decrypt_failed' }; }
     S.version = g.data.version;
     _applyRemote(data);
+    // El blob bajado puede traer un grant que otro dispositivo ya revoco (o un canEdit viejo)
+    reconcileGrant(true).catch(() => {});
     return { ok: true, version: g.data.version };
   }
 
@@ -249,7 +251,7 @@ const Acc = (() => {
     // Tras un push OK: espejo para la gestoria y, si nos dejo editar, recoger sus cambios.
     // pullOps aplica -> D.save -> notifyChange -> otro push; converge porque la segunda
     // vuelta ya no encuentra ops. Los dos son best-effort: no rompen el sync normal.
-    if (res && res.ok) { emitSync('synced', res); pushShadow().catch(() => {}); pullOps().catch(() => {}); }
+    if (res && res.ok) { emitSync('synced', res); reconcileGrant().catch(() => {}); pushShadow().catch(() => {}); pullOps().catch(() => {}); }
     else if (!res || res.error !== 'busy') emitSync('error', res || {}); // 'busy' = coalescado, el push en curso ya emitira
     return res;
   }
@@ -419,6 +421,13 @@ const Acc = (() => {
   function buildShareData(scope) {
     const d = D.d;
     if (scope === 'todo') return d;
+    /* Guard de deriva de esquema: si el store gana un campo raiz nuevo, que quedar fuera
+       del alcance fiscal sea una decision y no una omision (ya paso con audit[] en la
+       Etapa A). Lo desconocido NO se comparte (privado por defecto), pero se avisa para
+       que el proximo cambio de esquema pase por aqui conscientemente. */
+    const KNOWN = ['version', 'clientes', 'projects', 'gastos', 'deducibles', 'facturas', 'settings', 'audit', 'journey'];
+    const unknown = Object.keys(d).filter(k => !KNOWN.includes(k));
+    if (unknown.length) console.warn('buildShareData: campos del store fuera de la whitelist fiscal (no se comparten):', unknown);
     const s = d.settings || {};
     /* `audit` queda FUERA del alcance fiscal a proposito: el log lleva la actividad completa
        de la persona (incluidas entidades fuera del alcance) y el gestor no lo necesita para
@@ -457,6 +466,30 @@ const Acc = (() => {
     } catch (e) { console.warn('pushShadow failed:', e); }
   }
 
+  // Reconcilia el gestorGrant local contra el servidor (que es la fuente de verdad del
+  // vinculo). Cierra el hueco del merge multidispositivo: settings se funde con "local
+  // gana" y sin tombstones, asi que un grant revocado desde otro dispositivo podia
+  // resucitar aqui al resolver un 409. Si el grant local ya no esta vivo en el servidor
+  // se descarta; si difiere el canEdit (cambiado desde otro dispositivo), manda el server.
+  // El caso inverso (el servidor tiene un grant vivo que este blob no conoce) no es
+  // recuperable desde aqui: la shareKey solo viaja dentro del blob — lo trae el proximo
+  // push del dispositivo que creo el vinculo. Throttle de 60s: corre tras cada sync.
+  let _lastReconcile = 0;
+  async function reconcileGrant(force) {
+    const g = typeof D !== 'undefined' ? D.d?.settings?.gestorGrant : null;
+    if (!g || !isUnlocked() || !S.active || S.role === 'gestor') return;
+    const now = Date.now();
+    if (!force && now - _lastReconcile < 60000) return;
+    _lastReconcile = now;
+    try {
+      const r = await api('/v1/grants', { method: 'GET', auth: true });
+      if (r.status !== 200 || !Array.isArray(r.data?.grants)) return; // red/500: no tocar nada
+      const srv = r.data.grants.find(x => x.grantId === g.grantId);
+      if (!srv) { delete D.d.settings.gestorGrant; _lastShadowHash = null; D.save(); return; }
+      if (typeof srv.canEdit === 'boolean' && srv.canEdit !== g.canEdit) { g.canEdit = srv.canEdit; D.save(); }
+    } catch (e) { console.warn('reconcileGrant failed:', e); }
+  }
+
   /* ── Admin (solo is_admin; el servidor reverifica) ── */
   async function adminListUsers() { const r = await api('/v1/admin/users', { auth: true }); return r.status === 200 ? r.data.users : null; }
   async function adminSetActive(id, active) { const r = await api(`/v1/admin/users/${encodeURIComponent(id)}/active`, { method: 'POST', auth: true, body: { active } }); return r.status === 200; }
@@ -466,7 +499,7 @@ const Acc = (() => {
   return {
     signup, login, unlock, logout, changePassword, recover, pull, push: syncPush,
     gestorEnsureKey, gestorResolve, grantCreate, grantRevoke, gestorClients, gestorOpenClient, pushShadow, _buildShareData: buildShareData,
-    grantSetCanEdit, opsPush, pullOps, setOpsListener,
+    grantSetCanEdit, opsPush, pullOps, setOpsListener, reconcileGrant,
     adminListUsers, adminSetActive, adminSetPaid, adminDelete, _mergeData: mergeData,
     status, isUnlocked, detectLocked, setAutoSync, setSyncListener, notifyChange, setApiBase: (u) => { API_BASE = u; },
     get email() { return S.email; }, get version() { return S.version; }, get state() { return S.state; },
