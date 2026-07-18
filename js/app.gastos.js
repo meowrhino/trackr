@@ -284,6 +284,9 @@ Object.assign(App, {
    *  Referencia de casillas: TODO/20-modelos-fiscales-casillas.md
    * ══════════════════════════════════════ */
 
+  /** Casillas del 303 por tipo de IVA: [base, tipo, cuota] — numeración oficial vigente */
+  _CODES303: { 4: ['01', '02', '03'], 10: ['04', '05', '06'], 21: ['07', '08', '09'], 0: ['150', '151', '152'] },
+
   /** Config fiscal del usuario con defaults (schema en store.ensure) */
   _fiscalCfg() {
     const f = D.d.settings.fiscal || {};
@@ -504,8 +507,8 @@ Object.assign(App, {
     /* Stash datos para botones copiar */
     this._lastTrimData = { label: qLabel, isYear, q, ivaRep, ivaSop, iva303Year, t303, t130, extUE, extNoUE, ispUE, ispNoUE };
 
-    /* Render casillas 303 — numeración oficial: 4% → 01-03, 10% → 04-06, 21% → 07-09, 0% → 150-152 */
-    const codes303 = { 4: ['01', '02', '03'], 10: ['04', '05', '06'], 21: ['07', '08', '09'], 0: ['150', '151', '152'] };
+    /* Render casillas 303 (numeración en _CODES303) */
+    const codes303 = this._CODES303;
     const tiposRep = Object.keys(ivaRep).map(Number).sort((a, b) => b - a);
     const hayISP = ispUE.base > 0 || ispNoUE.base > 0;
     const hayExt = extUE > 0 || extNoUE > 0;
@@ -622,7 +625,7 @@ Object.assign(App, {
     const d = this._lastTrimData;
     if (!d) return;
     const lines = [`Modelo 303 — ${d.label}`];
-    const codes = { 4: ['01','02','03'], 10: ['04','05','06'], 21: ['07','08','09'], 0: ['150','151','152'] };
+    const codes = this._CODES303;
     const tipos = Object.keys(d.ivaRep).map(Number).sort((a,b)=>b-a);
     tipos.forEach(tipo => {
       const c = codes[tipo] || ['—','—','—'];

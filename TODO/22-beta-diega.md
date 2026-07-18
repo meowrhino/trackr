@@ -1,17 +1,11 @@
 # 22 — Beta gestoría con Diega: guion del test
 
-## Estado: 📋 listo para ejecutar en cuanto se despliegue la rama `gestores`
+## Estado: 📋 listo — todo desplegado en producción (2026-07-17); quedada prevista 19 jul
 
-## Antes del test (manu, ~10 min)
+## Antes del test (manu)
 
-1. **Backend**: en `trackr-api`, mergear `gestores` → main y:
-   ```
-   npx wrangler d1 execute trackr-db --remote --file scripts/migrate-gestores.sql
-   npx wrangler deploy
-   ```
-2. **Frontend**: en `trackr`, mergear `gestores` → main (incluye la Fase 1 de VeriFactu,
-   que va apagada por defecto — sin efecto). El deploy es automático al pushear.
-3. Los signups siguen cerrados (`SIGNUPS_OPEN=false`): para que Diega pueda crear cuenta,
+1. ~~Backend y frontend~~ ✅ ya desplegados (migraciones aplicadas, worker y Pages al día).
+2. Los signups siguen cerrados (`SIGNUPS_OPEN=false`): para que Diega pueda crear cuenta,
    o bien poner `SIGNUPS_OPEN=true` temporalmente y redeployar, o crearla juntos y activarla
    tú desde el panel admin en el momento.
 

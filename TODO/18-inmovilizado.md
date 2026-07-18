@@ -1,5 +1,7 @@
 # TODO #18 — Módulo Inmovilizado (amortización de bienes >300€)
 
+## Estado: ⏳ pendiente (sin fecha) — mientras tanto existe la categoría de gasto "amortización" para apuntarlo a mano
+
 ## Por qué
 
 Hoy todos los gastos en TRACKR se tratan como **gasto corriente** (deducible íntegro el año de la compra). Eso es incorrecto para compras de cierta entidad — ordenadores, cámaras, mobiliario… — que la AEAT obliga a **amortizar a lo largo de varios años** según tablas oficiales. Si un autónomo se desgrava un MacBook de 2.000€ entero en el trimestre que lo compra, su modelo 130 trimestral / IRPF anual estará mal.

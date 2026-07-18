@@ -545,47 +545,12 @@ const D = {
 
   /* ══════════════════════════════════════════════
    *  CUSTOMER JOURNEY (tablero kanban)
-   *  Estadios (columnas) + tarjetas (clientes/personas).
-   *  Plantilla genérica, independiente de `clientes`.
+   *  Solo lectura desde aquí: el widget (journey/journey.js vía app.journey.js)
+   *  muta d.journey directamente y llama a save() — la vieja API CRUD de
+   *  estadios/tarjetas se retiró al pasar al widget (nadie la llamaba).
    * ══════════════════════════════════════════════ */
-
-  /* ── Estadios (columnas) ── */
   jStages() { return this.d.journey.stages; },
   jStage(id) { return this.d.journey.stages.find(s => s.id === id); },
-  addJStage(s) { this.d.journey.stages.push(s); this.save(); return s; },
-  upJStage(id, u) {
-    const i = this.d.journey.stages.findIndex(s => s.id === id);
-    if (i !== -1) { Object.assign(this.d.journey.stages[i], u); this.save(); }
-  },
-  /** Elimina un estadio. Sus tarjetas se reasignan a `toStageId` (o se borran si null). */
-  delJStage(id, toStageId) {
-    if (toStageId) this.d.journey.cards.forEach(c => { if (c.stageId === id) c.stageId = toStageId; });
-    else this.d.journey.cards = this.d.journey.cards.filter(c => c.stageId !== id);
-    this.d.journey.stages = this.d.journey.stages.filter(s => s.id !== id);
-    this.save();
-  },
-  /** Reordena un estadio una posición (dir: -1 izquierda, +1 derecha) */
-  moveJStage(id, dir) {
-    const a = this.d.journey.stages;
-    const i = a.findIndex(s => s.id === id), j = i + dir;
-    if (i === -1 || j < 0 || j >= a.length) return;
-    [a[i], a[j]] = [a[j], a[i]];
-    this.save();
-  },
-
-  /* ── Tarjetas ── */
-  jCards() { return this.d.journey.cards; },
-  jCard(id) { return this.d.journey.cards.find(c => c.id === id); },
-  jCardsIn(stageId) { return this.d.journey.cards.filter(c => c.stageId === stageId); },
-  addJCard(c) { this.d.journey.cards.push(c); this.save(); return c; },
-  upJCard(id, u) {
-    const i = this.d.journey.cards.findIndex(c => c.id === id);
-    if (i !== -1) { Object.assign(this.d.journey.cards[i], u); this.save(); }
-  },
-  delJCard(id) {
-    this.d.journey.cards = this.d.journey.cards.filter(c => c.id !== id);
-    this.save();
-  },
 
   /* ══════════════════════════════════════════════
    *  IMPORT

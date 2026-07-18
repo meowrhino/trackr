@@ -5,6 +5,24 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-07-19 — Limpieza a fondo: vendors locales, código muerto e i18n huérfano
+
+Pasada de revisión sobre todo el frontend (sin cambios de comportamiento salvo el primero).
+
+### ✨ Mejora real
+- **jsPDF y LZ-String vendorizados** (`vendor/jspdf`, `vendor/lz-string`, con SRI como qrcode y argon2): venían de CDN y el service worker solo cachea el propio origen — offline podían fallar los PDFs de factura y las copias comprimidas, contra la promesa PWA. Contenido verificado byte a byte contra dos CDNs independientes. Ya no hay ningún script externo (solo las fuentes de Google, que degradan bien).
+
+### 🧹 Limpieza
+- **29 claves i18n huérfanas eliminadas** (×3 idiomas, −87 líneas de lang.js): restos de la vista fiscal antigua (`din.toRefund`, `renta.deductions`…), de la vista Info previa a las tarjetas y de textos de ejemplo sustituidos. Verificado que ninguna se usaba ni dinámicamente (las familias `guide.*`, `theme.*`, `journey.*`, plurales `.one/.other`… se construyen en runtime y se conservan).
+- **API CRUD de journey del store eliminada** (10 métodos muertos): desde el refactor al widget, journey muta `D.d.journey` directo; solo `jStages`/`jStage` se usan y se quedan.
+- **Tabla de casillas del 303 unificada** en `App._CODES303` (estaba duplicada en el render y en el copiar).
+- **`analytics/` fuera del build**: el Worker propio en reserva es código interno; se publicaba entero en el sitio sin motivo.
+- MDs: TODO/18 con cabecera de estado, TODO/22 al día (todo desplegado; solo queda el toggle de signups el día de la beta).
+
+Verificado en navegador: 3 idiomas × 7 vistas sin claves crudas filtradas, consola limpia, PDF generado con el vendor local, self-test VeriFactu OK, snapshot de copias OK, build sin `analytics/`.
+
+---
+
 ## 2026-07-18 — Gestores: reconciliación del vínculo multidispositivo + guard de esquema
 
 Dos pendientes medios de la revisión de la Etapa B (TODO/21), cerrados antes de la beta.
