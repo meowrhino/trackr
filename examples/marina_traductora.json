@@ -23,6 +23,7 @@
       "direccion1": "Friedrichstraße 112",
       "direccion2": "10117 Berlin, Alemania",
       "nif": "DE312456789",
+      "zonaFiscal": "ue",
       "color": "DodgerBlue"
     },
     {
@@ -47,6 +48,7 @@
       "direccion1": "Storgata 28",
       "direccion2": "0184 Oslo, Noruega",
       "nif": "NO987654321",
+      "zonaFiscal": "noue",
       "color": "SteelBlue"
     },
     {
@@ -2103,7 +2105,7 @@
         "importeIrpf": 0,
         "totalFactura": 0,
         "netoRecibido": 0,
-        "ivaExcepcion": "Operación intracomunitaria exenta (art. 25 Ley 37/1992)",
+        "ivaExcepcion": "Operación no sujeta por reglas de localización (art. 69 Ley 37/1992)",
         "pagado": false,
         "fechaPago": null,
         "gastos": 0,

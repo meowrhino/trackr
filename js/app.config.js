@@ -464,6 +464,8 @@ Object.assign(App, {
       + `<div class="fr"><div class="fg"><label>${t('field.nickname')}</label><input type="text" id="clN" value="${esc(c?.nombre || '')}" placeholder="${t('ph.clientNameOrCompany')}"></div><div class="fg"><label>${t('field.fullName')}</label><input type="text" id="clNC" value="${esc(c?.nombreCompleto || '')}" placeholder="${t('ph.fullName')}"></div></div>`
       + `<div class="fr"><div class="fg"><label>${t('cfg.address1')}</label><input type="text" id="clD1" value="${esc(c?.direccion1 || '')}" placeholder="${t('ph.street')}"></div><div class="fg"><label>${t('cfg.address2')}</label><input type="text" id="clD2" value="${esc(c?.direccion2 || '')}" placeholder="${t('ph.clientCity')}"></div></div>`
       + `<div class="fr"><div class="fg"><label>${t('cfg.nif')}</label><input type="text" id="clNif" value="${esc(c?.nif || '')}" placeholder="${t('ph.nif')}"></div><div class="fg"><label>${t('field.color')}</label>${this.colorSelect(clColor)}</div></div>`
+      + `<div class="fr"><div class="fg"><label>${t('field.zonaFiscal')}</label><select id="clZona">${Object.entries(ZONA_FISCAL).map(([k, v]) => `<option value="${k}" ${(c?.zonaFiscal || 'es') === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
+      + `<div class="fg" style="align-self:end"><p class="small" style="color:var(--t3);margin:0">${t('cfg.zonaClientHelp')}</p></div></div>`
       + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveCl('${cid || ''}')">${isE ? t('btn.save') : t('btn.create')}</button></div>`);
   },
 
@@ -472,7 +474,7 @@ Object.assign(App, {
     if (!nombre) { Toast.warn(t('msg.nameRequired')); return; }
     const color = document.getElementById('mpColor')?.value || 'CornflowerBlue';
     const nombreCompleto = document.getElementById('clNC').value.trim();
-    const data = { nombre, nombreCompleto, direccion1: document.getElementById('clD1').value.trim(), direccion2: document.getElementById('clD2').value.trim(), nif: document.getElementById('clNif').value.trim(), color };
+    const data = { nombre, nombreCompleto, direccion1: document.getElementById('clD1').value.trim(), direccion2: document.getElementById('clD2').value.trim(), nif: document.getElementById('clNif').value.trim(), zonaFiscal: document.getElementById('clZona').value, color };
     let savedId;
     if (cid) { D.upCl(cid, data); savedId = cid; }
     else { data.id = uid(); D.addCl(data); savedId = data.id; }

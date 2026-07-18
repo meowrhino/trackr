@@ -154,11 +154,18 @@ Incompatibilidad: el 5% (0222) es **incompatible** con la reducción TRADE (0232
 
 ## Divergencias del código actual (js/app.gastos.js, revisado 2026-07-05)
 
-1. **130 no acumulativo** — incorrecto desde T2 (falta 01/02/06 acumuladas + casilla 05).
-2. **Faltan casillas 13, 15, 16** del 130 (la 13 afecta a casi todo usuario con rendimientos bajos).
-3. **Falta el 5% de difícil justificación** en el 130 (sí entra, confirmado AEAT) y en la vista renta.
-4. **303: mapeo de casillas invertido** (21% debe ser 07-09, no 01-03) y **cuota soportada en la 30 en vez de la 29**.
-5. **303: sin arrastre de saldo a compensar** (110/78/87).
-6. **303: sin ISP/intracomunitarias** (10-13 y 36-37) ni informativas 59/120 → necesita país en cliente y flag en gasto ("proveedor UE/no UE sin IVA español").
-7. **Criterios inconsistentes entre vistas**: trimestral = devengo, renta anual = caja prorrateada por cobros; gastos en 130 = base, en renta = total. Unificar: fiscal siempre devengo + base (con opción de incluir IVA no deducible como gasto).
-8. **Retenciones**: la vista renta no suma 0599/0604.
+> **Estado 2026-07-18: las 8 resueltas.** 1-5, 7 y 8 en `ee26cec` (2026-07-05); la 6 el
+> 2026-07-18 con `zonaFiscal` en cliente y gasto (ES/UE/no UE): informativas 59/120,
+> ISP 10-13 + 36-37 (deducción no UE en 28/29), aviso 349, y desglose de la renta por
+> casilla de gasto (0186/0192/0194/0199/0200/0202/0208, mapeo por categoría, resto → 0202).
+> Sigue pendiente (documentado arriba): casilla 16 vivienda, aviso regla 70 %, campo
+> editable para 130 ya presentados, y prorrateo automático de suministros (solo hay nota).
+
+1. **130 no acumulativo** — incorrecto desde T2 (falta 01/02/06 acumuladas + casilla 05). ✅
+2. **Faltan casillas 13, 15, 16** del 130 (la 13 afecta a casi todo usuario con rendimientos bajos). ✅ (16 descartada: minoría)
+3. **Falta el 5% de difícil justificación** en el 130 (sí entra, confirmado AEAT) y en la vista renta. ✅
+4. **303: mapeo de casillas invertido** (21% debe ser 07-09, no 01-03) y **cuota soportada en la 30 en vez de la 29**. ✅
+5. **303: sin arrastre de saldo a compensar** (110/78/87). ✅
+6. **303: sin ISP/intracomunitarias** (10-13 y 36-37) ni informativas 59/120 → necesita país en cliente y flag en gasto ("proveedor UE/no UE sin IVA español"). ✅ 2026-07-18
+7. **Criterios inconsistentes entre vistas**: trimestral = devengo, renta anual = caja prorrateada por cobros; gastos en 130 = base, en renta = total. Unificar: fiscal siempre devengo + base (con opción de incluir IVA no deducible como gasto). ✅
+8. **Retenciones**: la vista renta no suma 0599/0604. ✅

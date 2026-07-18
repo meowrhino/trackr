@@ -5,6 +5,21 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-07-18 — Fiscalidad exterior: zona fiscal en cliente y gasto, 303 completo y renta desglosada
+
+Cierra la última divergencia de `TODO/20` (la n.º 6): operaciones con la UE y fuera de la UE.
+
+### ✨ Nuevo
+- **Zona fiscal** en cliente y en gasto (España / UE con NIF-IVA / fuera de la UE), con ayuda contextual en los modales. _frontend_
+- **303 — informativas**: los servicios facturados a clientes UE sin IVA van a la casilla **59** y a los de fuera de la UE a la **120** (obligatorias, no suman al resultado). Solo si la factura no lleva IVA español: una venta B2C con IVA sigue la vía normal.
+- **303 — inversión del sujeto pasivo**: los gastos de proveedores extranjeros sin IVA español autoliquidan la cuota — intracomunitarios en **10/11** con deducción en **36/37**, no UE en **12/13** con deducción en **28/29**. Neutro en el resultado (46), como manda el modelo. Un impuesto extranjero tecleado en el campo IVA no se deduce en el 303: cuenta como coste en IRPF.
+- **Aviso del modelo 349** cuando el periodo tiene operaciones intracomunitarias (requiere NIF-IVA/ROI).
+- **Renta desglosada por casilla**: los gastos se agrupan por su casilla de destino del D1 — 0186 (RETA), 0192 (arrendamientos), 0194 (suministros, con nota del prorrateo de vivienda afecta), 0199 (gestoría), 0200 (seguros), 0208 (amortización) y 0202 (resto) — sumando exacto al 0218.
+- "Copiar casillas" incluye todas las casillas nuevas.
+- i18n completo ES/EN/CA. Ejemplo `marina_traductora` actualizado: TechBridge (Berlín) como cliente UE, Nordic Health (Oslo) como no UE con el texto legal corregido (art. 69, no art. 25).
+
+---
+
 ## 2026-07-05 — Modelos fiscales reales: 130 acumulativo, 303 con numeración oficial y arrastre, renta D1
 
 Investigación previa con fuentes oficiales AEAT/BOE (referencia casilla por casilla en `TODO/20-modelos-fiscales-casillas.md`). El resumen fiscal pasa de aproximación a casillas exactas del formulario.

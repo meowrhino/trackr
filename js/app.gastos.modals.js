@@ -51,6 +51,8 @@ Object.assign(App, {
       + `<div class="fg"><label>${t('field.ivaRate')}</label><select id="gIva" onchange="App._gCalc('total')">${Object.entries(TIPOS_IVA).map(([k, v]) => `<option value="${k}" ${(g?.tipoIva ?? 21) == k ? 'selected' : ''}>${v}</option>`).join('')}</select></div></div>`
       + `<div class="fr"><div class="fg"><label>${t('field.recurrence')}</label><select id="gRec" onchange="App._toggleGasRec(this.value)">${Object.entries(RECURRENCIA).map(([k, v]) => `<option value="${k}" ${g?.recurrente === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
       + `<div class="fg" style="display:flex;align-items:end"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;padding:.45rem 0"><input type="checkbox" id="gDes" ${g?.desgravable ? 'checked' : ''}> ${t('gas.deductibleBadge')}</label></div></div>`
+      + `<div class="fr"><div class="fg"><label>${t('gas.zonaProveedor')}</label><select id="gZona" onchange="document.getElementById('gZonaHelp').style.display = this.value === 'es' ? 'none' : ''">${Object.entries(ZONA_FISCAL).map(([k, v]) => `<option value="${k}" ${(g?.zonaFiscal || 'es') === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
+      + `<div class="fg" style="align-self:end"><p class="small" id="gZonaHelp" style="color:var(--t3);margin:0${(g?.zonaFiscal || 'es') === 'es' ? ';display:none' : ''}">${t('gas.zonaHelp')}</p></div></div>`
       + recurringFields
       + entryFields
       + (isE && g?.finHasta ? `<div class="fg"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="gReact"> ${t('gas.reactivate')}</label></div>` : '')
@@ -75,7 +77,7 @@ Object.assign(App, {
     const recurrente = document.getElementById('gRec').value;
     const importeBase = parseFloat(document.getElementById('gIB')?.value);
     const diaRecurrente = parseInt(document.getElementById('gDR')?.value);
-    const data = { nombre, categoria: document.getElementById('gCat').value, recurrente, color, notas: document.getElementById('gNo').value.trim(), desgravable: document.getElementById('gDes').checked, tipoIva: ((v) => isNaN(v) ? 21 : v)(parseInt(document.getElementById('gIva').value)) };
+    const data = { nombre, categoria: document.getElementById('gCat').value, recurrente, color, notas: document.getElementById('gNo').value.trim(), desgravable: document.getElementById('gDes').checked, tipoIva: ((v) => isNaN(v) ? 21 : v)(parseInt(document.getElementById('gIva').value)), zonaFiscal: document.getElementById('gZona').value };
     if (recurrente !== 'no') {
       if (!isNaN(importeBase) && importeBase > 0) data.importeBase = roundMoney(importeBase);
       else data.importeBase = null;

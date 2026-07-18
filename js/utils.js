@@ -1,7 +1,7 @@
 /* ================================================
  * TRACKR — Utilidades
  * Constantes, helpers, formatos
- * Globales: EST, EST_ORDER, GASTO_CAT, RECURRENCIA,
+ * Globales: EST, EST_ORDER, GASTO_CAT, ZONA_FISCAL, RECURRENCIA,
  *           MESES, DIAS_SEM, uid(), esc(), fmtDate(),
  *           fmtMoney(), fmtNum(), sortHoras(),
  *           clienteName(), inPeriod(), todayStr()
@@ -60,6 +60,15 @@ let DEDUCIBLE_CAT = {
   asesoria:     'Asesoría',
   amortizacion: 'Amortización',
   otro:         'Otro'
+};
+
+/** Zona fiscal de clientes y proveedores (mutable para i18n).
+ *  Gobierna el enrutado 303: 'ue'/'noue' sin IVA español → informativas 59/120
+ *  (ingresos) e inversión del sujeto pasivo 10-13/36-37 (gastos). */
+let ZONA_FISCAL = {
+  es:   'España',
+  ue:   'UE (con NIF-IVA)',
+  noue: 'Fuera de la UE'
 };
 
 /** Tipos de recurrencia de gastos (mutable para i18n) */

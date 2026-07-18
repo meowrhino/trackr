@@ -303,6 +303,12 @@ Object.assign(App, {
     const m = q * 3;
     const ivaRep = {}, ivaSop = {};
     let ingresos = 0, gastos = 0, retenciones = 0;
+    /* Operaciones exteriores (según zonaFiscal de cliente/gasto):
+       extUE/extNoUE = bases de servicios a clientes fuera de España sin IVA español
+       (informativas 59/120); ispUE/ispNoUE = inversión del sujeto pasivo de gastos
+       con proveedor extranjero (devengado 10-13, deducible 36-37 o 28-29). */
+    let extUE = 0, extNoUE = 0;
+    const ispUE = { base: 0, cuota: 0 }, ispNoUE = { base: 0, cuota: 0 };
     const sinFecha = [];
     D.ps().forEach(p => {
       B.calc(p);
@@ -311,12 +317,20 @@ Object.assign(App, {
         if (h.fecha && inPeriod(h.fecha, 'trim', y, m) && h.monto) ingresos += h.monto;
       });
       if (f.facturaFecha && inPeriod(f.facturaFecha, 'trim', y, m) && f.baseImponible) {
-        const tipo = f.iva || 0;
-        if (!ivaRep[tipo]) ivaRep[tipo] = { base: 0, cuota: 0 };
-        ivaRep[tipo].base += f.baseImponible || 0;
-        ivaRep[tipo].cuota += f.importeIva || 0;
         ingresos += f.baseImponible || 0;
         retenciones += f.importeIrpf || 0;
+        const zona = (p.clienteId && D.cl(p.clienteId)?.zonaFiscal) || 'es';
+        if (zona !== 'es' && !(f.importeIva > 0)) {
+          /* B2B exterior sin IVA español: no devenga IVA aquí; solo informativa.
+             Si la factura SÍ lleva IVA español (B2C exterior) sigue la vía normal. */
+          if (zona === 'ue') extUE += f.baseImponible || 0;
+          else extNoUE += f.baseImponible || 0;
+        } else {
+          const tipo = f.iva || 0;
+          if (!ivaRep[tipo]) ivaRep[tipo] = { base: 0, cuota: 0 };
+          ivaRep[tipo].base += f.baseImponible || 0;
+          ivaRep[tipo].cuota += f.importeIva || 0;
+        }
       }
       /* Facturas con importe pero sin fecha: no entran en ningún periodo */
       if (!f.facturaFecha && (f.baseImponible || 0) > 0 && f.modo !== 'gratis' && p.estado !== 'potencial') {
@@ -334,15 +348,28 @@ Object.assign(App, {
         }
       });
       if (baseSum > 0 || ivaSum > 0) {
-        if (!ivaSop[tipo]) ivaSop[tipo] = { base: 0, cuota: 0 };
-        ivaSop[tipo].base += baseSum;
-        ivaSop[tipo].cuota += ivaSum;
-        gastos += baseSum;
+        const zona = g.zonaFiscal || 'es';
+        if (zona === 'es') {
+          if (!ivaSop[tipo]) ivaSop[tipo] = { base: 0, cuota: 0 };
+          ivaSop[tipo].base += baseSum;
+          ivaSop[tipo].cuota += ivaSum;
+          gastos += baseSum;
+        } else {
+          /* Proveedor extranjero, factura sin IVA español → ISP: se autoliquida la
+             cuota al tipo del gasto (general si el usuario dejó 0%). Un impuesto
+             extranjero tecleado en `iva` no es deducible en el 303 → cuenta como
+             coste en IRPF junto con la base. */
+          const rate = [21, 10, 4].includes(tipo) ? tipo : 21;
+          const isp = zona === 'ue' ? ispUE : ispNoUE;
+          isp.base += baseSum;
+          isp.cuota += roundMoney(baseSum * rate / 100);
+          gastos += baseSum + ivaSum;
+        }
       }
     });
     const deds = D.deds().filter(d => d.fecha && inPeriod(d.fecha, 'trim', y, m));
     gastos += deds.reduce((s, d) => s + (d.cantidad || 0), 0);
-    return { ivaRep, ivaSop, ingresos, gastos, retenciones, deds, sinFecha };
+    return { ivaRep, ivaSop, ingresos, gastos, retenciones, deds, sinFecha, extUE, extNoUE, ispUE, ispNoUE };
   },
 
   /** Primer año con datos fiscales (para el arrastre de saldo IVA) */
@@ -412,6 +439,8 @@ Object.assign(App, {
         const d = (yy === y && qDataOfY && qDataOfY[qq]) || this._fiscalQ(yy, qq);
         const repCuota = Object.values(d.ivaRep).reduce((s, x) => s + x.cuota, 0);
         const sopCuota = Object.values(d.ivaSop).reduce((s, x) => s + x.cuota, 0);
+        /* Las cuotas ISP (10-13) no entran: se devengan y deducen por el mismo
+           importe (36-37 / 28-29), así que el 46 no cambia. Se muestran aparte. */
         const c46 = repCuota - sopCuota;
         const c110 = carry;
         const c78 = c46 > 0 ? Math.min(carry, c46) : 0;   /* compensación aplicada */
@@ -441,9 +470,11 @@ Object.assign(App, {
     const t303 = this._calc303(y, q, qData);
 
     /* Vista año: devengado/soportado agregados (informativo, estilo 390) */
-    let ivaRep, ivaSop;
+    let ivaRep, ivaSop, extUE, extNoUE, ispUE, ispNoUE;
     if (isYear) {
       ivaRep = {}; ivaSop = {};
+      extUE = 0; extNoUE = 0;
+      ispUE = { base: 0, cuota: 0 }; ispNoUE = { base: 0, cuota: 0 };
       qData.forEach(d => {
         Object.entries(d.ivaRep).forEach(([tp, v]) => {
           if (!ivaRep[tp]) ivaRep[tp] = { base: 0, cuota: 0 };
@@ -453,9 +484,14 @@ Object.assign(App, {
           if (!ivaSop[tp]) ivaSop[tp] = { base: 0, cuota: 0 };
           ivaSop[tp].base += v.base; ivaSop[tp].cuota += v.cuota;
         });
+        extUE += d.extUE; extNoUE += d.extNoUE;
+        ispUE.base += d.ispUE.base; ispUE.cuota += d.ispUE.cuota;
+        ispNoUE.base += d.ispNoUE.base; ispNoUE.cuota += d.ispNoUE.cuota;
       });
     } else {
       ivaRep = dQ.ivaRep; ivaSop = dQ.ivaSop;
+      extUE = dQ.extUE; extNoUE = dQ.extNoUE;
+      ispUE = dQ.ispUE; ispNoUE = dQ.ispNoUE;
     }
     const iva303Year = isYear ? qData.reduce((s, d) =>
       s + Object.values(d.ivaRep).reduce((a, x) => a + x.cuota, 0)
@@ -466,13 +502,15 @@ Object.assign(App, {
     const dedsHtml = this._renderDedList(dedsShown);
 
     /* Stash datos para botones copiar */
-    this._lastTrimData = { label: qLabel, isYear, q, ivaRep, ivaSop, iva303Year, t303, t130 };
+    this._lastTrimData = { label: qLabel, isYear, q, ivaRep, ivaSop, iva303Year, t303, t130, extUE, extNoUE, ispUE, ispNoUE };
 
     /* Render casillas 303 — numeración oficial: 4% → 01-03, 10% → 04-06, 21% → 07-09, 0% → 150-152 */
     const codes303 = { 4: ['01', '02', '03'], 10: ['04', '05', '06'], 21: ['07', '08', '09'], 0: ['150', '151', '152'] };
     const tiposRep = Object.keys(ivaRep).map(Number).sort((a, b) => b - a);
+    const hayISP = ispUE.base > 0 || ispNoUE.base > 0;
+    const hayExt = extUE > 0 || extNoUE > 0;
     let html303 = '';
-    if (!tiposRep.length && !Object.keys(ivaSop).length && !(t303.c110 > 0)) {
+    if (!tiposRep.length && !Object.keys(ivaSop).length && !(t303.c110 > 0) && !hayISP && !hayExt) {
       html303 = `<div style="font-size:.78rem;color:var(--t3);padding:.5rem 0">${t('din.noInvoicesThisPeriod')}</div>`;
     } else {
       tiposRep.forEach(tipo => {
@@ -482,12 +520,26 @@ Object.assign(App, {
         html303 += `<div class="casilla-row"><span class="casilla-num">${c[1]}</span><span class="casilla-label">${t('din.vatRate')}</span><span class="casilla-val">${tipo} %</span></div>`;
         html303 += `<div class="casilla-row"><span class="casilla-num">${c[2]}</span><span class="casilla-label">${t('din.vatChargedAmt')}</span><span class="casilla-val">${fmtMoney(d.cuota)}</span></div>`;
       });
-      /* IVA soportado corriente: base 28, cuota 29 */
-      const baseSopTot = Object.values(ivaSop).reduce((s, x) => s + x.base, 0);
-      const cuotaSopTot = Object.values(ivaSop).reduce((s, x) => s + x.cuota, 0);
+      /* ISP devengado: intracomunitarias 10/11, proveedores no UE 12/13 */
+      if (ispUE.base > 0) {
+        html303 += `<div class="casilla-row"><span class="casilla-num">10</span><span class="casilla-label">${t('din.intraBase')}</span><span class="casilla-val">${fmtMoney(ispUE.base)}</span></div>`;
+        html303 += `<div class="casilla-row"><span class="casilla-num">11</span><span class="casilla-label">${t('din.intraCuota')}</span><span class="casilla-val">${fmtMoney(ispUE.cuota)}</span></div>`;
+      }
+      if (ispNoUE.base > 0) {
+        html303 += `<div class="casilla-row"><span class="casilla-num">12</span><span class="casilla-label">${t('din.ispNoUEBase')}</span><span class="casilla-val">${fmtMoney(ispNoUE.base)}</span></div>`;
+        html303 += `<div class="casilla-row"><span class="casilla-num">13</span><span class="casilla-label">${t('din.ispNoUECuota')}</span><span class="casilla-val">${fmtMoney(ispNoUE.cuota)}</span></div>`;
+      }
+      /* IVA soportado corriente: base 28, cuota 29 — la ISP de proveedores no UE
+         (12/13) se deduce aquí; la intracomunitaria (10/11) en 36/37 */
+      const baseSopTot = Object.values(ivaSop).reduce((s, x) => s + x.base, 0) + ispNoUE.base;
+      const cuotaSopTot = Object.values(ivaSop).reduce((s, x) => s + x.cuota, 0) + ispNoUE.cuota;
       if (baseSopTot > 0) {
         html303 += `<div class="casilla-row casilla-sep"><span class="casilla-num">28</span><span class="casilla-label">${t('din.inputBase')}</span><span class="casilla-val">${fmtMoney(baseSopTot)}</span></div>`;
         html303 += `<div class="casilla-row"><span class="casilla-num">29</span><span class="casilla-label">${t('din.inputVat')}</span><span class="casilla-val">${fmtMoney(cuotaSopTot)}</span></div>`;
+      }
+      if (ispUE.base > 0) {
+        html303 += `<div class="casilla-row"><span class="casilla-num">36</span><span class="casilla-label">${t('din.intraDedBase')}</span><span class="casilla-val">${fmtMoney(ispUE.base)}</span></div>`;
+        html303 += `<div class="casilla-row"><span class="casilla-num">37</span><span class="casilla-label">${t('din.intraDedCuota')}</span><span class="casilla-val">${fmtMoney(ispUE.cuota)}</span></div>`;
       }
       if (isYear) {
         html303 += `<div class="casilla-row casilla-result"><span class="casilla-num">&Sigma;46</span><span class="casilla-label">${t('din.result46')}</span><span class="casilla-val" style="color:${iva303Year > 0 ? 'var(--warn)' : 'var(--ok)'}">${fmtMoney(iva303Year)}</span></div>`;
@@ -503,6 +555,16 @@ Object.assign(App, {
         } else {
           html303 += `<div class="casilla-row casilla-result"><span class="casilla-num">72</span><span class="casilla-label">${t('din.toCompensate')}</span><span class="casilla-val" style="color:var(--ok)">${fmtMoney(-t303.c71)}</span></div>`;
         }
+      }
+      /* Informativas (no suman al resultado) */
+      if (hayExt) {
+        html303 += `<div style="font-size:.7rem;color:var(--t3);margin:.4rem 0 .1rem">${t('din.infoTitle')}</div>`;
+        if (extUE > 0) html303 += `<div class="casilla-row"><span class="casilla-num">59</span><span class="casilla-label">${t('din.box59')}</span><span class="casilla-val">${fmtMoney(extUE)}</span></div>`;
+        if (extNoUE > 0) html303 += `<div class="casilla-row"><span class="casilla-num">120</span><span class="casilla-label">${t('din.box120')}</span><span class="casilla-val">${fmtMoney(extNoUE)}</span></div>`;
+      }
+      /* Operaciones intracomunitarias (ventas 59 o compras 10/11) → también van al 349 */
+      if (extUE > 0 || ispUE.base > 0) {
+        html303 += `<div style="font-size:.7rem;color:var(--warn);margin-top:.4rem">&#9888; ${t('din.aviso349')}</div>`;
       }
     }
 
@@ -569,11 +631,23 @@ Object.assign(App, {
       lines.push(`${c[1]}  Tipo: ${tipo} %`);
       lines.push(`${c[2]}  Cuota: ${fmtMoney(r.cuota)}`);
     });
-    const baseSop = Object.values(d.ivaSop).reduce((s,x)=>s+x.base,0);
-    const cuoSop = Object.values(d.ivaSop).reduce((s,x)=>s+x.cuota,0);
+    if (d.ispUE.base > 0) {
+      lines.push(`10  Adquis. intracomunitarias (base): ${fmtMoney(d.ispUE.base)}`);
+      lines.push(`11  Adquis. intracomunitarias (cuota): ${fmtMoney(d.ispUE.cuota)}`);
+    }
+    if (d.ispNoUE.base > 0) {
+      lines.push(`12  ISP proveedores no UE (base): ${fmtMoney(d.ispNoUE.base)}`);
+      lines.push(`13  ISP proveedores no UE (cuota): ${fmtMoney(d.ispNoUE.cuota)}`);
+    }
+    const baseSop = Object.values(d.ivaSop).reduce((s,x)=>s+x.base,0) + d.ispNoUE.base;
+    const cuoSop = Object.values(d.ivaSop).reduce((s,x)=>s+x.cuota,0) + d.ispNoUE.cuota;
     if (baseSop > 0) {
       lines.push(`28  Base IVA soportado: ${fmtMoney(baseSop)}`);
       lines.push(`29  Cuota IVA soportado: ${fmtMoney(cuoSop)}`);
+    }
+    if (d.ispUE.base > 0) {
+      lines.push(`36  Adquis. intracomunitarias deducibles (base): ${fmtMoney(d.ispUE.base)}`);
+      lines.push(`37  Adquis. intracomunitarias deducibles (cuota): ${fmtMoney(d.ispUE.cuota)}`);
     }
     if (d.isYear) {
       lines.push(`Σ46 Resultado del año: ${fmtMoney(d.iva303Year)}`);
@@ -587,6 +661,9 @@ Object.assign(App, {
       }
       lines.push(t3.c71 >= 0 ? `71  A ingresar: ${fmtMoney(t3.c71)}` : `72  A compensar: ${fmtMoney(-t3.c71)}`);
     }
+    if (d.extUE > 0) lines.push(`59  Servicios a clientes UE (informativa): ${fmtMoney(d.extUE)}`);
+    if (d.extNoUE > 0) lines.push(`120 Servicios fuera de la UE (informativa): ${fmtMoney(d.extNoUE)}`);
+    if (d.extUE > 0 || d.ispUE.base > 0) lines.push(`⚠ Operaciones intracomunitarias: recuerda el modelo 349 (requiere NIF-IVA/ROI)`);
     this._copyToClipboard(lines.join('\n'));
   },
 
@@ -644,6 +721,24 @@ Object.assign(App, {
       .reduce((s, c) => s + Math.max(c.c19, 0), 0);                      /* 0604 */
     const deds = qData.flatMap(d => d.deds);
 
+    /* Desglose del 0218 por casilla de destino del D1 (Renta Web pide los gastos
+       repartidos, no un total). Mapeo por categoría; lo no mapeado → 0202 "otros
+       servicios exteriores". Mismo criterio de importe que _fiscalQ: base para
+       proveedores ES, base+iva para extranjeros (su impuesto no es deducible en 303). */
+    const GASTO_R = { cotizacion: '0186', suministros: '0194', gestoria: '0199', seguros: '0200', amortizacion: '0208' };
+    const DED_R = { autonomos: '0186', alquiler: '0192', suministros: '0194', asesoria: '0199', seguros: '0200', amortizacion: '0208' };
+    const porCasilla = {};
+    const addC = (cas, amt) => { if (amt > 0) porCasilla[cas] = (porCasilla[cas] || 0) + amt; };
+    D.gs().forEach(g => {
+      if (!g.desgravable) return;
+      let base = 0, iva = 0;
+      (g.entradas || []).forEach(e => {
+        if (e.fecha && +e.fecha.slice(0, 4) === y) { base += e.base || 0; iva += e.iva || 0; }
+      });
+      addC(GASTO_R[g.categoria] || '0202', (g.zonaFiscal || 'es') === 'es' ? base : base + iva);
+    });
+    deds.forEach(dd => addC(DED_R[dd.categoria] || '0202', dd.cantidad || 0));
+
     const rowR = (num, label, val, total = false) =>
       `<div class="din-tax-row${total ? ' din-tax-total' : ''}"><span><span class="casilla-num" style="margin-right:.4rem">${num}</span>${label}</span><span class="m">${val}</span></div>`;
 
@@ -655,6 +750,11 @@ Object.assign(App, {
       + `<div class="din-trim-card" style="margin-top:.75rem">`
       +   `<div style="font-size:.7rem;color:var(--t3);margin-bottom:.35rem">${t('renta.devengoNote')}</div>`
       +   rowR('0171', t('renta.annualIncome'), fmtMoney(ingresos))
+      +   ['0186', '0192', '0194', '0199', '0200', '0202', '0208']
+            .filter(cas => porCasilla[cas])
+            .map(cas => rowR(cas, t('renta.c' + cas), fmtMoney(porCasilla[cas])))
+            .join('')
+      +   (porCasilla['0194'] ? `<div style="font-size:.7rem;color:var(--t3);margin:-.15rem 0 .2rem">${t('renta.suministrosNote')}</div>` : '')
       +   rowR('0218', t('renta.businessExpenses'), fmtMoney(gastos))
       +   rowR('0221', t('renta.diff'), fmtMoney(dif))
       +   (dj > 0 ? rowR('0222', t('renta.dj'), '&minus;' + fmtMoney(dj)) : '')
