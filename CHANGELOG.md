@@ -5,6 +5,17 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-07-18 — Microherramientas públicas: calculadoras /303 y /130 (SEO)
+
+El canal SEO del plan de marketing (TODO/16): dos calculadoras gratuitas sin registro.
+
+### ✨ Nuevo
+- **`/303`** — calculadora del Modelo 303 con casillas oficiales: bases por tipo (21/10/4/0 %) con cuota autocalculada editable, soportado 28/29, saldo a compensar 110/78/87 y resultado 46 → 71/72. _frontend_
+- **`/130`** — calculadora del Modelo 130 **acumulativa** como el modelo real (casillas 01-19 con la 05, el 5 % de difícil justificación con toggle EDS, minoración 13 y negativos 15). El ángulo diferencial: casi todas las calculadoras online lo hacen mal por trimestre aislado.
+- Estado serializado a la URL (cálculos compartibles), copiar casillas, JSON-LD, meta OG, mobile-first, CTA suave a la app y bloque SEO con plazos y preguntas frecuentes. Standalone (una petición, cero JS externo). Añadidas a `build.sh` y `sitemap.xml`.
+
+---
+
 ## 2026-07-18 — Fiscalidad exterior: zona fiscal en cliente y gasto, 303 completo y renta desglosada
 
 Cierra la última divergencia de `TODO/20` (la n.º 6): operaciones con la UE y fuera de la UE.

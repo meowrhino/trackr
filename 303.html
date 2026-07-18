@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora Modelo 303 online gratis (IVA trimestral) · TRACKR</title>
+<meta name="description" content="Calculadora gratuita del Modelo 303 de IVA trimestral con las casillas oficiales de la AEAT: bases por tipo, IVA soportado, saldo a compensar y resultado. Sin registro, sin guardar nada.">
+<meta name="keywords" content="calculadora modelo 303, modelo 303 online, IVA trimestral autónomos, casillas modelo 303, calcular IVA">
+<meta property="og:title" content="Calculadora Modelo 303 (IVA trimestral) · gratis y sin registro">
+<meta property="og:description" content="Mete tus bases y gastos y obtén las casillas oficiales del 303 listas para copiar en la sede de la AEAT. No guardamos nada.">
+<meta property="og:image" content="https://trackr.meowrhino.studio/og-image.png">
+<meta property="og:url" content="https://trackr.meowrhino.studio/303">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://trackr.meowrhino.studio/303">
+<link rel="icon" type="image/png" href="navicon.png">
+<meta name="theme-color" content="#111111">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"Calculadora Modelo 303","url":"https://trackr.meowrhino.studio/303","applicationCategory":"FinanceApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Calculadora gratuita del Modelo 303 de IVA trimestral con las casillas oficiales de la AEAT."}
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#111;--bg2:#191919;--bg3:#222;--b1:#262626;--b2:#333;--t1:#ccc;--t2:#888;--t3:#555;--ok:#5a9;--warn:#c93;--ac:#5a9;--r:3px}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;accent-color:var(--ac)}
+.m{font-family:'DM Mono',monospace}
+.wrap{max-width:600px;margin:0 auto;padding:1.25rem 1rem 3rem}
+header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:1.5rem}
+header a{color:var(--t2);text-decoration:none;letter-spacing:.35em;font-weight:600;font-size:.85rem;white-space:nowrap}
+header a:hover{color:var(--t1)}
+h1{font-size:1.25rem;font-weight:600;margin-bottom:.35rem}
+.sub{font-size:.85rem;color:var(--t2);margin-bottom:1.5rem;line-height:1.5}
+.card{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:1rem;margin-bottom:1rem}
+.card h2{font-size:.75rem;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem}
+.fr{display:flex;gap:.75rem;flex-wrap:wrap}
+.fg{flex:1;min-width:120px;margin-bottom:.75rem}
+label{display:block;font-size:.7rem;color:var(--t2);margin-bottom:.3rem;text-transform:uppercase;letter-spacing:.05em}
+input,select{width:100%;background:var(--bg3);border:1px solid var(--b2);border-radius:var(--r);color:var(--t1);padding:.5rem .6rem;font-size:.9rem;font-family:'DM Mono',monospace}
+input:focus,select:focus{outline:none;border-color:var(--ac)}
+details{margin-bottom:.5rem}
+summary{font-size:.78rem;color:var(--t2);cursor:pointer;padding:.35rem 0}
+.casilla-row{display:flex;align-items:baseline;gap:.6rem;padding:.3rem 0;border-bottom:1px solid var(--b1);font-size:.85rem}
+.casilla-row:last-child{border-bottom:none}
+.casilla-num{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--t3);background:var(--bg3);border-radius:var(--r);padding:.1rem .35rem;min-width:2.2rem;text-align:center}
+.casilla-label{flex:1;color:var(--t2)}
+.casilla-val{font-family:'DM Mono',monospace}
+.casilla-result{font-weight:600;border-top:1px solid var(--b2);margin-top:.3rem;padding-top:.5rem}
+.bt{background:var(--bg3);border:1px solid var(--b2);border-radius:var(--r);color:var(--t1);padding:.5rem .9rem;font-size:.82rem;cursor:pointer;font-family:'Outfit',sans-serif}
+.bt:hover{border-color:var(--ac)}
+.bt-p{background:var(--ac);border-color:var(--ac);color:#111;font-weight:600}
+.actions{display:flex;gap:.6rem;margin-top:.85rem;flex-wrap:wrap}
+.note{font-size:.72rem;color:var(--t3);line-height:1.5;margin-top:.6rem}
+.cta{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:1rem;margin:1.5rem 0;font-size:.85rem;line-height:1.55}
+.cta a{color:var(--ok)}
+.seo{font-size:.8rem;color:var(--t2);line-height:1.6;margin-top:1.5rem}
+.seo h2{font-size:.9rem;color:var(--t1);margin:1.1rem 0 .35rem}
+footer{margin-top:2.5rem;font-size:.72rem;color:var(--t3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+footer a{color:var(--t3)}
+.toast{position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--ac);border-radius:var(--r);padding:.5rem .9rem;font-size:.8rem;opacity:0;transition:opacity .2s}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><a href="./">T R A C K R</a><span class="m" style="font-size:.72rem;color:var(--t3)">gratis · sin registro · no guardamos nada</span></header>
+
+  <h1>Calculadora del Modelo 303 (IVA trimestral)</h1>
+  <p class="sub">Mete tus bases y tus gastos y te damos las <strong>casillas oficiales de la AEAT</strong> listas para copiar en la sede electrónica. Todo se calcula en tu navegador: no enviamos ni guardamos nada.</p>
+
+  <div class="card">
+    <h2>Periodo</h2>
+    <div class="fr">
+      <div class="fg"><label>Trimestre</label><select id="t"><option value="0">1T (ene–mar)</option><option value="1">2T (abr–jun)</option><option value="2">3T (jul–sep)</option><option value="3">4T (oct–dic)</option></select></div>
+      <div class="fg"><label>Año</label><input type="number" id="y" min="2020" max="2099"></div>
+    </div>
+    <div class="note" id="plazo"></div>
+  </div>
+
+  <div class="card">
+    <h2>IVA repercutido (tus facturas emitidas)</h2>
+    <div class="fr">
+      <div class="fg"><label>Base al 21 %</label><input type="number" id="b21" min="0" step="0.01" placeholder="0,00"></div>
+      <div class="fg"><label>Cuota 21 %</label><input type="number" id="c21" min="0" step="0.01" placeholder="auto"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label>Base al 10 %</label><input type="number" id="b10" min="0" step="0.01" placeholder="0,00"></div>
+      <div class="fg"><label>Cuota 10 %</label><input type="number" id="c10" min="0" step="0.01" placeholder="auto"></div>
+    </div>
+    <details>
+      <summary>Tipos 4 % y 0 %</summary>
+      <div class="fr">
+        <div class="fg"><label>Base al 4 %</label><input type="number" id="b4" min="0" step="0.01" placeholder="0,00"></div>
+        <div class="fg"><label>Cuota 4 %</label><input type="number" id="c4" min="0" step="0.01" placeholder="auto"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label>Base al 0 %</label><input type="number" id="b0" min="0" step="0.01" placeholder="0,00"></div>
+      </div>
+    </details>
+    <div class="note">La cuota se rellena sola al escribir la base, pero puedes corregirla si tu suma real difiere por céntimos.</div>
+  </div>
+
+  <div class="card">
+    <h2>IVA soportado (tus gastos deducibles)</h2>
+    <div class="fr">
+      <div class="fg"><label>Base (casilla 28)</label><input type="number" id="sb" min="0" step="0.01" placeholder="0,00"></div>
+      <div class="fg"><label>Cuota (casilla 29)</label><input type="number" id="sc" min="0" step="0.01" placeholder="0,00"></div>
+    </div>
+    <details>
+      <summary>Saldo a compensar de trimestres anteriores</summary>
+      <div class="fr">
+        <div class="fg"><label>Saldo pendiente (casilla 110)</label><input type="number" id="prev" min="0" step="0.01" placeholder="0,00"></div>
+      </div>
+      <div class="note">Lo que te salió "a compensar" (casilla 72) en autoliquidaciones anteriores y aún no has aplicado.</div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h2>Casillas del Modelo 303</h2>
+    <div id="out"></div>
+    <div class="actions">
+      <button class="bt bt-p" onclick="copiar()">📋 Copiar casillas</button>
+      <button class="bt" onclick="compartir()">Compartir enlace</button>
+    </div>
+  </div>
+
+  <div class="cta">
+    ¿Cansado de rellenar esto a mano cada trimestre? <a href="./"><strong>TRACKR</strong></a> lo calcula solo a partir de tus facturas y gastos — 303, 130 y renta con casillas oficiales. Gratis, sin cuenta, funciona en tu navegador y tus datos no salen de él.
+  </div>
+
+  <div class="seo">
+    <h2>¿Qué es el Modelo 303?</h2>
+    <p>Es la autoliquidación trimestral del IVA: declaras el IVA que has repercutido en tus facturas y te deduces el que has soportado en tus gastos. La diferencia se ingresa (casilla 71) o se queda a compensar para el trimestre siguiente (casilla 72).</p>
+    <h2>¿Cuándo se presenta?</h2>
+    <p>Del 1 al 20 de abril (1T), julio (2T) y octubre (3T), y del 1 al 30 de enero (4T). Si domicilias el pago, el plazo acaba unos días antes.</p>
+    <h2>¿Qué casillas usa esta calculadora?</h2>
+    <p>La numeración oficial vigente: bases y cuotas por tipo (4 % → 01-03, 10 % → 04-06, 21 % → 07-09, 0 % → 150-152), IVA soportado corriente (28/29), saldo a compensar (110/78/87) y resultado (46 y 71/72).</p>
+    <p class="note">Esta calculadora es orientativa para el perfil más común (régimen general, sin prorrata, sin recargo de equivalencia) y no sustituye el asesoramiento de un profesional.</p>
+    <p class="note">¿Buscas el IRPF trimestral? Prueba la <a href="130" style="color:var(--ok)">calculadora del Modelo 130</a>.</p>
+  </div>
+
+  <footer>
+    <span><a href="./">TRACKR</a> — facturación para autónomos</span>
+    <span>hecho por <a href="https://meowrhino.studio" rel="author">meowrhino.studio</a></span>
+  </footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* Calculadora 303 — casillas oficiales. Sin dependencias, sin persistencia:
+   el estado vive en el formulario y se serializa a la URL para compartir. */
+const $ = id => document.getElementById(id);
+const num = id => { const v = parseFloat($(id).value); return isNaN(v) ? 0 : v; };
+const r2 = v => Math.round(v * 100) / 100;
+const fmt = v => v.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+
+const RATES = [{ p: 21, codes: ['07', '08', '09'] }, { p: 10, codes: ['04', '05', '06'] }, { p: 4, codes: ['01', '02', '03'] }, { p: 0, codes: ['150', '151', '152'] }];
+const FIELDS = ['t', 'y', 'b21', 'c21', 'b10', 'c10', 'b4', 'c4', 'b0', 'sb', 'sc', 'prev'];
+let lineas = [];
+
+function calc() {
+  let html = '', rep = 0;
+  lineas = [];
+  const row = (n, l, v, cls = '', style = '') =>
+    `<div class="casilla-row${cls}"><span class="casilla-num">${n}</span><span class="casilla-label">${l}</span><span class="casilla-val"${style}>${v}</span></div>`;
+  RATES.forEach(rt => {
+    const base = num('b' + rt.p);
+    if (base <= 0) return;
+    const cuota = rt.p === 0 ? 0 : num('c' + rt.p);
+    rep += cuota;
+    html += row(rt.codes[0], `Base imponible ${rt.p} %`, fmt(base));
+    if (rt.p !== 0) {
+      html += row(rt.codes[1], 'Tipo', rt.p + ' %');
+      html += row(rt.codes[2], 'Cuota devengada', fmt(cuota));
+    }
+    lineas.push(`${rt.codes[0]}  Base ${rt.p}%: ${fmt(base)}`);
+    if (rt.p !== 0) lineas.push(`${rt.codes[2]}  Cuota: ${fmt(cuota)}`);
+  });
+  const sb = num('sb'), sc = num('sc');
+  if (sb > 0 || sc > 0) {
+    html += row('28', 'Base IVA soportado', fmt(sb), ' casilla-sep');
+    html += row('29', 'Cuota IVA soportado', fmt(sc));
+    lineas.push(`28  Base IVA soportado: ${fmt(sb)}`, `29  Cuota IVA soportado: ${fmt(sc)}`);
+  }
+  const c46 = r2(rep - sc);
+  html += row('46', 'Resultado régimen general', fmt(c46));
+  lineas.push(`46  Resultado régimen general: ${fmt(c46)}`);
+  const c110 = num('prev');
+  let c71 = c46;
+  if (c110 > 0) {
+    const c78 = c46 > 0 ? Math.min(c110, c46) : 0;
+    const c87 = r2(c110 - c78);
+    c71 = r2(c46 - c78);
+    html += row('110', 'Saldo pendiente de periodos anteriores', fmt(c110));
+    lineas.push(`110 Saldo pendiente anterior: ${fmt(c110)}`);
+    if (c78 > 0) { html += row('78', 'Compensado en este periodo', '−' + fmt(c78)); lineas.push(`78  Compensado este periodo: ${fmt(c78)}`); }
+    if (c87 > 0) { html += row('87', 'Queda pendiente para periodos siguientes', fmt(c87)); lineas.push(`87  Pendiente para siguientes: ${fmt(c87)}`); }
+  }
+  if (c71 >= 0) {
+    html += row('71', 'Resultado: a ingresar', fmt(c71), ' casilla-result', ` style="color:${c71 > 0 ? 'var(--warn)' : 'var(--ok)'}"`);
+    lineas.push(`71  A ingresar: ${fmt(c71)}`);
+  } else {
+    html += row('72', 'Resultado: a compensar', fmt(-c71), ' casilla-result', ' style="color:var(--ok)"');
+    lineas.push(`72  A compensar: ${fmt(-c71)}`);
+  }
+  $('out').innerHTML = html;
+  const q = +$('t').value, plazos = ['1–20 de abril', '1–20 de julio', '1–20 de octubre', '1–30 de enero del año siguiente'];
+  $('plazo').textContent = `Plazo de presentación del ${['1T', '2T', '3T', '4T'][q]}: ${plazos[q]}. Con domiciliación bancaria el plazo acaba 5 días antes.`;
+  syncURL();
+}
+
+function autoCuota(p) { const b = num('b' + p); $('c' + p).value = b > 0 ? r2(b * p / 100) : ''; }
+
+function syncURL() {
+  const ps = new URLSearchParams();
+  FIELDS.forEach(f => { const v = $(f).value; if (v !== '' && v != null) ps.set(f, v); });
+  history.replaceState(null, '', location.pathname + (ps.toString() ? '?' + ps : ''));
+}
+
+function copiar() {
+  const q = ['1T', '2T', '3T', '4T'][+$('t').value];
+  const txt = [`Modelo 303 — ${q} ${$('y').value}`, ...lineas].join('\n');
+  navigator.clipboard.writeText(txt).then(() => toast('Casillas copiadas al portapapeles'));
+}
+function compartir() { navigator.clipboard.writeText(location.href).then(() => toast('Enlace copiado — el cálculo va incluido')); }
+function toast(msg) { const el = $('toast'); el.textContent = msg; el.classList.add('on'); setTimeout(() => el.classList.remove('on'), 2200); }
+
+/* init: URL → formulario; defaults al trimestre anterior al actual */
+(function init() {
+  const ps = new URLSearchParams(location.search);
+  const now = new Date();
+  const prevQ = (Math.floor(now.getMonth() / 3) + 3) % 4;
+  $('t').value = ps.get('t') ?? String(prevQ);
+  $('y').value = ps.get('y') ?? String(prevQ === 3 ? now.getFullYear() - 1 : now.getFullYear());
+  FIELDS.slice(2).forEach(f => { if (ps.has(f)) $(f).value = ps.get(f); });
+  [21, 10, 4].forEach(p => $('b' + p).addEventListener('input', () => { autoCuota(p); calc(); }));
+  FIELDS.forEach(f => $(f).addEventListener('input', calc));
+  if (ps.has('b4') || ps.has('b0')) document.querySelectorAll('details')[0].open = true;
+  if (ps.has('prev')) document.querySelectorAll('details')[1].open = true;
+  calc();
+})();
+</script>
+</body>
+</html>

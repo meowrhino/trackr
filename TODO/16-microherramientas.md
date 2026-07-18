@@ -1,6 +1,15 @@
 # 16 — Microherramientas públicas /303 y /130
 
-## Estado: ⏳ pendiente · Q2/Q3 2026
+## Estado: ✅ HECHO (2026-07-18) — `303.html` y `130.html` en producción · pendiente solo el lanzamiento (paso 7)
+
+> Cómo quedó: dos páginas standalone (HTML+CSS+JS inline, sin dependencias, estética TRACKR),
+> con la numeración oficial VIGENTE (posterior a esta spec): 21% → 07-09, 10% → 04-06, 4% → 01-03,
+> 0% → 150-152, soportado 28/29, saldo a compensar 110/78/87, resultado 46 y 71/72. El 130 es
+> ACUMULATIVO como el oficial (casillas 05/13/15, 5% difícil justificación con toggle EDS) — es
+> justo el ángulo SEO: "el error más común es calcularlo por trimestre aislado". Estado en query
+> string (compartible), botones copiar casillas + compartir enlace, JSON-LD WebApplication,
+> meta OG, mobile-first verificado, CTA suave a la app y enlaces cruzados 303↔130. Añadidas a
+> build.sh y sitemap.xml. Falta: post de lanzamiento (paso 7) y, si se quiere, OG image propia.
 
 ### Concepto
 

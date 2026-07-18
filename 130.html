@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora Modelo 130 online gratis (IRPF trimestral) · TRACKR</title>
+<meta name="description" content="Calculadora gratuita del Modelo 130 de IRPF trimestral (estimación directa) con las casillas oficiales de la AEAT: acumulado del año, 5 % de difícil justificación, minoración y retenciones. Sin registro.">
+<meta name="keywords" content="calculadora modelo 130, modelo 130 online, IRPF trimestral autónomos, pago fraccionado IRPF, casillas modelo 130">
+<meta property="og:title" content="Calculadora Modelo 130 (IRPF trimestral) · gratis y sin registro">
+<meta property="og:description" content="Mete tus ingresos y gastos acumulados y obtén las casillas oficiales del 130 listas para copiar en la sede de la AEAT. No guardamos nada.">
+<meta property="og:image" content="https://trackr.meowrhino.studio/og-image.png">
+<meta property="og:url" content="https://trackr.meowrhino.studio/130">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://trackr.meowrhino.studio/130">
+<link rel="icon" type="image/png" href="navicon.png">
+<meta name="theme-color" content="#111111">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"Calculadora Modelo 130","url":"https://trackr.meowrhino.studio/130","applicationCategory":"FinanceApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Calculadora gratuita del Modelo 130 de IRPF trimestral (pago fraccionado, estimación directa) con las casillas oficiales de la AEAT."}
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#111;--bg2:#191919;--bg3:#222;--b1:#262626;--b2:#333;--t1:#ccc;--t2:#888;--t3:#555;--ok:#5a9;--warn:#c93;--ac:#5a9;--r:3px}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;accent-color:var(--ac)}
+.m{font-family:'DM Mono',monospace}
+.wrap{max-width:600px;margin:0 auto;padding:1.25rem 1rem 3rem}
+header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:1.5rem}
+header a{color:var(--t2);text-decoration:none;letter-spacing:.35em;font-weight:600;font-size:.85rem;white-space:nowrap}
+header a:hover{color:var(--t1)}
+h1{font-size:1.25rem;font-weight:600;margin-bottom:.35rem}
+.sub{font-size:.85rem;color:var(--t2);margin-bottom:1.5rem;line-height:1.5}
+.card{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:1rem;margin-bottom:1rem}
+.card h2{font-size:.75rem;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem}
+.fr{display:flex;gap:.75rem;flex-wrap:wrap}
+.fg{flex:1;min-width:120px;margin-bottom:.75rem}
+label{display:block;font-size:.7rem;color:var(--t2);margin-bottom:.3rem;text-transform:uppercase;letter-spacing:.05em}
+input,select{width:100%;background:var(--bg3);border:1px solid var(--b2);border-radius:var(--r);color:var(--t1);padding:.5rem .6rem;font-size:.9rem;font-family:'DM Mono',monospace}
+input:focus,select:focus{outline:none;border-color:var(--ac)}
+input[type=checkbox]{width:auto}
+.chk{display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--t1);cursor:pointer;text-transform:none;letter-spacing:0}
+details{margin-bottom:.5rem}
+summary{font-size:.78rem;color:var(--t2);cursor:pointer;padding:.35rem 0}
+.casilla-row{display:flex;align-items:baseline;gap:.6rem;padding:.3rem 0;border-bottom:1px solid var(--b1);font-size:.85rem}
+.casilla-row:last-child{border-bottom:none}
+.casilla-num{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--t3);background:var(--bg3);border-radius:var(--r);padding:.1rem .35rem;min-width:2.2rem;text-align:center}
+.casilla-label{flex:1;color:var(--t2)}
+.casilla-val{font-family:'DM Mono',monospace}
+.casilla-result{font-weight:600;border-top:1px solid var(--b2);margin-top:.3rem;padding-top:.5rem}
+.bt{background:var(--bg3);border:1px solid var(--b2);border-radius:var(--r);color:var(--t1);padding:.5rem .9rem;font-size:.82rem;cursor:pointer;font-family:'Outfit',sans-serif}
+.bt:hover{border-color:var(--ac)}
+.bt-p{background:var(--ac);border-color:var(--ac);color:#111;font-weight:600}
+.actions{display:flex;gap:.6rem;margin-top:.85rem;flex-wrap:wrap}
+.note{font-size:.72rem;color:var(--t3);line-height:1.5;margin-top:.6rem}
+.cta{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:1rem;margin:1.5rem 0;font-size:.85rem;line-height:1.55}
+.cta a{color:var(--ok)}
+.seo{font-size:.8rem;color:var(--t2);line-height:1.6;margin-top:1.5rem}
+.seo h2{font-size:.9rem;color:var(--t1);margin:1.1rem 0 .35rem}
+footer{margin-top:2.5rem;font-size:.72rem;color:var(--t3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+footer a{color:var(--t3)}
+.toast{position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--ac);border-radius:var(--r);padding:.5rem .9rem;font-size:.8rem;opacity:0;transition:opacity .2s}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><a href="./">T R A C K R</a><span class="m" style="font-size:.72rem;color:var(--t3)">gratis · sin registro · no guardamos nada</span></header>
+
+  <h1>Calculadora del Modelo 130 (IRPF trimestral)</h1>
+  <p class="sub">Pago fraccionado del IRPF en <strong>estimación directa</strong>, con las casillas oficiales de la AEAT. Ojo: el 130 es <strong>acumulativo</strong> — se declara todo el año hasta el fin del trimestre, y lo ya pagado se descuenta en la casilla 05. Esta calculadora lo hace bien.</p>
+
+  <div class="card">
+    <h2>Periodo</h2>
+    <div class="fr">
+      <div class="fg"><label>Trimestre</label><select id="t"><option value="0">1T (ene–mar)</option><option value="1">2T (abr–jun)</option><option value="2">3T (jul–sep)</option><option value="3">4T (oct–dic)</option></select></div>
+      <div class="fg"><label>Año</label><input type="number" id="y" min="2020" max="2099"></div>
+    </div>
+    <div class="note" id="plazo"></div>
+  </div>
+
+  <div class="card">
+    <h2>Acumulado desde el 1 de enero</h2>
+    <div class="fr">
+      <div class="fg"><label>Ingresos (sin IVA)</label><input type="number" id="ing" min="0" step="0.01" placeholder="0,00"></div>
+      <div class="fg"><label>Gastos deducibles (sin IVA)</label><input type="number" id="gas" min="0" step="0.01" placeholder="0,00"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label>Retenciones soportadas</label><input type="number" id="ret" min="0" step="0.01" placeholder="0,00"></div>
+      <div class="fg"><label>Pagado en los 130 anteriores del año</label><input type="number" id="prev07" min="0" step="0.01" placeholder="0,00"></div>
+    </div>
+    <label class="chk"><input type="checkbox" id="eds" checked> Estimación directa simplificada (aplica el 5 % de difícil justificación)</label>
+    <details style="margin-top:.6rem">
+      <summary>Minoración por rendimientos bajos y negativos anteriores</summary>
+      <div class="fr">
+        <div class="fg"><label>Rendimiento neto del año pasado</label><input type="number" id="rn" step="0.01" placeholder="deja vacío si no lo sabes"></div>
+        <div class="fg"><label>Negativos de trimestres anteriores (casilla 19) sin aplicar</label><input type="number" id="neg" min="0" step="0.01" placeholder="0,00"></div>
+      </div>
+      <div class="note">La minoración (casilla 13) es de 100/75/50/25 € por trimestre si tu rendimiento neto del año anterior fue de hasta 9.000/10.000/11.000/12.000 €. En el primer año de actividad se toma 0 € → 100 €/trimestre.</div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h2>Casillas del Modelo 130</h2>
+    <div id="out"></div>
+    <div class="actions">
+      <button class="bt bt-p" onclick="copiar()">📋 Copiar casillas</button>
+      <button class="bt" onclick="compartir()">Compartir enlace</button>
+    </div>
+  </div>
+
+  <div class="cta">
+    ¿Cansado de rellenar esto a mano cada trimestre? <a href="./"><strong>TRACKR</strong></a> lo calcula solo a partir de tus facturas y gastos — 130, 303 y renta con casillas oficiales, acumulados y arrastres incluidos. Gratis, sin cuenta, y tus datos no salen de tu navegador.
+  </div>
+
+  <div class="seo">
+    <h2>¿Qué es el Modelo 130?</h2>
+    <p>Es el pago fraccionado trimestral del IRPF para autónomos en estimación directa: un adelanto del 20 % de tu rendimiento neto que luego se regulariza en la Renta. Se presenta aunque salga cero o negativo.</p>
+    <h2>El error más común: calcularlo por trimestre aislado</h2>
+    <p>Las casillas 01, 02 y 06 son <strong>acumuladas desde el 1 de enero</strong>, no del trimestre suelto. Lo ya pagado en trimestres anteriores se descuenta en la casilla 05, y los resultados negativos se arrastran vía casilla 15. Si lo calculas por trimestre aislado, a partir del 2T estarás pagando de más o de menos.</p>
+    <h2>¿Tengo que presentar el 130?</h2>
+    <p>Si eres profesional y en el año anterior te retuvieron en al menos el 70 % de tus ingresos, no estás obligado. Si estás en módulos, tu modelo es el 131.</p>
+    <h2>¿Cuándo se presenta?</h2>
+    <p>Del 1 al 20 de abril (1T), julio (2T) y octubre (3T), y del 1 al 30 de enero (4T).</p>
+    <p class="note">Esta calculadora cubre actividades no agrícolas sin deducción por vivienda (casilla 16) y es orientativa: no sustituye el asesoramiento de un profesional.</p>
+    <p class="note">¿Buscas el IVA trimestral? Prueba la <a href="303" style="color:var(--ok)">calculadora del Modelo 303</a>.</p>
+  </div>
+
+  <footer>
+    <span><a href="./">TRACKR</a> — facturación para autónomos</span>
+    <span>hecho por <a href="https://meowrhino.studio" rel="author">meowrhino.studio</a></span>
+  </footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* Calculadora 130 — casillas oficiales, cálculo ACUMULATIVO (art. 99.7 LIRPF).
+   Sin dependencias ni persistencia; el estado se serializa a la URL. */
+const $ = id => document.getElementById(id);
+const num = id => { const v = parseFloat($(id).value); return isNaN(v) ? 0 : v; };
+const r2 = v => Math.round(v * 100) / 100;
+const fmt = v => v.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+const FIELDS = ['t', 'y', 'ing', 'gas', 'ret', 'prev07', 'rn', 'neg', 'eds'];
+let lineas = [];
+
+function calc() {
+  const q = +$('t').value;
+  const c01 = num('ing'), gasReal = num('gas');
+  /* EDS: 5 % de difícil justificación sobre la diferencia positiva, tope 2.000 €/año */
+  const dj = $('eds').checked ? r2(Math.min(0.05 * Math.max(c01 - gasReal, 0), 2000)) : 0;
+  const c02 = r2(gasReal + dj);
+  const c03 = r2(c01 - c02);
+  const c04 = c03 > 0 ? r2(c03 * 0.20) : 0;
+  const c05 = num('prev07');
+  const c06 = num('ret');
+  const c07 = r2(c04 - c05 - c06);
+  const c12 = Math.max(c07, 0);
+  /* Casilla 13: minoración art. 110.3.c según rendimiento neto del año anterior */
+  const rnRaw = $('rn').value;
+  const rn = rnRaw === '' ? null : parseFloat(rnRaw);
+  const c13 = rn == null ? 0 : rn <= 9000 ? 100 : rn <= 10000 ? 75 : rn <= 11000 ? 50 : rn <= 12000 ? 25 : 0;
+  const c14 = r2(c12 - c13);
+  const c15 = c14 > 0 ? r2(Math.min(num('neg'), c14)) : 0;
+  const c17 = r2(c14 - c15);
+  const c19 = c17;
+
+  const row = (n, l, v, cls = '', style = '') =>
+    `<div class="casilla-row${cls}"><span class="casilla-num">${n}</span><span class="casilla-label">${l}</span><span class="casilla-val"${style}>${v}</span></div>`;
+  let html = '';
+  lineas = [];
+  const add = (n, l, v, ...rest) => { html += row(n, l, v, ...rest); lineas.push(`${n}  ${l}: ${v}`); };
+  add('01', 'Ingresos acumulados', fmt(c01));
+  add('02', 'Gastos deducibles acumulados', fmt(c02));
+  if (dj > 0) html += `<div class="note" style="margin:-.15rem 0 .2rem">incluye ${fmt(dj)} del 5 % de difícil justificación</div>`;
+  add('03', 'Rendimiento neto', fmt(c03));
+  add('04', '20 % del rendimiento', fmt(c04));
+  if (c05 > 0) add('05', 'Pagos fraccionados anteriores', '−' + fmt(c05));
+  add('06', 'Retenciones acumuladas', '−' + fmt(c06));
+  add('07', 'Pago fraccionado previo', fmt(c07));
+  if (c13 > 0) add('13', 'Minoración por rendimientos bajos', '−' + fmt(c13));
+  if (c15 > 0) add('15', 'Negativos de trimestres anteriores', '−' + fmt(c15));
+  const lbl19 = c19 >= 0 ? 'Resultado: a ingresar' : (q < 3 ? 'Resultado: a deducir en próximos trimestres' : 'Resultado: negativa (se recupera en la Renta)');
+  add('19', lbl19, fmt(Math.abs(c19)), ' casilla-result', ` style="color:${c19 > 0 ? 'var(--warn)' : 'var(--ok)'}"`);
+
+  $('out').innerHTML = html;
+  const plazos = ['1–20 de abril', '1–20 de julio', '1–20 de octubre', '1–30 de enero del año siguiente'];
+  $('plazo').textContent = `Plazo de presentación del ${['1T', '2T', '3T', '4T'][q]}: ${plazos[q]}.`;
+  syncURL();
+}
+
+function syncURL() {
+  const ps = new URLSearchParams();
+  FIELDS.forEach(f => {
+    const el = $(f);
+    if (el.type === 'checkbox') { if (!el.checked) ps.set(f, '0'); }
+    else if (el.value !== '') ps.set(f, el.value);
+  });
+  history.replaceState(null, '', location.pathname + (ps.toString() ? '?' + ps : ''));
+}
+
+function copiar() {
+  const q = ['1T', '2T', '3T', '4T'][+$('t').value];
+  const txt = [`Modelo 130 — ${q} ${$('y').value} (acumulado desde el 1 de enero)`, ...lineas].join('\n');
+  navigator.clipboard.writeText(txt).then(() => toast('Casillas copiadas al portapapeles'));
+}
+function compartir() { navigator.clipboard.writeText(location.href).then(() => toast('Enlace copiado — el cálculo va incluido')); }
+function toast(msg) { const el = $('toast'); el.textContent = msg; el.classList.add('on'); setTimeout(() => el.classList.remove('on'), 2200); }
+
+(function init() {
+  const ps = new URLSearchParams(location.search);
+  const now = new Date();
+  const prevQ = (Math.floor(now.getMonth() / 3) + 3) % 4;
+  $('t').value = ps.get('t') ?? String(prevQ);
+  $('y').value = ps.get('y') ?? String(prevQ === 3 ? now.getFullYear() - 1 : now.getFullYear());
+  ['ing', 'gas', 'ret', 'prev07', 'rn', 'neg'].forEach(f => { if (ps.has(f)) $(f).value = ps.get(f); });
+  if (ps.get('eds') === '0') $('eds').checked = false;
+  FIELDS.forEach(f => $(f).addEventListener('input', calc));
+  if (ps.has('rn') || ps.has('neg')) document.querySelector('details').open = true;
+  calc();
+})();
+</script>
+</body>
+</html>
