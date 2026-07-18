@@ -1,6 +1,6 @@
 # 19 — Fase 0: Responsive/PWA + quick wins (sin backend)
 
-## Estado: ⏳ en curso · arrancada 2026-06-10
+## Estado: ✅ completada (jun 2026) — responsive + PWA en producción; ver notas al final
 
 Parte del **Pivot A** (ver `17-pivot-cloud.md`). La Fase 0 es **todo lo que da valor en móvil sin backend ni riesgo legal**. La Fase 1 (cuentas + cloud cifrado) viene después y depende de tracción.
 
@@ -62,5 +62,7 @@ Backend Worker + R2 + D1, sistema de cuentas, cifrado client-side (envelope: DEK
 - ✅ **Tarea 2 (botón calendario):** hecho y verificado (desktop a la derecha + móvil a nueva línea + click abre modal con fecha=hoy). Archivos: `js/app.calendar.js`, `css/calendar.css`.
 - ✅ **Tarea 3 (historial de versiones):** hecho y verificado. Nuevo `js/history.js` (objeto `H`: ring buffer 10, LZString ~3,3×, snapshot/restore/download/maybeAutoSnapshot). Auto-snapshot 1/día al arrancar. UI en Configuración → "Copias de seguridad" (i18n inline es/en/ca — pendiente migrar a lang.js). Archivos: `js/history.js` (nuevo), `index.html` (LZString CDN + script), `js/app.js` (hook arranque), `js/app.config.js` (sección + métodos histSnapshot/histRestore/histDownload). Verificado en preview: compresión 93→28 KB, tope de 10 respetado, 0 errores en consola.
 - ⏸ **Tarea 1 (hosting/subdominio):** INTENTADA por navegador (Brave elegido por manu). El dashboard de Cloudflare NO cargó (spinner infinito ~50s incl. recarga, sin errores en consola — probable lentitud/problema temporal de CF SPA). No se forzó deploy por `wrangler` para no publicar el working tree sin commitear. PENDIENTE: (a) manu reintenta el dashboard en su sesión normal [flujo **Pages** → Connect to Git → repo trackr → Framework None, build vacío, output `/`], o (b) Claude lo monta por `wrangler pages` con OK de manu sobre qué desplegar (origin/main limpio vs commitear antes botón+historial).
-- ⏳ **Tareas 4 (responsive) y 5 (PWA):** sin empezar — para hacer con manu (decisiones de UX; service worker delicado).
+- ✅ **Tareas 4 (responsive) y 5 (PWA):** hechas (jun 2026, commits `e608ac7` y `5ba2d6d`):
+  instalable + offline (manifest + service worker + iconos), responsive verificado e
+  invitación a instalar con pulido móvil de la barra.
 - **Git:** nada commiteado ni pusheado. Pendiente decisión de manu sobre commit + qué hacer con los archivos de Verifactu que siguen colgando.

@@ -1,6 +1,11 @@
 # 17 — Cuentas + cloud (Pivot A)
 
-## Estado: ⏳ pendiente · Q4 2026 / Q1 2027
+## Estado: ✅ hecho (jun 2026) — en producción con signups cerrados (`SIGNUPS_OPEN=false`)
+
+> Implementado tal y como se diseñó aquí (Escenario A, zero-knowledge estricto): backend
+> `trackr-api` (Cloudflare Worker + D1 + R2), cifrado envelope client-side, panel admin de
+> metadatos, auto-sync con merge y copias locales. Los blobs migraron de KV a R2 en la Etapa 3.
+> Este documento queda como registro de diseño y decisiones.
 
 ### Contexto y filosofía
 

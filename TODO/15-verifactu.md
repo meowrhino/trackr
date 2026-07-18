@@ -1,6 +1,6 @@
 # 15 — VeriFactu / SIF
 
-## Estado: 🎯 diseño cerrado (investigación 2026-07-16) · pendiente de ejecución
+## Estado: 🚧 en ejecución — Fase 1 ✅ (código local, commit `48ab47a`) · Fase 2 en marcha (email a AEAT **enviado el 2026-07-18**, esperando respuesta)
 ## Deadline: 1 ene 2027 (sociedades) · **1 jul 2027 (autónomos)** — RDL 15/2025 (BOE 03/12/2025)
 
 > Historia: el plan original (mayo 2026) apostaba por la modalidad "no verificable" creyendo que era
@@ -132,15 +132,16 @@ emitir factura                         POST /v1/verifactu/registros    SOAP Veri
 
 | Fase | Quién | Qué | Estimación |
 |------|-------|-----|-----------|
-| **1. Código local** | Claude | Retomar `verifactu-wip`: huella con formato oficial, QR con URL oficial, registro de alta completo (F1/F2 + desglose IVA), anulación/rectificativa, vista auditoría "Verificar integridad". Sin certificado, testeable ya. | 3-4 días |
-| **2. Gestiones** | Manu | Localizar certificado FNMT · email a `comunicacion.sepri@correo.aeat.es` (preguntas de arriba) · acceso al portal de pruebas AEAT. | 1-2 h + espera respuesta |
+| **1. Código local** ✅ | Claude | Hecho (commit `48ab47a`, 2026-07-16): huella oficial (pasa los 3 vectores de test AEAT v0.1.2 §6), QR con URL oficial de cotejo, bloque en el PDF (leyenda + SIF), verificación de cadena con guard de esquema legacy. Apagado por defecto. | ~~3-4 días~~ |
+| **2. Gestiones** 🚧 | Manu | **Email a `comunicacion.sepri@correo.aeat.es` enviado el 2026-07-18** — esperando respuesta (camino crítico). Pendiente: localizar certificado FNMT · acceso al portal de pruebas AEAT. | espera de respuesta |
 | **3. Backend remisión** | Claude | `POST /v1/verifactu/registros` + cola D1 + cliente SOAP contra **preproducción** + gestión de respuestas/reintentos. Bloqueado por Fase 2 (certificado). | 4-6 días |
 | **4. Legal/producto** | Manu (+textos de Claude) | Flujo de representación normalizada por usuario · declaración responsable pública (base en `verifactu.html` de la rama) · elegir ID SIF (propuesta: `1T`) · ajustar copy zero-knowledge. | 2-3 días |
 | **5. Ensayo general** | ambos | Cadena de 10+ facturas contra preproducción, anulación, corte de red simulado, verificación QR. | 1-2 días |
 
-**Cuándo:** la Fase 1 puede arrancar ya. El email de la Fase 2 conviene mandarlo **esta semana**
-(la respuesta de AEAT puede tardar y es el camino crítico). Objetivo razonable: remisión funcionando
-en preproducción antes de fin de 2026, margen de 6 meses sobre el deadline.
+**Cuándo:** Fase 1 hecha y el email de la Fase 2 salió el 2026-07-18 — el reloj de la AEAT ya
+corre. Mientras llega respuesta se puede adelantar la Fase 3 en lo que no necesita certificado
+(cola D1, XML de registros, validación) y la Fase 4 (textos legales). Objetivo: remisión
+funcionando en preproducción antes de fin de 2026, margen de 6 meses sobre el deadline.
 
 ---
 

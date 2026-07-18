@@ -16,12 +16,33 @@ Orden de implementación. Cada archivo tiene el detalle.
 | 10 | Migración de datos (versioning) | `10-migracion.md` | ✅ hecho |
 | 11 | Analytics anónimo | `11-analytics.md` | ✅ Cloudflare Web Analytics activo · Worker propio en reserva |
 | 12 | Gastos recurrentes avanzados | `12-gastos-recurrentes.md` | ✅ hecho (12 may 2026) |
-| 13 | Asistente trimestral (303+130) | `13-asistente-trimestral.md` | ✅ hecho (12 may 2026) |
+| 13 | Asistente trimestral (303+130) | `13-asistente-trimestral.md` | ✅ hecho (12 may 2026) · casillas oficiales exactas desde 5 jul, exterior (ISP/59/120) desde 18 jul |
 | 14 | Plan de marketing v1 (deck 25 slides) | `14-marketing-plan.md` | ✅ hecho (12 may 2026) |
-| 15 | Verifactu / homologación SIF | `15-verifactu.md` | 🎯 diseño cerrado (16 jul 2026) — ejecutar antes 1 jul 2027 |
-| 16 | Microherramientas públicas /303 y /130 | `16-microherramientas.md` | ⏳ pendiente — Q2/Q3 2026 |
+| 15 | Verifactu / homologación SIF | `15-verifactu.md` | 🚧 Fase 1 (código local) ✅ · email AEAT enviado 18 jul, esperando respuesta — deadline 1 jul 2027 |
+| 16 | Microherramientas públicas /303 y /130 | `16-microherramientas.md` | ✅ hecho (18 jul 2026) — en producción; falta solo el post de lanzamiento |
 | 17 | Cuentas + cloud (Pivot A) | `17-pivot-cloud.md` | ✅ hecho (jun 2026) — en producción, signups cerrados (`SIGNUPS_OPEN=false`) |
-| 21 | Cuentas gestor (compartir E2E con gestoría) | `21-gestores.md` | ✅ v1 en ramas `gestores` (16 jul 2026) — falta desplegar + beta con Diega |
+| 18 | Módulo inmovilizado (amortización >300 €) | `18-inmovilizado.md` | ⏳ pendiente |
+| 19 | Fase 0: responsive + PWA | `19-fase0.md` | ✅ hecho (jun 2026) |
+| 20 | Referencia de casillas 130/303/renta | `20-modelos-fiscales-casillas.md` | 📚 referencia — las 8 divergencias resueltas (18 jul 2026) |
+| 21 | Cuentas gestor (compartir E2E con gestoría) | `21-gestores.md` | ✅ desplegado en producción (17 jul 2026) + reconciliación multidispositivo (18 jul) |
+| 22 | Beta gestoría con Diega | `22-beta-diega.md` | 📋 guion listo — quedada prevista 19 jul 2026 |
+
+---
+
+## Sprint del 18 de julio de 2026 (resumen)
+
+Sesión larga de código con tres tandas, todas desplegadas a producción, la víspera de la beta
+con Diega. El email del acuerdo 017 a la AEAT salió el mismo día (Fase 2 de VeriFactu en marcha).
+
+1. **Fiscalidad exterior** (`9d38899`): zona fiscal en cliente y gasto (ES/UE/no UE) →
+   informativas 59/120, inversión del sujeto pasivo (10-13, 36-37, deducción no UE en 28/29),
+   aviso del 349 y renta desglosada por casilla del D1. Cierra la última divergencia de TODO/20.
+2. **Microherramientas SEO** (`e5d4ed8`): calculadoras públicas `/303` y `/130` — standalone,
+   casillas oficiales, 130 acumulativo, estado compartible por URL. TODO/16 hecho.
+3. **Gestores** (`744d451`): reconciliación del vínculo contra el servidor (el grant revocado
+   desde otro dispositivo ya no resucita en un merge) + guard de deriva de esquema en el
+   alcance fiscal. Verificado E2E contra wrangler dev.
+4. **Docs**: README.md nuevo del repo, estados de TODO/15/16/17/19/20/21 puestos al día.
 
 ---
 
