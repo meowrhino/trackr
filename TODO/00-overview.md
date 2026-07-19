@@ -25,7 +25,10 @@ Orden de implementación. Cada archivo tiene el detalle.
 | 19 | Fase 0: responsive + PWA | `19-fase0.md` | ✅ hecho (jun 2026) |
 | 20 | Referencia de casillas 130/303/renta | `20-modelos-fiscales-casillas.md` | 📚 referencia — las 8 divergencias resueltas (18 jul 2026) |
 | 21 | Cuentas gestor (compartir E2E con gestoría) | `21-gestores.md` | ✅ desplegado en producción (17 jul 2026) + reconciliación multidispositivo (18 jul) |
-| 22 | Beta gestoría con Diega | `22-beta-diega.md` | 📋 guion listo — quedada prevista 19 jul 2026 |
+| 22 | Beta gestoría con Diego | `22-beta-diega.md` | 🚧 en curso (19 jul 2026) — cuenta activa y vínculo creado; roces del alta anotados |
+| 23 | Exportar libros registro (AEAT) | `23-libros-registro.md` | 💡 diseñado — investigar formato oficial |
+| 24 | Adjuntos: justificantes de gasto | `24-adjuntos.md` | 💡 diseñado — define el plan de pago |
+| 25 | Panel de admin como página aparte (`/admin`) | — | 💡 acordado (19 jul) — sacar el bloque admin de la Configuración personal |
 
 ---
 
