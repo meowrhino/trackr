@@ -5,6 +5,16 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-07-19 — Libros registro AEAT: exporta el Excel oficial para tu gestoría (y para Hacienda)
+
+### ✨ Nuevo
+- **Exportar → "Libros registro (AEAT)"**: genera el Excel del formato oficial (llevanza conjunta IVA+IRPF, V.18.02.2026) con las pestañas EXPEDIDAS_INGRESOS y RECIBIDAS_GASTOS — el mismo fichero que se importa en **Renta Web, Pre303 y el modelo 130**, y lo que una gestoría pide cada trimestre. Cabeceras y catálogos copiados de la plantilla oficial de la AEAT; conceptos mapeados por categoría (RETA→G45, suministros→GY4, gestoría→G19…), exterior con calificación N2 e ISP marcada, retenciones incluidas. Generado en tu navegador sin librerías ni red. _frontend_
+- **Config → Fiscal**: tipo/subtipo de actividad y epígrafe del IAE (van en cada fila de los libros).
+- El botón Exportar ahora abre un modal: copia JSON de siempre + libros por ejercicio y trimestre ("hasta 2T", año completo…), siempre acumulado desde el 1 de enero como exige el formato.
+- ⚠️ Beta hasta pasar el primer fichero por el validador oficial de la sede (TODO/23).
+
+---
+
 ## 2026-07-19 — El registro se abre y cierra desde /admin (sin deploys)
 
 ### ✨ Nuevo

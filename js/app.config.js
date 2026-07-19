@@ -34,6 +34,9 @@ Object.assign(App, {
       + `<div class="fg"><label>${t('cfg.rendAnterior')}</label><input type="number" id="cfgFRend" value="${fis.rendAnterior ?? ''}" min="0" step="100" placeholder="—"><div style="font-size:.72rem;color:var(--t3);margin-top:.35rem">${t('cfg.rendAnteriorHelp')}</div></div>`
       + `<div class="fg"><label>${t('cfg.saldoIva')}</label><input type="number" id="cfgFSaldo" value="${fis.saldoIvaInicial || ''}" min="0" step="0.01" placeholder="0"><div style="font-size:.72rem;color:var(--t3);margin-top:.35rem">${t('cfg.saldoIvaHelp')}</div></div>`
       + `<div class="cfg-full fg"><label style="font-size:.82rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0;color:var(--t2)"><input type="checkbox" id="cfgFEds" style="margin:0;width:14px;height:14px;accent-color:var(--ac)" ${fis.eds !== false ? 'checked' : ''}>${t('cfg.eds')}</label></div>`
+      + `<div class="fg"><label>${t('cfg.actTipo')}</label><select id="cfgFActT">${[['A', t('cfg.actTipoA')], ['B', t('cfg.actTipoB')]].map(([k, v]) => `<option value="${k}" ${(fis.actTipo || 'A') === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
+      + `<div class="fg"><label>${t('cfg.actCodigo')}</label><select id="cfgFActC">${[['05', t('cfg.act05')], ['04', t('cfg.act04')], ['03', t('cfg.act03')], ['01', t('cfg.act01')]].map(([k, v]) => `<option value="${k}" ${(fis.actCodigo || '05') === k ? 'selected' : ''}>${k} — ${v}</option>`).join('')}</select></div>`
+      + `<div class="cfg-full fg"><label>${t('cfg.actIAE')}</label><input type="text" id="cfgFActE" value="${esc(fis.actIAE || '')}" placeholder="763"><div style="font-size:.72rem;color:var(--t3);margin-top:.35rem">${t('cfg.actHelp')}</div></div>`
       + `</div><div class="cfg-save"><button class="bt bt-p" onclick="App.saveFiscal()">${t('btn.save')}</button></div></div>`
       + `<div class="cfg-section"><div class="cfg-section-title">${t('cfg.goals')}</div><div class="cfg-grid">`
       + `<div class="fg"><label>${t('cfg.hoursMonth')}</label><input type="number" id="cfgTHm" value="${tg.horasMes || ''}" min="0" step="1" placeholder="${t('ph.hoursMonth')}"></div>`
@@ -427,6 +430,9 @@ Object.assign(App, {
     s.fiscal.rendAnterior = rend === '' ? null : (parseFloat(rend) || 0);
     s.fiscal.saldoIvaInicial = parseFloat(document.getElementById('cfgFSaldo').value) || 0;
     s.fiscal.eds = document.getElementById('cfgFEds').checked;
+    s.fiscal.actTipo = document.getElementById('cfgFActT').value;
+    s.fiscal.actCodigo = document.getElementById('cfgFActC').value;
+    s.fiscal.actIAE = document.getElementById('cfgFActE').value.trim();
     /* Payload SOLO aquí: fiscal es lo único de settings que el gestor puede editar
        (GOps.WRITABLE), y sin el payload la op no puede construirse (hallazgo #1 de la
        revisión: la capacidad anunciada era inalcanzable). Los demás save* de settings

@@ -253,12 +253,44 @@ const App = {
    *  EXPORT / IMPORT
    * ══════════════════════════════════════════════ */
 
+  /* Exportar: modal con la copia JSON de siempre + los libros registro AEAT (TODO/23) */
   exp() {
+    const now = new Date();
+    const years = [];
+    for (let yy = now.getFullYear() + 1; yy >= now.getFullYear() - 5; yy--) years.push(yy);
+    const defQ = Math.floor(now.getMonth() / 3);
+    this.om(`<div class="mt">${t('exp.title')}</div>`
+      + `<div class="fg"><button class="bt bt-p" style="width:100%" onclick="App.expJson()">${t('exp.jsonBtn')}</button>`
+      + `<p class="small" style="color:var(--t3);margin-top:.4rem">${t('exp.jsonDesc')}</p></div>`
+      + `<div class="fg" style="margin-top:1rem;border-top:1px solid var(--b1);padding-top:.9rem"><label>${t('exp.librosTitle')}</label>`
+      + `<p class="small" style="color:var(--t3);margin:.2rem 0 .6rem">${t('exp.librosDesc')}</p>`
+      + `<div class="fr"><div class="fg"><label>${t('exp.year')}</label><select id="expY">${years.map(yy => `<option value="${yy}" ${yy === now.getFullYear() ? 'selected' : ''}>${yy}</option>`).join('')}</select></div>`
+      + `<div class="fg"><label>${t('exp.upTo')}</label><select id="expQ">${[0, 1, 2, 3].map(qq => `<option value="${qq}" ${qq === defQ ? 'selected' : ''}>${qq === 3 ? t('exp.fullYear') : (qq + 1) + 'T'}</option>`).join('')}</select></div></div>`
+      + `<button class="bt" style="width:100%" onclick="App.expLibros()">${t('exp.librosBtn')}</button></div>`
+      + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button></div>`);
+  },
+
+  expJson() {
     T.ev('action', 'export');
     const d = JSON.stringify(D.d, null, 2), b = new Blob([d], { type: 'application/json' }), u = URL.createObjectURL(b), a = document.createElement('a');
     const now = new Date();
     const ts = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}`;
     a.href = u; a.download = `trackr_backup_${ts}.json`; a.click(); URL.revokeObjectURL(u);
+    this.cm();
+  },
+
+  expLibros() {
+    if (typeof LR === 'undefined') return;
+    const y = +document.getElementById('expY').value;
+    const q = +document.getElementById('expQ').value;
+    const r = LR.download(y, q);
+    if (!r.ok) {
+      Toast.error(r.error === 'sin_nif' ? t('exp.needNif') : t('exp.noData'));
+      return;
+    }
+    this.cm();
+    Toast.ok(t('exp.librosDone', r.filas.exp, r.filas.rec));
+    if (r.avisos.length) setTimeout(() => Toast.warn(r.avisos[0] + (r.avisos.length > 1 ? ` (+${r.avisos.length - 1})` : '')), 2400);
   },
 
   imp(ev) {
