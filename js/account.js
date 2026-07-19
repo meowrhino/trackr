@@ -481,15 +481,25 @@ const Acc = (() => {
     try {
       /* Lotes de 100 (tope del endpoint), en orden de cadena: si un lote falla se corta
          aqui — encolar los siguientes dejaria un hueco en el encadenamiento del emisor. */
+      /* Para localizar el registro anterior de la cadena (el XML de remision referencia
+         su NumSerie y fecha ademas de la huella) */
+      const porHash = new Map((D.d.facturas || []).map(x => [x.hash, x]));
       for (let i = 0; i < pend.length; i += 100) {
         const lote = pend.slice(i, i + 100);
-        const registros = lote.map(f => ({
-          tipoRegistro: f.tipoRegistro === 'anulacion' ? 'anulacion' : 'alta',
-          emisorNif: f.emisorNif, numSerie: f.numero, fecha: f.fecha,
-          tipoFactura: f.tipoFactura, cuotaTotal: f.cuotaTotal, importeTotal: f.importeTotal,
-          huella: f.hash, huellaPrev: f.hashPrev || '', fechaHoraHuso: f.timestamp,
-          desglose: (f.desglose || []).map(d => ({ tipo: d.tipoImpositivo, base: d.base, cuota: d.cuota })),
-        }));
+        const registros = lote.map(f => {
+          const prev = f.hashPrev ? porHash.get(f.hashPrev) : null;
+          return {
+            tipoRegistro: f.tipoRegistro === 'anulacion' ? 'anulacion' : 'alta',
+            emisorNif: f.emisorNif, numSerie: f.numero, fecha: f.fecha,
+            tipoFactura: f.tipoFactura, cuotaTotal: f.cuotaTotal, importeTotal: f.importeTotal,
+            huella: f.hash, huellaPrev: f.hashPrev || '', fechaHoraHuso: f.timestamp,
+            desglose: (f.desglose || []).map(d => ({ tipo: d.tipoImpositivo, base: d.base, cuota: d.cuota })),
+            nombreEmisor: f.emisorNombre || undefined,
+            destinatario: f.clienteNif ? { nombre: f.clienteNombre || '', nif: f.clienteNif } : undefined,
+            prevNumSerie: prev ? prev.numero : undefined,
+            prevFecha: prev ? prev.fecha : undefined,
+          };
+        });
         const r = await api('/v1/verifactu/registros', { method: 'POST', auth: true, body: { registros } });
         if (r.status !== 201) { console.warn('pushVerifactu: lote rechazado', r.status, r.data); return; }
         lote.forEach(f => { f.remitida = true; });
