@@ -17,10 +17,11 @@ en TODO/20: el Excel oficial de traslado libros→casillas IRPF.
 1. **Investigar**: descargar la plantilla oficial de la AEAT y clavar columnas exactas
    de cada libro (expedidas / recibidas / ingresos-gastos). Confirmar si Pre303 exige
    XLSX estricto o admite CSV.
-2. **Datos que faltan** (campos opcionales nuevos):
-   - Gasto: **NIF del proveedor** y **número de factura** (sin ellos el libro de
-     recibidas queda cojo; con zonaFiscal ya sabemos si es intracomunitario).
-   - Revisar si la fecha de operación ≠ fecha de expedición importa para nuestro perfil.
+2. ~~**Datos que faltan**~~ ✅ hecho (2026-07-19): `nifProveedor` en el gasto y
+   `numFactura` en cada entrada, opcionales, en los tres modales (gasto puntual,
+   editar gasto y entrada). Los datos empiezan a acumularse desde ya.
+   - Pendiente de revisar al investigar el formato: si la fecha de operación ≠
+     fecha de expedición importa para nuestro perfil.
 3. **Generación**: en Exportar, junto al JSON — "Libros registro (año X)". Empezar por
    CSV por libro (abre en cualquier Excel); XLSX solo si Pre303 lo exige (evaluar coste
    de una lib mínima vs. generar SpreadsheetML a mano; nada pesado tipo SheetJS entero).

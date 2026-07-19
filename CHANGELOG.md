@@ -5,6 +5,13 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-07-19 — Gastos: NIF del proveedor y nº de factura (preparando los libros registro)
+
+### ✨ Nuevo
+- **NIF del proveedor** (por gasto) y **nº de factura** (por entrada), opcionales, en los tres modales de gasto. Son los dos datos que le faltaban al futuro export de **libros registro** (TODO/23) — capturarlos desde ya evita rellenar un año hacia atrás cuando llegue. La gestoría con permiso de edición también puede completarlos. _frontend_
+
+---
+
 ## 2026-07-19 — Limpieza a fondo: vendors locales, código muerto e i18n huérfano
 
 Pasada de revisión sobre todo el frontend (sin cambios de comportamiento salvo el primero).
