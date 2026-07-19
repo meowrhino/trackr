@@ -19,6 +19,7 @@
       backLogin: '← Volver a iniciar sesión', haveCode: 'Tengo un código de recuperación',
       locked: 'Sesión bloqueada tras recargar. Introduce tu contraseña para desbloquear y descifrar tus datos.',
       pending: 'Cuenta creada. Pendiente de activación por el administrador antes de poder sincronizar.',
+      signupsClosed: 'Los registros están cerrados ahora mismo: la cuenta NO se ha creado. Escribe a manu para que abra el registro.',
       activeOk: 'Sincronización activa', notActive: 'Pendiente de activación', version: 'versión en la nube', autoSync: 'Sincronizar automáticamente al cambiar',
       pwWeak: 'La contraseña debe tener al menos 12 caracteres.', pwMismatch: 'Las contraseñas no coinciden.', legalReq: 'Debes aceptar para continuar.', emailBad: 'Email no válido.',
       recTitle: 'Tu código de recuperación', recDesc: 'Apúntalo y guárdalo OFFLINE (no en este dispositivo). Es la ÚNICA forma de recuperar tus datos si olvidas la contraseña. NO se vuelve a mostrar.', copy: 'Copiar', download: 'Descargar .txt', saved: 'Lo he guardado, continuar', copied: 'Copiado', copyErr: 'No se pudo copiar. Usa "Descargar .txt".',
@@ -39,6 +40,7 @@
       backLogin: '← Back to log in', haveCode: 'I have a recovery code',
       locked: 'Session locked after reload. Enter your password to unlock and decrypt your data.',
       pending: 'Account created. Pending admin activation before you can sync.',
+      signupsClosed: 'Sign-ups are closed right now: the account was NOT created. Contact manu to open registration.',
       activeOk: 'Sync active', notActive: 'Pending activation', version: 'cloud version', autoSync: 'Auto-sync on change',
       pwWeak: 'Password must be at least 12 characters.', pwMismatch: 'Passwords do not match.', legalReq: 'You must accept to continue.', emailBad: 'Invalid email.',
       recTitle: 'Your recovery code', recDesc: 'Write it down and keep it OFFLINE (not on this device). It is the ONLY way to recover your data if you forget your password. It will NOT be shown again.', copy: 'Copy', download: 'Download .txt', saved: 'I saved it, continue', copied: 'Copied', copyErr: 'Could not copy. Use "Download .txt".',
@@ -59,6 +61,7 @@
       backLogin: '← Tornar a iniciar sessió', haveCode: 'Tinc un codi de recuperació',
       locked: 'Sessió bloquejada després de recarregar. Introdueix la contrasenya per desbloquejar i desxifrar les dades.',
       pending: 'Compte creat. Pendent d\'activació per l\'administrador abans de sincronitzar.',
+      signupsClosed: 'Els registres estan tancats ara mateix: el compte NO s\'ha creat. Escriu a manu perquè obri el registre.',
       activeOk: 'Sincronització activa', notActive: 'Pendent d\'activació', version: 'versió al núvol', autoSync: 'Sincronitzar automàticament en canviar',
       pwWeak: 'La contrasenya ha de tenir almenys 12 caràcters.', pwMismatch: 'Les contrasenyes no coincideixen.', legalReq: 'Has d\'acceptar per continuar.', emailBad: 'Email no vàlid.',
       recTitle: 'El teu codi de recuperació', recDesc: 'Apunta\'l i guarda\'l OFFLINE (no en aquest dispositiu). És l\'ÚNICA manera de recuperar les dades si oblides la contrasenya. NO es tornarà a mostrar.', copy: 'Copiar', download: 'Descarregar .txt', saved: 'L\'he guardat, continuar', copied: 'Copiat', copyErr: 'No s\'ha pogut copiar. Usa "Descarregar .txt".',
@@ -246,7 +249,7 @@
         if (r.ok && r.recoveryCode) {
           this._accShowRecovery(r.recoveryCode, () => { if (Acc.state === 'in' && Acc.status().active) Acc.setAutoSync(true); this._accInModal = false; this.refreshAccountNav(); this.go(this.cv); });
           if (r.pending) Toast.ok(t('pending'));
-        } else { Toast.error(r.error === 'signups_closed' ? t('pending') : (r.error || 'error')); }
+        } else { Toast.error(r.error === 'signups_closed' ? t('signupsClosed') : (r.error || 'error')); }
       } catch (e) { Toast.error(String(e.message || e)); }
     },
 
