@@ -251,7 +251,7 @@ const Acc = (() => {
     // Tras un push OK: espejo para la gestoria y, si nos dejo editar, recoger sus cambios.
     // pullOps aplica -> D.save -> notifyChange -> otro push; converge porque la segunda
     // vuelta ya no encuentra ops. Los dos son best-effort: no rompen el sync normal.
-    if (res && res.ok) { emitSync('synced', res); reconcileGrant().catch(() => {}); pushShadow().catch(() => {}); pullOps().catch(() => {}); }
+    if (res && res.ok) { emitSync('synced', res); reconcileGrant().catch(() => {}); pushShadow().catch(() => {}); pullOps().catch(() => {}); pushVerifactu().catch(() => {}); }
     else if (!res || res.error !== 'busy') emitSync('error', res || {}); // 'busy' = coalescado, el push en curso ya emitira
     return res;
   }
@@ -466,6 +466,38 @@ const Acc = (() => {
     } catch (e) { console.warn('pushShadow failed:', e); }
   }
 
+  /* ── VeriFactu Fase 3 (frontend): vaciar la cola local contra el backend ──
+     Los registros firmados (D.d.facturas[]) se encolan en el servidor para su futura
+     remision a AEAT. Viajan EN CLARO a proposito (TODO/15, "canal en claro"): van a la
+     AEAT igualmente y el remitente necesita leerlos. Best-effort tras cada sync OK,
+     como pushShadow. El servidor es idempotente por huella: reintentar no duplica.
+     `f.remitida` = aceptado en la cola del servidor (el estado AEAT real llegara con
+     el remitente SOAP de la parte 2); viaja en el blob, asi que vale entre dispositivos. */
+  async function pushVerifactu() {
+    if (typeof D === 'undefined' || !isUnlocked() || !S.active || S.role === 'gestor') return;
+    if (D.d?.settings?.verifactu?.habilitado !== true) return;
+    const pend = (D.d.facturas || []).filter(f => !f.remitida && f.hash).sort((a, b) => (a.seq || 0) - (b.seq || 0));
+    if (!pend.length) return;
+    try {
+      /* Lotes de 100 (tope del endpoint), en orden de cadena: si un lote falla se corta
+         aqui — encolar los siguientes dejaria un hueco en el encadenamiento del emisor. */
+      for (let i = 0; i < pend.length; i += 100) {
+        const lote = pend.slice(i, i + 100);
+        const registros = lote.map(f => ({
+          tipoRegistro: f.tipoRegistro === 'anulacion' ? 'anulacion' : 'alta',
+          emisorNif: f.emisorNif, numSerie: f.numero, fecha: f.fecha,
+          tipoFactura: f.tipoFactura, cuotaTotal: f.cuotaTotal, importeTotal: f.importeTotal,
+          huella: f.hash, huellaPrev: f.hashPrev || '', fechaHoraHuso: f.timestamp,
+          desglose: (f.desglose || []).map(d => ({ tipo: d.tipoImpositivo, base: d.base, cuota: d.cuota })),
+        }));
+        const r = await api('/v1/verifactu/registros', { method: 'POST', auth: true, body: { registros } });
+        if (r.status !== 201) { console.warn('pushVerifactu: lote rechazado', r.status, r.data); return; }
+        lote.forEach(f => { f.remitida = true; });
+        D.save();
+      }
+    } catch (e) { console.warn('pushVerifactu failed:', e); }
+  }
+
   // Reconcilia el gestorGrant local contra el servidor (que es la fuente de verdad del
   // vinculo). Cierra el hueco del merge multidispositivo: settings se funde con "local
   // gana" y sin tombstones, asi que un grant revocado desde otro dispositivo podia
@@ -501,7 +533,7 @@ const Acc = (() => {
   return {
     signup, login, unlock, logout, changePassword, recover, pull, push: syncPush,
     gestorEnsureKey, gestorResolve, grantCreate, grantRevoke, gestorClients, gestorOpenClient, pushShadow, _buildShareData: buildShareData,
-    grantSetCanEdit, opsPush, pullOps, setOpsListener, reconcileGrant,
+    grantSetCanEdit, opsPush, pullOps, setOpsListener, reconcileGrant, pushVerifactu,
     adminListUsers, adminSetActive, adminSetPaid, adminDelete, adminGetConfig, adminSetConfig, _mergeData: mergeData,
     status, isUnlocked, detectLocked, setAutoSync, setSyncListener, notifyChange, setApiBase: (u) => { API_BASE = u; },
     get email() { return S.email; }, get version() { return S.version; }, get state() { return S.state; },

@@ -287,6 +287,7 @@ Object.assign(App, {
       + `<div class="fg"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="cfgVfEnabled" ${v.habilitado === true ? 'checked' : ''}> ${t('cfg.vfEnabled')}</label></div>`
       + `</div>`
       + `<p class="small" style="color:var(--t3);margin-top:.5rem">${t('cfg.vfLastHash')}: <code class="mono" style="font-size:.72rem">${esc(lastH)}</code> · ${t('cfg.vfTotalSigned', facts.length)} · ${t('cfg.vfEmisor')}: ${esc(emisor || t('cfg.vfNoEmisor'))}</p>`
+      + this._vfRemisionLine(facts, v)
       + `<div class="cfg-save" style="gap:.5rem;display:flex"><button class="bt bt-p" onclick="App.saveVerifactu()">${t('btn.save')}</button>`
       + `<button class="bt" onclick="App.verifyChain()">&#128274; ${t('cfg.vfVerifyChain')}</button>`
       + `<button class="bt" onclick="App.vfSelfTest()">${t('cfg.vfSelfTest')}</button></div>`
@@ -294,6 +295,28 @@ Object.assign(App, {
       + listHtml
       + `</div>`
       + `</div>`;
+  },
+
+  /* Estado de la remisión (Fase 3): cuántos registros esperan en la cola del servidor
+     y cuántos ni siquiera se han encolado. Solo con VeriFactu activado. */
+  _vfRemisionLine(facts, v) {
+    if (v.habilitado !== true || !facts.length) return '';
+    const enCola = facts.filter(f => f.remitida).length;
+    const pend = facts.length - enCola;
+    const hasSession = typeof Acc !== 'undefined' && Acc.status().state === 'in' && Acc.status().active;
+    let inner = `${t('cfg.vfRemisionState', enCola, pend)}`;
+    if (pend > 0) {
+      inner += hasSession
+        ? ` <button class="bt" style="font-size:.68rem;padding:.15rem .5rem" onclick="App.vfPushNow()">${t('cfg.vfPushNow')}</button>`
+        : ` · ${t('cfg.vfNeedsAccount')}`;
+    }
+    return `<p class="small" style="color:var(--t3);margin-top:.35rem">${t('cfg.vfRemision')}: ${inner}<br><span style="font-size:.7rem">${t('cfg.vfRemisionNote')}</span></p>`;
+  },
+
+  async vfPushNow() {
+    await Acc.pushVerifactu();
+    this.rCfg();
+    Toast.ok(t('cfg.vfPushed'));
   },
 
   saveVerifactu() {
