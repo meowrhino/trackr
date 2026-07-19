@@ -5,6 +5,17 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-07-19 — Panel de administración como página aparte (/admin)
+
+Salido de la beta con Diego: la gestión de usuarios no pintaba nada dentro de la Configuración personal de manu.
+
+### ✨ Nuevo
+- **`/admin`** — página standalone (noindex, fuera del sitemap) con la lista de usuarios: activar/desactivar, pago y borrado, **badge de rol visible** (persona/gestoría — hoy se echó de menos), fechas de alta y último acceso, y pendientes ordenados arriba. Reutiliza la sesión de la app al navegar en la misma pestaña; si no hay sesión, login propio. Cada acción la re-autoriza el servidor (`is_admin`): la página no custodia nada. _frontend_
+- En la app queda solo un enlace "Panel de administración →" (visible únicamente para el admin); el bloque de usuarios embebido en Configuración desaparece.
+- El toast de activar recuerda el truco descubierto hoy: "que cierre sesión y vuelva a entrar".
+
+---
+
 ## 2026-07-19 — Gastos: NIF del proveedor y nº de factura (preparando los libros registro)
 
 ### ✨ Nuevo

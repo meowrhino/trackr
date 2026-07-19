@@ -376,31 +376,13 @@
     },
     accDoneRecovery() { const cb = this._recDone; this._recCode = null; this._recDone = null; this.cm(); if (cb) cb(); },
 
-    /* ── Admin: lista de usuarios + activar/pagar/borrar ── */
+    /* ── Admin: la gestión de usuarios vive en su propia página (admin.html).
+     * Aquí solo el enlace: el panel no pinta nada en la app personal de manu.
+     * Misma pestaña a propósito — el token está en sessionStorage y así /admin
+     * reutiliza la sesión sin pedir contraseña. ── */
     _accAdminBlock() {
-      return `<div style="margin-top:1.5rem"><div class="cfg-section-title" style="font-size:.95rem">Usuarios (admin)</div>`
-        + `<button class="bt bt-s" onclick="App.accAdminLoad()">Ver / refrescar usuarios</button>`
-        + `<div id="accAdminList"></div></div>`;
+      return `<div style="margin-top:1.5rem"><a class="bt" href="admin" style="text-decoration:none;display:inline-block">Panel de administración →</a></div>`;
     },
-    async accAdminLoad() {
-      const el = document.getElementById('accAdminList'); if (!el) return;
-      el.innerHTML = `<div style="color:var(--t3);font-size:.8rem;margin-top:.5rem">…</div>`;
-      const users = await Acc.adminListUsers();
-      if (!users) { el.innerHTML = `<div class="acc-warn" style="margin-top:.5rem">No se pudieron cargar los usuarios.</div>`; return; }
-      el.innerHTML = `<div class="cl-list" style="margin-top:.6rem">` + users.map(u =>
-        `<div class="cl-item">`
-        + `<span class="cl-name" style="font-size:.82rem">${esc2(u.email)}${u.isAdmin ? ' <span class="acc-badge">admin</span>' : ''}${u.paid ? ' <span class="acc-badge">pago</span>' : ''}</span>`
-        + `<span class="cl-nif" style="font-size:.72rem;color:var(--t3)">${u.active ? '<span style="color:var(--ok)">activo</span>' : '<span style="color:var(--warn)">pendiente</span>'} · v${u.currentVersion} · ${Math.round((u.totalBytes || 0) / 1024)}KB</span>`
-        + `<div class="cl-actions">`
-        + `<button class="cl-btn" title="${u.active ? 'Desactivar' : 'Activar'}" onclick="App.accAdminActive('${u.userId}',${u.active ? 0 : 1})">${u.active ? '✓' : '○'}</button>`
-        + `<button class="cl-btn" title="${u.paid ? 'Quitar pago' : 'Marcar pagado'}" onclick="App.accAdminPaid('${u.userId}',${u.paid ? 0 : 1})">&euro;</button>`
-        + `<button class="cl-btn cl-btn-del" title="Borrar (soft)" onclick="App.accAdminDelete('${u.userId}')">&times;</button>`
-        + `</div></div>`
-      ).join('') + `</div>`;
-    },
-    async accAdminActive(id, active) { if (await Acc.adminSetActive(id, !!active)) { Toast.ok(active ? 'Activado' : 'Desactivado'); this.accAdminLoad(); } else Toast.error('Error'); },
-    async accAdminPaid(id, paid) { if (await Acc.adminSetPaid(id, !!paid)) { Toast.ok('OK'); this.accAdminLoad(); } else Toast.error('Error'); },
-    async accAdminDelete(id) { if (!confirm('¿Borrar esta cuenta? (soft-delete, reversible 30 días). Mira el email en su fila.')) return; if (await Acc.adminDelete(id)) { Toast.ok('Borrada'); this.accAdminLoad(); } else Toast.error('Error'); },
   });
 
   // ── Auto-sync: engancha D.save() (todos los mutadores pasan por ahi) ──

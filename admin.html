@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRACKR · Panel de administración</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="navicon.png">
+<meta name="theme-color" content="#111111">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#111;--bg2:#191919;--bg3:#222;--b1:#262626;--b2:#333;--t1:#ccc;--t2:#888;--t3:#555;--ok:#5a9;--warn:#c93;--bad:#c55;--ac:#5a9;--r:3px}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;accent-color:var(--ac)}
+.m{font-family:'DM Mono',monospace}
+.wrap{max-width:760px;margin:0 auto;padding:1.25rem 1rem 3rem}
+header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:1.5rem}
+header a{color:var(--t2);text-decoration:none;letter-spacing:.35em;font-weight:600;font-size:.85rem;white-space:nowrap}
+header a:hover{color:var(--t1)}
+h1{font-size:1.25rem;font-weight:600;margin-bottom:.35rem}
+.sub{font-size:.85rem;color:var(--t2);margin-bottom:1.5rem;line-height:1.5}
+.card{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:1rem;margin-bottom:1rem}
+.fg{margin-bottom:.75rem}
+label{display:block;font-size:.7rem;color:var(--t2);margin-bottom:.3rem;text-transform:uppercase;letter-spacing:.05em}
+input{width:100%;background:var(--bg3);border:1px solid var(--b2);border-radius:var(--r);color:var(--t1);padding:.5rem .6rem;font-size:.9rem}
+input:focus{outline:none;border-color:var(--ac)}
+.bt{background:var(--bg3);border:1px solid var(--b2);border-radius:var(--r);color:var(--t1);padding:.5rem .9rem;font-size:.82rem;cursor:pointer;font-family:'Outfit',sans-serif}
+.bt:hover{border-color:var(--ac)}
+.bt-p{background:var(--ac);border-color:var(--ac);color:#111;font-weight:600}
+.bt-s{font-size:.72rem;padding:.25rem .55rem}
+.bt-danger{border-color:var(--bad);color:var(--bad)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:.75rem;padding:.6rem .75rem;background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);margin-bottom:.4rem;flex-wrap:wrap}
+.row .who{flex:1;min-width:220px}
+.row .email{font-weight:600;font-size:.9rem}
+.badge{display:inline-block;font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;border:1px solid var(--b2);border-radius:var(--r);padding:.08rem .35rem;margin-left:.4rem;color:var(--t2)}
+.badge.gestor{border-color:var(--warn);color:var(--warn)}
+.badge.admin{border-color:var(--ac);color:var(--ac)}
+.meta{font-size:.72rem;color:var(--t3);margin-top:.15rem}
+.state-on{color:var(--ok)}
+.state-off{color:var(--warn)}
+.acts{display:flex;gap:.35rem}
+.msg{font-size:.8rem;color:var(--t2);padding:.5rem 0}
+.err{color:var(--bad)}
+.toast{position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--ac);border-radius:var(--r);padding:.5rem .9rem;font-size:.8rem;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+footer{margin-top:2.5rem;font-size:.72rem;color:var(--t3)}
+footer a{color:var(--t3)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><a href="./">T R A C K R</a><span class="m" style="font-size:.72rem;color:var(--t3)">panel de administración</span></header>
+
+  <h1>Usuarios</h1>
+  <p class="sub">Activar, marcar pago y borrar cuentas. Solo funciona con sesión de administrador — el servidor lo re-verifica en cada acción. Los datos de los usuarios son ilegibles desde aquí (cifrado de conocimiento cero): solo ves metadatos.</p>
+
+  <div id="login" class="card" style="display:none;max-width:420px">
+    <div class="fg"><label>Email</label><input type="email" id="em" autocomplete="username"></div>
+    <div class="fg"><label>Contraseña</label><input type="password" id="pw" autocomplete="current-password" onkeydown="if(event.key==='Enter')entrar()"></div>
+    <button class="bt bt-p" onclick="entrar()">Entrar</button>
+    <div class="msg err" id="loginErr"></div>
+  </div>
+
+  <div id="panel" style="display:none">
+    <div style="display:flex;gap:.5rem;margin-bottom:.75rem;align-items:center">
+      <button class="bt" onclick="cargar()">Refrescar</button>
+      <span class="msg" id="quien"></span>
+    </div>
+    <div id="lista"></div>
+  </div>
+
+  <div class="msg" id="estado">Comprobando sesión…</div>
+
+  <footer><a href="./">← Volver a TRACKR</a></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="vendor/hash-wasm/argon2.umd.min.js" integrity="sha384-tP0Wy54CKmng7i9EoTlPySD0hBx6Octj0VS6MfwlnUu111MPa+JLm0CCbep6XJ1W"></script>
+<script src="js/crypto-account.js"></script>
+<script src="js/account.js"></script>
+<script>
+/* Panel de admin standalone. Reutiliza la sesión de la app si llegas navegando en la
+   misma pestaña (el token vive en sessionStorage); si no, login propio. La página no
+   custodia nada: cada llamada /v1/admin/* la re-autoriza el servidor (is_admin). */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function toast(msg) { const el = $('toast'); el.textContent = msg; el.classList.add('on'); setTimeout(() => el.classList.remove('on'), 2200); }
+function ver(v) { ['login', 'panel'].forEach(id => $(id).style.display = id === v ? '' : 'none'); $('estado').textContent = ''; }
+
+const fmtTs = s => s ? new Date(s * 1000).toLocaleString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+
+async function cargar() {
+  const users = await Acc.adminListUsers();
+  if (!users) {
+    // sin sesión válida de admin → login (o cuenta sin permisos)
+    ver('login');
+    if (Acc.status().email) $('em').value = Acc.status().email;
+    return;
+  }
+  ver('panel');
+  $('quien').textContent = `${Acc.status().email || ''} · ${users.length} cuenta${users.length === 1 ? '' : 's'}`;
+  users.sort((a, b) => (a.active - b.active) || (b.createdAt - a.createdAt)); // pendientes arriba
+  $('lista').innerHTML = users.map(u => `
+    <div class="row">
+      <div class="who">
+        <span class="email">${esc(u.email)}</span>
+        ${u.isAdmin ? '<span class="badge admin">admin</span>' : ''}
+        <span class="badge${u.role === 'gestor' ? ' gestor' : ''}">${u.role === 'gestor' ? 'gestoría' : 'persona'}</span>
+        ${u.paid ? '<span class="badge">pago</span>' : ''}
+        <div class="meta">
+          ${u.active ? '<span class="state-on">activo</span>' : '<span class="state-off">PENDIENTE DE ACTIVAR</span>'}
+          · v${u.currentVersion} · ${Math.round((u.totalBytes || 0) / 1024)} KB cifrados
+          · alta ${fmtTs(u.createdAt)} · último acceso ${fmtTs(u.lastLoginAt)}
+        </div>
+      </div>
+      <div class="acts">
+        <button class="bt bt-s${u.active ? '' : ' bt-p'}" title="${u.active ? 'Desactivar' : 'Activar'}" onclick="setActivo('${u.userId}',${u.active ? 0 : 1})">${u.active ? 'Desactivar' : 'Activar'}</button>
+        <button class="bt bt-s" title="${u.paid ? 'Quitar pago' : 'Marcar pagado'}" onclick="setPago('${u.userId}',${u.paid ? 0 : 1})">€</button>
+        <button class="bt bt-s bt-danger" title="Borrar (soft, reversible 30 días)" onclick="borrar('${u.userId}','${esc(u.email)}')">×</button>
+      </div>
+    </div>`).join('') || '<div class="msg">No hay usuarios.</div>';
+}
+
+async function setActivo(id, on) { if (await Acc.adminSetActive(id, !!on)) { toast(on ? 'Activado — que cierre sesión y vuelva a entrar' : 'Desactivado'); cargar(); } else toast('Error'); }
+async function setPago(id, on) { if (await Acc.adminSetPaid(id, !!on)) { toast('OK'); cargar(); } else toast('Error'); }
+async function borrar(id, email) { if (!confirm(`¿Borrar la cuenta ${email}? (soft-delete, reversible 30 días)`)) return; if (await Acc.adminDelete(id)) { toast('Borrada'); cargar(); } else toast('Error'); }
+
+async function entrar() {
+  $('loginErr').textContent = '';
+  const r = await Acc.login($('em').value.trim(), $('pw').value);
+  if (!r.ok) { $('loginErr').textContent = r.error === 'invalid_credentials' ? 'Credenciales no válidas.' : (r.error || 'Error'); return; }
+  if (!Acc.status().isAdmin) { $('loginErr').textContent = 'Esta cuenta no es de administrador.'; return; }
+  cargar();
+}
+
+(function init() {
+  Acc.detectLocked();       // restaura token+meta si venimos de la app (misma pestaña)
+  cargar();                 // si el token no vale o no es admin, cae al login
+})();
+</script>
+</body>
+</html>
