@@ -5,6 +5,13 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-07-19 — El registro se abre y cierra desde /admin (sin deploys)
+
+### ✨ Nuevo
+- **Interruptor "Registro de cuentas nuevas"** en el panel /admin: un clic para abrir (las cuentas nuevas quedan pendientes de tu activación, como siempre) y otro para cerrar. Sustituye el baile de `wrangler deploy --var` que mordió tres veces en el alta de la beta. El valor vive en D1 (`app_config`) con la variable de deploy como valor por defecto; cada cambio queda en el audit del servidor. _frontend + backend_
+
+---
+
 ## 2026-07-19 — Panel de administración como página aparte (/admin)
 
 Salido de la beta con Diego: la gestión de usuarios no pintaba nada dentro de la Configuración personal de manu.

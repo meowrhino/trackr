@@ -64,7 +64,14 @@ footer a{color:var(--t3)}
   </div>
 
   <div id="panel" style="display:none">
-    <div style="display:flex;gap:.5rem;margin-bottom:.75rem;align-items:center">
+    <div class="row" id="cfgRow" style="border-color:var(--b2)">
+      <div class="who">
+        <span class="email">Registro de cuentas nuevas</span>
+        <div class="meta" id="cfgEstado">…</div>
+      </div>
+      <div class="acts"><button class="bt bt-s" id="cfgBtn" onclick="toggleSignups()">…</button></div>
+    </div>
+    <div style="display:flex;gap:.5rem;margin:.9rem 0 .75rem;align-items:center">
       <button class="bt" onclick="cargar()">Refrescar</button>
       <span class="msg" id="quien"></span>
     </div>
@@ -91,6 +98,22 @@ function ver(v) { ['login', 'panel'].forEach(id => $(id).style.display = id === 
 
 const fmtTs = s => s ? new Date(s * 1000).toLocaleString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
 
+let _signupsOpen = null;
+async function pintarConfig() {
+  const cfg = await Acc.adminGetConfig();
+  if (!cfg) { $('cfgEstado').textContent = 'no disponible'; return; }
+  _signupsOpen = cfg.signupsOpen;
+  $('cfgEstado').innerHTML = cfg.signupsOpen
+    ? '<span class="state-off">ABIERTO</span> — cualquiera puede crear cuenta (queda pendiente de tu activación)'
+    : '<span class="state-on">cerrado</span> — nadie puede registrarse';
+  $('cfgBtn').textContent = cfg.signupsOpen ? 'Cerrar registro' : 'Abrir registro';
+}
+async function toggleSignups() {
+  if (_signupsOpen === null) return;
+  if (await Acc.adminSetConfig(!_signupsOpen)) { toast(!_signupsOpen ? 'Registro abierto' : 'Registro cerrado'); pintarConfig(); }
+  else toast('Error');
+}
+
 async function cargar() {
   const users = await Acc.adminListUsers();
   if (!users) {
@@ -100,6 +123,7 @@ async function cargar() {
     return;
   }
   ver('panel');
+  pintarConfig();
   $('quien').textContent = `${Acc.status().email || ''} · ${users.length} cuenta${users.length === 1 ? '' : 's'}`;
   users.sort((a, b) => (a.active - b.active) || (b.createdAt - a.createdAt)); // pendientes arriba
   $('lista').innerHTML = users.map(u => `

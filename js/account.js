@@ -495,12 +495,14 @@ const Acc = (() => {
   async function adminSetActive(id, active) { const r = await api(`/v1/admin/users/${encodeURIComponent(id)}/active`, { method: 'POST', auth: true, body: { active } }); return r.status === 200; }
   async function adminSetPaid(id, paid) { const r = await api(`/v1/admin/users/${encodeURIComponent(id)}/paid`, { method: 'POST', auth: true, body: { paid } }); return r.status === 200; }
   async function adminDelete(id) { const r = await api(`/v1/admin/users/${encodeURIComponent(id)}`, { method: 'DELETE', auth: true }); return r.status === 204; }
+  async function adminGetConfig() { const r = await api('/v1/admin/config', { auth: true }); return r.status === 200 ? r.data : null; }
+  async function adminSetConfig(signupsOpen) { const r = await api('/v1/admin/config', { method: 'POST', auth: true, body: { signupsOpen: !!signupsOpen } }); return r.status === 200; }
 
   return {
     signup, login, unlock, logout, changePassword, recover, pull, push: syncPush,
     gestorEnsureKey, gestorResolve, grantCreate, grantRevoke, gestorClients, gestorOpenClient, pushShadow, _buildShareData: buildShareData,
     grantSetCanEdit, opsPush, pullOps, setOpsListener, reconcileGrant,
-    adminListUsers, adminSetActive, adminSetPaid, adminDelete, _mergeData: mergeData,
+    adminListUsers, adminSetActive, adminSetPaid, adminDelete, adminGetConfig, adminSetConfig, _mergeData: mergeData,
     status, isUnlocked, detectLocked, setAutoSync, setSyncListener, notifyChange, setApiBase: (u) => { API_BASE = u; },
     get email() { return S.email; }, get version() { return S.version; }, get state() { return S.state; },
   };
