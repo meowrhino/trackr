@@ -42,6 +42,16 @@ const Acc = (() => {
     return { status: res.status, data };
   }
 
+  /* Codigo de error para una respuesta fallida. Distingue el fallo de red REAL
+     (fetch caido: sin conexion, o CORS bloqueando el origen) del 429 del rate limiter
+     y del error que mande el servidor — todos acababan saliendo como 'network' o,
+     peor, como 'invalid_credentials', y el usuario no podia saber que le pasaba. */
+  function failOf(r, fallback) {
+    if (r.netErr) return 'network';
+    if (r.status === 429) return 'rate_limited';
+    return r.data?.error || fallback;
+  }
+
   function status() { return { state: S.state, email: S.email, active: S.active, isAdmin: S.isAdmin, role: S.role, version: S.version }; }
   function isUnlocked() { return S.state === 'in' && !!S.dek; }
 
@@ -76,11 +86,11 @@ const Acc = (() => {
     const email = CA.canonEmail(emailRaw);
     if (!email) return { ok: false, error: 'invalid_email' };
     const pre = await api('/v1/prelogin', { method: 'POST', body: { email } });
-    if (pre.status !== 200 || !pre.data) return { ok: false, error: 'network' };
+    if (pre.status !== 200 || !pre.data) return { ok: false, error: failOf(pre, 'server_error') };
     const kdf = { mem: pre.data.kdfMem, time: pre.data.kdfTime, par: pre.data.kdfPar };
     const { authKey, wrapKeyPwd } = await CA.deriveForLogin(password, pre.data.kdfSalt, kdf);
     const lg = await api('/v1/login', { method: 'POST', body: { email, loginNonce: pre.data.loginNonce, authKey } });
-    if (lg.status !== 200 || !lg.data) return { ok: false, error: lg.data?.error || 'invalid_credentials' };
+    if (lg.status !== 200 || !lg.data) return { ok: false, error: failOf(lg, 'invalid_credentials') };
     let dek;
     try { dek = await CA.unwrapLogin(wrapKeyPwd, lg.data.wrappedDEK_pwd, email, lg.data.credEpoch); }
     catch (e) { return { ok: false, error: 'unwrap_failed' }; } // contrasena ok pero envelope no abre (no deberia pasar)
@@ -112,7 +122,7 @@ const Acc = (() => {
     if (!isUnlocked()) return { ok: false, error: 'locked' };
     // necesitamos el kdfSalt actual: lo pedimos via prelogin (timing-equalizado, no filtra)
     const pre = await api('/v1/prelogin', { method: 'POST', body: { email: S.email } });
-    if (pre.status !== 200) return { ok: false, error: 'network' };
+    if (pre.status !== 200) return { ok: false, error: failOf(pre, 'server_error') };
     let pc;
     try { pc = await CA.buildPasswordChange(S.email, currentPassword, newPassword, S.dek, pre.data.kdfSalt, S.credEpoch, S.kdf); }
     catch (e) { return { ok: false, error: e.message }; }
@@ -129,7 +139,7 @@ const Acc = (() => {
     if (!email) return { ok: false, error: 'invalid_email' };
     if (!CA.isValidRecovery(recoveryCode)) return { ok: false, error: 'invalid_recovery_format' };
     const start = await api('/v1/recover/start', { method: 'POST', body: { email } });
-    if (start.status !== 200) return { ok: false, error: 'network' };
+    if (start.status !== 200) return { ok: false, error: failOf(start, 'server_error') };
     const kdf = { mem: start.data.kdfMem, time: start.data.kdfTime, par: start.data.kdfPar };
     const { recProof, wrapKeyRec } = await CA.buildRecoverProof(recoveryCode, start.data.recSalt, kdf);
     // fase material

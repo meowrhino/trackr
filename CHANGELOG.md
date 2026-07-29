@@ -5,6 +5,17 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-07-29 — "network": nadie podía entrar desde tr4ckr.com
+
+Diega intentó iniciar sesión y solo vio un toast que decía `network`.
+
+### 🐛 Arreglado
+- **CORS: `tr4ckr.com` faltaba en el allowlist del backend.** El sitio se sirve desde dos dominios pero el servidor solo reconocía `trackr.meowrhino.studio`; desde el alias corto el navegador bloqueaba **todas** las llamadas a la API — login, sync, todo. _backend@3581d05_
+- **Los errores de cuenta ya dicen qué pasa.** Se separan el fallo de red real (conexión caída o CORS), el `429` del límite de intentos y el error del servidor, con texto traducido (es/en/ca) en login, desbloqueo, alta, recuperación y cambio de contraseña. _frontend_
+- Si se caía la llamada a `/v1/login`, la app decía **"contraseña incorrecta"** aunque la contraseña fuese buena: mandaba a resetear credenciales que estaban bien. _frontend_
+
+---
+
 ## 2026-07-19 — Libros registro AEAT: exporta el Excel oficial para tu gestoría (y para Hacienda)
 
 ### ✨ Nuevo

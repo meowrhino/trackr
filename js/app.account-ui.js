@@ -21,6 +21,9 @@
       pending: 'Cuenta creada. Pendiente de activación por el administrador antes de poder sincronizar.',
       signupsClosed: 'Los registros están cerrados ahora mismo: la cuenta NO se ha creado. Escribe a manu para que abra el registro.',
       rateLimited: 'Demasiados intentos desde tu conexión (máx. 5 por hora). Espera un rato o prueba desde otra red, p. ej. datos móviles.',
+      netErr: 'No se pudo conectar con el servidor. Revisa tu conexión (o si un bloqueador está cortando las llamadas) y vuelve a intentarlo.',
+      serverErr: 'El servidor no ha respondido bien. Prueba de nuevo en un rato.',
+      badCreds: 'Email o contraseña incorrectos.',
       activeOk: 'Sincronización activa', notActive: 'Pendiente de activación', version: 'versión en la nube', autoSync: 'Sincronizar automáticamente al cambiar',
       pwWeak: 'La contraseña debe tener al menos 12 caracteres.', pwMismatch: 'Las contraseñas no coinciden.', legalReq: 'Debes aceptar para continuar.', emailBad: 'Email no válido.',
       recTitle: 'Tu código de recuperación', recDesc: 'Apúntalo y guárdalo OFFLINE (no en este dispositivo). Es la ÚNICA forma de recuperar tus datos si olvidas la contraseña. NO se vuelve a mostrar.', copy: 'Copiar', download: 'Descargar .txt', saved: 'Lo he guardado, continuar', copied: 'Copiado', copyErr: 'No se pudo copiar. Usa "Descargar .txt".',
@@ -43,6 +46,9 @@
       pending: 'Account created. Pending admin activation before you can sync.',
       signupsClosed: 'Sign-ups are closed right now: the account was NOT created. Contact manu to open registration.',
       rateLimited: 'Too many attempts from your connection (max 5 per hour). Wait a while or try from another network, e.g. mobile data.',
+      netErr: 'Could not reach the server. Check your connection (or whether a blocker is cutting the calls) and try again.',
+      serverErr: 'The server did not respond properly. Try again in a while.',
+      badCreds: 'Wrong email or password.',
       activeOk: 'Sync active', notActive: 'Pending activation', version: 'cloud version', autoSync: 'Auto-sync on change',
       pwWeak: 'Password must be at least 12 characters.', pwMismatch: 'Passwords do not match.', legalReq: 'You must accept to continue.', emailBad: 'Invalid email.',
       recTitle: 'Your recovery code', recDesc: 'Write it down and keep it OFFLINE (not on this device). It is the ONLY way to recover your data if you forget your password. It will NOT be shown again.', copy: 'Copy', download: 'Download .txt', saved: 'I saved it, continue', copied: 'Copied', copyErr: 'Could not copy. Use "Download .txt".',
@@ -65,6 +71,9 @@
       pending: 'Compte creat. Pendent d\'activació per l\'administrador abans de sincronitzar.',
       signupsClosed: 'Els registres estan tancats ara mateix: el compte NO s\'ha creat. Escriu a manu perquè obri el registre.',
       rateLimited: 'Massa intents des de la teva connexió (màx. 5 per hora). Espera una estona o prova des d\'una altra xarxa, p. ex. dades mòbils.',
+      netErr: 'No s\'ha pogut connectar amb el servidor. Revisa la connexió (o si un bloquejador està tallant les crides) i torna-ho a provar.',
+      serverErr: 'El servidor no ha respost bé. Torna-ho a provar d\'aquí una estona.',
+      badCreds: 'Email o contrasenya incorrectes.',
       activeOk: 'Sincronització activa', notActive: 'Pendent d\'activació', version: 'versió al núvol', autoSync: 'Sincronitzar automàticament en canviar',
       pwWeak: 'La contrasenya ha de tenir almenys 12 caràcters.', pwMismatch: 'Les contrasenyes no coincideixen.', legalReq: 'Has d\'acceptar per continuar.', emailBad: 'Email no vàlid.',
       recTitle: 'El teu codi de recuperació', recDesc: 'Apunta\'l i guarda\'l OFFLINE (no en aquest dispositiu). És l\'ÚNICA manera de recuperar les dades si oblides la contrasenya. NO es tornarà a mostrar.', copy: 'Copiar', download: 'Descarregar .txt', saved: 'L\'he guardat, continuar', copied: 'Copiat', copyErr: 'No s\'ha pogut copiar. Usa "Descarregar .txt".',
@@ -78,6 +87,13 @@
     },
   };
   const t = (k) => (TXT[L()] || TXT.es)[k] || k;
+  // Codigo de error (Acc o servidor) -> texto traducido. Lo no mapeado sale crudo:
+  // mejor un codigo raro que un "error" a secas cuando toca depurar con alguien al telefono.
+  const ERRTXT = {
+    network: 'netErr', server_error: 'serverErr', rate_limited: 'rateLimited',
+    invalid_credentials: 'badCreds', signups_closed: 'signupsClosed', inactive: 'pending',
+  };
+  const errMsg = (e) => (ERRTXT[e] ? t(ERRTXT[e]) : (e || 'error'));
   const val = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
   const esc2 = (s) => (typeof esc === 'function' ? esc(s) : String(s));
 
@@ -253,9 +269,7 @@
           this._accShowRecovery(r.recoveryCode, () => { if (Acc.state === 'in' && Acc.status().active) Acc.setAutoSync(true); this._accInModal = false; this.refreshAccountNav(); this.go(this.cv); });
           if (r.pending) Toast.ok(t('pending'));
         } else {
-          // Codigo del servidor -> texto traducido; lo no mapeado sale crudo (mejor que "error" a secas).
-          const ERRTXT = { signups_closed: 'signupsClosed', rate_limited: 'rateLimited' };
-          Toast.error(ERRTXT[r.error] ? t(ERRTXT[r.error]) : (r.error || 'error'));
+          Toast.error(errMsg(r.error));
         }
       } catch (e) { Toast.error(String(e.message || e)); }
     },
@@ -266,7 +280,7 @@
       if (this._gstForceExit) this._gstForceExit(); // un re-login no debe reactivar sync sobre datos de un cliente en visor
       try {
         const r = await Acc.login(email, pw);
-        if (!r.ok) return Toast.error(r.error === 'inactive' ? t('pending') : (r.error || 'error'));
+        if (!r.ok) return Toast.error(errMsg(r.error));
         Toast.ok(t('welcome'));
         if (r.active) { if (typeof H !== 'undefined') H.snapshot(); await this._accPull(); Acc.setAutoSync(true); if (this._gestorPostLogin) await this._gestorPostLogin(); }
         this._accDone();
@@ -278,7 +292,7 @@
       if (this._gstForceExit) this._gstForceExit(); // idem: desbloquear en visor no debe subir datos del cliente
       try {
         const r = await Acc.unlock(pw);
-        if (!r.ok) return Toast.error(r.error || 'error');
+        if (!r.ok) return Toast.error(errMsg(r.error));
         Toast.ok(t('welcome'));
         if (r.active) { if (typeof H !== 'undefined') H.snapshot(); await this._accPull(); Acc.setAutoSync(true); if (this._gestorPostLogin) await this._gestorPostLogin(); }
         this._accDone();
@@ -333,7 +347,7 @@
       if (nw !== nw2) return Toast.error(t('pwMismatch'));
       const r = await Acc.changePassword(cur, nw);
       if (r.ok) { Toast.ok(t('pwChanged')); this.cm(); this.rCfg(); }
-      else Toast.error(r.error === 'invalid_credentials' ? t('currentPassword') + ' ✗' : (r.error || 'error'));
+      else Toast.error(r.error === 'invalid_credentials' ? t('currentPassword') + ' ✗' : errMsg(r.error));
     },
 
     async accRecover() {
@@ -343,7 +357,7 @@
       if (!CA.checkPassword(pw).ok) return Toast.error(t('pwWeak'));
       try {
         const r = await Acc.recover(email, code, pw);
-        if (!r.ok) return Toast.error(r.error || 'error');
+        if (!r.ok) return Toast.error(errMsg(r.error));
         Toast.ok(t('recovered'));
         if (typeof H !== 'undefined') H.snapshot(); await this._accPull(); Acc.setAutoSync(true);
         this._accDone();
