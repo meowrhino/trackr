@@ -222,7 +222,7 @@ Object.assign(App, {
       html += '<div class="gas-list">';
       gastos.forEach(g => {
         const entries = (g.entradas || []).filter(e => e.fecha && inPeriod(e.fecha, type, y, m));
-        const total = entries.reduce((s, e) => s + (e.total || e.cantidad || 0), 0);
+        const total = entries.reduce((s, e) => s + gastoCoste(e), 0);
         const catLabel = GASTO_CAT[g.categoria] || g.categoria || 'Otro';
         const gHex = colorHex(g.color || 'Salmon');
         const isPuntual = !g.recurrente || g.recurrente === 'no';
@@ -243,7 +243,8 @@ Object.assign(App, {
           const e0 = entries[0];
           html += `<div class="gas-card" style="border-left:3px solid ${gHex}"><div class="gas-header">`
             + `<span class="gas-name">${esc(g.nombre)}</span>${badges}`
-            + `<span class="gas-total m">${fmtMoney(e0?.total ?? e0?.cantidad ?? 0)}</span>`
+            + `<span class="gas-total m">${fmtMoney(e0 ? gastoCoste(e0) : 0)}</span>`
+            + (e0?.irpf > 0 ? `<span class="gas-irpf" title="${t('gas.irpfTip', fmtMoney(e0.irpf), fmtMoney(e0.total || 0))}">IRPF ${fmtMoney(e0.irpf)}</span>` : '')
             + `<span class="gas-date-info">${fmtDate(e0.fecha)}</span>`
             + `<div class="gas-actions"><button class="cl-btn" onclick="App.gModal('${g.id}')" title="${t('btn.edit')}">&#9998;</button><button class="cl-btn cl-btn-del" onclick="App.delG('${g.id}')" title="${t('btn.delete')}">&times;</button></div>`
             + `</div></div>`;
@@ -267,7 +268,8 @@ Object.assign(App, {
             + `</div><div class="gas-body">`;
           if (entries.length) {
             entries.sort((a, b) => (b.fecha || '').localeCompare(a.fecha || '')).forEach(e => {
-              html += `<div class="gas-entry"><span class="gas-e-date">${fmtDate(e.fecha)}</span><span class="gas-e-amount m">${fmtMoney(e.total || e.cantidad || 0)}</span><span class="gas-e-nota">${esc(e.nota || '')}</span><button class="gas-e-edit" onclick="App.geModal('${g.id}','${e.id}')" title="${t('btn.edit')}">&#9998;</button><button class="gas-e-del" onclick="App.delGE('${g.id}','${e.id}')" title="${t('btn.delete')}">&times;</button></div>`;
+              const irpfBadge = e.irpf > 0 ? `<span class="gas-irpf" title="${t('gas.irpfTip', fmtMoney(e.irpf), fmtMoney(e.total || 0))}">IRPF ${fmtMoney(e.irpf)}</span>` : '';
+              html += `<div class="gas-entry"><span class="gas-e-date">${fmtDate(e.fecha)}</span><span class="gas-e-amount m">${fmtMoney(gastoCoste(e))}</span>${irpfBadge}<span class="gas-e-nota">${esc(e.nota || '')}</span><button class="gas-e-edit" onclick="App.geModal('${g.id}','${e.id}')" title="${t('btn.edit')}">&#9998;</button><button class="gas-e-del" onclick="App.delGE('${g.id}','${e.id}')" title="${t('btn.delete')}">&times;</button></div>`;
             });
           }
           html += `<button class="bt bt-add" style="margin-top:.5rem" onclick="App.geModal('${g.id}')">${t('btn.addEntry')}</button></div></div>`;
@@ -340,6 +342,12 @@ Object.assign(App, {
         sinFecha.push(p.nombre);
       }
     });
+    let retPract = 0;
+    D.gs().forEach(g => {
+      (g.entradas || []).forEach(e => {
+        if (e.irpf > 0 && e.fecha && inPeriod(e.fecha, 'trim', y, m)) retPract += e.irpf;
+      });
+    });
     D.gs().forEach(g => {
       if (!g.desgravable) return;
       const tipo = g.tipoIva || 21;
@@ -372,7 +380,7 @@ Object.assign(App, {
     });
     const deds = D.deds().filter(d => d.fecha && inPeriod(d.fecha, 'trim', y, m));
     gastos += deds.reduce((s, d) => s + (d.cantidad || 0), 0);
-    return { ivaRep, ivaSop, ingresos, gastos, retenciones, deds, sinFecha, extUE, extNoUE, ispUE, ispNoUE };
+    return { ivaRep, ivaSop, ingresos, gastos, retenciones, retPract: roundMoney(retPract), deds, sinFecha, extUE, extNoUE, ispUE, ispNoUE };
   },
 
   /** Primer año con datos fiscales (para el arrastre de saldo IVA) */
@@ -500,6 +508,7 @@ Object.assign(App, {
       s + Object.values(d.ivaRep).reduce((a, x) => a + x.cuota, 0)
         - Object.values(d.ivaSop).reduce((a, x) => a + x.cuota, 0), 0) : 0;
 
+    const retPract = isYear ? qData.reduce((s, d) => s + (d.retPract || 0), 0) : dQ.retPract;
     const qLabel = isYear ? `${y}` : `T${q + 1} ${y}`;
     const dedsShown = isYear ? qData.flatMap(d => d.deds) : dQ.deds;
     const dedsHtml = this._renderDedList(dedsShown);
@@ -616,6 +625,7 @@ Object.assign(App, {
       +     `<div class="din-trim-actions"><button class="bt bt-s" onclick="App.copyTrim130()" title="${t('din.copyBoxes')}">&#128203; ${t('din.copyBoxes')}</button></div>`
       +   `</div>`
       + `</div>`
+      + (retPract > 0 ? `<div class="din-trim-warn">&#9888; ${t('din.ret111', fmtMoney(retPract))}</div>` : '')
       + dedsHtml
       + `</div>`;
   },

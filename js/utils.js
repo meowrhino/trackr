@@ -100,6 +100,14 @@ let DIAS_SEM = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 /** Redondea a 2 decimales (céntimos) */
 function roundMoney(v) { return Math.round(v * 100) / 100; }
 
+/** Coste real de una entrada de gasto: base + IVA. La retención de IRPF no
+ *  abarata el gasto (ese dinero lo ingresas tú en el 111), así que el total
+ *  de la factura (base + IVA − IRPF) no sirve como coste. */
+function gastoCoste(e) {
+  const bi = (e.base || 0) + (e.iva || 0);
+  return bi > 0 ? bi : (e.total || e.cantidad || 0) + (e.irpf || 0);
+}
+
 /** Genera un ID único tipo xxxx-xxxx-xxxx */
 function uid() {
   return 'xxxx-xxxx-xxxx'.replace(/x/g, () =>

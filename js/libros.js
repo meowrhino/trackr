@@ -109,7 +109,7 @@ const LR = {
       const n3 = this._nif3(zona, g.nifProveedor);
       (g.entradas || []).forEach((e) => {
         if (!enRango(e.fecha)) return;
-        const base = e.base || 0, iva = e.iva || 0;
+        const base = e.base || 0, iva = e.iva || 0, irpf = e.irpf || 0;
         if (!(base > 0 || iva > 0)) return;
         const ext = zona !== 'es';
         const cuotaISP = ext ? this._r2(base * tipo / 100) : 0;
@@ -122,9 +122,10 @@ const LR = {
           P: n3.t, Q: n3.pais, R: n3.id, S: String(g.nombre || '').slice(0, 40),
           T: zona === 'ue' ? '09' : '01',
           V: ext ? 'S' : '',                                    /* inversión del sujeto pasivo */
-          Z: this._r2(e.total || base + iva), AA: this._r2(base),
+          Z: this._r2(e.total || base + iva - irpf), AA: this._r2(base),
           AB: ext ? tipo : (g.tipoIva || 0),
           AC: ext ? cuotaISP : this._r2(iva), AD: ext ? cuotaISP : this._r2(iva),
+          AK: irpf > 0 ? (e.tipoIrpf || g.tipoIrpf || 0) : '', AL: irpf > 0 ? this._r2(irpf) : '',
         });
       });
     });

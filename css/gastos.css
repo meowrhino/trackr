@@ -272,3 +272,6 @@
 
 /* ── Finalizado badge ── */
 .gas-fin{font-size:.62rem;padding:.1rem .35rem;border-radius:var(--r);background:color-mix(in srgb,var(--t3) 15%,transparent);color:var(--t3);text-transform:uppercase;letter-spacing:.02em;white-space:nowrap}
+
+/* Retención de IRPF practicada al proveedor (la ingresa el usuario en el 111) */
+.gas-irpf{font-size:.62rem;padding:.1rem .35rem;border-radius:var(--r);background:color-mix(in srgb,var(--warn) 15%,transparent);color:var(--warn);white-space:nowrap;font-family:'DM Mono',monospace}

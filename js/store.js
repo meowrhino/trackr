@@ -245,6 +245,7 @@ const D = {
       if (!g.color) g.color = 'Salmon';
       if (g.desgravable == null) g.desgravable = false;
       if (g.tipoIva == null) g.tipoIva = 21;
+      if (g.tipoIrpf == null) g.tipoIrpf = 0;
       /* v4: migrar entradas cantidad → base/iva/total */
       g.entradas.forEach(e => {
         if (e.cantidad != null && e.total == null) {

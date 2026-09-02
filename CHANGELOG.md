@@ -5,6 +5,18 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-09-02 — Gastos con retención de IRPF: por fin se pueden meter
+
+Si tu proveedor te factura con retención (un profesional, el alquiler de la oficina…), hasta ahora no había dónde apuntarla: los números del gasto nunca cuadraban con el papel.
+
+### ✨ Nuevo
+- **Retención IRPF % en el gasto** (junto al tipo de IVA) e **IRPF (€) en cada entrada**. El cálculo automático va en las dos direcciones: desde la base salen IVA, retención y total; y si escribes el total de la factura, se desglosa hacia atrás. 265 € + 21% − 15% = **280,90 €**, igual que en tu factura. _frontend_
+- **El gasto sigue costando lo que cuesta.** En tarjetas, barras y calendario se cuenta base + IVA: la retención no te la ahorras, la ingresas tú. La entrada lleva una etiqueta `IRPF 39,75 €` con el total real de la factura en el tooltip. _frontend_
+- **Resumen fiscal**: aviso con lo retenido a proveedores en el trimestre, que es lo que va al **modelo 111** (TRACKR todavía no lo calcula). _frontend_
+- **Libros registro AEAT**: las facturas recibidas ya rellenan "Tipo Retención del IRPF" (AK) e "Importe Retenido" (AL), y el Total Factura descuenta la retención. _frontend_
+
+---
+
 ## 2026-07-29 — "network": nadie podía entrar desde tr4ckr.com
 
 Diega intentó iniciar sesión y solo vio un toast que decía `network`.
