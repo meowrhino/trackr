@@ -70,6 +70,10 @@ const D = {
         calStartHour: 0
       }
     };
+    /* create() enumera solo lo básico; ensure() añade el resto del esquema
+       (deducibles, fiscal, verifactu…). Sin esto, la primera sesión de una
+       cuenta nueva reventaba al pintar el resumen fiscal. */
+    this.ensure();
     this.save();
   },
 
