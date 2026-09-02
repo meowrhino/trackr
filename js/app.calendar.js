@@ -242,7 +242,7 @@ Object.assign(App, {
     let timeLbl = '';
     for (let i = 0; i < 24; i++) {
       const hr = (startHour + i) % 24;
-      timeLbl += `<div class="cal-tl">${String(hr).padStart(2, '0')}:00</div>`;
+      timeLbl += `<div class="cal-tl"><span>${String(hr).padStart(2, '0')}:00</span></div>`;
     }
 
     const now = new Date();
@@ -489,6 +489,13 @@ Object.assign(App, {
 
     const snap30 = m => Math.floor(m / 30) * 30;
 
+    /* Minutos visuales → hora de reloj, para escribirla en el preview */
+    const clock = visMin => {
+      const real = (visMin + colStartMins) % colSpanMins;
+      return `${String(Math.floor(real / 60)).padStart(2, '0')}:${String(real % 60).padStart(2, '0')}`;
+    };
+    const fmtDur = h => (h % 1 === 0 ? String(h) : String(h).replace('.', ',')) + 'h';
+
     const updatePreview = endVisMin => {
       if (!drag) return;
       const stVis = drag.startVisMin;
@@ -497,6 +504,8 @@ Object.assign(App, {
       if (etVis > colSpanMins) etVis = colSpanMins;
       drag.preview.style.top = (stVis / 60 * slotH) + 'px';
       drag.preview.style.height = Math.max(((etVis - stVis) / 60) * slotH, 15) + 'px';
+      /* Sin esto no sabes si arrancaste en la :00 o en la :30 */
+      drag.label.textContent = `${clock(stVis)} – ${clock(etVis)} · ${fmtDur((etVis - stVis) / 60)}`;
       drag.endVisMin = etVis;
     };
 
@@ -524,6 +533,9 @@ Object.assign(App, {
       const wcol = slot.closest('.cal-wcol');
       const pv = document.createElement('div');
       pv.className = 'cal-drag-pv';
+      const lb = document.createElement('span');
+      lb.className = 'cal-drag-pv-t';
+      pv.appendChild(lb);
       wcol.appendChild(pv);
       const startVisMin = slotVisMin(slot);
       drag = {
@@ -532,6 +544,7 @@ Object.assign(App, {
         date: slot.dataset.date,
         startVisMin,
         preview: pv,
+        label: lb,
         wcol,
         endVisMin: startVisMin + 30
       };

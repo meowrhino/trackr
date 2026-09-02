@@ -221,13 +221,19 @@
   height:var(--slot-h,60px);
   display:flex;
   align-items:flex-start;
-  justify-content:center;
-  padding-top:.25rem;
+  justify-content:flex-end;
+  padding-right:.4rem;
+  border-top:1px solid var(--b1);
   font-family:'DM Mono',monospace;
   font-size:.65rem;
   color:var(--t3);
   flex-shrink:0;
 }
+/* La etiqueta va centrada SOBRE la línea de su hora, no debajo: así el número
+   coincide con el borde donde empieza el slot. La primera se queda abajo,
+   porque encima no hay sitio. */
+.cal-tl span{transform:translateY(-50%);display:block}
+.cal-tl:first-child span{transform:none;padding-top:.2rem}
 
 /* Columna de día (slots + eventos) */
 .cal-wcol{
@@ -245,6 +251,8 @@
   flex-shrink:0;
 }
 .cal-slot:hover{background:var(--bg3)}
+/* Línea fina en cada hora en punto (la media hora se deja limpia) */
+.cal-slot[data-min="0"]{border-top:1px solid var(--b1)}
 
 /* Evento posicionado */
 .cal-evt{
@@ -330,6 +338,16 @@
   pointer-events:none;
   z-index:2;
   transition:height .05s ease;
+  overflow:hidden;
+}
+.cal-drag-pv-t{
+  display:block;
+  padding:.15rem .3rem;
+  font-family:'DM Mono',monospace;
+  font-size:.62rem;
+  line-height:1.1;
+  color:var(--t1);
+  white-space:nowrap;
 }
 
 /* Sección "sin hora asignada" debajo del grid semanal */
