@@ -223,7 +223,6 @@
   align-items:flex-start;
   justify-content:flex-end;
   padding-right:.4rem;
-  border-top:1px solid var(--b1);
   font-family:'DM Mono',monospace;
   font-size:.65rem;
   color:var(--t3);
@@ -251,8 +250,9 @@
   flex-shrink:0;
 }
 .cal-slot:hover{background:var(--bg3)}
-/* Línea fina en cada hora en punto (la media hora se deja limpia) */
-.cal-slot[data-min="0"]{border-top:1px solid var(--b1)}
+/* Línea fina en cada hora en punto: solo sobre los días (en la columna de
+   etiquetas tachaba el número) y a media opacidad. La media hora, limpia. */
+.cal-slot[data-min="0"]{border-top:1px solid color-mix(in srgb,var(--b1) 55%,transparent)}
 
 /* Evento posicionado */
 .cal-evt{
