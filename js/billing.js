@@ -63,6 +63,19 @@ const B={
     return { importeIva, importeIrpf, totalFactura: roundMoney(base + importeIva - importeIrpf), netoRecibido: roundMoney(base - importeIrpf) };
   },
 
+  /**
+   * Inversa de calcTax: del total de una factura a su desglose. Con retención el
+   * total es base + IVA − IRPF, así que la base se despeja dividiendo por
+   * (1 + iva% − irpf%). Redondeos: base+IVA−IRPF puede bailar un céntimo
+   * respecto al total tecleado; el total no se toca.
+   */
+  desglosarTotal(total, ivaRate, irpfRate = 0) {
+    const div = 1 + (ivaRate || 0) / 100 - (irpfRate || 0) / 100;
+    const base = roundMoney(div > 0 ? total / div : total);
+    const { importeIva, importeIrpf } = this.calcTax(base, ivaRate || 0, irpfRate || 0);
+    return { base, importeIva, importeIrpf };
+  },
+
   /* Suma total de horas registradas en el proyecto */
   totalHoras(p){ return p.horas.reduce((s,h)=>s+(h.cantidad||0),0); },
 

@@ -117,7 +117,7 @@ const LR = {
         rec.push({
           A: y, B: this._trim(e.fecha), C: act.C, D: act.D, E: act.E,
           F: n3.id ? 'F1' : 'F2', G: this.GASTO_G[g.categoria] || 'G22',
-          H: this._r2(ext ? base + iva : base),                 /* IRPF: criterio TODO/20 */
+          H: this._r2(gastoImporteFiscal(zona, base, iva)),
           I: this._fmtFecha(e.fecha), K: e.numFactura || '',
           P: n3.t, Q: n3.pais, R: n3.id, S: String(g.nombre || '').slice(0, 40),
           T: zona === 'ue' ? '09' : '01',

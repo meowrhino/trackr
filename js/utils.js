@@ -100,6 +100,16 @@ let DIAS_SEM = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 /** Redondea a 2 decimales (céntimos) */
 function roundMoney(v) { return Math.round(v * 100) / 100; }
 
+/**
+ * Importe de un gasto que cuenta como deducible en IRPF (130, renta y libros).
+ * Proveedor español: la base, porque el IVA se deduce en el 303. Proveedor
+ * extranjero sin IVA español: base + IVA, porque ese impuesto extranjero no es
+ * deducible aquí y se convierte en coste. Criterio de TODO/20.
+ */
+function gastoImporteFiscal(zona, base, iva) {
+  return (zona || 'es') === 'es' ? base : base + iva;
+}
+
 /** Coste real de una entrada de gasto: base + IVA. La retención de IRPF no
  *  abarata el gasto (ese dinero lo ingresas tú en el 111), así que el total
  *  de la factura (base + IVA − IRPF) no sirve como coste. */

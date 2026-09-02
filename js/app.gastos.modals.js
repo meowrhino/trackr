@@ -5,7 +5,7 @@
  * Modales: gModal/saveG/delG (gasto), geModal/saveGE/delGE (entrada),
  * quickAddRecurring, _gCalc, _toggleGasRec. Comparte App.rGas() (render,
  * en app.gastos.js) en runtime -> separacion segura.
- * Deps globales: D, T, Toast, t, roundMoney, todayStr, uid, ...
+ * Deps globales: D, B, T, Toast, t, roundMoney, todayStr, uid, ...
  * ================================================ */
 Object.assign(App, {
   /* ══════════════════════════════════════
@@ -22,22 +22,19 @@ Object.assign(App, {
     const tEl = document.getElementById(prefix + 'EA');
     const ivaSelEl = document.getElementById(prefix === 'g' ? 'gIva' : 'geIva');
     const irpfEl = document.getElementById(prefix === 'g' ? 'gIrpf' : 'geIrpf');
-    const rate = ivaSelEl ? (parseInt(ivaSelEl.value) || 0) / 100 : 0.21;
-    const irRate = irpfEl ? (parseFloat(irpfEl.value) || 0) / 100 : 0;
+    const ivaPct = ivaSelEl ? (parseInt(ivaSelEl.value) || 0) : 21;
+    const irpfPct = irpfEl ? (parseFloat(irpfEl.value) || 0) : 0;
     let base;
     if (from === 'total') {
-      const total = parseFloat(tEl.value) || 0;
-      const div = 1 + rate - irRate;
-      base = roundMoney(div > 0 ? total / div : total);
+      base = B.desglosarTotal(parseFloat(tEl.value) || 0, ivaPct, irpfPct).base;
       bEl.value = base || '';
     } else {
       base = parseFloat(bEl.value) || 0;
     }
-    const iva = roundMoney(base * rate);
-    const irpf = roundMoney(base * irRate);
-    iEl.value = iva || '';
-    if (rEl) rEl.value = irpf || '';
-    if (from !== 'total') tEl.value = roundMoney(base + iva - irpf) || '';
+    const { importeIva, importeIrpf, totalFactura } = B.calcTax(base, ivaPct, irpfPct);
+    iEl.value = importeIva || '';
+    if (rEl) rEl.value = importeIrpf || '';
+    if (from !== 'total') tEl.value = totalFactura || '';
   },
 
   /** Al cambiar un tipo (IVA/IRPF) recalcula desde donde haya datos: si hay base
@@ -149,12 +146,9 @@ Object.assign(App, {
        (importeBase = total de la factura, ya con la retención descontada) */
     let prefillBase = '', prefillIva = '', prefillIrpf = '', prefillTotal = '';
     if (!isE && isRecurrente && gasto.importeBase) {
-      const rate = (tipoIva || 0) / 100, irRate = tipoIrpf / 100;
-      const div = 1 + rate - irRate;
       prefillTotal = roundMoney(gasto.importeBase);
-      prefillBase = roundMoney(div > 0 ? prefillTotal / div : prefillTotal);
-      prefillIva = roundMoney(prefillBase * rate);
-      prefillIrpf = roundMoney(prefillBase * irRate);
+      const d = B.desglosarTotal(prefillTotal, tipoIva, tipoIrpf);
+      prefillBase = d.base; prefillIva = d.importeIva; prefillIrpf = d.importeIrpf;
     }
     const valBase = e?.base ?? prefillBase;
     const valIva = e?.iva ?? prefillIva;
@@ -214,12 +208,8 @@ Object.assign(App, {
     }
     const tipoIva = g.tipoIva || 0;
     const tipoIrpf = g.tipoIrpf || 0;
-    const rate = tipoIva / 100, irRate = tipoIrpf / 100;
-    const div = 1 + rate - irRate;
     const total = roundMoney(g.importeBase);
-    const base = roundMoney(div > 0 ? total / div : total);
-    const iva = roundMoney(base * rate);
-    const irpf = roundMoney(base * irRate);
+    const { base, importeIva: iva, importeIrpf: irpf } = B.desglosarTotal(total, tipoIva, tipoIrpf);
     const fecha = todayStr();
     if (!g.entradas) g.entradas = [];
     g.entradas.push({ id: uid(), fecha, base, iva, irpf, total, cantidad: total, tipoIva, tipoIrpf, nota: '' });
