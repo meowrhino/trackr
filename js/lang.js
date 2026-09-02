@@ -2195,3 +2195,30 @@ function _updateNav() {
 
   if (typeof App !== 'undefined' && App._renderSaved) App._renderSaved();
 }
+
+/**
+ * Chequeo de traducciones (solo en local): compara `en` y `ca` contra `es`, que
+ * es la referencia. Avisa de claves sin traducir y de claves que sobran porque
+ * ya no existen en español. Nadie te avisaba de esto y era fácil que colara.
+ */
+function checkLangs() {
+  const ref = Object.keys(LANGS.es);
+  const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+  const informe = {};
+  ['en', 'ca'].forEach(code => {
+    const dic = LANGS[code];
+    const faltan = ref.filter(k => !has(dic, k));
+    const sobran = Object.keys(dic).filter(k => !has(LANGS.es, k));
+    informe[code] = { faltan, sobran };
+    if (faltan.length) console.warn(`[i18n] ${code}: ${faltan.length} clave(s) sin traducir`, faltan);
+    if (sobran.length) console.warn(`[i18n] ${code}: ${sobran.length} clave(s) que ya no están en es`, sobran);
+    if (!faltan.length && !sobran.length) console.info(`[i18n] ${code}: al día (${ref.length} claves)`);
+  });
+  return informe;
+}
+
+/* En producción no molesta: solo corre sirviendo en local. */
+if (typeof location !== 'undefined'
+    && (['localhost', '127.0.0.1'].includes(location.hostname) || location.protocol === 'file:')) {
+  checkLangs();
+}
