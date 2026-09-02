@@ -12,8 +12,13 @@ Si tu proveedor te factura con retención (un profesional, el alquiler de la ofi
 ### ✨ Nuevo
 - **Retención IRPF % en el gasto** (junto al tipo de IVA) e **IRPF (€) en cada entrada**. El cálculo automático va en las dos direcciones: desde la base salen IVA, retención y total; y si escribes el total de la factura, se desglosa hacia atrás. 265 € + 21% − 15% = **280,90 €**, igual que en tu factura. _frontend_
 - **El gasto sigue costando lo que cuesta.** En tarjetas, barras y calendario se cuenta base + IVA: la retención no te la ahorras, la ingresas tú. La entrada lleva una etiqueta `IRPF 39,75 €` con el total real de la factura en el tooltip. _frontend_
-- **Resumen fiscal**: aviso con lo retenido a proveedores en el trimestre, que es lo que va al **modelo 111** (TRACKR todavía no lo calcula). _frontend_
 - **Libros registro AEAT**: las facturas recibidas ya rellenan "Tipo Retención del IRPF" (AK) e "Importe Retenido" (AL), y el Total Factura descuenta la retención. _frontend_
+
+### 🧹 Por dentro
+- **El motor fiscal sale de la vista**: los cálculos del 303 y el 130 pasan de `app.gastos.js` (826 líneas, mitad pintar mitad calcular) a `js/fiscal.js` — objeto `F`, sin DOM, al lado de `billing.js` y `libros.js`. Los mismos números exactos en los tres ejemplos, comparados uno a uno. _frontend_
+- **Tres criterios duplicados, ahora uno**: `gastoImporteFiscal()` (base en España, base+IVA con proveedor extranjero) estaba copiado en el trimestral, en la renta y en los libros; `B.desglosarTotal()` recoge el desglose desde el total que estaba escrito tres veces en los modales. _frontend_
+- Una versión intermedia avisaba en el resumen fiscal de las retenciones practicadas y del **modelo 111**. Retirado: no aplica a quien no lo presenta. El importe retenido se sigue guardando en cada entrada. _frontend_
+- Roadmap y guía interna al día; las specs de las diez primeras features, ya construidas, archivadas en `TODO/hechos/`. _docs_
 
 ---
 
