@@ -4,21 +4,21 @@ Orden de implementación. Cada archivo tiene el detalle.
 
 | # | Feature | Archivo | Estado |
 |---|---------|---------|--------|
-| 1 | Clientes como entidad | `01-clientes.md` | ✅ hecho |
-| 2 | Nuevos estados + flags | `02-estados.md` | ✅ hecho |
-| 3 | Renombrar Dashboard → Proyectos | `03-renombrar-proyectos.md` | ✅ hecho |
-| 4 | Configuración (emisor + targets) | `04-configuracion.md` | ✅ hecho |
-| 5 | Gastos | `05-gastos.md` | ✅ hecho |
-| 6 | Resumen financiero en Info | `06-resumen-financiero.md` | ✅ hecho |
-| 7 | Objetivos en calendario | `07-objetivos-calendario.md` | ✅ hecho |
-| 8 | Resumen en calendario | `08-resumen-calendario.md` | ✅ hecho |
-| 9 | Generación de facturas | `09-facturas.md` | ✅ hecho |
-| 10 | Migración de datos (versioning) | `10-migracion.md` | ✅ hecho |
+| 1 | Clientes como entidad | `hechos/01-clientes.md` | ✅ hecho |
+| 2 | Nuevos estados + flags | `hechos/02-estados.md` | ✅ hecho |
+| 3 | Renombrar Dashboard → Proyectos | `hechos/03-renombrar-proyectos.md` | ✅ hecho |
+| 4 | Configuración (emisor + targets) | `hechos/04-configuracion.md` | ✅ hecho |
+| 5 | Gastos | `hechos/05-gastos.md` | ✅ hecho |
+| 6 | Resumen financiero en Info | `hechos/06-resumen-financiero.md` | ✅ hecho |
+| 7 | Objetivos en calendario | `hechos/07-objetivos-calendario.md` | ✅ hecho |
+| 8 | Resumen en calendario | `hechos/08-resumen-calendario.md` | ✅ hecho |
+| 9 | Generación de facturas | `hechos/09-facturas.md` | ✅ hecho |
+| 10 | Migración de datos (versioning) | `hechos/10-migracion.md` | ✅ hecho |
 | 11 | Analytics anónimo | `11-analytics.md` | ✅ Cloudflare Web Analytics activo · Worker propio en reserva |
 | 12 | Gastos recurrentes avanzados | `12-gastos-recurrentes.md` | ✅ hecho (12 may 2026) |
 | 13 | Asistente trimestral (303+130) | `13-asistente-trimestral.md` | ✅ hecho (12 may 2026) · casillas oficiales exactas desde 5 jul, exterior (ISP/59/120) desde 18 jul |
 | 14 | Plan de marketing v1 (deck 25 slides) | `14-marketing-plan.md` | ✅ hecho (12 may 2026) |
-| 15 | Verifactu / homologación SIF | `15-verifactu.md` | 🚧 Fase 1 (código local) ✅ · email AEAT enviado 18 jul, esperando respuesta — deadline 1 jul 2027 |
+| 15 | Verifactu / homologación SIF | `15-verifactu.md` | 🚧 Fases 1-3 ✅ (registros firmados y encolados en el servidor con emisor, destinatario y encadenado) · email AEAT enviado 18 jul, esperando respuesta — deadline 1 jul 2027 |
 | 16 | Microherramientas públicas /303 y /130 | `16-microherramientas.md` | ✅ hecho (18 jul 2026) — en producción; falta solo el post de lanzamiento |
 | 17 | Cuentas + cloud (Pivot A) | `17-pivot-cloud.md` | ✅ hecho (jun 2026) — en producción, signups cerrados (`SIGNUPS_OPEN=false`) |
 | 18 | Módulo inmovilizado (amortización >300 €) | `18-inmovilizado.md` | ⏳ pendiente |
@@ -26,9 +26,29 @@ Orden de implementación. Cada archivo tiene el detalle.
 | 20 | Referencia de casillas 130/303/renta | `20-modelos-fiscales-casillas.md` | 📚 referencia — las 8 divergencias resueltas (18 jul 2026) |
 | 21 | Cuentas gestor (compartir E2E con gestoría) | `21-gestores.md` | ✅ desplegado en producción (17 jul 2026) + reconciliación multidispositivo (18 jul) |
 | 22 | Beta gestoría con Diego | `22-beta-diega.md` | 🚧 en curso (19 jul 2026) — cuenta activa y vínculo creado; roces del alta anotados |
-| 23 | Exportar libros registro (AEAT) | `23-libros-registro.md` | 💡 diseñado — investigar formato oficial |
+| 23 | Exportar libros registro (AEAT) | `23-libros-registro.md` | ✅ hecho (19 jul 2026) — Excel oficial IVA+IRPF, beta hasta pasar el validador de la sede |
 | 24 | Adjuntos: justificantes de gasto | `24-adjuntos.md` | 💡 diseñado — define el plan de pago |
-| 25 | Panel de admin como página aparte (`/admin`) | — | 💡 acordado (19 jul) — sacar el bloque admin de la Configuración personal |
+| 25 | Panel de admin como página aparte (`/admin`) | — | ✅ hecho (jul 2026) — incluye abrir/cerrar el registro con un clic |
+| 26 | Retención de IRPF en gastos | — | ✅ hecho (2 sep 2026) — captura, cálculo en ambos sentidos y columnas AK/AL en los libros |
+| 27 | Modelo 111 (retenciones practicadas) | — | ❌ descartado por ahora — meowrhino no lo presenta; el dato se guarda por si algún día |
+
+---
+
+## Sprint del 2 de septiembre de 2026 (resumen)
+
+Sesión corta a raíz de una factura de proveedor con retención que no se podía meter.
+
+1. **Retención de IRPF en gastos** (`f28cb35`): tipo de retención en el gasto e importe por
+   entrada, cálculo en ambos sentidos (desde la base y desde el total de la factura), etiqueta
+   `IRPF x €` en la entrada y columnas AK/AL en el libro de recibidas. El coste que cuentan
+   barras y tarjetas sigue siendo base + IVA: la retención no abarata el gasto.
+2. **Nada de modelo 111** (`dfa179b`): el primer intento avisaba de la obligación del 111 en el
+   campo y en el resumen fiscal. Fuera: no aplica a este usuario.
+3. **Refactor fiscal** (`f7bc128`): el motor de 303/130 sale de `app.gastos.js` a `js/fiscal.js`
+   (objeto `F`); `gastoImporteFiscal()` y `B.desglosarTotal()` acaban con tres criterios
+   duplicados. Verificado dando exactamente los mismos números en los tres ejemplos.
+4. **Docs**: specs 01-10 (todas ✅ desde mayo) a `TODO/hechos/`, `historial.txt` a
+   `docs/historial-origen.txt`, roadmap puesto al día y guía interna corregida.
 
 ---
 

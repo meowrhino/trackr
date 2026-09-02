@@ -28,7 +28,8 @@ de él salvo que tú lo pidas.
 ## Stack
 
 Vanilla JS sin build ni dependencias de runtime (los vendors — jsPDF, qrcode — van en `vendor/`).
-Módulos como globales (`D` store, `App` UI, `Acc` cuentas, `V` verifactu, `B` billing…) cargados
+Módulos como globales (`D` store, `App` UI, `Acc` cuentas, `V` verifactu, `B` billing, `F` fiscal,
+`LR` libros registro…) cargados
 en orden desde `index.html`. El backend es un repo aparte:
 [trackr-api](https://github.com/meowrhino/trackr-api) (Cloudflare Worker + D1 + R2).
 
@@ -38,6 +39,8 @@ css/         estilos (variables.css primero, responsive.css último)
 journey/     widget kanban de customer journey (autocontenido)
 examples/    cuentas de ejemplo completas (las fechas futuras son intencionales)
 TODO/        roadmap y documentos de diseño — empezar por TODO/00-overview.md
+TODO/hechos/ specs de features ya construidas (archivo)
+docs/        material histórico (la conversación en que nació TRACKR)
 deck/        deck de marketing (25 slides)
 303.html     calculadora pública del Modelo 303
 130.html     calculadora pública del Modelo 130
@@ -65,6 +68,7 @@ sitio) y `npx wrangler deploy`. El service worker purga su caché por release (s
 - [TODO/00-overview.md](TODO/00-overview.md) — roadmap con el estado de cada feature.
 - [TODO/21-gestores.md](TODO/21-gestores.md) — diseño del rol gestoría (E2E, autoría, edición).
 - [TODO/22-beta-diega.md](TODO/22-beta-diega.md) — guion de la beta del rol gestoría.
-- `historial.txt` — la conversación fundacional del proyecto, para la posteridad.
+- [TODO/hechos/](TODO/hechos/) — specs de las features ya construidas (01-10), archivadas.
+- `docs/historial-origen.txt` — la conversación fundacional del proyecto, para la posteridad.
 
 Hecho por [meowrhino](https://meowrhino.studio).
