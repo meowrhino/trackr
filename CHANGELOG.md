@@ -5,6 +5,23 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-10-14 (tarde) — Menos subidas y versiones de verdad en la nube
+
+Cada entrada del calendario creaba una versión en el servidor (de la v100 a la v200 en una hora), y el servidor solo guardaba las 10 últimas: unos minutos de trabajo. No servía para volver atrás.
+
+### ✨ Nuevo
+- **Versiones en la nube** (Configuración → Cuenta): lista con fecha y botón **Restaurar**, desde cualquier ordenador. Se guardan las 10 últimas y, de los últimos 30 días, la última de cada día. Restaurar crea una versión nueva con ese contenido: lo de ahora sigue en la lista y además se guarda una copia en este navegador. _frontend, backend@99ac237_
+
+### 🔧 Cambiado
+- **Se sube a los 30 s del último cambio** (antes 2,5 s), y **enseguida al cambiar de pestaña o cerrar**. Cada cambio sigue guardándose al momento en el navegador; lo que no llegue a subirse lo recoge el siguiente inicio de sesión. 5 entradas seguidas = 1 versión. _frontend_
+- **No se sube si nada ha cambiado** (antes, cualquier guardado sin cambios creaba una versión idéntica). _frontend_
+- **Si una subida falla** (sin red, límite), se reintenta sola al minuto en vez de esperar al siguiente cambio. _frontend_
+- **Indicador "Cambios por subir…"** mientras espera; navegar ya no lo tapa con "Sincronizado". _frontend_
+- **Tope de 120 subidas por hora y usuario**, como freno si algo entra en bucle. Usando la app no se alcanza. _backend@99ac237_
+- **"Borrar datos de este navegador" dice la verdad**: las copias de seguridad y la cuenta en la nube se conservan. El botón rojo ponía "Cerrar sesión" y ahora pone lo que hace. _frontend_
+
+---
+
 ## 2026-10-14 — Presupuestos, proyectos que se arrastran y «hola de nuevo»
 
 ### ✨ Nuevo

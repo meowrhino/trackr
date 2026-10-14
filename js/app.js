@@ -349,7 +349,7 @@ const App = {
       + `<div style="display:flex;gap:.5rem;margin-bottom:.5rem">`
       + `<button class="bt" onclick="App.exp()" style="flex:1">${t('nav.export')} JSON</button>`
       + `</div>`
-      + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-d" onclick="App.resetData()">${t('btn.logout')}</button></div>`);
+      + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-d" onclick="App.resetData()">${t('msg.clearBtn')}</button></div>`);
   },
 
   /* ══════════════════════════════════════════════

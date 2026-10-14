@@ -11,6 +11,7 @@ function setup({ meta, cloudVersion, local, lastSaved }) {
   const calls = [];
   const cloud = { projects: [{ id: 'c1' }], clientes: [], gastos: [] };
   let srvVersion = cloudVersion;
+  const pushed = {}; // version -> datos subidos (para restaurar)
   const D = { d: local, lastSaved, load(j) { this.d = j; this.lastSaved = ++clock; } };
   let clock = lastSaved + 1000;
   const res = (status, data) => ({ status, json: async () => data });
@@ -22,10 +23,14 @@ function setup({ meta, cloudVersion, local, lastSaved }) {
     if (path === '/v1/prelogin') return res(200, { kdfMem: 1, kdfTime: 1, kdfPar: 1, kdfSalt: 's', loginNonce: 'n' });
     if (path === '/v1/login') return res(200, { token: 't', credEpoch: 1, currentVersion: srvVersion, active: true, role: 'persona' });
     if (path === '/v1/blob/meta') return res(200, { currentVersion: srvVersion, updatedAt: 1700000000 });
-    if (path === '/v1/blob' && m === 'GET') return res(200, { blob: 'b', version: srvVersion });
+    if (path === '/v1/blob' && m === 'GET') {
+      const v = Number(new URL(url).searchParams.get('version')) || srvVersion;
+      return res(200, { blob: pushed[v] || null, version: v });
+    }
     if (path === '/v1/blob' && m === 'PUT') {
       if (body.baseVersion !== srvVersion) return res(409, { currentVersion: srvVersion });
-      return res(200, { version: ++srvVersion });
+      pushed[++srvVersion] = body.blob;
+      return res(200, { version: srvVersion });
     }
     return res(404, {});
   };
@@ -33,14 +38,15 @@ function setup({ meta, cloudVersion, local, lastSaved }) {
     available: () => true, canonEmail: (e) => e,
     deriveForLogin: async () => ({ authKey: 'a', wrapKeyPwd: 'w' }),
     unwrapLogin: async () => 'dek',
-    decryptDownload: async () => structuredClone(cloud),
-    encryptForUpload: async () => ({ blob: 'b', blobHash: 'h' }),
+    decryptDownload: async (dek, blob) => blob ? JSON.parse(blob) : structuredClone(cloud),
+    encryptForUpload: async (dek, data) => ({ blob: JSON.stringify(data), blobHash: 'h' }),
+    _: { b64u: (u8) => Buffer.from(u8).toString('base64url') },
   };
   const ls = { getItem: (k) => store[k] ?? null, setItem: (k, v) => { store[k] = v; }, removeItem: (k) => { delete store[k]; } };
-  const ctx = { D, CA, fetch, localStorage: ls, sessionStorage: ls, console, setTimeout, clearTimeout };
+  const ctx = { D, CA, fetch, localStorage: ls, sessionStorage: ls, console, setTimeout, clearTimeout, crypto: globalThis.crypto, TextEncoder };
   vm.createContext(ctx);
   vm.runInContext(src + '\nthis.Acc = Acc;', ctx);
-  return { Acc: ctx.Acc, D, calls, store, get srvVersion() { return srvVersion; } };
+  return { Acc: ctx.Acc, D, calls, store, get srvVersion() { return srvVersion; }, get puts() { return calls.filter((c) => c === 'PUT /v1/blob').length; } };
 }
 
 const withData = { projects: [{ id: 'l1' }], clientes: [], gastos: [] };
@@ -116,4 +122,30 @@ for (const [choice, ids] of [['cloud', ['c1']], ['local', ['l1']], ['merge', ['c
   assert.equal(sh.clientes[0].nif, '1');
   assert.equal(D.d.clientes[0].notas, 'privado'); // el original intacto
   console.log('ok - fiscal: sin notas de cliente');
+}
+
+// no se sube lo que no ha cambiado (cada subida = una versión en el servidor)
+{
+  const e = setup({ meta: me(5, 100), cloudVersion: 5, local: withData, lastSaved: 200 });
+  await e.Acc.login('a@b.c', 'pw');
+  await e.Acc.resume();                      // sube (había cambios)
+  const v = e.srvVersion, n = e.puts;
+  const r = await e.Acc.push();              // nada cambió
+  assert.equal(r.unchanged, true); assert.equal(e.srvVersion, v); assert.equal(e.puts, n);
+  e.D.d.clientes.push({ id: 'nuevo' });
+  await e.Acc.push();                        // ahora sí
+  assert.equal(e.srvVersion, v + 1);
+  console.log('ok - sin cambios no se sube');
+}
+
+// restaurar una versión vieja = versión nueva con ese contenido (base = la actual, sin merge)
+{
+  const e = setup({ meta: me(5, 100), cloudVersion: 5, local: withData, lastSaved: 200 });
+  await e.Acc.login('a@b.c', 'pw');
+  await e.Acc.resume();                      // v6: solo l1
+  e.D.d.projects.push({ id: 'l2' }); await e.Acc.push();   // v7: l1 + l2
+  const r = await e.Acc.restoreVersion(6, 7);
+  assert.equal(r.ok, true); assert.equal(e.srvVersion, 8);
+  assert.equal(JSON.stringify(e.D.d.projects.map((p) => p.id)), '["l1"]');
+  console.log('ok - restaurar versión');
 }

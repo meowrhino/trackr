@@ -64,15 +64,27 @@ const Acc = (() => {
     if (r.status !== 200 || !r.data) return null;
     return { currentVersion: r.data.currentVersion || 0, updatedAt: (r.data.updatedAt || 0) * 1000 };
   }
+  // Huella del texto plano de los datos: si no cambio desde la ultima vez que local y nube
+  // coincidieron, no hay nada que subir (cada subida cifra con IV nuevo, asi que el servidor
+  // no puede detectarlo y crearia una version identica).
+  let _lastPlainHash = null;
+  async function plainHash(data) {
+    const b = new TextEncoder().encode(JSON.stringify(data));
+    return CA._.b64u(new Uint8Array(await crypto.subtle.digest('SHA-256', b)));
+  }
   function markSynced() { S.syncedAt = (typeof D !== 'undefined' && D.lastSaved) || Date.now(); saveMeta(); }
 
   /* ── fetch helper ── */
-  async function api(path, { method = 'GET', body, auth = false } = {}) {
+  async function api(path, { method = 'GET', body, auth = false, keepalive = false } = {}) {
     const headers = {};
     if (body !== undefined) headers['Content-Type'] = 'application/json';
     if (auth && S.token) headers['Authorization'] = 'Bearer ' + S.token;
+    const payload = body !== undefined ? JSON.stringify(body) : undefined;
+    // keepalive deja terminar la peticion aunque se cierre la pestana, pero el navegador
+    // la rechaza por encima de 64 KB: solo se pide si cabe.
+    keepalive = keepalive && (!payload || payload.length < 60000);
     let res;
-    try { res = await fetch(API_BASE + path, { method, headers, body: body !== undefined ? JSON.stringify(body) : undefined }); }
+    try { res = await fetch(API_BASE + path, { method, headers, body: payload, keepalive }); }
     catch (e) { return { status: 0, data: null, netErr: true }; }
     let data = null; try { data = await res.json(); } catch (e) { /* 204 etc */ }
     return { status: res.status, data };
@@ -210,6 +222,7 @@ const Acc = (() => {
     S.version = g.data.version;
     _applyRemote(data);
     markSynced();
+    _lastPlainHash = await plainHash(D.d);
     // El blob bajado puede traer un grant que otro dispositivo ya revoco (o un canEdit viejo)
     reconcileGrant(true).catch(() => {});
     return { ok: true, version: g.data.version };
@@ -267,9 +280,11 @@ const Acc = (() => {
       const data = dataObj || (typeof D !== 'undefined' ? D.d : null);
       if (!data) return { ok: false, error: 'no_data' };
       const savedAt = typeof D !== 'undefined' ? D.lastSaved : null; // lo que se edite durante el PUT sigue sucio
+      const ph = await plainHash(data);
+      if (!_retry && ph === _lastPlainHash && S.version) { S.syncedAt = savedAt || Date.now(); saveMeta(); return { ok: true, version: S.version, unchanged: true }; }
       const { blob, blobHash } = await CA.encryptForUpload(S.dek, data, S.email, S.version + 1);
-      const r = await api('/v1/blob', { method: 'PUT', auth: true, body: { blob, blobHash, baseVersion: S.version } });
-      if (r.status === 200) { S.version = r.data.version; S.syncedAt = savedAt || Date.now(); saveMeta(); return { ok: true, version: r.data.version }; }
+      const r = await api('/v1/blob', { method: 'PUT', auth: true, keepalive: true, body: { blob, blobHash, baseVersion: S.version } });
+      if (r.status === 200) { S.version = r.data.version; S.syncedAt = savedAt || Date.now(); _lastPlainHash = ph; saveMeta(); return { ok: true, version: r.data.version }; }
       if (r.status === 409 && !_retry) {
         S.version = r.data.currentVersion;
         const g = await api('/v1/blob', { method: 'GET', auth: true });
@@ -287,7 +302,7 @@ const Acc = (() => {
         return { ok: false, error: 'version_conflict', currentVersion: r.data.currentVersion };
       }
       if (r.status === 403) return { ok: false, error: 'inactive' };
-      return { ok: false, error: r.data?.error || 'put_failed' };
+      return { ok: false, error: failOf(r, 'put_failed') };
     } finally {
       if (!_retry) {
         _pushing = false;
@@ -347,6 +362,7 @@ const Acc = (() => {
     // Tras un push OK: espejo para la gestoria y, si nos dejo editar, recoger sus cambios.
     // pullOps aplica -> D.save -> notifyChange -> otro push; converge porque la segunda
     // vuelta ya no encuentra ops. Los dos son best-effort: no rompen el sync normal.
+    if (!res || (!res.ok && !['busy', 'not_ready', 'inactive'].includes(res.error))) scheduleSync(RETRY_MS); // red caida, 429...: reintentar sin esperar a otro cambio
     if (res && res.ok) { emitSync('synced', res); reconcileGrant().catch(() => {}); pushShadow().catch(() => {}); pullOps().catch(() => {}); pushVerifactu().catch(() => {}); }
     else if (!res || res.error !== 'busy') emitSync('error', res || {}); // 'busy' = coalescado, el push en curso ya emitira
     return res;
@@ -356,10 +372,51 @@ const Acc = (() => {
     _applyingRemote = true;
     try { if (typeof D !== 'undefined' && D.load) D.load(data); } finally { _applyingRemote = false; }
   }
+  /* Cuanto esperar tras el ultimo cambio antes de subir. Cada cambio queda guardado AL
+     MOMENTO en el navegador; esto solo agrupa subidas (antes 2,5 s = una version por cada
+     entrada del calendario). Al ocultar la pestana se sube ya; lo que no llegue a subir
+     lo recoge resume() en el siguiente inicio de sesion. */
+  const SYNC_DEBOUNCE_MS = 30000, RETRY_MS = 60000;
+  function scheduleSync(ms) {
+    if (!_enabled || !isUnlocked() || !S.active) return;
+    if (_timer) clearTimeout(_timer);
+    _timer = setTimeout(() => { _timer = null; syncPush().catch(() => {}); }, ms);
+  }
   function notifyChange() {
     if (!_enabled || _applyingRemote || !isUnlocked() || !S.active) return;
-    if (_timer) clearTimeout(_timer);
-    _timer = setTimeout(() => { _timer = null; syncPush().catch(() => {}); }, 2500);
+    scheduleSync(SYNC_DEBOUNCE_MS);
+    emitSync('pending');
+  }
+  function flushSync() {
+    if (!_timer) return;
+    clearTimeout(_timer); _timer = null;
+    syncPush().catch(() => {});
+  }
+  if (typeof document !== 'undefined') {
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushSync(); });
+    window.addEventListener('pagehide', flushSync);
+  }
+
+  /* ── Versiones en la nube (retencion escalonada en el servidor) ── */
+  async function versions() {
+    if (!isUnlocked() || !S.active) return { ok: false, error: 'not_ready' };
+    const r = await api('/v1/versions', { auth: true });
+    if (r.status !== 200) return { ok: false, error: failOf(r, 'list_failed') };
+    return { ok: true, current: r.data.current, versions: (r.data.versions || []).map(v => ({ version: v.version, createdAt: v.createdAt * 1000, sizeBytes: v.sizeBytes })) };
+  }
+  // Restaurar = subir el contenido de una version vieja como version NUEVA. Nada se borra:
+  // la que habia sigue en el historial. `current` sale del listado; se usa como base para
+  // que el push no dispare el merge del 409 (que volveria a meter lo que se quiere quitar).
+  async function restoreVersion(v, current) {
+    if (!isUnlocked() || !S.active) return { ok: false, error: 'not_ready' };
+    const g = await api('/v1/blob?version=' + encodeURIComponent(v), { auth: true });
+    if (g.status !== 200) return { ok: false, error: failOf(g, 'get_failed') };
+    let data;
+    try { data = await CA.decryptDownload(S.dek, g.data.blob, S.email, g.data.version); }
+    catch (e) { return { ok: false, error: 'decrypt_failed' }; }
+    _applyRemote(data);
+    S.version = current;
+    return await syncPush();
   }
 
   /* ── Gestores (comparticion E2E, PROTOCOL §15) ── */
@@ -638,7 +695,7 @@ const Acc = (() => {
   async function adminSetConfig(signupsOpen) { const r = await api('/v1/admin/config', { method: 'POST', auth: true, body: { signupsOpen: !!signupsOpen } }); return r.status === 200; }
 
   return {
-    signup, login, unlock, logout, changePassword, recover, pull, push: syncPush, resume, resolve, remembered, cloudMeta,
+    signup, login, unlock, logout, changePassword, recover, pull, push: syncPush, resume, resolve, remembered, cloudMeta, versions, restoreVersion,
     gestorEnsureKey, gestorResolve, grantCreate, grantRevoke, gestorClients, gestorOpenClient, pushShadow, _buildShareData: buildShareData,
     grantSetCanEdit, opsPush, pullOps, setOpsListener, reconcileGrant, pushVerifactu,
     adminListUsers, adminSetActive, adminSetPaid, adminDelete, adminGetConfig, adminSetConfig, _mergeData: mergeData,

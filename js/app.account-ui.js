@@ -31,6 +31,7 @@
   const esc2 = (s) => (typeof esc === 'function' ? esc(s) : String(s));
 
   let mode = 'login'; // out-state: login | signup | recover
+  let lastSync = null; // ultimo estado de sync pintado (ver _renderSyncStatus)
 
   function fieldsFor(m) {
     if (m === 'signup') {
@@ -82,7 +83,7 @@
           + `</div>`
           + (st.active ? `<label class="acc-legal" style="margin-top:.6rem"><input type="checkbox" id="accAuto" style="width:auto;margin-right:.5rem" onchange="App.accToggleAuto(this.checked)">${t('autoSync')}</label>` : `<div class="acc-warn" style="margin-top:.6rem">${t('pending')}</div>`)
           + `<div class="acc-actions">`
-          + (st.active ? `<button class="bt bt-s" onclick="App.accSyncNow()">${t('syncNow')}</button>` : '')
+          + (st.active ? `<button class="bt bt-s" onclick="App.accSyncNow()">${t('syncNow')}</button><button class="bt bt-s" onclick="App.accVersions()">${t('verBtn')}</button>` : '')
           + `<button class="bt bt-s" onclick="App.accChangePwModal()">${t('changePw')}</button>`
           + `<button class="bt bt-s" onclick="App.accLogout()">${t('logout')}</button>`
           + `</div>`
@@ -212,8 +213,10 @@
       this._renderSyncStatus();
     },
 
-    // Indicador de sync en la barra lateral. syncState: 'syncing' | 'synced' | 'error' | undefined (lee estado actual).
+    // Indicador de sync en la barra lateral. syncState: 'pending' | 'syncing' | 'synced' | 'error' |
+    // undefined (repinta el ultimo conocido: navegar no debe tapar un "por subir" o un error).
     _renderSyncStatus(syncState) {
+      if (syncState) lastSync = syncState; else syncState = lastSync;
       const el = document.getElementById('syncStatus');
       if (!el || typeof Acc === 'undefined') return;
       const st = Acc.status();
@@ -232,6 +235,7 @@
       el.onclick = null; el.style.cursor = '';
       let cls, txt;
       if (syncState === 'syncing') { cls = 'syncing'; txt = t('syncing'); }
+      else if (syncState === 'pending') { cls = 'warn'; txt = t('pendingSync'); }
       else if (syncState === 'error') { cls = 'err'; txt = t('syncErrShort'); }
       else if (!st.active) { cls = 'warn'; txt = t('pendingShort'); }
       else { cls = 'ok'; txt = `${t('synced')} · v${st.version}`; }
@@ -349,6 +353,32 @@
       const r = await Acc.pull();
       if (r.ok && !r.empty) { this._applyPrefs && this._applyPrefs(); this.go(this.cv); }
       return r;
+    },
+
+    /* ── Versiones en la nube: listar y restaurar (retencion escalonada en el servidor) ── */
+    async accVersions() {
+      const r = await Acc.versions();
+      if (!r.ok) return Toast.error(t('syncErr') + ` (${errMsg(r.error)})`);
+      const rows = r.versions.map(v => `<div class="cl-item">`
+        + `<span class="cl-name" style="font-size:.82rem"><span class="m">v${v.version}</span> · ${when(v.createdAt)}${v.version === r.current ? ` · <strong style="color:var(--ok)">${t('verCurrent')}</strong>` : ''}</span>`
+        + `<span class="cl-nif" style="font-size:.72rem;color:var(--t3)">${Math.max(1, Math.round(v.sizeBytes / 1024))} KB</span>`
+        + (v.version === r.current ? '' : `<div class="cl-actions"><button class="bt bt-s" onclick="App.accRestore(${v.version},${r.current},${v.createdAt})">${t('verRestore')}</button></div>`)
+        + `</div>`).join('');
+      this.om(`<div class="mt">${t('verTitle')}</div>`
+        + `<p style="font-size:.84rem;color:var(--t2);line-height:1.5;margin-bottom:.9rem">${t('verDesc')}</p>`
+        + (rows ? `<div class="cl-list" style="max-height:55vh;overflow:auto">${rows}</div>` : `<div style="color:var(--t3)">${t('verEmpty')}</div>`)
+        + `<div class="ma"><button class="bt" onclick="App.cm()">${window.t('btn.close')}</button></div>`);
+    },
+
+    async accRestore(v, current, ts) {
+      if (!confirm(t('verConfirm', v, new Date(ts).toLocaleString(L(), { dateStyle: 'medium', timeStyle: 'short' })))) return;
+      if (typeof H !== 'undefined') H.snapshot(); // lo de ahora, a salvo en este navegador
+      const r = await Acc.restoreVersion(v, current);
+      if (!r.ok) return Toast.error(t('syncErr') + ` (${errMsg(r.error)})`);
+      Toast.ok(t('verDone', v, r.version));
+      this.cm();
+      this._applyPrefs && this._applyPrefs();
+      this.go(this.cv);
     },
 
     accToggleAuto(on) { Acc.setAutoSync(on); if (on) this.accSyncNow(); },
