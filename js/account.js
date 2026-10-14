@@ -513,7 +513,8 @@ const Acc = (() => {
        lo fiscal. En scope 'todo' viaja entero, que es donde tiene sentido. */
     return {
       version: d.version,
-      clientes: d.clientes || [],
+      /* Las notas del cliente son de la persona (como las de los proyectos): fuera */
+      clientes: (d.clientes || []).map(({ notas, ...c }) => c),
       gastos: d.gastos || [],
       deducibles: d.deducibles || [],
       facturas: d.facturas || [],

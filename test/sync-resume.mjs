@@ -106,3 +106,14 @@ for (const [choice, ids] of [['cloud', ['c1']], ['local', ['l1']], ['merge', ['c
   assert.equal(JSON.stringify(m.audit.map((e) => e.ts)), '[1,2]');
   console.log('ok - merge: journey y audit');
 }
+
+// alcance fiscal de la gestoría: las notas del cliente no viajan
+{
+  const { Acc, D } = setup({ meta: null, cloudVersion: 1, local: empty, lastSaved: 1 });
+  D.d = { version: 4, clientes: [{ id: 'c', nombre: 'X', nif: '1', notas: 'privado' }], projects: [], gastos: [], deducibles: [], facturas: [], settings: {} };
+  const sh = Acc._buildShareData('fiscal');
+  assert.equal(sh.clientes[0].notas, undefined);
+  assert.equal(sh.clientes[0].nif, '1');
+  assert.equal(D.d.clientes[0].notas, 'privado'); // el original intacto
+  console.log('ok - fiscal: sin notas de cliente');
+}

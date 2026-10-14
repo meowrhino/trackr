@@ -60,7 +60,7 @@ Object.assign(App, {
         }).join('')}</div></div>`
       + `<div class="cfg-section" style="margin-top:2.5rem"><div class="cfg-section-title">${t('cfg.clients')}</div>`
       + (cls.length
-        ? `<div class="cl-list">${cls.map(c => `<div class="cl-item"><span class="cl-dot" style="background:${colorHex(c.color || 'CornflowerBlue')}"></span><span class="cl-name">${esc(c.nombre)}</span>${c.nif ? `<span class="cl-nif">${esc(c.nif)}</span>` : ''}<div class="cl-actions"><button class="cl-btn" onclick="App.budModal('${c.id}')" title="${t('bud.generate')}">&#128203;</button><button class="cl-btn" onclick="App.clModal('${c.id}')" title="${t('btn.edit')}">&#9998;</button><button class="cl-btn cl-btn-del" onclick="App.delCl('${c.id}')" title="${t('btn.delete')}">&times;</button></div></div>`).join('')}</div>`
+        ? `<div class="cl-list">${cls.map(c => `<div class="cl-item"><span class="cl-dot" style="background:${colorHex(c.color || 'CornflowerBlue')}"></span><span class="cl-name"${c.notas ? ` title="${esc(c.notas)}"` : ''}>${esc(c.nombre)}${c.notas ? ' <span style="color:var(--t3)">📝</span>' : ''}</span>${c.nif ? `<span class="cl-nif">${esc(c.nif)}</span>` : ''}<div class="cl-actions"><button class="cl-btn" onclick="App.budModal('${c.id}')" title="${t('bud.generate')}">&#128203;</button><button class="cl-btn" onclick="App.clModal('${c.id}')" title="${t('btn.edit')}">&#9998;</button><button class="cl-btn cl-btn-del" onclick="App.delCl('${c.id}')" title="${t('btn.delete')}">&times;</button></div></div>`).join('')}</div>`
         : `<div style="color:var(--t3);font-size:.82rem">${t('cfg.noClients')}</div>`)
       + `<button class="bt bt-add" style="margin-top:.75rem" onclick="App.clModal()">${t('btn.newClient')}</button></div>`
       + `<div class="cfg-section" style="margin-top:2.5rem"><div class="cfg-section-title">${t('cfg.importOldInvoices')}</div>`
@@ -493,6 +493,7 @@ Object.assign(App, {
       + `<div class="fr"><div class="fg"><label>${t('cfg.nif')}</label><input type="text" id="clNif" value="${esc(c?.nif || '')}" placeholder="${t('ph.nif')}"></div><div class="fg"><label>${t('field.color')}</label>${this.colorSelect(clColor)}</div></div>`
       + `<div class="fr"><div class="fg"><label>${t('field.zonaFiscal')}</label><select id="clZona">${Object.entries(ZONA_FISCAL).map(([k, v]) => `<option value="${k}" ${(c?.zonaFiscal || 'es') === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
       + `<div class="fg" style="align-self:end"><p class="small" style="color:var(--t3);margin:0">${t('cfg.zonaClientHelp')}</p></div></div>`
+      + `<div class="fg"><label>${t('field.notes')}</label><textarea id="clNo" placeholder="${t('ph.notes')}">${esc(c?.notas || '')}</textarea></div>`
       + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveCl('${cid || ''}')">${isE ? t('btn.save') : t('btn.create')}</button></div>`);
   },
 
@@ -501,7 +502,7 @@ Object.assign(App, {
     if (!nombre) { Toast.warn(t('msg.nameRequired')); return; }
     const color = document.getElementById('mpColor')?.value || 'CornflowerBlue';
     const nombreCompleto = document.getElementById('clNC').value.trim();
-    const data = { nombre, nombreCompleto, direccion1: document.getElementById('clD1').value.trim(), direccion2: document.getElementById('clD2').value.trim(), nif: document.getElementById('clNif').value.trim(), zonaFiscal: document.getElementById('clZona').value, color };
+    const data = { nombre, nombreCompleto, direccion1: document.getElementById('clD1').value.trim(), direccion2: document.getElementById('clD2').value.trim(), nif: document.getElementById('clNif').value.trim(), zonaFiscal: document.getElementById('clZona').value, color, notas: document.getElementById('clNo').value.trim() };
     let savedId;
     if (cid) { D.upCl(cid, data); savedId = cid; }
     else { data.id = uid(); D.addCl(data); savedId = data.id; }

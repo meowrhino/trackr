@@ -10,6 +10,7 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 ### ✨ Nuevo
 - **Presupuestos por cliente.** Se crean desde el icono 📋 en la lista de clientes o desde el botón "Presupuesto" en el detalle de un proyecto. Cada proyecto marcado del cliente es una línea (concepto e importe editables) y hay una descripción libre para servicios, plazos y condiciones. El PDF tiene el mismo diseño que la factura; si los proyectos llevan tipos distintos de IVA o IRPF, sale una fila por tipo. **No es una factura:** no gasta numeración de facturas, no pasa por VeriFactu y no sale en los libros. Lleva su propio contador, y cada proyecto incluido muestra "Presupuesto N/AA · fecha" en su ficha. _frontend_
 - **Arrastrar proyectos entre estados.** En Proyectos, arrastra una tarjeta a otro grupo para cambiarle el estado. Mientras arrastras aparecen también los estados vacíos, y se puede soltar sobre los grupos plegados (Completados, Abandonados). Soltar en Internos o Recurrentes la deja en Activo. Solo funciona en ordenador; en el móvil el estado se sigue cambiando desde el modal. _frontend_
+- **Notas libres en el cliente** (al editarlo), como las que ya tenían los proyectos. En la lista de clientes aparece un 📝 y, al pasar el ratón, se ven las notas. **No se comparten con la gestoría** en el alcance fiscal; en "Todo", sí. _frontend_
 
 ---
 
