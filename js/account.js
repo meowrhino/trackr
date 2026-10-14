@@ -16,13 +16,13 @@ const Acc = (() => {
   // `syncedAt` = D.lastSaved en el momento en que local y nube coincidian (tras pull/push OK).
   // Si D.lastSaved > syncedAt, este navegador tiene cambios que la nube no ha visto.
   const fresh = () => ({ state: 'out', token: null, email: null, dek: null, credEpoch: 1, kdf: { mem: 65536, time: 3, par: 1 },
-            version: 0, syncedAt: 0, active: false, isAdmin: false, role: 'persona', userId: null });
+            version: 0, syncedAt: 0, metaToken: null, active: false, isAdmin: false, role: 'persona', userId: null });
   let S = fresh();
 
   /* ── persistencia ── */
   function saveMeta() {
     try {
-      localStorage.setItem(MKEY, JSON.stringify({ email: S.email, kdf: S.kdf, credEpoch: S.credEpoch, version: S.version, syncedAt: S.syncedAt, active: S.active, isAdmin: S.isAdmin, role: S.role, userId: S.userId }));
+      localStorage.setItem(MKEY, JSON.stringify({ email: S.email, kdf: S.kdf, credEpoch: S.credEpoch, version: S.version, syncedAt: S.syncedAt, metaToken: S.metaToken, active: S.active, isAdmin: S.isAdmin, role: S.role, userId: S.userId }));
     } catch (e) { /* ignore */ }
   }
   function loadMeta() { try { return JSON.parse(localStorage.getItem(MKEY) || 'null'); } catch (e) { return null; } }
@@ -37,7 +37,7 @@ const Acc = (() => {
   // Otra cuenta, o nunca sincronizado aqui: base 0 y syncedAt 0 (= sin referencia).
   function localBase(email) {
     const m = loadMeta();
-    return (m && m.email === email) ? { version: m.version || 0, syncedAt: m.syncedAt || 0 } : { version: 0, syncedAt: 0 };
+    return (m && m.email === email) ? { version: m.version || 0, syncedAt: m.syncedAt || 0, metaToken: m.metaToken || null } : { version: 0, syncedAt: 0, metaToken: null };
   }
   const hasData = (d) => !!d && ['projects', 'clientes', 'gastos'].some(k => (d[k] || []).length);
   // Cambios locales que la nube no ha visto. Sin referencia (primera vez aqui) cuenta como
@@ -46,6 +46,23 @@ const Acc = (() => {
     const d = typeof D !== 'undefined' ? D.d : null;
     if (!hasData(d)) return false;
     return !S.syncedAt || (D.lastSaved || 0) > S.syncedAt;
+  }
+  // Cuenta recordada en este navegador (aunque no haya sesion): para la pantalla de inicio.
+  function remembered() {
+    const m = loadMeta();
+    if (!m || !m.email) return null;
+    const d = typeof D !== 'undefined' ? D.d : null;
+    const dirty = hasData(d) && (!m.syncedAt || (D.lastSaved || 0) > m.syncedAt);
+    return { email: m.email, version: m.version || 0, syncedAt: m.syncedAt || 0, dirty, hasPass: !!m.metaToken };
+  }
+  // Ultima subida a la nube desde CUALQUIER dispositivo, sin sesion (pase de solo
+  // metadatos que da el login, ver backend handleDeviceMeta). null si no hay pase o falla.
+  async function cloudMeta() {
+    const m = loadMeta();
+    if (!m || !m.metaToken) return null;
+    const r = await api('/v1/device/meta', { method: 'POST', body: { token: m.metaToken } });
+    if (r.status !== 200 || !r.data) return null;
+    return { currentVersion: r.data.currentVersion || 0, updatedAt: (r.data.updatedAt || 0) * 1000 };
   }
   function markSynced() { S.syncedAt = (typeof D !== 'undefined' && D.lastSaved) || Date.now(); saveMeta(); }
 
@@ -114,7 +131,7 @@ const Acc = (() => {
     try { dek = await CA.unwrapLogin(wrapKeyPwd, lg.data.wrappedDEK_pwd, email, lg.data.credEpoch); }
     catch (e) { return { ok: false, error: 'unwrap_failed' }; } // contrasena ok pero envelope no abre (no deberia pasar)
     const base = localBase(email); // NO la version del servidor: la copia local puede ir por detras (ver resume)
-    S = { state: 'in', token: lg.data.token, email, dek, credEpoch: lg.data.credEpoch, kdf, version: base.version, syncedAt: base.syncedAt, active: !!lg.data.active, isAdmin: !!lg.data.isAdmin, role: lg.data.role || 'persona', userId: lg.data.userId };
+    S = { state: 'in', token: lg.data.token, email, dek, credEpoch: lg.data.credEpoch, kdf, version: base.version, syncedAt: base.syncedAt, metaToken: lg.data.metaToken || base.metaToken, active: !!lg.data.active, isAdmin: !!lg.data.isAdmin, role: lg.data.role || 'persona', userId: lg.data.userId };
     setToken(lg.data.token); saveMeta();
     return { ok: true, active: S.active, isAdmin: S.isAdmin, role: S.role };
   }
@@ -123,7 +140,7 @@ const Acc = (() => {
   function detectLocked() {
     const t = getToken(); const m = loadMeta();
     if (t && m && m.email && !S.dek) {
-      S = { ...S, state: 'locked', token: t, email: m.email, kdf: m.kdf || S.kdf, credEpoch: m.credEpoch || 1, version: m.version || 0, syncedAt: m.syncedAt || 0, active: !!m.active, isAdmin: !!m.isAdmin, role: m.role || 'persona', userId: m.userId || null };
+      S = { ...S, state: 'locked', token: t, email: m.email, kdf: m.kdf || S.kdf, credEpoch: m.credEpoch || 1, version: m.version || 0, syncedAt: m.syncedAt || 0, metaToken: m.metaToken || null, active: !!m.active, isAdmin: !!m.isAdmin, role: m.role || 'persona', userId: m.userId || null };
       return true;
     }
     return false;
@@ -172,7 +189,7 @@ const Acc = (() => {
     const com = await api('/v1/recover/redeem?phase=commit', { method: 'POST', body: { email, recNonce: mat.data.recNonce, recProof: recProof, ...built.commit } });
     if (com.status !== 200) return { ok: false, error: com.data?.error || 'recovery_failed' };
     const base = localBase(email);
-    S = { ...fresh(), state: 'in', token: com.data.token, email, dek: built.dek, credEpoch: built.commit.newCredEpoch, kdf, version: base.version, syncedAt: base.syncedAt, active: true, userId: mat.data.userId };
+    S = { ...fresh(), state: 'in', token: com.data.token, email, dek: built.dek, credEpoch: built.commit.newCredEpoch, kdf, version: base.version, syncedAt: base.syncedAt, metaToken: base.metaToken, active: true, userId: mat.data.userId };
     setToken(com.data.token); saveMeta();
     return { ok: true };
   }
@@ -621,7 +638,7 @@ const Acc = (() => {
   async function adminSetConfig(signupsOpen) { const r = await api('/v1/admin/config', { method: 'POST', auth: true, body: { signupsOpen: !!signupsOpen } }); return r.status === 200; }
 
   return {
-    signup, login, unlock, logout, changePassword, recover, pull, push: syncPush, resume, resolve,
+    signup, login, unlock, logout, changePassword, recover, pull, push: syncPush, resume, resolve, remembered, cloudMeta,
     gestorEnsureKey, gestorResolve, grantCreate, grantRevoke, gestorClients, gestorOpenClient, pushShadow, _buildShareData: buildShareData,
     grantSetCanEdit, opsPush, pullOps, setOpsListener, reconcileGrant, pushVerifactu,
     adminListUsers, adminSetActive, adminSetPaid, adminDelete, adminGetConfig, adminSetConfig, _mergeData: mergeData,

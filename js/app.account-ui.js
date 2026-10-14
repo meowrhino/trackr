@@ -4,98 +4,22 @@
  * Extiende App. Renderiza una seccion en Configuracion segun Acc.state
  * (out / locked / in) y cablea los flujos de Acc (signup/login/unlock/logout/
  * cambio de contrasena/recuperacion) + sync. Auto-sync: engancha D.save().
- * Textos i18n inline (es/en/ca) — migrar a lang.js cuando se valide la UX.
+ * Textos en lang.js (prefijo acc.).
  * Globales usados: Acc, CA, D, H, Toast.
  * ================================================ */
 (() => {
   const L = () => (typeof _lang !== 'undefined' ? _lang : 'es');
-  const TXT = {
-    es: {
-      cfTitle: 'Este navegador y la nube no coinciden', cfBody: 'Aquí hay cambios que no se subieron, y desde entonces la nube también ha cambiado (seguramente desde otro dispositivo). ¿Con qué te quedas?',
-      cfMerge: 'Fusionar las dos', cfMergeDesc: 'Junta proyectos, clientes y gastos de ambas; si uno está en las dos, gana el de aquí.', cfCloud: 'Usar la nube', cfLocal: 'Usar este navegador',
-      cfSafety: 'Elijas lo que elijas, la copia de este navegador queda guardada en Configuración → Copias de seguridad.',
-      title: 'Cuenta y sincronización', zk: 'Tus datos se cifran en tu navegador antes de subirse. Ni nosotros ni el servidor podemos leerlos (cifrado de conocimiento cero).',
-      login: 'Iniciar sesión', signup: 'Crear cuenta', recover: '¿Olvidaste tu contraseña?',
-      email: 'Email', password: 'Contraseña', password2: 'Repite la contraseña', newPassword: 'Contraseña nueva', currentPassword: 'Contraseña actual',
-      recoveryCode: 'Código de recuperación', enter: 'Entrar', create: 'Crear cuenta', unlock: 'Desbloquear', logout: 'Cerrar sesión', syncNow: 'Sincronizar ahora', changePw: 'Cambiar contraseña', save: 'Guardar', cancel: 'Cancelar', doRecover: 'Recuperar acceso',
-      legal: 'He leído que TRACKR cifra mis datos en mi navegador y que soy responsable de guardar mi contraseña y mi código de recuperación (no se pueden recuperar si los pierdo).',
-      backLogin: '← Volver a iniciar sesión', haveCode: 'Tengo un código de recuperación',
-      locked: 'Sesión bloqueada tras recargar. Introduce tu contraseña para desbloquear y descifrar tus datos.',
-      pending: 'Cuenta creada. Pendiente de activación por el administrador antes de poder sincronizar.',
-      signupsClosed: 'Los registros están cerrados ahora mismo: la cuenta NO se ha creado. Escribe a manu para que abra el registro.',
-      rateLimited: 'Demasiados intentos desde tu conexión (máx. 5 por hora). Espera un rato o prueba desde otra red, p. ej. datos móviles.',
-      netErr: 'No se pudo conectar con el servidor. Revisa tu conexión (o si un bloqueador está cortando las llamadas) y vuelve a intentarlo.',
-      serverErr: 'El servidor no ha respondido bien. Prueba de nuevo en un rato.',
-      badCreds: 'Email o contraseña incorrectos.',
-      activeOk: 'Sincronización activa', notActive: 'Pendiente de activación', version: 'versión en la nube', autoSync: 'Sincronizar automáticamente al cambiar',
-      pwWeak: 'La contraseña debe tener al menos 12 caracteres.', pwMismatch: 'Las contraseñas no coinciden.', legalReq: 'Debes aceptar para continuar.', emailBad: 'Email no válido.',
-      recTitle: 'Tu código de recuperación', recDesc: 'Apúntalo y guárdalo OFFLINE (no en este dispositivo). Es la ÚNICA forma de recuperar tus datos si olvidas la contraseña. NO se vuelve a mostrar.', copy: 'Copiar', download: 'Descargar .txt', saved: 'Lo he guardado, continuar', copied: 'Copiado', copyErr: 'No se pudo copiar. Usa "Descargar .txt".',
-      welcome: 'Sesión iniciada', loggedOut: 'Sesión cerrada', synced: 'Sincronizado', syncErr: 'No se pudo sincronizar', pwChanged: 'Contraseña cambiada', recovered: 'Acceso recuperado',
-      confirmLogout: '¿Cerrar sesión? Tus datos locales se mantienen en este navegador.', adminBadge: 'admin',
-      cfgPrompt: 'Inicia sesión o crea una cuenta para sincronizar tus datos cifrados en la nube y usarlos en varios dispositivos.',
-      syncing: 'Sincronizando…', syncErrShort: 'Error de sync', pendingShort: 'Pendiente', locked2: 'Bloqueado',
-      roleLabel: 'Tipo de cuenta', rolePersona: 'Persona', rolePersonaDesc: 'Para llevar tu actividad: proyectos, horas, gastos, facturas.',
-      roleGestor: 'Gestoría', roleGestorDesc: 'Para ver los datos de tus clientes de TRACKR (con su consentimiento). La cuenta empieza vacía.',
-      gestorBadge: 'gestoría',
-    },
-    en: {
-      cfTitle: 'This browser and the cloud differ', cfBody: 'There are changes here that were never uploaded, and the cloud has changed since then too (probably from another device). Which do you keep?',
-      cfMerge: 'Merge both', cfMergeDesc: 'Combines projects, clients and expenses from both; if one exists in both, this browser wins.', cfCloud: 'Use the cloud', cfLocal: 'Use this browser',
-      cfSafety: 'Whatever you choose, this browser\'s copy stays saved in Settings → Backups.',
-      title: 'Account & sync', zk: 'Your data is encrypted in your browser before upload. Neither we nor the server can read it (zero-knowledge).',
-      login: 'Log in', signup: 'Create account', recover: 'Forgot your password?',
-      email: 'Email', password: 'Password', password2: 'Repeat password', newPassword: 'New password', currentPassword: 'Current password',
-      recoveryCode: 'Recovery code', enter: 'Log in', create: 'Create account', unlock: 'Unlock', logout: 'Log out', syncNow: 'Sync now', changePw: 'Change password', save: 'Save', cancel: 'Cancel', doRecover: 'Recover access',
-      legal: 'I understand TRACKR encrypts my data in my browser and that I am responsible for keeping my password and recovery code (they cannot be recovered if lost).',
-      backLogin: '← Back to log in', haveCode: 'I have a recovery code',
-      locked: 'Session locked after reload. Enter your password to unlock and decrypt your data.',
-      pending: 'Account created. Pending admin activation before you can sync.',
-      signupsClosed: 'Sign-ups are closed right now: the account was NOT created. Contact manu to open registration.',
-      rateLimited: 'Too many attempts from your connection (max 5 per hour). Wait a while or try from another network, e.g. mobile data.',
-      netErr: 'Could not reach the server. Check your connection (or whether a blocker is cutting the calls) and try again.',
-      serverErr: 'The server did not respond properly. Try again in a while.',
-      badCreds: 'Wrong email or password.',
-      activeOk: 'Sync active', notActive: 'Pending activation', version: 'cloud version', autoSync: 'Auto-sync on change',
-      pwWeak: 'Password must be at least 12 characters.', pwMismatch: 'Passwords do not match.', legalReq: 'You must accept to continue.', emailBad: 'Invalid email.',
-      recTitle: 'Your recovery code', recDesc: 'Write it down and keep it OFFLINE (not on this device). It is the ONLY way to recover your data if you forget your password. It will NOT be shown again.', copy: 'Copy', download: 'Download .txt', saved: 'I saved it, continue', copied: 'Copied', copyErr: 'Could not copy. Use "Download .txt".',
-      welcome: 'Logged in', loggedOut: 'Logged out', synced: 'Synced', syncErr: 'Could not sync', pwChanged: 'Password changed', recovered: 'Access recovered',
-      confirmLogout: 'Log out? Your local data stays in this browser.', adminBadge: 'admin',
-      cfgPrompt: 'Log in or create an account to sync your encrypted data to the cloud and use it across devices.',
-      syncing: 'Syncing…', syncErrShort: 'Sync error', pendingShort: 'Pending', locked2: 'Locked',
-      roleLabel: 'Account type', rolePersona: 'Person', rolePersonaDesc: 'To run your business: projects, hours, expenses, invoices.',
-      roleGestor: 'Advisor', roleGestorDesc: 'To view your TRACKR clients\' data (with their consent). The account starts empty.',
-      gestorBadge: 'advisor',
-    },
-    ca: {
-      cfTitle: 'Aquest navegador i el núvol no coincideixen', cfBody: 'Aquí hi ha canvis que no es van pujar, i des d\'aleshores el núvol també ha canviat (segurament des d\'un altre dispositiu). Amb què et quedes?',
-      cfMerge: 'Fusionar-les', cfMergeDesc: 'Ajunta projectes, clients i despeses de totes dues; si un és a les dues, guanya el d\'aquí.', cfCloud: 'Fer servir el núvol', cfLocal: 'Fer servir aquest navegador',
-      cfSafety: 'Triïs el que triïs, la còpia d\'aquest navegador queda desada a Configuració → Còpies de seguretat.',
-      title: 'Compte i sincronització', zk: 'Les teves dades es xifren al navegador abans de pujar-se. Ni nosaltres ni el servidor podem llegir-les (coneixement zero).',
-      login: 'Iniciar sessió', signup: 'Crear compte', recover: 'Has oblidat la contrasenya?',
-      email: 'Email', password: 'Contrasenya', password2: 'Repeteix la contrasenya', newPassword: 'Contrasenya nova', currentPassword: 'Contrasenya actual',
-      recoveryCode: 'Codi de recuperació', enter: 'Entrar', create: 'Crear compte', unlock: 'Desbloquejar', logout: 'Tancar sessió', syncNow: 'Sincronitzar ara', changePw: 'Canviar contrasenya', save: 'Desar', cancel: 'Cancel·lar', doRecover: 'Recuperar accés',
-      legal: 'Entenc que TRACKR xifra les meves dades al navegador i que soc responsable de guardar la contrasenya i el codi de recuperació (no es poden recuperar si els perdo).',
-      backLogin: '← Tornar a iniciar sessió', haveCode: 'Tinc un codi de recuperació',
-      locked: 'Sessió bloquejada després de recarregar. Introdueix la contrasenya per desbloquejar i desxifrar les dades.',
-      pending: 'Compte creat. Pendent d\'activació per l\'administrador abans de sincronitzar.',
-      signupsClosed: 'Els registres estan tancats ara mateix: el compte NO s\'ha creat. Escriu a manu perquè obri el registre.',
-      rateLimited: 'Massa intents des de la teva connexió (màx. 5 per hora). Espera una estona o prova des d\'una altra xarxa, p. ex. dades mòbils.',
-      netErr: 'No s\'ha pogut connectar amb el servidor. Revisa la connexió (o si un bloquejador està tallant les crides) i torna-ho a provar.',
-      serverErr: 'El servidor no ha respost bé. Torna-ho a provar d\'aquí una estona.',
-      badCreds: 'Email o contrasenya incorrectes.',
-      activeOk: 'Sincronització activa', notActive: 'Pendent d\'activació', version: 'versió al núvol', autoSync: 'Sincronitzar automàticament en canviar',
-      pwWeak: 'La contrasenya ha de tenir almenys 12 caràcters.', pwMismatch: 'Les contrasenyes no coincideixen.', legalReq: 'Has d\'acceptar per continuar.', emailBad: 'Email no vàlid.',
-      recTitle: 'El teu codi de recuperació', recDesc: 'Apunta\'l i guarda\'l OFFLINE (no en aquest dispositiu). És l\'ÚNICA manera de recuperar les dades si oblides la contrasenya. NO es tornarà a mostrar.', copy: 'Copiar', download: 'Descarregar .txt', saved: 'L\'he guardat, continuar', copied: 'Copiat', copyErr: 'No s\'ha pogut copiar. Usa "Descarregar .txt".',
-      welcome: 'Sessió iniciada', loggedOut: 'Sessió tancada', synced: 'Sincronitzat', syncErr: 'No s\'ha pogut sincronitzar', pwChanged: 'Contrasenya canviada', recovered: 'Accés recuperat',
-      confirmLogout: 'Tancar sessió? Les dades locals es mantenen en aquest navegador.', adminBadge: 'admin',
-      cfgPrompt: 'Inicia sessió o crea un compte per sincronitzar les teves dades xifrades al núvol i fer-les servir en diversos dispositius.',
-      syncing: 'Sincronitzant…', syncErrShort: 'Error de sync', pendingShort: 'Pendent', locked2: 'Bloquejat',
-      roleLabel: 'Tipus de compte', rolePersona: 'Persona', rolePersonaDesc: 'Per portar la teva activitat: projectes, hores, despeses, factures.',
-      roleGestor: 'Gestoria', roleGestorDesc: 'Per veure les dades dels teus clients de TRACKR (amb el seu consentiment). El compte comença buit.',
-      gestorBadge: 'gestoria',
-    },
+  /* Textos en lang.js con prefijo 'acc.' */
+  const t = (k, ...a) => window.t('acc.' + k, ...a);
+  /* "hace 3 días (12 oct 2026, 18:40)" en el idioma activo */
+  const when = (ts) => {
+    if (!ts) return '—';
+    const s = (ts - Date.now()) / 1000, a = Math.abs(s);
+    const rtf = new Intl.RelativeTimeFormat(L(), { numeric: 'auto' });
+    const rel = a < 60 ? rtf.format(Math.round(s), 'second') : a < 3600 ? rtf.format(Math.round(s / 60), 'minute')
+      : a < 86400 ? rtf.format(Math.round(s / 3600), 'hour') : rtf.format(Math.round(s / 86400), 'day');
+    return `${rel} <span style="color:var(--t3)">(${new Date(ts).toLocaleString(L(), { dateStyle: 'medium', timeStyle: 'short' })})</span>`;
   };
-  const t = (k) => (TXT[L()] || TXT.es)[k] || k;
   // Codigo de error (Acc o servidor) -> texto traducido. Lo no mapeado sale crudo:
   // mejor un codigo raro que un "error" a secas cuando toca depurar con alguien al telefono.
   const ERRTXT = {
@@ -216,6 +140,53 @@
       setTimeout(() => { const f = document.getElementById('accEmail') || document.getElementById('accPw'); if (f) f.focus(); }, 30);
     },
 
+    /**
+     * Pantalla de bienvenida: este navegador recuerda una cuenta pero no hay sesion.
+     * Dice cuando se guardo aqui, cuando se subio desde aqui, cuando fue la ultima subida
+     * desde CUALQUIER dispositivo (pase de metadatos, sin contrasena) y si conviene entrar
+     * antes de trabajar. Una vez por pestana salvo que se pida (force: clic en el indicador).
+     */
+    _accWelcomeBack(force) {
+      if (typeof Acc === 'undefined' || Acc.state === 'in' || D._readOnly) return;
+      const rm = Acc.remembered();
+      if (!rm) return;
+      if (!force) {
+        try { if (sessionStorage.getItem('trackr_wb_skip')) return; } catch (e) { /* */ }
+        if (document.getElementById('mO').classList.contains('on')) return; // otro modal (bienvenida, etc.)
+      }
+      const row = (label, val, id) => `<div class="br"><span class="la">${label}</span><span class="va"${id ? ` id="${id}"` : ''}>${val}</span></div>`;
+      this._accInModal = true;
+      this.om(`<div class="mt">${t('wbTitle')}</div>`
+        + `<div class="acc-email" style="margin-bottom:.9rem">${esc2(rm.email)}</div>`
+        + `<div class="bb">`
+        + row(t('wbHere'), when(D.lastSaved))
+        + row(t('wbSyncedHere'), rm.syncedAt ? `${when(rm.syncedAt)} · v${rm.version}` : t('wbNever'))
+        + row(t('wbCloud'), rm.hasPass ? '…' : t('wbCloudNeedsLogin'), 'wbCloud')
+        + `</div>`
+        + (rm.dirty ? `<div class="acc-warn" style="margin-top:.75rem">${t('wbDirty')}</div>` : '')
+        + `<div id="wbNewer"></div>`
+        + `<form style="display:contents" onsubmit="App.accLogin();return false">`
+        + `<input id="accEmail" type="email" name="email" autocomplete="username" value="${esc2(rm.email)}" readonly tabindex="-1" aria-hidden="true" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">`
+        + `<div class="fg" style="margin-top:.85rem"><label>${t('password')}</label><input id="accPw" name="password" type="password" autocomplete="current-password"></div>`
+        + `<button type="submit" class="bt bt-p">${t('enter')}</button>`
+        + `</form>`
+        + `<div class="acc-links"><a onclick="App._accWbSkip()">${t('wbSkip')}</a> · <a onclick="App.accModal()">${t('wbOther')}</a></div>`);
+      setTimeout(() => document.getElementById('accPw')?.focus(), 30);
+      if (rm.hasPass) Acc.cloudMeta().then((cm) => {
+        const el = document.getElementById('wbCloud');
+        if (!el) return; // el modal ya se cerro
+        if (!cm) { el.textContent = t('wbCloudErr'); return; }
+        el.innerHTML = cm.updatedAt ? `${when(cm.updatedAt)} · v${cm.currentVersion}` : t('wbNever');
+        if (cm.currentVersion > rm.version) document.getElementById('wbNewer').innerHTML = `<div class="acc-warn" style="margin-top:.75rem">${t('wbNewer', cm.currentVersion, rm.version)}</div>`;
+      });
+    },
+
+    _accWbSkip() {
+      try { sessionStorage.setItem('trackr_wb_skip', '1'); } catch (e) { /* */ }
+      this._accInModal = false;
+      this.cm();
+    },
+
     // Cierra el modal de cuenta y refresca la vista actual + la barra.
     _accDone() { this._accInModal = false; this.cm(); this.go(this.cv); },
 
@@ -246,7 +217,19 @@
       const el = document.getElementById('syncStatus');
       if (!el || typeof Acc === 'undefined') return;
       const st = Acc.status();
-      if (st.state !== 'in') { el.style.display = 'none'; el.innerHTML = ''; return; }
+      if (st.state !== 'in') {
+        /* Sin sesion con cuenta recordada: los cambios se quedan solo aqui. Que se vea. */
+        const rm = Acc.remembered && Acc.remembered();
+        if (!rm) { el.style.display = 'none'; el.innerHTML = ''; el.onclick = null; return; }
+        el.style.display = '';
+        el.className = 'sync-status warn';
+        el.title = t('noSession');
+        el.style.cursor = 'pointer';
+        el.onclick = () => App._accWelcomeBack(true);
+        el.innerHTML = `<span class="sync-dot"></span><span class="nt">${esc2(t('noSession'))}</span>`;
+        return;
+      }
+      el.onclick = null; el.style.cursor = '';
       let cls, txt;
       if (syncState === 'syncing') { cls = 'syncing'; txt = t('syncing'); }
       else if (syncState === 'error') { cls = 'err'; txt = t('syncErrShort'); }

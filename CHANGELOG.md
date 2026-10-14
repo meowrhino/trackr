@@ -5,12 +5,18 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
-## 2026-10-14 — Presupuestos y proyectos que se arrastran
+## 2026-10-14 — Presupuestos, proyectos que se arrastran y «hola de nuevo»
 
 ### ✨ Nuevo
 - **Presupuestos por cliente.** Se crean desde el icono 📋 en la lista de clientes o desde el botón "Presupuesto" en el detalle de un proyecto. Cada proyecto marcado del cliente es una línea (concepto e importe editables) y hay una descripción libre para servicios, plazos y condiciones. El PDF tiene el mismo diseño que la factura; si los proyectos llevan tipos distintos de IVA o IRPF, sale una fila por tipo. **No es una factura:** no gasta numeración de facturas, no pasa por VeriFactu y no sale en los libros. Lleva su propio contador, y cada proyecto incluido muestra "Presupuesto N/AA · fecha" en su ficha. _frontend_
 - **Arrastrar proyectos entre estados.** En Proyectos, arrastra una tarjeta a otro grupo para cambiarle el estado. Mientras arrastras aparecen también los estados vacíos, y se puede soltar sobre los grupos plegados (Completados, Abandonados). Soltar en Internos o Recurrentes la deja en Activo. Solo funciona en ordenador; en el móvil el estado se sigue cambiando desde el modal. _frontend_
+- **"Hola de nuevo" al abrir TRACKR.** Si este navegador recuerda tu cuenta pero no hay sesión, te recibe con tu email y cuatro datos: cuándo se guardó aquí, cuándo se subió desde aquí y **cuándo fue la última subida a la nube desde cualquier dispositivo**, aunque no hayas puesto la contraseña. También avisa si aquí hay cambios sin subir o si la nube tiene algo más nuevo de otro ordenador. Se puede seguir sin sesión. _frontend, backend@b9a09e4_
+- **El indicador de la barra ya no desaparece al recargar**: sin sesión pone "Sin sesión · solo aquí" y, al pulsarlo, abre esa pantalla. _frontend_
+- **Pase de metadatos por dispositivo** (`POST /v1/device/meta`): el login entrega un pase firmado (HMAC, 180 días) que solo sirve para consultar la versión y la fecha de la última subida. No da acceso a los datos ni permite subir nada; deja de valer si la cuenta se borra o se desactiva. _backend@b9a09e4_
 - **Notas libres en el cliente** (al editarlo), como las que ya tenían los proyectos. En la lista de clientes aparece un 📝 y, al pasar el ratón, se ven las notas. **No se comparten con la gestoría** en el alcance fiscal; en "Todo", sí. _frontend_
+
+### 🧹 Por dentro
+- Los textos de la cuenta (71 por idioma) pasan de un diccionario dentro de `app.account-ui.js` a `lang.js` con el prefijo `acc.`, así que `checkLangs()` ya los vigila. _frontend_
 
 ---
 

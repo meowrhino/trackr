@@ -70,6 +70,8 @@ const App = {
     this.enter();
     this._maybeWelcome();
     if (typeof Acc !== 'undefined') { Acc.detectLocked(); if (this.refreshAccountNav) this.refreshAccountNav(); }
+    /* Cuenta recordada sin sesión: pantalla de "hola de nuevo" con el estado de esta copia */
+    if (this._accWelcomeBack) this._accWelcomeBack();
 
     /* Otra pestaña guardó: adoptar sus datos. Sin esto, cada pestaña guarda SU copia en
        memoria entera y la última en guardar pisa a la otra sin avisar. Con un modal
