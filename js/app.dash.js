@@ -79,24 +79,78 @@ Object.assign(App, {
       : EST_ORDER;
     let html = '';
     renderOrder.forEach(st => {
-      const g = groups[st];
-      if (!g || !g.length) return;
+      const g = groups[st] || [];
+      /* Estados reales vacíos: se pintan ocultos para poder soltar en ellos al arrastrar.
+         Los subgrupos _interno/_recurrente son marcas, no estados: vacíos no salen. */
+      if (!g.length) {
+        if (st[0] !== '_') html += `<div class="dash-group empty" data-st="${st}"><div class="dash-group-title">${labels[st] || st}</div><div class="pg"></div></div>`;
+        return;
+      }
       if (collapsible[st]) {
         const open = this._groupOpen?.[st] ?? false;
-        html += `<div class="dash-group">`
+        html += `<div class="dash-group" data-st="${st}">`
           + `<div class="dash-group-title dash-group-toggle" onclick="App.toggleGroup('${st}')">`
           +   `<span class="dash-group-chev${open ? ' open' : ''}">\u25B8</span> ${labels[st] || st} <span class="dash-group-count">${g.length}</span>`
           + `</div>`
           + `<div class="pg${open ? '' : ' hidden'}">${g.map(p => this.card(p)).join('')}</div>`
           + `</div>`;
       } else {
-        html += `<div class="dash-group">`
+        html += `<div class="dash-group" data-st="${st}">`
           + `<div class="dash-group-title">${labels[st] || st}</div>`
           + `<div class="pg">${g.map(p => this.card(p)).join('')}</div>`
           + `</div>`;
       }
     });
     c.innerHTML = html;
+    this._dashDnd(c);
+  },
+
+  /**
+   * Arrastrar tarjetas entre estados (HTML5 drag & drop, como el journey). Delegado en
+   * el contenedor y enganchado una sola vez: rDash solo cambia su innerHTML. En móvil el
+   * navegador no arrastra; el estado se sigue cambiando desde el modal del proyecto.
+   */
+  _dashDnd(c) {
+    if (c._dnd) return;
+    c._dnd = true;
+    let pid = null, over = null;
+    const clear = () => { if (over) over.classList.remove('drag-over'); over = null; };
+    c.addEventListener('dragstart', e => {
+      const card = e.target.closest && e.target.closest('.pc[data-pid]');
+      if (!card) return;
+      pid = card.dataset.pid;
+      e.dataTransfer.setData('text/plain', pid);
+      e.dataTransfer.effectAllowed = 'move';
+      card.classList.add('dragging');
+      c.classList.add('dnd');
+    });
+    c.addEventListener('dragend', e => {
+      e.target.closest && e.target.closest('.pc')?.classList.remove('dragging');
+      c.classList.remove('dnd'); clear(); pid = null;
+    });
+    c.addEventListener('dragover', e => {
+      const g = pid && e.target.closest && e.target.closest('.dash-group[data-st]');
+      if (!g) return;
+      e.preventDefault();
+      if (g !== over) { clear(); over = g; g.classList.add('drag-over'); }
+    });
+    c.addEventListener('drop', e => {
+      const g = e.target.closest && e.target.closest('.dash-group[data-st]');
+      const id = pid || e.dataTransfer.getData('text/plain');
+      if (!g || !id) return;
+      e.preventDefault();
+      /* Limpiar aquí y no en dragend: rDash() sustituye la tarjeta arrastrada y su
+         dragend ya no llega al contenedor (se quedaban visibles los estados vacíos). */
+      c.classList.remove('dnd'); clear(); pid = null;
+      /* Internos / Recurrentes son activos con marca: soltar ahí = activo */
+      const st = g.dataset.st[0] === '_' ? 'activo' : g.dataset.st;
+      const p = D.p(id);
+      if (p && p.estado !== st) {
+        D.up(id, { estado: st });
+        Toast.ok(`${p.nombre} → ${EST[st] || st}`);
+      }
+      this.rDash();
+    });
   },
 
   card(p) {
@@ -115,7 +169,7 @@ Object.assign(App, {
       flags += `<span class="pc-flag pc-flag-inv">${t('dash.flagInvoiced')}</span>`;
     }
 
-    return `<div class="pc" style="--project-color:${hex}" onclick="App.go('det','${p.id}')">
+    return `<div class="pc" draggable="true" data-pid="${p.id}" style="--project-color:${hex}" onclick="App.go('det','${p.id}')">
       <div class="pc-h">
         <div>
           <div class="pc-n">${esc(p.nombre)}</div>

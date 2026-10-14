@@ -19,10 +19,12 @@ function yearShort(fecha) {
 const Fac = {
 
   /**
-   * Genera un PDF de factura para un proyecto.
+   * Genera un PDF de factura (o de presupuesto) para uno o varios proyectos.
    * @param {Object} data - Datos de la factura:
    *   { emisor, cliente, factura: {numero, fecha, asunto},
    *     calculos: {base, iva, ivaRate, irpf, irpfRate, total, ivaExcepcion} }
+   *   Presupuesto: kind:'presupuesto', lineas:[{concepto, base}] y, si mezcla tipos,
+   *   calculos.ivas/irpfs:[{rate, amount}] (una fila de totales por tipo).
    * @param {string} lang - Codigo de idioma para la factura ('es' o 'en')
    * @returns {jsPDF} instancia del PDF generado
    */
@@ -49,6 +51,7 @@ const Fac = {
     /* Number with year: NNNN/YY */
     const ys = yearShort(data.factura.fecha);
     const numYY = `${data.factura.numero}/${ys}`;
+    const isBud = data.kind === 'presupuesto';
 
     /* Column positions */
     const leftX = mg;
@@ -58,7 +61,7 @@ const Fac = {
     doc.setFontSize(16);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(40);
-    doc.text(`${tf('fac.invoice', lang)} ${numYY}`, leftX, y);
+    doc.text(`${tf(isBud ? 'fac.budget' : 'fac.invoice', lang)} ${numYY}`, leftX, y);
     y += 8;
 
     /* ── 2-column header: Emisor (left) | Datos de factura (right) ── */
@@ -66,7 +69,7 @@ const Fac = {
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(60);
     doc.text(tf('fac.issuerLabel', lang), leftX, y);
-    doc.text(tf('fac.invoiceData', lang), rightX, y);
+    doc.text(tf(isBud ? 'fac.budgetData' : 'fac.invoiceData', lang), rightX, y);
     y += 5;
 
     doc.setFontSize(10);
@@ -112,21 +115,37 @@ const Fac = {
       y += 5;
     }
 
-    /* ── Concepto ── */
-    y += 3;
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(60);
-    doc.text(tf('fac.concept', lang), leftX, y);
-    y += 5;
+    /* ── Concepto (en presupuesto: descripción libre, se omite si va vacía) ── */
+    const section = (label) => {
+      y += 3;
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(60);
+      doc.text(label, leftX, y);
+      y += 5;
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(60);
+    };
+    if (!isBud || data.factura.asunto) {
+      section(tf(isBud ? 'fac.description' : 'fac.concept', lang));
+      const concepto = data.factura.asunto || '\u2014';
+      const conceptoLines = doc.splitTextToSize(concepto, pageW - mg * 2);
+      doc.text(conceptoLines, leftX, y);
+      y += conceptoLines.length * 5 + 6;
+    }
 
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(60);
-    const concepto = data.factura.asunto || '\u2014';
-    const conceptoLines = doc.splitTextToSize(concepto, pageW - mg * 2);
-    doc.text(conceptoLines, leftX, y);
-    y += conceptoLines.length * 5 + 6;
+    /* ── Líneas (una por proyecto): concepto a la izquierda, base a la derecha ── */
+    if (data.lineas && data.lineas.length) {
+      section(tf('fac.breakdown', lang));
+      data.lineas.forEach(l => {
+        const ls = doc.splitTextToSize(l.concepto || '\u2014', pageW - mg * 2 - 40);
+        doc.text(ls, leftX, y);
+        doc.text(fmt(l.base) + ' \u20AC', pageW - mg, y, { align: 'right' });
+        y += ls.length * 5 + 1.5;
+      });
+      y += 4;
+    }
 
     /* ── Totals (positioned at bottom of page when possible) ── */
     const labelX = pageW - mg - PDF_TOTALS_W;
@@ -137,25 +156,19 @@ const Fac = {
     const rows = [];
     rows.push({ label: tf('fac.taxableBase', lang), value: fmt(data.calculos.base) + ' \u20AC' });
 
-    if (data.calculos.irpfRate > 0) {
-      rows.push({
-        label: tf('fac.retention', lang, data.calculos.irpfRate),
-        value: '- ' + fmt(Math.abs(data.calculos.irpf)) + ' \u20AC'
-      });
-    }
-
-    if (data.calculos.ivaRate > 0) {
-      rows.push({
-        label: tf('fac.iva', lang, data.calculos.ivaRate),
-        value: fmt(data.calculos.iva) + ' \u20AC'
-      });
-    } else {
-      /* IVA 0 — show row but mark as exempt if exception text */
-      rows.push({
-        label: tf('fac.iva', lang, 0),
-        value: fmt(0) + ' \u20AC'
-      });
-    }
+    /* Una fila por tipo. La factura trae un solo tipo; el presupuesto puede mezclar. */
+    const c = data.calculos;
+    const irpfs = c.irpfs || [{ rate: c.irpfRate, amount: c.irpf }];
+    const ivas = c.ivas || [{ rate: c.ivaRate, amount: c.iva }];
+    irpfs.filter(r => r.rate > 0).forEach(r => rows.push({
+      label: tf('fac.retention', lang, r.rate),
+      value: '- ' + fmt(Math.abs(r.amount)) + ' \u20AC'
+    }));
+    /* IVA 0 también sale como fila (con la nota de exención debajo si la hay) */
+    ivas.forEach(r => rows.push({
+      label: tf('fac.iva', lang, r.rate || 0),
+      value: fmt(r.rate > 0 ? r.amount : 0) + ' \u20AC'
+    }));
 
     rows.push({
       label: tf('fac.total', lang),
@@ -269,6 +282,57 @@ const Fac = {
    * @param {string} pid - ID del proyecto
    * @param {Object} opts - { fecha, asunto } (opcionales, para override)
    */
+  /** Bloque CLIENTE del PDF (factura y presupuesto) */
+  clienteData(cl, fallbackName) {
+    return cl
+      ? { nombre: cl.nombreCompleto || cl.nombre, direccion1: cl.direccion1 || '', direccion2: cl.direccion2 || '', nif: cl.nif || '' }
+      : { nombre: fallbackName || '', direccion1: '', direccion2: '', nif: '' };
+  },
+
+  /**
+   * Presupuesto de varios proyectos de un cliente. NO es factura: no consume numeración
+   * de facturas, no firma VeriFactu y no sale en los libros. Contador propio.
+   * @param {string} cid  cliente
+   * @param {Array} lineas  [{pid, concepto, base}]
+   * @param {Object} opts  { num, fecha, descripcion }
+   */
+  presupuesto(cid, lineas, opts) {
+    const s = D.d.settings;
+    const cl = D.cl(cid);
+    const first = D.p(lineas[0].pid);
+    const lang = first?.facturacion?.idiomaFactura || s.idioma || 'es';
+    /* Tipos de cada línea: los del proyecto (o los de Configuración si es gratis) */
+    const ivaG = {}, irpfG = {};
+    let base = 0;
+    lineas.forEach(l => {
+      const f = D.p(l.pid)?.facturacion || {};
+      const iva = f.modo === 'gratis' || f.iva == null ? s.defaultIva : f.iva;
+      const irpf = f.modo === 'gratis' || f.irpf == null ? s.defaultIrpf : f.irpf;
+      base += l.base;
+      ivaG[iva] = (ivaG[iva] || 0) + l.base * iva / 100;
+      irpfG[irpf] = (irpfG[irpf] || 0) + l.base * irpf / 100;
+    });
+    const group = g => Object.keys(g).map(Number).sort((a, b) => b - a).map(rate => ({ rate, amount: roundMoney(g[rate]) }));
+    const ivas = group(ivaG), irpfs = group(irpfG);
+    const total = roundMoney(base + ivas.reduce((a, r) => a + r.amount, 0) - irpfs.reduce((a, r) => a + r.amount, 0));
+    const data = {
+      kind: 'presupuesto',
+      emisor: s.emisor,
+      cliente: this.clienteData(cl, ''),
+      factura: { numero: String(opts.num), fecha: opts.fecha, asunto: opts.descripcion || '' },
+      lineas,
+      calculos: { base: roundMoney(base), ivas, irpfs, total },
+      beneficiarioPago: s.emisor.beneficiarioPago || '',
+      instruccionesPago: s.emisor.instruccionesPago || ''
+    };
+    const doc = this.genPDF(data, lang);
+    doc.save(`presupuesto_${opts.num}_${yearShort(opts.fecha)}_${(cl?.nombre || '').replace(/\s+/g, '_')}.pdf`);
+
+    lineas.forEach(l => D.up(l.pid, { presupuesto: { num: opts.num, fecha: opts.fecha } }));
+    if (opts.num >= (s.nextPresupuestoNum || 1)) { s.nextPresupuestoNum = opts.num + 1; D.save(); }
+    return { total };
+  },
+
   download(pid, opts = {}) {
     const p = D.p(pid);
     if (!p) return;
@@ -291,9 +355,7 @@ const Fac = {
     /* Construir datos */
     const data = {
       emisor: s.emisor,
-      cliente: cl
-        ? { nombre: cl.nombreCompleto || cl.nombre, direccion1: cl.direccion1 || '', direccion2: cl.direccion2 || '', nif: cl.nif || '' }
-        : { nombre: clienteName(p), direccion1: '', direccion2: '', nif: '' },
+      cliente: this.clienteData(cl, clienteName(p)),
       factura: {
         numero: numStr,
         fecha: fecha,

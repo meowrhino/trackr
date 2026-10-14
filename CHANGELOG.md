@@ -5,6 +5,32 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-10-14 — Presupuestos y proyectos que se arrastran
+
+### ✨ Nuevo
+- **Presupuestos por cliente.** Se crean desde el icono 📋 en la lista de clientes o desde el botón "Presupuesto" en el detalle de un proyecto. Cada proyecto marcado del cliente es una línea (concepto e importe editables) y hay una descripción libre para servicios, plazos y condiciones. El PDF tiene el mismo diseño que la factura; si los proyectos llevan tipos distintos de IVA o IRPF, sale una fila por tipo. **No es una factura:** no gasta numeración de facturas, no pasa por VeriFactu y no sale en los libros. Lleva su propio contador, y cada proyecto incluido muestra "Presupuesto N/AA · fecha" en su ficha. _frontend_
+- **Arrastrar proyectos entre estados.** En Proyectos, arrastra una tarjeta a otro grupo para cambiarle el estado. Mientras arrastras aparecen también los estados vacíos, y se puede soltar sobre los grupos plegados (Completados, Abandonados). Soltar en Internos o Recurrentes la deja en Activo. Solo funciona en ordenador; en el móvil el estado se sigue cambiando desde el modal. _frontend_
+
+---
+
+## 2026-10-13 — Entrar ya no pisa lo que hiciste sin sesión
+
+Si editabas con la sesión cerrada o bloqueada (por ejemplo, tras cerrar el navegador), esos cambios se quedaban solo en ese ordenador. Al volver a entrar, la nube los sustituía sin avisar: solo quedaban en Copias de seguridad.
+
+### 🐛 Arreglado
+- **Al entrar, TRACKR mira quién tiene lo último.** Si solo cambió la nube, la baja. Si solo cambió este navegador, lo sube. Si cambiaron los dos, pregunta: **fusionar**, **usar la nube** o **usar este navegador**, con la fecha de cada uno. Pase lo que pase, la copia local queda en Copias de seguridad. _frontend_
+- "Sincronizar ahora" con conflicto irresoluble ya guarda una copia antes de bajar la nube. _frontend_
+- **Dos pestañas abiertas ya no se pisan.** Cada una guardaba su copia en memoria entera y la última en guardar borraba lo hecho en la otra. Ahora, cuando una pestaña guarda, las demás adoptan sus datos. _frontend_
+- **Fusionar ya no pierde el journey ni el historial de cambios.** Antes la nube sustituía las tarjetas del journey y la auditoría enteras. Ahora se juntan las de los dos lados. _frontend_
+
+### 🧹 Por dentro
+- Cada navegador recuerda en qué versión de la nube se basa su copia y cuándo coincidieron por última vez (`trackr_acct.syncedAt`). _frontend_
+- Login, desbloqueo y recuperación comparten un único `_accAfterAuth()` en vez de tres copias. La recuperación ahora también recoge los cambios de la gestoría. _frontend_
+- Cerrar sesión dejaba el estado sin `role`. Arreglado. _frontend_
+- Check sin red: `node test/sync-resume.mjs`. _frontend_
+
+---
+
 ## 2026-09-02 — Gastos con retención de IRPF: por fin se pueden meter
 
 Si tu proveedor te factura con retención (un profesional, el alquiler de la oficina…), hasta ahora no había dónde apuntarla: los números del gasto nunca cuadraban con el papel.

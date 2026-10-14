@@ -60,7 +60,7 @@ Object.assign(App, {
         }).join('')}</div></div>`
       + `<div class="cfg-section" style="margin-top:2.5rem"><div class="cfg-section-title">${t('cfg.clients')}</div>`
       + (cls.length
-        ? `<div class="cl-list">${cls.map(c => `<div class="cl-item"><span class="cl-dot" style="background:${colorHex(c.color || 'CornflowerBlue')}"></span><span class="cl-name">${esc(c.nombre)}</span>${c.nif ? `<span class="cl-nif">${esc(c.nif)}</span>` : ''}<div class="cl-actions"><button class="cl-btn" onclick="App.clModal('${c.id}')" title="${t('btn.edit')}">&#9998;</button><button class="cl-btn cl-btn-del" onclick="App.delCl('${c.id}')" title="${t('btn.delete')}">&times;</button></div></div>`).join('')}</div>`
+        ? `<div class="cl-list">${cls.map(c => `<div class="cl-item"><span class="cl-dot" style="background:${colorHex(c.color || 'CornflowerBlue')}"></span><span class="cl-name">${esc(c.nombre)}</span>${c.nif ? `<span class="cl-nif">${esc(c.nif)}</span>` : ''}<div class="cl-actions"><button class="cl-btn" onclick="App.budModal('${c.id}')" title="${t('bud.generate')}">&#128203;</button><button class="cl-btn" onclick="App.clModal('${c.id}')" title="${t('btn.edit')}">&#9998;</button><button class="cl-btn cl-btn-del" onclick="App.delCl('${c.id}')" title="${t('btn.delete')}">&times;</button></div></div>`).join('')}</div>`
         : `<div style="color:var(--t3);font-size:.82rem">${t('cfg.noClients')}</div>`)
       + `<button class="bt bt-add" style="margin-top:.75rem" onclick="App.clModal()">${t('btn.newClient')}</button></div>`
       + `<div class="cfg-section" style="margin-top:2.5rem"><div class="cfg-section-title">${t('cfg.importOldInvoices')}</div>`

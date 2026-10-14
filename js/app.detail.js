@@ -47,6 +47,7 @@ Object.assign(App, {
       + `<div class="bg"><span class="bd bd-${p.estado}">${EST[p.estado] || p.estado}</span>`
       +   `<button class="bt bt-s" onclick="App.pModal('${p.id}')">${t('btn.edit')}</button>`
       +   `${f.modo !== 'gratis' ? `<button class="bt bt-s" onclick="App.facModal('${p.id}')">${t('det.invoice')}</button>` : ''}`
+      +   (p.clienteId ? `<button class="bt bt-s" onclick="App.budModal('${p.clienteId}','${p.id}')">${t('bud.btn')}</button>` : '')
       +   payBtn
       + `</div></div>`;
   },
@@ -57,6 +58,7 @@ Object.assign(App, {
       + `<div><div class="dfl">${t('field.estEnd')}</div><div class="dfv">${fmtDate(p.fechas.finEstimada)}</div></div>`
       + `<div><div class="dfl">${t('field.actualEnd')}</div><div class="dfv">${fmtDate(p.fechas.finReal)}</div></div>`
       + `<div><div class="dfl">${t('field.hours')}</div><div class="dfv">${th.toFixed(1)}h <span style="color:var(--t3);font-size:.72rem">💻${wh.toFixed(1)} 👥${mh.toFixed(1)}</span></div></div>`
+      + (p.presupuesto ? `<div><div class="dfl">${t('bud.btn')}</div><div class="dfv">${p.presupuesto.num}/${yearShort(p.presupuesto.fecha)} · ${fmtDate(p.presupuesto.fecha)}</div></div>` : '')
       + `</div>${p.notas ? `<div style="margin-top:.75rem"><div class="dfl">${t('field.notes')}</div><div style="color:var(--t3);font-size:.85rem">${esc(p.notas)}</div></div>` : ''}</div>`;
   },
 

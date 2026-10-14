@@ -176,6 +176,60 @@ Object.assign(App, {
 
 
   /* ══════════════════════════════════════════════
+   *  PRESUPUESTOS (por cliente, varias líneas)
+   * ══════════════════════════════════════════════ */
+
+  /**
+   * Modal de presupuesto. Se abre desde la lista de clientes (cid) o desde un proyecto
+   * (cid de su cliente + pid premarcado). Cada proyecto del cliente marcado = una línea.
+   */
+  budModal(cid, pid) {
+    const s = D.d.settings;
+    const cls = D.cls();
+    if (!cid) cid = cls[0]?.id;
+    const ps = D.ps().filter(p => p.clienteId === cid && p.estado !== 'abandonado');
+    /* Premarcado: el proyecto desde el que se abre; desde el cliente, los potenciales */
+    const pre = p => pid ? p.id === pid : p.estado === 'potencial';
+    const lines = ps.map(p => `<div class="cl-item bud-line" data-pid="${p.id}" style="gap:.5rem">`
+      + `<input type="checkbox" ${pre(p) ? 'checked' : ''} style="width:auto">`
+      + `<input type="text" class="bud-c" value="${esc(p.nombre)}" style="flex:1">`
+      + `<input type="number" class="bud-b" step="0.01" min="0" value="${p.facturacion?.modo === 'gratis' ? '' : (p.facturacion?.baseImponible || '')}" placeholder="0" style="width:7rem;font-family:'DM Mono',monospace">`
+      + `</div>`).join('');
+    this.om(`<div class="mt">${t('bud.generate')}</div>`
+      + `<div class="fg"><label>${t('fac.client')}</label><select id="budCl" onchange="App.budModal(this.value)">`
+      +   cls.map(c => `<option value="${c.id}" ${c.id === cid ? 'selected' : ''}>${esc(c.nombre)}</option>`).join('')
+      + `</select></div>`
+      + `<div class="fr"><div class="fg"><label>${t('bud.num')}</label><input type="text" id="budNum" value="${s.nextPresupuestoNum || 1}" style="font-family:'DM Mono',monospace"></div>`
+      + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="budDate" value="${todayStr()}"></div></div>`
+      + `<div class="fg"><label>${t('bud.projects')}</label>`
+      +   (ps.length ? `<div class="cl-list">${lines}</div>` : `<div style="color:var(--t3);font-size:.85rem">${t(cid ? 'bud.noProjects' : 'bud.noClient')}</div>`)
+      + `</div>`
+      + `<div class="fg"><label>${t('bud.desc')}</label><textarea id="budDesc" placeholder="${t('bud.descPh')}"></textarea></div>`
+      + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button>`
+      + (ps.length ? `<button class="bt bt-p" onclick="App.budGen('${cid}')">${t('btn.downloadPdf')}</button>` : '')
+      + `</div>`);
+  },
+
+  budGen(cid) {
+    const lineas = [...document.querySelectorAll('.bud-line')]
+      .filter(el => el.querySelector('input[type=checkbox]').checked)
+      .map(el => ({
+        pid: el.dataset.pid,
+        concepto: el.querySelector('.bud-c').value.trim(),
+        base: roundMoney(parseFloat(el.querySelector('.bud-b').value) || 0)
+      }));
+    if (!lineas.length) return Toast.error(t('bud.none'));
+    const num = parseInt(document.getElementById('budNum').value) || D.d.settings.nextPresupuestoNum || 1;
+    const fecha = document.getElementById('budDate').value || todayStr();
+    const r = Fac.presupuesto(cid, lineas, { num, fecha, descripcion: document.getElementById('budDesc').value.trim() });
+    T.ev('action', 'budget_generate');
+    Toast.ok(`${t('bud.btn')} ${num} · ${fmtMoney(r.total)}`);
+    this.cm();
+    if (this.cv === 'det' && this.cp) this.rDet(this.cp); else this.go(this.cv);
+  },
+
+
+  /* ══════════════════════════════════════════════
    *  COBROS PARCIALES (Partial Payments)
    * ══════════════════════════════════════════════ */
 

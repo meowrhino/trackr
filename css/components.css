@@ -113,6 +113,13 @@
 .dash-group-chev.open{transform:rotate(90deg)}
 .dash-group-count{font-size:.6rem;color:var(--t3);margin-left:.3rem}
 .pg.hidden{display:none}
+/* Arrastrar proyectos entre estados (app.dash.js _dashDnd) */
+.dash-group.empty{display:none}
+.dnd .dash-group.empty{display:block}
+.dnd .dash-group .pg:empty{min-height:3.5rem;border:1px dashed var(--b1);border-radius:8px}
+.dash-group.drag-over .dash-group-title{color:var(--t1);border-bottom-color:var(--t2)}
+.dash-group.drag-over .pg{outline:1px dashed var(--t2);outline-offset:4px;border-radius:8px}
+.pc.dragging{opacity:.4}
 
 /* ── Color selector grid ── */
 .cs-wrap{display:flex;flex-direction:column;gap:.5rem}
