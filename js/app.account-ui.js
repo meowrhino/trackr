@@ -11,6 +11,9 @@
   const L = () => (typeof _lang !== 'undefined' ? _lang : 'es');
   const TXT = {
     es: {
+      cfTitle: 'Este navegador y la nube no coinciden', cfBody: 'Aquí hay cambios que no se subieron, y desde entonces la nube también ha cambiado (seguramente desde otro dispositivo). ¿Con qué te quedas?',
+      cfMerge: 'Fusionar las dos', cfMergeDesc: 'Junta proyectos, clientes y gastos de ambas; si uno está en las dos, gana el de aquí.', cfCloud: 'Usar la nube', cfLocal: 'Usar este navegador',
+      cfSafety: 'Elijas lo que elijas, la copia de este navegador queda guardada en Configuración → Copias de seguridad.',
       title: 'Cuenta y sincronización', zk: 'Tus datos se cifran en tu navegador antes de subirse. Ni nosotros ni el servidor podemos leerlos (cifrado de conocimiento cero).',
       login: 'Iniciar sesión', signup: 'Crear cuenta', recover: '¿Olvidaste tu contraseña?',
       email: 'Email', password: 'Contraseña', password2: 'Repite la contraseña', newPassword: 'Contraseña nueva', currentPassword: 'Contraseña actual',
@@ -36,6 +39,9 @@
       gestorBadge: 'gestoría',
     },
     en: {
+      cfTitle: 'This browser and the cloud differ', cfBody: 'There are changes here that were never uploaded, and the cloud has changed since then too (probably from another device). Which do you keep?',
+      cfMerge: 'Merge both', cfMergeDesc: 'Combines projects, clients and expenses from both; if one exists in both, this browser wins.', cfCloud: 'Use the cloud', cfLocal: 'Use this browser',
+      cfSafety: 'Whatever you choose, this browser\'s copy stays saved in Settings → Backups.',
       title: 'Account & sync', zk: 'Your data is encrypted in your browser before upload. Neither we nor the server can read it (zero-knowledge).',
       login: 'Log in', signup: 'Create account', recover: 'Forgot your password?',
       email: 'Email', password: 'Password', password2: 'Repeat password', newPassword: 'New password', currentPassword: 'Current password',
@@ -61,6 +67,9 @@
       gestorBadge: 'advisor',
     },
     ca: {
+      cfTitle: 'Aquest navegador i el núvol no coincideixen', cfBody: 'Aquí hi ha canvis que no es van pujar, i des d\'aleshores el núvol també ha canviat (segurament des d\'un altre dispositiu). Amb què et quedes?',
+      cfMerge: 'Fusionar-les', cfMergeDesc: 'Ajunta projectes, clients i despeses de totes dues; si un és a les dues, guanya el d\'aquí.', cfCloud: 'Fer servir el núvol', cfLocal: 'Fer servir aquest navegador',
+      cfSafety: 'Triïs el que triïs, la còpia d\'aquest navegador queda desada a Configuració → Còpies de seguretat.',
       title: 'Compte i sincronització', zk: 'Les teves dades es xifren al navegador abans de pujar-se. Ni nosaltres ni el servidor podem llegir-les (coneixement zero).',
       login: 'Iniciar sessió', signup: 'Crear compte', recover: 'Has oblidat la contrasenya?',
       email: 'Email', password: 'Contrasenya', password2: 'Repeteix la contrasenya', newPassword: 'Contrasenya nova', currentPassword: 'Contrasenya actual',
@@ -282,7 +291,7 @@
         const r = await Acc.login(email, pw);
         if (!r.ok) return Toast.error(errMsg(r.error));
         Toast.ok(t('welcome'));
-        if (r.active) { if (typeof H !== 'undefined') H.snapshot(); await this._accPull(); Acc.setAutoSync(true); if (this._gestorPostLogin) await this._gestorPostLogin(); }
+        if (r.active) await this._accAfterAuth();
         this._accDone();
       } catch (e) { Toast.error(String(e.message || e)); }
     },
@@ -294,7 +303,7 @@
         const r = await Acc.unlock(pw);
         if (!r.ok) return Toast.error(errMsg(r.error));
         Toast.ok(t('welcome'));
-        if (r.active) { if (typeof H !== 'undefined') H.snapshot(); await this._accPull(); Acc.setAutoSync(true); if (this._gestorPostLogin) await this._gestorPostLogin(); }
+        if (r.active) await this._accAfterAuth();
         this._accDone();
       } catch (e) { Toast.error(String(e.message || e)); }
     },
@@ -314,9 +323,43 @@
     async accSyncNow() {
       const r = await Acc.push();
       if (r.ok) Toast.ok(`${t('synced')} · v${r.version}`);
-      else if (r.error === 'version_conflict') { await this._accPull(); Toast.warn(`${t('synced')} (${t('version')} ${r.currentVersion})`); }
+      else if (r.error === 'version_conflict') { if (typeof H !== 'undefined') H.snapshot(); await this._accPull(); Toast.warn(`${t('synced')} (${t('version')} ${r.currentVersion})`); }
       else Toast.error(t('syncErr') + (r.error ? ` (${r.error})` : ''));
       this.rCfg();
+    },
+
+    // Tras login/desbloqueo/recuperacion con cuenta activa: reconciliar local <-> nube
+    // (Acc.resume decide; si ambos cambiaron, pregunta), y luego auto-sync + gestoria.
+    async _accAfterAuth() {
+      if (typeof H !== 'undefined') H.snapshot(); // red de seguridad: pase lo que pase, lo local queda en el historial
+      let r = await Acc.resume();
+      if (r.action === 'conflict') {
+        const choice = await this._accAskConflict(r);
+        r = await Acc.resolve(choice, r.cloudVersion);
+      }
+      if (!r.ok && r.error !== 'busy') Toast.error(t('syncErr') + (r.error ? ` (${errMsg(r.error)})` : ''));
+      else if (r.action !== 'pulled' && r.action !== 'none') Toast.ok(`${t('synced')} · v${Acc.version}`);
+      this._applyPrefs && this._applyPrefs();
+      this.go(this.cv);
+      Acc.setAutoSync(true);
+      if (this._gestorPostLogin) await this._gestorPostLogin();
+    },
+
+    // Modal obligatorio (cm() lo ignora mientras _accChoose este pendiente): no hay
+    // respuesta por defecto segura, cualquiera de las tres descarta o mezcla algo.
+    _accAskConflict(c) {
+      const when = (ts) => ts ? new Date(ts).toLocaleString(L()) : '—';
+      return new Promise((res) => {
+        this._accChoose = (v) => { this._accChoose = null; res(v); };
+        this.om(`<div class="mt">${t('cfTitle')}</div>`
+          + `<p style="font-size:.88rem;color:var(--t2);line-height:1.5;margin-bottom:1rem">${t('cfBody')}</p>`
+          + `<div class="acc-actions" style="flex-direction:column;align-items:stretch">`
+          + `<button class="bt bt-p" style="display:block;text-align:left" onclick="App._accChoose('merge')">${t('cfMerge')}<div class="small" style="opacity:.8">${t('cfMergeDesc')}</div></button>`
+          + `<button class="bt" style="display:block;text-align:left" onclick="App._accChoose('cloud')">${t('cfCloud')} · v${c.cloudVersion}<div class="small" style="opacity:.8">${when(c.cloudAt)}</div></button>`
+          + `<button class="bt" style="display:block;text-align:left" onclick="App._accChoose('local')">${t('cfLocal')}<div class="small" style="opacity:.8">${when(c.localAt)}</div></button>`
+          + `</div>`
+          + `<p class="small" style="color:var(--t3);margin-top:.85rem">${t('cfSafety')}</p>`);
+      });
     },
 
     async _accPull() {
@@ -359,7 +402,7 @@
         const r = await Acc.recover(email, code, pw);
         if (!r.ok) return Toast.error(errMsg(r.error));
         Toast.ok(t('recovered'));
-        if (typeof H !== 'undefined') H.snapshot(); await this._accPull(); Acc.setAutoSync(true);
+        await this._accAfterAuth();
         this._accDone();
       } catch (e) { Toast.error(String(e.message || e)); }
     },

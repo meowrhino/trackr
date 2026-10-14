@@ -71,6 +71,17 @@ const App = {
     this._maybeWelcome();
     if (typeof Acc !== 'undefined') { Acc.detectLocked(); if (this.refreshAccountNav) this.refreshAccountNav(); }
 
+    /* Otra pestaña guardó: adoptar sus datos. Sin esto, cada pestaña guarda SU copia en
+       memoria entera y la última en guardar pisa a la otra sin avisar. Con un modal
+       abierto no se repinta (se perdería lo tecleado); su guardado ya cae sobre lo nuevo. */
+    window.addEventListener('storage', e => {
+      if (e.key !== 'trackr_data' || !e.newValue || D._readOnly) return;
+      try { D.d = JSON.parse(e.newValue); D.ensure(); } catch { return; }
+      D.lastSaved = parseInt(localStorage.getItem('trackr_saved_at'), 10) || Date.now();
+      this._renderSaved();
+      if (!document.getElementById('mO').classList.contains('on')) { this._applyPrefs(); this.go(this.cv); }
+    });
+
     /* Indicador "Guardado hace…" en el pie del sidebar */
     this._renderSaved();
 
@@ -226,6 +237,8 @@ const App = {
     });
   },
   cm() {
+    /* Conflicto local/nube pendiente (app.account-ui.js): no se cierra sin elegir */
+    if (this._accChoose) return;
     /* Si venimos del flujo facModal→clModal, volver a facModal en lugar de cerrar */
     if (this._facReturn) {
       const r = this._facReturn;

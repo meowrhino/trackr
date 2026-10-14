@@ -12,14 +12,17 @@ const Acc = (() => {
   const TKEY = 'trackr_token';     // token en sessionStorage
   const MKEY = 'trackr_acct';      // metadatos no secretos en localStorage (email, kdf, version...)
 
-  // estado en memoria
-  let S = { state: 'out', token: null, email: null, dek: null, credEpoch: 1, kdf: { mem: 65536, time: 3, par: 1 },
-            version: 0, active: false, isAdmin: false, role: 'persona', userId: null };
+  // estado en memoria. `version` = version de la nube en la que se basa la copia LOCAL;
+  // `syncedAt` = D.lastSaved en el momento en que local y nube coincidian (tras pull/push OK).
+  // Si D.lastSaved > syncedAt, este navegador tiene cambios que la nube no ha visto.
+  const fresh = () => ({ state: 'out', token: null, email: null, dek: null, credEpoch: 1, kdf: { mem: 65536, time: 3, par: 1 },
+            version: 0, syncedAt: 0, active: false, isAdmin: false, role: 'persona', userId: null });
+  let S = fresh();
 
   /* ── persistencia ── */
   function saveMeta() {
     try {
-      localStorage.setItem(MKEY, JSON.stringify({ email: S.email, kdf: S.kdf, credEpoch: S.credEpoch, version: S.version, active: S.active, isAdmin: S.isAdmin, role: S.role, userId: S.userId }));
+      localStorage.setItem(MKEY, JSON.stringify({ email: S.email, kdf: S.kdf, credEpoch: S.credEpoch, version: S.version, syncedAt: S.syncedAt, active: S.active, isAdmin: S.isAdmin, role: S.role, userId: S.userId }));
     } catch (e) { /* ignore */ }
   }
   function loadMeta() { try { return JSON.parse(localStorage.getItem(MKEY) || 'null'); } catch (e) { return null; } }
@@ -27,8 +30,24 @@ const Acc = (() => {
   function getToken() { try { return sessionStorage.getItem(TKEY); } catch (e) { return null; } }
   function wipe() {
     try { sessionStorage.removeItem(TKEY); } catch (e) { /* */ }
-    S = { state: 'out', token: null, email: null, dek: null, credEpoch: 1, kdf: { mem: 65536, time: 3, par: 1 }, version: 0, active: false, isAdmin: false, userId: null };
+    S = fresh(); // la meta en localStorage se queda: recuerda en que version estaba esta copia local
   }
+
+  // Lo que este navegador sabe de su copia local para `email` (de la meta guardada).
+  // Otra cuenta, o nunca sincronizado aqui: base 0 y syncedAt 0 (= sin referencia).
+  function localBase(email) {
+    const m = loadMeta();
+    return (m && m.email === email) ? { version: m.version || 0, syncedAt: m.syncedAt || 0 } : { version: 0, syncedAt: 0 };
+  }
+  const hasData = (d) => !!d && ['projects', 'clientes', 'gastos'].some(k => (d[k] || []).length);
+  // Cambios locales que la nube no ha visto. Sin referencia (primera vez aqui) cuenta como
+  // sucio si hay datos: no sabemos si estan en la nube. Una copia vacia nunca esta sucia.
+  function localDirty() {
+    const d = typeof D !== 'undefined' ? D.d : null;
+    if (!hasData(d)) return false;
+    return !S.syncedAt || (D.lastSaved || 0) > S.syncedAt;
+  }
+  function markSynced() { S.syncedAt = (typeof D !== 'undefined' && D.lastSaved) || Date.now(); saveMeta(); }
 
   /* ── fetch helper ── */
   async function api(path, { method = 'GET', body, auth = false } = {}) {
@@ -71,7 +90,7 @@ const Acc = (() => {
     const r = await api('/v1/signup', { method: 'POST', body: su.payload });
     if (r.status === 201) {
       S = { state: 'in', token: r.data.token, email: su.email, dek: su.dek, credEpoch: su.credEpoch, kdf: { mem: 65536, time: 3, par: 1 }, version: r.data.currentVersion || 1, active: !!r.data.active, isAdmin: !!r.data.isAdmin, role, userId: r.data.userId };
-      setToken(r.data.token); saveMeta();
+      setToken(r.data.token); markSynced(); // el blob inicial ES la copia local
       return { ok: true, recoveryCode: su.recoveryCode, active: S.active, isAdmin: S.isAdmin };
     }
     if (r.status === 202) return { ok: true, pending: true, recoveryCode: su.recoveryCode }; // cuenta creada (active=0) o email ya existente (anti-enum)
@@ -94,7 +113,8 @@ const Acc = (() => {
     let dek;
     try { dek = await CA.unwrapLogin(wrapKeyPwd, lg.data.wrappedDEK_pwd, email, lg.data.credEpoch); }
     catch (e) { return { ok: false, error: 'unwrap_failed' }; } // contrasena ok pero envelope no abre (no deberia pasar)
-    S = { state: 'in', token: lg.data.token, email, dek, credEpoch: lg.data.credEpoch, kdf, version: lg.data.currentVersion || 0, active: !!lg.data.active, isAdmin: !!lg.data.isAdmin, role: lg.data.role || 'persona', userId: lg.data.userId };
+    const base = localBase(email); // NO la version del servidor: la copia local puede ir por detras (ver resume)
+    S = { state: 'in', token: lg.data.token, email, dek, credEpoch: lg.data.credEpoch, kdf, version: base.version, syncedAt: base.syncedAt, active: !!lg.data.active, isAdmin: !!lg.data.isAdmin, role: lg.data.role || 'persona', userId: lg.data.userId };
     setToken(lg.data.token); saveMeta();
     return { ok: true, active: S.active, isAdmin: S.isAdmin, role: S.role };
   }
@@ -103,7 +123,7 @@ const Acc = (() => {
   function detectLocked() {
     const t = getToken(); const m = loadMeta();
     if (t && m && m.email && !S.dek) {
-      S = { ...S, state: 'locked', token: t, email: m.email, kdf: m.kdf || S.kdf, credEpoch: m.credEpoch || 1, version: m.version || 0, active: !!m.active, isAdmin: !!m.isAdmin, role: m.role || 'persona', userId: m.userId || null };
+      S = { ...S, state: 'locked', token: t, email: m.email, kdf: m.kdf || S.kdf, credEpoch: m.credEpoch || 1, version: m.version || 0, syncedAt: m.syncedAt || 0, active: !!m.active, isAdmin: !!m.isAdmin, role: m.role || 'persona', userId: m.userId || null };
       return true;
     }
     return false;
@@ -151,7 +171,8 @@ const Acc = (() => {
     // fase commit (con el recNonce fresco que devolvio material)
     const com = await api('/v1/recover/redeem?phase=commit', { method: 'POST', body: { email, recNonce: mat.data.recNonce, recProof: recProof, ...built.commit } });
     if (com.status !== 200) return { ok: false, error: com.data?.error || 'recovery_failed' };
-    S = { state: 'in', token: com.data.token, email, dek: built.dek, credEpoch: built.commit.newCredEpoch, kdf, version: 0, active: true, isAdmin: false, userId: mat.data.userId };
+    const base = localBase(email);
+    S = { ...fresh(), state: 'in', token: com.data.token, email, dek: built.dek, credEpoch: built.commit.newCredEpoch, kdf, version: base.version, syncedAt: base.syncedAt, active: true, userId: mat.data.userId };
     setToken(com.data.token); saveMeta();
     return { ok: true };
   }
@@ -162,7 +183,7 @@ const Acc = (() => {
     if (!isUnlocked() || !S.active) return { ok: false, error: 'not_ready' };
     const meta = await api('/v1/blob/meta', { method: 'GET', auth: true });
     if (meta.status !== 200) return { ok: false, error: meta.data?.error || 'meta_failed' };
-    if (!meta.data.currentVersion) { S.version = 0; return { ok: true, empty: true }; }
+    if (!meta.data.currentVersion) { S.version = 0; saveMeta(); return { ok: true, empty: true }; }
     const g = await api('/v1/blob', { method: 'GET', auth: true });
     if (g.status === 503) return { ok: false, error: 'kv_unavailable_retry' };
     if (g.status !== 200) return { ok: false, error: g.data?.error || 'get_failed' };
@@ -171,6 +192,7 @@ const Acc = (() => {
     catch (e) { return { ok: false, error: 'decrypt_failed' }; }
     S.version = g.data.version;
     _applyRemote(data);
+    markSynced();
     // El blob bajado puede traer un grant que otro dispositivo ya revoco (o un canEdit viejo)
     reconcileGrant(true).catch(() => {});
     return { ok: true, version: g.data.version };
@@ -181,22 +203,35 @@ const Acc = (() => {
   // aun presente en la nube REAPARECE (los borrados no se propagan), y una edicion concurrente del
   // mismo id la pisa el local. Borrado/edicion fiables multi-dispositivo necesitan tombstones + reloj
   // por registro (futuro). Para 1 dispositivo (caso comun ahora) no aplica. El 409 hace H.snapshot.
+  // Union de dos listas por clave; en colision gana la local.
+  function unionBy(cloudArr, localArr, key) {
+    const m = new Map();
+    for (const x of [...(cloudArr || []), ...(localArr || [])]) { const k = x && key(x); if (k != null) m.set(k, x); }
+    return [...m.values()];
+  }
   function mergeData(local, cloud) {
     local = local || {}; cloud = cloud || {};
     const out = {};
     for (const k of Object.keys(cloud)) out[k] = cloud[k];
     for (const key of ['projects', 'clientes', 'gastos', 'deducibles', 'facturas']) {
-      if (!(local[key] || cloud[key])) continue;
-      const byId = {};
-      (cloud[key] || []).forEach((x) => { if (x && x.id != null) byId[x.id] = x; });
-      (local[key] || []).forEach((x) => { if (x && x.id != null) byId[x.id] = x; }); // local gana
-      out[key] = Object.values(byId);
+      if (local[key] || cloud[key]) out[key] = unionBy(cloud[key], local[key], (x) => x.id);
+    }
+    // Journey: estadios del local (es lo que se ve aqui), tarjetas de los dos. Antes la
+    // nube pisaba el objeto entero y se perdian las tarjetas creadas en este dispositivo.
+    if (local.journey || cloud.journey) {
+      out.journey = { ...(cloud.journey || {}), ...(local.journey || {}),
+        cards: unionBy(cloud.journey?.cards, local.journey?.cards, (c) => c.id) };
+    }
+    // Auditoria: los eventos de los dos, en orden, con el mismo tope que D._auditAs.
+    if (local.audit || cloud.audit) {
+      out.audit = unionBy(cloud.audit, local.audit, (e) => `${e.ts}|${e.accion}|${e.entidad}|${e.entidadId}`)
+        .sort((a, b) => a.ts - b.ts).slice(-((typeof D !== 'undefined' && D.AUDIT_MAX) || 500));
     }
     // Settings: UI local gana, pero conservamos campos solo-nube y NO retrocedemos contadores monotonos
     // (p.ej. numeracion de facturas) para no romper la cadena/correlativo.
     out.settings = Object.assign({}, cloud.settings || {}, local.settings || {});
     const lc = local.settings || {}, cc = cloud.settings || {};
-    for (const numKey of ['nextFacturaNum', 'nextNum', 'facturaCounter', 'numFactura']) {
+    for (const numKey of ['nextFacturaNum', 'nextPresupuestoNum', 'nextNum', 'facturaCounter', 'numFactura']) {
       if (lc[numKey] != null || cc[numKey] != null) out.settings[numKey] = Math.max(Number(lc[numKey]) || 0, Number(cc[numKey]) || 0);
     }
     if (local.version != null) out.version = local.version;
@@ -214,9 +249,10 @@ const Acc = (() => {
     try {
       const data = dataObj || (typeof D !== 'undefined' ? D.d : null);
       if (!data) return { ok: false, error: 'no_data' };
+      const savedAt = typeof D !== 'undefined' ? D.lastSaved : null; // lo que se edite durante el PUT sigue sucio
       const { blob, blobHash } = await CA.encryptForUpload(S.dek, data, S.email, S.version + 1);
       const r = await api('/v1/blob', { method: 'PUT', auth: true, body: { blob, blobHash, baseVersion: S.version } });
-      if (r.status === 200) { S.version = r.data.version; saveMeta(); return { ok: true, version: r.data.version }; }
+      if (r.status === 200) { S.version = r.data.version; S.syncedAt = savedAt || Date.now(); saveMeta(); return { ok: true, version: r.data.version }; }
       if (r.status === 409 && !_retry) {
         S.version = r.data.currentVersion;
         const g = await api('/v1/blob', { method: 'GET', auth: true });
@@ -241,6 +277,39 @@ const Acc = (() => {
         if (_dirty) { _dirty = false; setTimeout(() => { syncPush().catch(() => {}); }, 50); }
       }
     }
+  }
+
+  /* ── Al entrar (login/desbloqueo/recuperacion): decidir quien manda ──
+     Antes se bajaba la nube SIEMPRE y pisaba lo editado aqui estando fuera/bloqueado
+     (quedaba solo en el historial local, sin aviso). Ahora:
+       nube vacia            -> se sube lo local
+       local sin cambios     -> se baja la nube
+       local con cambios y la nube no se ha movido desde su base -> se sube lo local
+       los dos han cambiado  -> conflict: decide la persona (resolve) */
+  async function resume() {
+    if (!isUnlocked() || !S.active) return { ok: false, error: 'not_ready' };
+    const meta = await api('/v1/blob/meta', { method: 'GET', auth: true });
+    if (meta.status !== 200) return { ok: false, error: failOf(meta, 'meta_failed') };
+    const cloudVersion = meta.data.currentVersion || 0;
+    const dirty = localDirty();
+    if (!cloudVersion) {
+      if (!hasData(D.d)) return { ok: true, action: 'none' };
+      S.version = 0;
+      const r = await syncPush();
+      return { ...r, action: 'pushed' };
+    }
+    if (!dirty) { const r = await pull(); return { ...r, action: 'pulled' }; }
+    if (cloudVersion === S.version) { const r = await syncPush(); return { ...r, action: 'pushed' }; }
+    return { ok: true, action: 'conflict', cloudVersion, cloudAt: (meta.data.updatedAt || 0) * 1000, localAt: D.lastSaved || 0 };
+  }
+
+  // Resuelve el conflicto de resume(). 'cloud' baja y descarta lo local (el llamante hace
+  // H.snapshot antes); 'local' sube y la nube pasa a ser esta copia; 'merge' empuja con la
+  // base vieja -> el 409 de push() baja la nube y fusiona por id (mergeData), sin duplicar logica.
+  async function resolve(choice, cloudVersion) {
+    if (choice === 'cloud') return await pull();
+    if (choice === 'local') S.version = cloudVersion;
+    return await syncPush();
   }
 
   /* ── auto-sync (debounce) + guards de concurrencia/reentrada ── */
@@ -551,7 +620,7 @@ const Acc = (() => {
   async function adminSetConfig(signupsOpen) { const r = await api('/v1/admin/config', { method: 'POST', auth: true, body: { signupsOpen: !!signupsOpen } }); return r.status === 200; }
 
   return {
-    signup, login, unlock, logout, changePassword, recover, pull, push: syncPush,
+    signup, login, unlock, logout, changePassword, recover, pull, push: syncPush, resume, resolve,
     gestorEnsureKey, gestorResolve, grantCreate, grantRevoke, gestorClients, gestorOpenClient, pushShadow, _buildShareData: buildShareData,
     grantSetCanEdit, opsPush, pullOps, setOpsListener, reconcileGrant, pushVerifactu,
     adminListUsers, adminSetActive, adminSetPaid, adminDelete, adminGetConfig, adminSetConfig, _mergeData: mergeData,
