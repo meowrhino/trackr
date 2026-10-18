@@ -100,7 +100,7 @@ Object.assign(App, {
       let listHtml = '';
       if (cobros.length) {
         listHtml = `<div class="hl" style="margin-top:.5rem">${cobros.map(c =>
-          `<div class="hr"><span class="hr-d">${fmtDate(c.fecha)}</span><span class="hr-a m" style="color:var(--ok)">${fmtMoney(c.cantidad)}</span><span class="hr-e" onclick="App.cobroModal('${p.id}','${c.id}')" title="${t('btn.edit')}">&#9998;</span><span class="hr-x" onclick="App.delCobro('${p.id}','${c.id}')" title="${t('btn.delete')}">&times;</span></div>`
+          `<div class="hr"><span class="hr-d">${fmtDate(c.fecha)}</span><span class="hr-a m" style="color:var(--ok)">${fmtMoney(c.cantidad)}</span>${c.metodo ? `<span class="hr-n">${t('billing.m.' + c.metodo)}</span>` : ''}<span class="hr-e" onclick="App.cobroModal('${p.id}','${c.id}')" title="${t('btn.edit')}">&#9998;</span><span class="hr-x" onclick="App.delCobro('${p.id}','${c.id}')" title="${t('btn.delete')}">&times;</span></div>`
         ).join('')}</div>`;
       }
 

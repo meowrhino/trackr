@@ -12,6 +12,8 @@ Cada entrada del calendario creaba una versión en el servidor (de la v100 a la 
 ### ✨ Nuevo
 - **Versiones en la nube** (Configuración → Cuenta): lista con fecha y botón **Restaurar**, desde cualquier ordenador. Se guardan las 10 últimas y, de los últimos 30 días, la última de cada día. Restaurar crea una versión nueva con ese contenido: lo de ahora sigue en la lista y además se guarda una copia en este navegador. _frontend, backend@99ac237_
 
+- **Método de cobro** en cada cobro: transferencia, efectivo, Bizum, tarjeta u otro. Aparece junto al cobro en la ficha del proyecto. Es solo informativo: no cambia ningún cálculo. _frontend_
+
 ### 🔧 Cambiado
 - **Se sube a los 30 s del último cambio** (antes 2,5 s), y **enseguida al cambiar de pestaña o cerrar**. Cada cambio sigue guardándose al momento en el navegador; lo que no llegue a subirse lo recoge el siguiente inicio de sesión. 5 entradas seguidas = 1 versión. _frontend_
 - **No se sube si nada ha cambiado** (antes, cualquier guardado sin cambios creaba una versión idéntica). _frontend_

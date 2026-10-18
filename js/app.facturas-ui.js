@@ -8,6 +8,9 @@
  * Deps globales: Fac (facturas.js), V (verifactu.js, opcional), D, B, T, t, esc...
  * cm() (cierre de modal con _facReturn) queda en el core app.js.
  * ================================================ */
+/** Cómo llegó el dinero de un cobro. Solo informativo: no cambia ningún cálculo fiscal. */
+const COBRO_METODOS = ['transferencia', 'efectivo', 'bizum', 'tarjeta', 'otro'];
+
 Object.assign(App, {
 
   /* ══════════════════════════════════════════════
@@ -248,6 +251,7 @@ Object.assign(App, {
       `<div class="mt">${title}</div>`
       + `<div class="fr"><div class="fg"><label>${t('billing.paymentAmount')}</label><input type="number" id="mcA" min="0.01" step="0.01" value="${defAmount}"></div>`
       + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="mcD" value="${defDate}"></div></div>`
+      + `<div class="fg"><label>${t('billing.method')}</label><select id="mcM">${COBRO_METODOS.map(m => `<option value="${m}" ${(existing?.metodo || 'transferencia') === m ? 'selected' : ''}>${t('billing.m.' + m)}</option>`).join('')}</select></div>`
       + (isEdit ? '' : `<div style="font-size:.78rem;color:var(--t3);margin-bottom:.75rem">${t('billing.remaining', fmtMoney(pend))}</div>`)
       + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveCobro('${pid}'${isEdit ? `,'${cid}'` : ''})">${t('btn.save')}</button></div>`
     );
@@ -256,6 +260,7 @@ Object.assign(App, {
   saveCobro(pid, cid) {
     let cant = parseFloat(document.getElementById('mcA').value) || 0;
     const fecha = document.getElementById('mcD').value || todayStr();
+    const metodo = document.getElementById('mcM').value;
     if (cant <= 0) return;
     const p = D.p(pid); if (!p) return;
     if (!p.facturacion.cobros) p.facturacion.cobros = [];
@@ -269,9 +274,9 @@ Object.assign(App, {
     }
     cant = roundMoney(cant);
     if (existing) {
-      existing.fecha = fecha; existing.cantidad = cant;
+      existing.fecha = fecha; existing.cantidad = cant; existing.metodo = metodo;
     } else {
-      p.facturacion.cobros.push({ id: uid(), fecha, cantidad: cant });
+      p.facturacion.cobros.push({ id: uid(), fecha, cantidad: cant, metodo });
     }
     B.calc(p);
     D.up(pid, { facturacion: p.facturacion });
