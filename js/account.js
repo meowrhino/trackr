@@ -302,6 +302,9 @@ const Acc = (() => {
         return { ok: false, error: 'version_conflict', currentVersion: r.data.currentVersion };
       }
       if (r.status === 403) return { ok: false, error: 'inactive' };
+      // Token caducado (24 h sin uso / 7 dias). Antes salia como 'Error de sync' y se reintentaba cada
+      // minuto para siempre; ahora la copia pasa a bloqueada y el indicador pide volver a entrar.
+      if (r.status === 401) { S.state = 'locked'; S.dek = null; return { ok: false, error: 'session_expired' }; }
       return { ok: false, error: failOf(r, 'put_failed') };
     } finally {
       if (!_retry) {
@@ -362,7 +365,7 @@ const Acc = (() => {
     // Tras un push OK: espejo para la gestoria y, si nos dejo editar, recoger sus cambios.
     // pullOps aplica -> D.save -> notifyChange -> otro push; converge porque la segunda
     // vuelta ya no encuentra ops. Los dos son best-effort: no rompen el sync normal.
-    if (!res || (!res.ok && !['busy', 'not_ready', 'inactive'].includes(res.error))) scheduleSync(RETRY_MS); // red caida, 429...: reintentar sin esperar a otro cambio
+    if (!res || (!res.ok && !['busy', 'not_ready', 'inactive', 'session_expired'].includes(res.error))) scheduleSync(RETRY_MS); // red caida, 429...: reintentar sin esperar a otro cambio
     if (res && res.ok) { emitSync('synced', res); reconcileGrant().catch(() => {}); pushShadow().catch(() => {}); pullOps().catch(() => {}); pushVerifactu().catch(() => {}); }
     else if (!res || res.error !== 'busy') emitSync('error', res || {}); // 'busy' = coalescado, el push en curso ya emitira
     return res;

@@ -15,6 +15,7 @@ Cada entrada del calendario creaba una versión en el servidor (de la v100 a la 
 - **Método de cobro** en cada cobro: transferencia, efectivo, Bizum, tarjeta u otro. Aparece junto al cobro en la ficha del proyecto. Es solo informativo: no cambia ningún cálculo. _frontend_
 
 ### 🔧 Cambiado
+- **Sesión caducada mientras la pestaña estaba abierta** (24 h sin uso): antes salía «Error de sync» y se reintentaba cada minuto con el token muerto; ahora la copia pasa a bloqueada y el indicador pide volver a entrar. Lo editado sigue guardado en el navegador y se sube al entrar. _frontend_
 - **Se sube a los 30 s del último cambio** (antes 2,5 s), y **enseguida al cambiar de pestaña o cerrar**. Cada cambio sigue guardándose al momento en el navegador; lo que no llegue a subirse lo recoge el siguiente inicio de sesión. 5 entradas seguidas = 1 versión. _frontend_
 - **No se sube si nada ha cambiado** (antes, cualquier guardado sin cambios creaba una versión idéntica). _frontend_
 - **Si una subida falla** (sin red, límite), se reintenta sola al minuto en vez de esperar al siguiente cambio. _frontend_

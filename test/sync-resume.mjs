@@ -46,7 +46,7 @@ function setup({ meta, cloudVersion, local, lastSaved }) {
   const ctx = { D, CA, fetch, localStorage: ls, sessionStorage: ls, console, setTimeout, clearTimeout, crypto: globalThis.crypto, TextEncoder };
   vm.createContext(ctx);
   vm.runInContext(src + '\nthis.Acc = Acc;', ctx);
-  return { Acc: ctx.Acc, D, calls, store, get srvVersion() { return srvVersion; }, get puts() { return calls.filter((c) => c === 'PUT /v1/blob').length; } };
+  return { Acc: ctx.Acc, D, calls, store, ctx, get srvVersion() { return srvVersion; }, get puts() { return calls.filter((c) => c === 'PUT /v1/blob').length; } };
 }
 
 const withData = { projects: [{ id: 'l1' }], clientes: [], gastos: [] };
@@ -148,4 +148,19 @@ for (const [choice, ids] of [['cloud', ['c1']], ['local', ['l1']], ['merge', ['c
   assert.equal(r.ok, true); assert.equal(e.srvVersion, 8);
   assert.equal(JSON.stringify(e.D.d.projects.map((p) => p.id)), '["l1"]');
   console.log('ok - restaurar versión');
+}
+
+// token caducado (401 en el PUT): la copia pasa a bloqueada y no se reintenta en silencio
+{
+  const e = setup({ meta: me(5, 100), cloudVersion: 5, local: withData, lastSaved: 200 });
+  await e.Acc.login('a@b.c', 'pw');
+  await e.Acc.resume();
+  const real = e.ctx.fetch;
+  e.ctx.fetch = async (url, opt = {}) => (opt.method === 'PUT' ? { status: 401, json: async () => ({ error: 'invalid_token' }) } : real(url, opt));
+  e.D.d.clientes.push({ id: 'nuevo' });
+  const r = await e.Acc.push();
+  assert.equal(r.error, 'session_expired');
+  assert.equal(e.Acc.status().state, 'locked');
+  assert.equal((await e.Acc.push()).error, 'not_ready');   // bloqueada: no vuelve a intentarlo solo
+  console.log('ok - 401 bloquea la sesión');
 }

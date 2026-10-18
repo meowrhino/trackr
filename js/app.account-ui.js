@@ -464,6 +464,7 @@
 
   // ── Indicador de sync: la cuenta avisa al cambiar de estado (sincronizando/ok/error) ──
   if (typeof Acc !== 'undefined' && Acc.setSyncListener) {
-    Acc.setSyncListener((state) => { try { App._renderSyncStatus(state); } catch (e) { /* */ } });
+    // Si el push descubre que la sesion caduco (401), el boton de cuenta tambien pasa a «Desbloquear».
+    Acc.setSyncListener((state) => { try { if (Acc.state !== 'in') App.refreshAccountNav(); else App._renderSyncStatus(state); } catch (e) { /* */ } });
   }
 })();
