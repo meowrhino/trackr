@@ -119,19 +119,20 @@
           {
             "id": "cb301-01",
             "fecha": "2026-02-01",
-            "cantidad": 1500,
+            "cantidad": 1870.59,
             "metodo": "transferencia"
           },
           {
             "id": "cb301-02",
             "fecha": "2026-05-01",
-            "cantidad": 1475,
+            "cantidad": 1839.41,
             "metodo": "transferencia"
           }
         ],
         "facturaNum": 3,
         "facturaFecha": "2026-01-20",
-        "idiomaFactura": null
+        "idiomaFactura": null,
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -270,13 +271,14 @@
           {
             "id": "cb302-01",
             "fecha": "2026-03-20",
-            "cantidad": 680,
+            "cantidad": 760,
             "metodo": "transferencia"
           }
         ],
         "facturaNum": 4,
         "facturaFecha": "2026-03-16",
-        "idiomaFactura": null
+        "idiomaFactura": null,
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -347,13 +349,14 @@
           {
             "id": "cb303-01",
             "fecha": "2026-08-12",
-            "cantidad": 1700,
+            "cantidad": 1900,
             "metodo": "transferencia"
           }
         ],
         "facturaNum": 5,
         "facturaFecha": "2026-07-13",
-        "idiomaFactura": null
+        "idiomaFactura": null,
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -452,13 +455,14 @@
           {
             "id": "cb304-01",
             "fecha": "2025-12-15",
-            "cantidad": 510,
+            "cantidad": 570,
             "metodo": "transferencia"
           }
         ],
         "facturaNum": 2,
         "facturaFecha": "2025-11-19",
-        "idiomaFactura": null
+        "idiomaFactura": null,
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -1093,19 +1097,20 @@
           {
             "id": "cb307-01",
             "fecha": "2026-06-15",
-            "cantidad": 2125,
+            "cantidad": 2650,
             "metodo": "transferencia"
           },
           {
             "id": "cb307-02",
             "fecha": "2027-04-15",
-            "cantidad": 2125,
+            "cantidad": 2650,
             "metodo": "transferencia"
           }
         ],
         "facturaNum": 7,
         "facturaFecha": "2027-03-10",
-        "idiomaFactura": null
+        "idiomaFactura": null,
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -1562,13 +1567,14 @@
           {
             "id": "cb309-01",
             "fecha": "2027-08-10",
-            "cantidad": 2125,
+            "cantidad": 2375,
             "metodo": "transferencia"
           }
         ],
         "facturaNum": 8,
         "facturaFecha": "2027-07-11",
-        "idiomaFactura": null
+        "idiomaFactura": null,
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -1752,19 +1758,20 @@
           {
             "id": "cb311-01",
             "fecha": "2027-04-15",
-            "cantidad": 1700,
+            "cantidad": 2120,
             "metodo": "transferencia"
           },
           {
             "id": "cb311-02",
             "fecha": "2027-12-15",
-            "cantidad": 1700,
+            "cantidad": 2120,
             "metodo": "transferencia"
           }
         ],
         "facturaNum": 10,
         "facturaFecha": "2027-11-15",
-        "idiomaFactura": null
+        "idiomaFactura": null,
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -1895,13 +1902,14 @@
           {
             "id": "cb312-01",
             "fecha": "2028-08-12",
-            "cantidad": 2550,
+            "cantidad": 2850,
             "metodo": "transferencia"
           }
         ],
         "facturaNum": 12,
         "facturaFecha": "2028-07-13",
-        "idiomaFactura": null
+        "idiomaFactura": null,
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -1992,19 +2000,20 @@
           {
             "id": "cb313-01",
             "fecha": "2028-10-15",
-            "cantidad": 3400,
+            "cantidad": 4240,
             "metodo": "transferencia"
           },
           {
             "id": "cb313-02",
             "fecha": "2029-02-28",
-            "cantidad": 3400,
+            "cantidad": 4240,
             "metodo": "transferencia"
           }
         ],
         "facturaNum": 14,
         "facturaFecha": "2029-01-20",
-        "idiomaFactura": null
+        "idiomaFactura": null,
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -2119,19 +2128,20 @@
           {
             "id": "cb314-01",
             "fecha": "2028-02-15",
-            "cantidad": 1487.5,
+            "cantidad": 1855,
             "metodo": "transferencia"
           },
           {
             "id": "cb314-02",
             "fecha": "2028-10-15",
-            "cantidad": 1487.5,
+            "cantidad": 1855,
             "metodo": "transferencia"
           }
         ],
         "facturaNum": 11,
         "facturaFecha": "2028-09-20",
-        "idiomaFactura": null
+        "idiomaFactura": null,
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -2291,13 +2301,14 @@
           {
             "id": "cb316-01",
             "fecha": "2029-07-07",
-            "cantidad": 2550,
+            "cantidad": 2850,
             "metodo": "transferencia"
           }
         ],
         "facturaNum": 17,
         "facturaFecha": "2029-06-08",
-        "idiomaFactura": null
+        "idiomaFactura": null,
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -2380,25 +2391,26 @@
           {
             "id": "cb317-01",
             "fecha": "2029-07-15",
-            "cantidad": 3400,
+            "cantidad": 4240,
             "metodo": "transferencia"
           },
           {
             "id": "cb317-02",
             "fecha": "2029-09-15",
-            "cantidad": 3400,
+            "cantidad": 4240,
             "metodo": "transferencia"
           },
           {
             "id": "cb317-03",
             "fecha": "2029-12-20",
-            "cantidad": 3400,
+            "cantidad": 4240,
             "metodo": "transferencia"
           }
         ],
         "facturaNum": 19,
         "facturaFecha": "2029-11-20",
-        "idiomaFactura": null
+        "idiomaFactura": null,
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -2529,13 +2541,14 @@
           {
             "id": "cb318-01",
             "fecha": "2029-08-12",
-            "cantidad": 2975,
+            "cantidad": 3325,
             "metodo": "transferencia"
           }
         ],
         "facturaNum": 18,
         "facturaFecha": "2029-07-13",
-        "idiomaFactura": null
+        "idiomaFactura": null,
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -4817,7 +4830,8 @@
     "nif": "43987654K",
     "direccion1": "Carrer de Verdi 78, 2n 1a",
     "direccion2": "08012 Barcelona",
-    "nextPresupuestoNum": 15
+    "nextPresupuestoNum": 15,
+    "diasVencimiento": 45
   },
   "journey": {
     "stages": [
@@ -4858,5 +4872,231 @@
       }
     ],
     "cards": []
-  }
+  },
+  "presupuestos": [
+    {
+      "id": "bud-ana-1",
+      "num": 1,
+      "fecha": "2025-12-26",
+      "clienteId": "c301-aa11-bb22",
+      "lineas": [
+        {
+          "pid": "p301-m1m1-n1n1",
+          "concepto": "Producció EP Samantha",
+          "base": 3500
+        }
+      ],
+      "descripcion": "Producció de l'EP (5 temes): preproducció, gravació a l'estudi, mescla i màster. 50 % a l'inici i 50 % a l'entrega del màster.",
+      "total": 3710,
+      "estado": "aceptado"
+    },
+    {
+      "id": "bud-ana-2",
+      "num": 2,
+      "fecha": "2026-01-12",
+      "clienteId": "c304-gg77-hh88",
+      "lineas": [
+        {
+          "pid": "p303-m3m3-n3n3",
+          "concepto": "Festival Cruïlla 2026",
+          "base": 2000
+        }
+      ],
+      "descripcion": "Concert al Festival Cruïlla: caixet, desplaçament i backline. Pagament a 30 dies de la factura.",
+      "total": 1900,
+      "estado": "aceptado"
+    },
+    {
+      "id": "bud-ana-3",
+      "num": 3,
+      "fecha": "2026-05-12",
+      "clienteId": "c305-ii99-jj00",
+      "lineas": [
+        {
+          "pid": "p307-m7m7-n7n7",
+          "concepto": "Àlbum Marc Puig",
+          "base": 5000
+        }
+      ],
+      "descripcion": "Producció de l'àlbum (10 temes), 4 mesos. Tres pagaments: inici, final de gravació i entrega.",
+      "total": 5300,
+      "estado": "aceptado"
+    },
+    {
+      "id": "bud-ana-4",
+      "num": 4,
+      "fecha": "2027-02-09",
+      "clienteId": "c304-gg77-hh88",
+      "lineas": [
+        {
+          "pid": "p309-m9m9-n9n9",
+          "concepto": "Festival Cruïlla 2027",
+          "base": 2500
+        }
+      ],
+      "descripcion": "Concert al Festival Cruïlla 2027: caixet i desplaçament.",
+      "total": 2375,
+      "estado": "aceptado"
+    },
+    {
+      "id": "bud-ana-5",
+      "num": 5,
+      "fecha": "2027-03-12",
+      "clienteId": "c306-kk11-ll22",
+      "lineas": [
+        {
+          "pid": "p311-m11m-n11n",
+          "concepto": "Producció Llum — Àlbum Noa Serra",
+          "base": 4000
+        }
+      ],
+      "descripcion": "Producció per a Discogràfica Llum: àlbum de Noa Serra, 10 temes. Pagament a 45 dies.",
+      "total": 4240,
+      "estado": "aceptado"
+    },
+    {
+      "id": "bud-ana-6",
+      "num": 6,
+      "fecha": "2028-01-12",
+      "clienteId": "c306-kk11-ll22",
+      "lineas": [
+        {
+          "pid": "p314-m14m-n14n",
+          "concepto": "Producció Llum — Singles 2028",
+          "base": 3500
+        }
+      ],
+      "descripcion": "Producció de tres singles per a Discogràfica Llum. Pagament a 45 dies.",
+      "total": 3710,
+      "estado": "aceptado"
+    },
+    {
+      "id": "bud-ana-7",
+      "num": 7,
+      "fecha": "2028-02-10",
+      "clienteId": "c304-gg77-hh88",
+      "lineas": [
+        {
+          "pid": "p312-m12m-n12n",
+          "concepto": "Festival Cruïlla 2028",
+          "base": 3000
+        }
+      ],
+      "descripcion": "Concert al Festival Cruïlla 2028: caixet i desplaçament.",
+      "total": 2850,
+      "estado": "aceptado"
+    },
+    {
+      "id": "bud-ana-8",
+      "num": 8,
+      "fecha": "2028-09-11",
+      "clienteId": "c307-mm33-nn44",
+      "lineas": [
+        {
+          "pid": "p313-m13m-n13n",
+          "concepto": "Soundtrack Netflix — curt documental",
+          "base": 8000
+        }
+      ],
+      "descripcion": "Banda sonora del curt documental: composició, gravació i mescla. Cessió de drets inclosa. Pagament a 45 dies.",
+      "total": 8480,
+      "estado": "aceptado"
+    },
+    {
+      "id": "bud-ana-9",
+      "num": 9,
+      "fecha": "2029-02-09",
+      "clienteId": "c308-oo55-pp66",
+      "lineas": [
+        {
+          "pid": "p316-m16m-n16n",
+          "concepto": "Primavera Sound 2029",
+          "base": 3000
+        }
+      ],
+      "descripcion": "Concert al Primavera Sound 2029: caixet, desplaçament i backline.",
+      "total": 2850,
+      "estado": "aceptado"
+    },
+    {
+      "id": "bud-ana-10",
+      "num": 10,
+      "fecha": "2029-03-12",
+      "clienteId": "c304-gg77-hh88",
+      "lineas": [
+        {
+          "pid": "p318-m18m-n18n",
+          "concepto": "Festival Cruïlla 2029",
+          "base": 3500
+        }
+      ],
+      "descripcion": "Concert al Festival Cruïlla 2029: caixet i desplaçament.",
+      "total": 3325,
+      "estado": "aceptado"
+    },
+    {
+      "id": "bud-ana-11",
+      "num": 11,
+      "fecha": "2029-06-11",
+      "clienteId": "c307-mm33-nn44",
+      "lineas": [
+        {
+          "pid": "p317-m17m-n17n",
+          "concepto": "Soundtrack Netflix — sèrie documental",
+          "base": 12000
+        }
+      ],
+      "descripcion": "Banda sonora de la sèrie documental (6 episodis). Cessió de drets inclosa. Pagament per episodi entregat.",
+      "total": 12720,
+      "estado": "aceptado"
+    },
+    {
+      "id": "bud-ana-12",
+      "num": 12,
+      "fecha": "2029-12-26",
+      "clienteId": "c306-kk11-ll22",
+      "lineas": [
+        {
+          "pid": "p319-m19m-n19n",
+          "concepto": "Producció Llum — Àlbum estrella 2030",
+          "base": 6000
+        }
+      ],
+      "descripcion": "Producció de l'àlbum estrella 2030 per a Discogràfica Llum. Tres pagaments.",
+      "total": 6360,
+      "estado": "aceptado"
+    },
+    {
+      "id": "bud-ana-13",
+      "num": 13,
+      "fecha": "2030-02-09",
+      "clienteId": "c308-oo55-pp66",
+      "lineas": [
+        {
+          "pid": "p320-m20m-n20n",
+          "concepto": "Primavera Sound 2030",
+          "base": 4000
+        }
+      ],
+      "descripcion": "Concert al Primavera Sound 2030: caixet, desplaçament i backline.",
+      "total": 3800,
+      "estado": "aceptado"
+    },
+    {
+      "id": "bud-ana-14",
+      "num": 14,
+      "fecha": "2030-02-09",
+      "clienteId": "c307-mm33-nn44",
+      "lineas": [
+        {
+          "pid": "p321-m21m-n21n",
+          "concepto": "Soundtrack Netflix — llargmetratge",
+          "base": 15000
+        }
+      ],
+      "descripcion": "Banda sonora del llargmetratge: composició, gravació amb orquestra i mescla. Pagament en tres plegues.",
+      "total": 15900,
+      "estado": "aceptado"
+    }
+  ]
 }

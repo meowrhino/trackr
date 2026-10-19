@@ -5944,7 +5944,8 @@
     },
     "nextFacturaNum": 26,
     "tema": "monokai",
-    "nextPresupuestoNum": 10
+    "nextPresupuestoNum": 10,
+    "diasVencimiento": 30
   },
   "journey": {
     "stages": [
@@ -5980,5 +5981,151 @@
       }
     ],
     "cards": []
-  }
+  },
+  "presupuestos": [
+    {
+      "id": "bud-marina-1",
+      "num": 1,
+      "fecha": "2025-08-26",
+      "clienteId": null,
+      "lineas": [
+        {
+          "pid": "p208-a5a5-b6b6",
+          "concepto": "Manual técnico Valensi",
+          "base": 2200
+        }
+      ],
+      "descripcion": "Traducción técnica IT→ES, 180 páginas. Entrega en 6 semanas. 50 % a la aceptación y 50 % a la entrega. Glosario del cliente incluido.",
+      "total": 2332,
+      "estado": "rechazado"
+    },
+    {
+      "id": "bud-marina-2",
+      "num": 2,
+      "fecha": "2025-11-11",
+      "clienteId": "c201-xa11-yb22",
+      "lineas": [
+        {
+          "pid": "p204-s7s7-t8t8",
+          "concepto": "Novela Mediterráneo (trad. literaria)",
+          "base": 4500
+        }
+      ],
+      "descripcion": "Traducción literaria IT→ES, 320 páginas. Entrega en 5 meses, con una ronda de revisión de la editorial incluida. Pago a 60 días.",
+      "total": 4005,
+      "estado": "aceptado"
+    },
+    {
+      "id": "bud-marina-3",
+      "num": 3,
+      "fecha": "2026-09-11",
+      "clienteId": "c205-xi99-yj00",
+      "lineas": [
+        {
+          "pid": "p209-c7c7-d8d8",
+          "concepto": "Catálogo vinos Priorat ES→EN",
+          "base": 2000
+        }
+      ],
+      "descripcion": "Catálogo ES→EN: 60 fichas de vino y textos de marca. Entrega en 4 semanas. Revisión nativa incluida.",
+      "total": 2120,
+      "estado": "aceptado"
+    },
+    {
+      "id": "bud-marina-4",
+      "num": 4,
+      "fecha": "2027-02-09",
+      "clienteId": "c201-xa11-yb22",
+      "lineas": [
+        {
+          "pid": "p212-i3i3-j4j4",
+          "concepto": "2ª Novela Editorial Mediterráneo",
+          "base": 6000
+        }
+      ],
+      "descripcion": "Traducción literaria IT→ES, 350 páginas. Entrega en 7 meses. Pago en dos plazos.",
+      "total": 5340,
+      "estado": "aceptado"
+    },
+    {
+      "id": "bud-marina-5",
+      "num": 5,
+      "fecha": "2027-03-12",
+      "clienteId": "c206-xk11-yl22",
+      "lineas": [
+        {
+          "pid": "p213-k5k5-l6l6",
+          "concepto": "Nordic Health — App NO→ES",
+          "base": 4347
+        }
+      ],
+      "descripcion": "Localización de app NO→ES, unas 25.000 palabras. Entregas por lotes quincenales. Sin IVA (cliente fuera de la UE); transferencia internacional.",
+      "total": 4347,
+      "estado": "aceptado"
+    },
+    {
+      "id": "bud-marina-6",
+      "num": 6,
+      "fecha": "2028-07-12",
+      "clienteId": "c201-xa11-yb22",
+      "lineas": [
+        {
+          "pid": "p218-u5u5-v6v6",
+          "concepto": "3ª Libro Mediterráneo (no-ficción)",
+          "base": 5500
+        }
+      ],
+      "descripcion": "No ficción IT→ES, 280 páginas. Entrega en 6 meses. Pago a 60 días.",
+      "total": 4895,
+      "estado": "aceptado"
+    },
+    {
+      "id": "bud-marina-7",
+      "num": 7,
+      "fecha": "2029-06-11",
+      "clienteId": "c207-xm33-yn44",
+      "lineas": [
+        {
+          "pid": "p219-w7w7-x8x8",
+          "concepto": "EU-Translate: Proyecto institucional",
+          "base": 8000
+        }
+      ],
+      "descripcion": "Tarifa por palabra cerrada. Volumen estimado: 80.000 palabras en 5 meses. Factura mensual por lo entregado.",
+      "total": 8000,
+      "estado": "aceptado"
+    },
+    {
+      "id": "bud-marina-8",
+      "num": 8,
+      "fecha": "2029-12-26",
+      "clienteId": "c207-xm33-yn44",
+      "lineas": [
+        {
+          "pid": "p221-a1a1-b2b2",
+          "concepto": "EU-Translate: Segundo proyecto",
+          "base": 10000
+        }
+      ],
+      "descripcion": "Mismas condiciones que el proyecto institucional. 100.000 palabras estimadas.",
+      "total": 10000,
+      "estado": "aceptado"
+    },
+    {
+      "id": "bud-marina-9",
+      "num": 9,
+      "fecha": "2030-01-12",
+      "clienteId": "c201-xa11-yb22",
+      "lineas": [
+        {
+          "pid": "p222-c3c3-d4d4",
+          "concepto": "4ª Libro Mediterráneo (novela negra)",
+          "base": 7000
+        }
+      ],
+      "descripcion": "Novela negra IT→ES, 400 páginas. Entrega en 8 meses. Pago en dos plazos.",
+      "total": 6230,
+      "estado": "aceptado"
+    }
+  ]
 }

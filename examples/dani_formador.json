@@ -110,13 +110,14 @@
           {
             "id": "cb401-01",
             "fecha": "2025-11-15",
-            "cantidad": 3396.23,
+            "cantidad": 4200,
             "metodo": "transferencia"
           }
         ],
         "facturaNum": 1,
         "facturaFecha": "2025-10-29",
-        "idiomaFactura": "en"
+        "idiomaFactura": "en",
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -203,19 +204,20 @@
           {
             "id": "cb402-01",
             "fecha": "2026-04-10",
-            "cantidad": 1360,
+            "cantidad": 1523.84,
             "metodo": "transferencia"
           },
           {
             "id": "cb402-02",
             "fecha": "2026-07-15",
-            "cantidad": 1620,
+            "cantidad": 1815.16,
             "metodo": "transferencia"
           }
         ],
         "facturaNum": 4,
         "facturaFecha": "2026-06-26",
-        "idiomaFactura": "en"
+        "idiomaFactura": "en",
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -731,19 +733,20 @@
           {
             "id": "cb407-01",
             "fecha": "2026-09-20",
-            "cantidad": 980,
+            "cantidad": 1110.22,
             "metodo": "transferencia"
           },
           {
             "id": "cb407-02",
             "fecha": "2027-01-10",
-            "cantidad": 1420,
+            "cantidad": 1608.68,
             "metodo": "transferencia"
           }
         ],
         "facturaNum": 6,
         "facturaFecha": "2026-12-11",
-        "idiomaFactura": "en"
+        "idiomaFactura": "en",
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -852,13 +855,14 @@
           {
             "id": "cb408-01",
             "fecha": "2026-10-20",
-            "cantidad": 4042.02,
+            "cantidad": 5000,
             "metodo": "transferencia"
           }
         ],
         "facturaNum": 5,
         "facturaFecha": "2026-09-26",
-        "idiomaFactura": "en"
+        "idiomaFactura": "en",
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -2243,19 +2247,20 @@
           {
             "id": "cb418-01",
             "fecha": "2028-06-15",
-            "cantidad": 3500,
+            "cantidad": 2533.58,
             "metodo": "transferencia"
           },
           {
             "id": "cb418-02",
             "fecha": "2028-09-15",
-            "cantidad": 3200,
+            "cantidad": 2316.42,
             "metodo": "transferencia"
           }
         ],
         "facturaNum": 17,
         "facturaFecha": "2028-08-23",
-        "idiomaFactura": "en"
+        "idiomaFactura": "en",
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -3120,19 +3125,20 @@
           {
             "id": "cb423-01",
             "fecha": "2029-09-10",
-            "cantidad": 3400,
+            "cantidad": 2498.48,
             "metodo": "transferencia"
           },
           {
             "id": "cb423-02",
             "fecha": "2029-12-15",
-            "cantidad": 3200,
+            "cantidad": 2351.52,
             "metodo": "transferencia"
           }
         ],
         "facturaNum": 29,
         "facturaFecha": "2029-11-21",
-        "idiomaFactura": "en"
+        "idiomaFactura": "en",
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -6711,7 +6717,8 @@
     "nif": "41876543J",
     "direccion1": "Carrer de Bailèn 55, 4t 2a",
     "direccion2": "08010 Barcelona",
-    "nextPresupuestoNum": 9
+    "nextPresupuestoNum": 9,
+    "diasVencimiento": 60
   },
   "journey": {
     "stages": [
@@ -6747,5 +6754,135 @@
       }
     ],
     "cards": []
-  }
+  },
+  "presupuestos": [
+    {
+      "id": "bud-dani-1",
+      "num": 1,
+      "fecha": "2026-12-21",
+      "clienteId": "c405-jj99-kk00",
+      "lineas": [
+        {
+          "pid": "p411-a5a5-b5b5",
+          "concepto": "Quarterly Training — CaixaBank Tech",
+          "base": 26955
+        }
+      ],
+      "descripcion": "Quarterly training programme: 4 workshops per quarter, up to 15 people each. Invoiced per quarter; order reference required.",
+      "total": 28572.3,
+      "estado": "aceptado"
+    },
+    {
+      "id": "bud-dani-2",
+      "num": 2,
+      "fecha": "2027-04-11",
+      "clienteId": "c406-ll11-mm22",
+      "lineas": [
+        {
+          "pid": "p412-a6a6-b6b6",
+          "concepto": "DevOps Training — Vueling",
+          "base": 6000
+        }
+      ],
+      "descripcion": "DevOps training: 5 full days on site, materials included. 30% upfront, rest after the last session.",
+      "total": 6360,
+      "estado": "aceptado"
+    },
+    {
+      "id": "bud-dani-3",
+      "num": 3,
+      "fecha": "2028-01-12",
+      "clienteId": "c406-ll11-mm22",
+      "lineas": [
+        {
+          "pid": "p417-b2b2-c2c2",
+          "concepto": "Vueling Consulting",
+          "base": 8000
+        }
+      ],
+      "descripcion": "Frontend consulting: 10 days spread over 6 months. Invoiced monthly for the days delivered.",
+      "total": 8480,
+      "estado": "aceptado"
+    },
+    {
+      "id": "bud-dani-4",
+      "num": 4,
+      "fecha": "2028-01-12",
+      "clienteId": "c403-ee55-ff66",
+      "lineas": [
+        {
+          "pid": "p419-b4b4-c4c4",
+          "concepto": "Annual Bootcamp Contract — Barcelona Activa 2028",
+          "base": 5400
+        }
+      ],
+      "descripcion": "Annual bootcamp contract: two bootcamps (spring and autumn), 8 weeks each. Invoiced per bootcamp through the supplier portal.",
+      "total": 4590,
+      "estado": "aceptado"
+    },
+    {
+      "id": "bud-dani-5",
+      "num": 5,
+      "fecha": "2029-01-12",
+      "clienteId": "c403-ee55-ff66",
+      "lineas": [
+        {
+          "pid": "p425-c1c1-d1d1",
+          "concepto": "Annual Bootcamp Contract — Barcelona Activa 2029",
+          "base": 5400
+        }
+      ],
+      "descripcion": "Annual bootcamp contract 2029, same terms as 2028.",
+      "total": 4590,
+      "estado": "aceptado"
+    },
+    {
+      "id": "bud-dani-6",
+      "num": 6,
+      "fecha": "2029-02-09",
+      "clienteId": "c406-ll11-mm22",
+      "lineas": [
+        {
+          "pid": "p424-b9b9-c9c9",
+          "concepto": "Vueling Frontend Coaching 2029",
+          "base": 6000
+        }
+      ],
+      "descripcion": "Frontend coaching 2029: 12 half-day sessions. Invoiced monthly.",
+      "total": 6360,
+      "estado": "aceptado"
+    },
+    {
+      "id": "bud-dani-7",
+      "num": 7,
+      "fecha": "2029-12-26",
+      "clienteId": "c408-qq55-rr66",
+      "lineas": [
+        {
+          "pid": "p426-c2c2-d2d2",
+          "concepto": "Digital Transformation — Seat/Cupra",
+          "base": 12000
+        }
+      ],
+      "descripcion": "Digital transformation programme: discovery, 6 workshops and a 3-month follow-up. 30% upfront, rest on delivery. Approved by procurement.",
+      "total": 12720,
+      "estado": "aceptado"
+    },
+    {
+      "id": "bud-dani-8",
+      "num": 8,
+      "fecha": "2030-03-31",
+      "clienteId": null,
+      "lineas": [
+        {
+          "pid": "p427-c3c3-d3d3",
+          "concepto": "ReactConf EU 2030 — Keynote",
+          "base": 2000
+        }
+      ],
+      "descripcion": "ReactConf EU keynote: talk fee, travel and two hotel nights.",
+      "total": 2000,
+      "estado": "aceptado"
+    }
+  ]
 }

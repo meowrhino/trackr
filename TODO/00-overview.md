@@ -34,6 +34,21 @@ Orden de implementación. Cada archivo tiene el detalle.
 
 ---
 
+## Sprint del 19 de octubre de 2026 (resumen)
+
+Revisión de UX a raíz de un presupuesto que manu no encontraba. Todo desplegado en producción el mismo día.
+
+1. **Clientes y Facturas con vista propia** en el menú, bajo Dineros (`c04f752`); Configuración se queda con los ajustes. Filas de lista apiladas en móvil.
+2. **Journey pasa a ser el modo «Tablero» de Proyectos** (`e3e957d`): conmutador Lista/Tablero, fase visible en ficha y tarjeta, aviso al soltar en la fase de presupuesto sin tener uno.
+3. **Presupuestos guardados** (`568483b`, `28d7467`): líneas, descripción, total y estado enviado/aceptado/rechazado en Facturas → Presupuestos; PDF de nuevo; editar; aceptar activa los proyectos potenciales. Migración de las marcas antiguas, idempotente, con test (`test/presupuestos.mjs`). Fuera del alcance fiscal de la gestoría.
+4. **Vencimientos** (`068285e`, `5ff0c05`): días de pago en Configuración, «vence el…» / «vencida hace N días» en Facturas y en la alerta de Proyectos, impreso en el PDF, y botón ✉ que copia un recordatorio de cobro. **Dineros con pestañas** Ingresos/Gastos/Fiscal.
+5. **Arranque y vuelta** (`14add4d`): lista «Para empezar» en Info, banda honesta al cargar un ejemplo, aviso del próximo 303/130, pantalla de primera factura, aviso de copia a los 30 días. Los ejemplos usan todo lo nuevo.
+6. **303/130 verificados** con un recálculo independiente desde el JSON crudo (T3 2026 y 130 acumulado): coinciden casilla por casilla.
+
+**Decisiones**: la competencia (Holded, Quipu) gana en portal de cliente, aceptación online de presupuestos y recordatorios automáticos; se descartan porque exigen servidor público por documento y rompen el «sin cuenta». El registro de cuentas sigue cerrado hasta que manu lo abra desde `/admin`.
+
+---
+
 ## Sprint del 2 de septiembre de 2026 (resumen)
 
 Sesión corta a raíz de una factura de proveedor con retención que no se podía meter.
