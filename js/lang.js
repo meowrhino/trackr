@@ -607,7 +607,7 @@ const LANGS = {
     'guide.projects.states.title': 'Estados de proyecto',
     'guide.projects.states.body': '<ul><li><strong>Potencial</strong> — un lead o propuesta que aún no se ha confirmado. Puedes registrar el tiempo de llamadas y reuniones iniciales.</li><li><strong>Activo</strong> — proyecto en marcha.</li><li><strong>Pausado</strong> — esperando feedback del cliente o detenido temporalmente.</li><li><strong>Completado</strong> — trabajo terminado.</li><li><strong>Abandonado</strong> — cancelado o descartado.</li></ul>',
     'guide.projects.clients.title': 'Clientes',
-    'guide.projects.clients.body': '<p>Puedes crear <strong>clientes</strong> y asignarlos a proyectos. Cada cliente tiene nombre, dirección, NIF y un color. Los datos del cliente aparecen en las facturas PDF.</p><p>Si no asignas cliente, el proyecto se considera "sin cliente" — ideal para proyectos internos o personales.</p><div class="guide-tip">Los clientes se gestionan desde Configuración o se crean directamente al añadir un proyecto.</div>',
+    'guide.projects.clients.body': '<p>Puedes crear <strong>clientes</strong> y asignarlos a proyectos. Cada cliente tiene nombre, dirección, NIF y un color. Los datos del cliente aparecen en las facturas PDF.</p><p>Si no asignas cliente, el proyecto se considera "sin cliente" — ideal para proyectos internos o personales.</p><div class="guide-tip">Los clientes tienen su propia vista en el menú (Clientes), y también se crean directamente al añadir un proyecto.</div>',
     'guide.projects.filters.title': 'Filtros y agrupación',
     'guide.projects.filters.body': '<p>En la vista de proyectos puedes filtrar por:</p><ul><li><strong>Externos</strong> — proyectos para clientes (no internos).</li><li><strong>Todos</strong> — todos los proyectos agrupados: activos externos → internos → recurrentes → potenciales → pausados → completados → abandonados.</li><li><strong>Internos</strong> — solo proyectos marcados como internos.</li><li><strong>Recurrentes</strong> — solo proyectos recurrentes.</li></ul><div class="guide-tip">Los completados y abandonados se muestran colapsados para no ocupar espacio.</div>',
 
@@ -655,7 +655,7 @@ const LANGS = {
     'guide.config.title': 'Configuración',
     'guide.config.desc': 'Idioma, tema, datos del emisor y objetivos',
     'guide.config.intro': '<p>Haz que Trackr se sienta tuyo. Aquí ajustas desde el idioma y los colores hasta tus datos fiscales y objetivos de trabajo.</p>',
-    'guide.config.body': '<p>En Configuración puedes ajustar:</p><ul><li><strong>Idioma</strong>: español, inglés o catalán.</li><li><strong>Tema</strong>: 8 paletas de colores con personalidades distintas.</li><li><strong>Datos del emisor</strong>: nombre, dirección, NIF — aparecen en las facturas PDF.</li><li><strong>Cuenta bancaria</strong>: IBAN para incluir en las facturas.</li><li><strong>Concepto por defecto</strong>: texto base para el asunto de las facturas.</li><li><strong>IVA/IRPF por defecto</strong>: los valores que se rellenan al crear un proyecto nuevo.</li><li><strong>Objetivos</strong>: horas/semana, horas/mes, ingresos/mes — para las barras de progreso del calendario.</li><li><strong>Clientes</strong>: lista de todos tus clientes con NIF, dirección y color.</li></ul>',
+    'guide.config.body': '<p>En Configuración puedes ajustar:</p><ul><li><strong>Idioma</strong>: español, inglés o catalán.</li><li><strong>Tema</strong>: 8 paletas de colores con personalidades distintas.</li><li><strong>Datos del emisor</strong>: nombre, dirección, NIF — aparecen en las facturas PDF.</li><li><strong>Cuenta bancaria</strong>: IBAN para incluir en las facturas.</li><li><strong>Concepto por defecto</strong>: texto base para el asunto de las facturas.</li><li><strong>IVA/IRPF por defecto</strong>: los valores que se rellenan al crear un proyecto nuevo.</li><li><strong>Objetivos</strong>: horas/semana, horas/mes, ingresos/mes — para las barras de progreso del calendario.</li></ul>',
 
     /* Datos */
     'guide.data.title': 'Tus datos',
@@ -664,6 +664,12 @@ const LANGS = {
     'guide.data.body': '<ul><li><strong>Exportar</strong> (⤓): descarga tu archivo de guardado .json con todos tus proyectos, horas, gastos y configuración.</li><li><strong>Importar</strong> (⤒): carga un .json para restaurar o mover tus datos a otro navegador.</li><li><strong>Datos de ejemplo</strong>: en la pantalla de bienvenida puedes cargar 3 perfiles de prueba (traductora, música, formador) para explorar Trackr antes de usarlo con tus datos reales.</li></ul><div class="guide-tip">Haz backups regulares exportando tu archivo. Si cambias de navegador o borras datos, necesitarás el .json para recuperar todo.</div>',
     /* ── Customer Journey ── */
     'nav.journey': 'Journey',
+    'nav.clients': 'Clientes',
+    'nav.invoices': 'Facturas',
+    'fac.none': 'Todavía no has emitido ninguna factura. Se generan desde el detalle de un proyecto.',
+    'fac.st.paid': 'Pagada',
+    'fac.st.pending': 'Pendiente',
+    'fac.st.void': 'Anulada',
     'journey.subtitle': 'Cada tarjeta es un proyecto. Arrástralo a su fase de producción, o tócalo para abrir su detalle. El estado del proyecto (Activo, Completado…) se gestiona aparte.',
     'journey.addStage': 'Añadir estadio',
     'journey.addCard': 'Añadir',
@@ -1405,7 +1411,7 @@ const LANGS = {
     'guide.projects.states.title': 'Project statuses',
     'guide.projects.states.body': '<ul><li><strong>Potential</strong> — a lead or proposal not yet confirmed. Log time for initial calls and meetings.</li><li><strong>Active</strong> — ongoing project.</li><li><strong>Paused</strong> — waiting for client feedback or temporarily stopped.</li><li><strong>Completed</strong> — work finished.</li><li><strong>Archived</strong> — cancelled or discarded.</li></ul>',
     'guide.projects.clients.title': 'Clients',
-    'guide.projects.clients.body': '<p>Create <strong>clients</strong> and assign them to projects. Each client has a name, address, tax ID and a color. Client details appear on PDF invoices.</p><p>Projects without a client are considered "clientless" — ideal for internal or personal projects.</p><div class="guide-tip">Clients can be managed in Settings or created directly when adding a project.</div>',
+    'guide.projects.clients.body': '<p>Create <strong>clients</strong> and assign them to projects. Each client has a name, address, tax ID and a color. Client details appear on PDF invoices.</p><p>Projects without a client are considered "clientless" — ideal for internal or personal projects.</p><div class="guide-tip">Clients have their own view in the menu (Clients), and can also be created directly when adding a project.</div>',
     'guide.projects.filters.title': 'Filters and grouping',
     'guide.projects.filters.body': '<p>In the project view you can filter by:</p><ul><li><strong>External</strong> — client projects (non-internal).</li><li><strong>All</strong> — all projects grouped: active external → internal → recurring → potential → paused → completed → archived.</li><li><strong>Internal</strong> — only internal projects.</li><li><strong>Recurring</strong> — only recurring projects.</li></ul><div class="guide-tip">Completed and archived groups are collapsed by default to save space.</div>',
 
@@ -1447,7 +1453,7 @@ const LANGS = {
     'guide.config.title': 'Settings',
     'guide.config.desc': 'Language, theme, issuer details and goals',
     'guide.config.intro': '<p>Make Trackr feel like yours. Here you can adjust everything from language and colors to your tax details and work goals.</p>',
-    'guide.config.body': '<p>In Settings you can adjust:</p><ul><li><strong>Language</strong>: Spanish, English or Catalan.</li><li><strong>Theme</strong>: 8 color palettes with distinct personalities.</li><li><strong>Issuer details</strong>: name, address, tax ID — shown on PDF invoices.</li><li><strong>Bank account</strong>: IBAN to include on invoices.</li><li><strong>Default subject</strong>: base text for invoice subjects.</li><li><strong>Default VAT/tax</strong>: values pre-filled when creating a new project.</li><li><strong>Goals</strong>: hours/week, hours/month, income/month — for calendar progress bars.</li><li><strong>Clients</strong>: list of all your clients with tax ID, address and color.</li></ul>',
+    'guide.config.body': '<p>In Settings you can adjust:</p><ul><li><strong>Language</strong>: Spanish, English or Catalan.</li><li><strong>Theme</strong>: 8 color palettes with distinct personalities.</li><li><strong>Issuer details</strong>: name, address, tax ID — shown on PDF invoices.</li><li><strong>Bank account</strong>: IBAN to include on invoices.</li><li><strong>Default subject</strong>: base text for invoice subjects.</li><li><strong>Default VAT/tax</strong>: values pre-filled when creating a new project.</li><li><strong>Goals</strong>: hours/week, hours/month, income/month — for calendar progress bars.</li></ul>',
 
     'guide.data.title': 'Your data',
     'guide.data.desc': 'Export, import, examples and privacy',
@@ -1455,6 +1461,12 @@ const LANGS = {
     'guide.data.body': '<ul><li><strong>Export</strong> (⤓): download your .json save file with all your projects, hours, expenses and settings.</li><li><strong>Import</strong> (⤒): load a .json to restore or move your data to another browser.</li><li><strong>Sample data</strong>: on the welcome screen you can load 3 test profiles (translator, musician, trainer) to explore Trackr before using your real data.</li></ul><div class="guide-tip">Make regular backups by exporting your file. If you switch browsers or clear data, you\'ll need the .json to recover everything.</div>',
     /* ── Customer Journey ── */
     'nav.journey': 'Journey',
+    'nav.clients': 'Clients',
+    'nav.invoices': 'Invoices',
+    'fac.none': 'No invoices issued yet. They are generated from a project\'s detail view.',
+    'fac.st.paid': 'Paid',
+    'fac.st.pending': 'Pending',
+    'fac.st.void': 'Voided',
     'journey.subtitle': 'Each card is a project. Drag it to its production stage, or tap it to open its detail. The project status (Active, Completed…) is managed separately.',
     'journey.addStage': 'Add stage',
     'journey.addCard': 'Add',
@@ -2196,7 +2208,7 @@ const LANGS = {
     'guide.projects.states.title': 'Estats de projecte',
     'guide.projects.states.body': '<ul><li><strong>Potencial</strong> — un lead o proposta que encara no s\'ha confirmat. Pots registrar el temps de trucades i reunions inicials.</li><li><strong>Actiu</strong> — projecte en marxa.</li><li><strong>Pausat</strong> — esperant feedback del client o aturat temporalment.</li><li><strong>Completat</strong> — feina acabada.</li><li><strong>Abandonat</strong> — cancel·lat o descartat.</li></ul>',
     'guide.projects.clients.title': 'Clients',
-    'guide.projects.clients.body': '<p>Crea <strong>clients</strong> i assigna\'ls a projectes. Cada client té nom, adreça, NIF i un color. Les dades del client apareixen a les factures PDF.</p><p>Si no assignes client, el projecte es considera "sense client" — ideal per projectes interns o personals.</p><div class="guide-tip">Els clients es gestionen des de Configuració o es creen directament en afegir un projecte.</div>',
+    'guide.projects.clients.body': '<p>Crea <strong>clients</strong> i assigna\'ls a projectes. Cada client té nom, adreça, NIF i un color. Les dades del client apareixen a les factures PDF.</p><p>Si no assignes client, el projecte es considera "sense client" — ideal per projectes interns o personals.</p><div class="guide-tip">Els clients tenen la seva pròpia vista al menú (Clients), i també es creen directament en afegir un projecte.</div>',
     'guide.projects.filters.title': 'Filtres i agrupació',
     'guide.projects.filters.body': '<p>A la vista de projectes pots filtrar per:</p><ul><li><strong>Externs</strong> — projectes per a clients (no interns).</li><li><strong>Tots</strong> — tots els projectes agrupats: actius externs → interns → recurrents → potencials → pausats → completats → abandonats.</li><li><strong>Interns</strong> — només projectes marcats com a interns.</li><li><strong>Recurrents</strong> — només projectes recurrents.</li></ul><div class="guide-tip">Els completats i abandonats es mostren plegats per no ocupar espai.</div>',
 
@@ -2238,7 +2250,7 @@ const LANGS = {
     'guide.config.title': 'Configuració',
     'guide.config.desc': 'Idioma, tema, dades de l\'emissor i objectius',
     'guide.config.intro': '<p>Fes que Trackr se senti teu. Aquí ajustes des de l\'idioma i els colors fins a les teves dades fiscals i objectius de feina.</p>',
-    'guide.config.body': '<p>A Configuració pots ajustar:</p><ul><li><strong>Idioma</strong>: castellà, anglès o català.</li><li><strong>Tema</strong>: 8 paletes de colors amb personalitats diferents.</li><li><strong>Dades de l\'emissor</strong>: nom, adreça, NIF — apareixen a les factures PDF.</li><li><strong>Compte bancari</strong>: IBAN per incloure a les factures.</li><li><strong>Concepte per defecte</strong>: text base per l\'assumpte de les factures.</li><li><strong>IVA/IRPF per defecte</strong>: els valors que s\'omplen en crear un projecte nou.</li><li><strong>Objectius</strong>: hores/setmana, hores/mes, ingressos/mes — per les barres de progrés del calendari.</li><li><strong>Clients</strong>: llista de tots els teus clients amb NIF, adreça i color.</li></ul>',
+    'guide.config.body': '<p>A Configuració pots ajustar:</p><ul><li><strong>Idioma</strong>: castellà, anglès o català.</li><li><strong>Tema</strong>: 8 paletes de colors amb personalitats diferents.</li><li><strong>Dades de l\'emissor</strong>: nom, adreça, NIF — apareixen a les factures PDF.</li><li><strong>Compte bancari</strong>: IBAN per incloure a les factures.</li><li><strong>Concepte per defecte</strong>: text base per l\'assumpte de les factures.</li><li><strong>IVA/IRPF per defecte</strong>: els valors que s\'omplen en crear un projecte nou.</li><li><strong>Objectius</strong>: hores/setmana, hores/mes, ingressos/mes — per les barres de progrés del calendari.</li></ul>',
 
     'guide.data.title': 'Les teves dades',
     'guide.data.desc': 'Exportar, importar, exemples i privacitat',
@@ -2247,6 +2259,12 @@ const LANGS = {
 
     /* ── Customer Journey ── */
     'nav.journey': 'Journey',
+    'nav.clients': 'Clients',
+    'nav.invoices': 'Factures',
+    'fac.none': 'Encara no has emès cap factura. Es generen des del detall d\'un projecte.',
+    'fac.st.paid': 'Pagada',
+    'fac.st.pending': 'Pendent',
+    'fac.st.void': 'Anul·lada',
     'journey.subtitle': 'Cada targeta és un projecte. Arrossega’l a la seva fase de producció, o toca’l per obrir-ne el detall. L’estat del projecte (Actiu, Completat…) es gestiona a part.',
     'journey.addStage': 'Afegir estadi',
     'journey.addCard': 'Afegir',
@@ -2498,7 +2516,7 @@ function setLang(code) {
 function _updateNav() {
   const map = {
     info: 'nav.info', dash: 'nav.projects', cal: 'nav.calendar',
-    gas: 'nav.expenses', jrn: 'nav.journey', cfg: 'nav.config', guide: 'nav.guide'
+    gas: 'nav.expenses', cli: 'nav.clients', fac: 'nav.invoices', jrn: 'nav.journey', cfg: 'nav.config', guide: 'nav.guide'
   };
   document.querySelectorAll('.ni[data-v]').forEach(el => {
     const v = el.dataset.v;
@@ -2528,6 +2546,16 @@ function _updateNav() {
   if (gasTitle) gasTitle.textContent = t('nav.expenses');
   const gasBtn = document.querySelector('#vGas .bt-p');
   if (gasBtn) gasBtn.textContent = t('btn.newExpense');
+
+  const cliTitle = document.querySelector('#vCli .pt');
+  if (cliTitle) cliTitle.textContent = t('nav.clients');
+  const cliBtn = document.querySelector('#vCli .bt-p');
+  if (cliBtn) cliBtn.textContent = t('btn.newClient');
+
+  const facTitle = document.querySelector('#vFac .pt');
+  if (facTitle) facTitle.textContent = t('nav.invoices');
+  const facBtn = document.querySelector('#vFac .bt');
+  if (facBtn) facBtn.textContent = t('cfg.importOldInvoices');
 
   const jrnTitle = document.querySelector('#vJrn .pt');
   if (jrnTitle) jrnTitle.textContent = t('nav.journey');

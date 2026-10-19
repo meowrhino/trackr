@@ -54,6 +54,8 @@
       <div class="ni" data-v="dash" onclick="App.go('dash')"><span class="ic">▣</span><span class="nt">Proyectos</span></div>
       <div class="ni" data-v="cal" onclick="App.go('cal')"><span class="ic">▨</span><span class="nt">Calendario</span></div>
       <div class="ni" data-v="gas" onclick="App.go('gas')"><span class="ic">€</span><span class="nt">Dineros</span></div>
+      <div class="ni" data-v="cli" onclick="App.go('cli')"><span class="ic">◍</span><span class="nt">Clientes</span></div>
+      <div class="ni" data-v="fac" onclick="App.go('fac')"><span class="ic">⎙</span><span class="nt">Facturas</span></div>
       <div class="ni" data-v="jrn" onclick="App.go('jrn')"><span class="ic">◫</span><span class="nt">Journey</span></div>
       <div class="sep"></div>
       <div class="ni" data-v="cfg" onclick="App.go('cfg')"><span class="ic">⚙&#xFE0E;</span><span class="nt">Configuración</span></div>
@@ -109,6 +111,24 @@
       <div id="dinGastos"></div>
       <div id="dinTrim"></div>
       <div id="dinRenta"></div>
+    </div>
+
+    <!-- ── Vista: Clientes ── -->
+    <div id="vCli" class="vw">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
+        <h1 class="pt" style="margin:0">Clientes</h1>
+        <button class="bt bt-p" onclick="App.clModal()">+ Nuevo cliente</button>
+      </div>
+      <div id="cliC"></div>
+    </div>
+
+    <!-- ── Vista: Facturas ── -->
+    <div id="vFac" class="vw">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
+        <h1 class="pt" style="margin:0">Facturas</h1>
+        <button class="bt" onclick="App.importOldInvoicesClick()">Importar facturas antiguas</button>
+      </div>
+      <div id="facC"></div>
     </div>
 
     <!-- ── Vista: Customer Journey ── -->

@@ -1,5 +1,5 @@
 /* ================================================
- * TRACKR — App: Vista Configuración + Clientes
+ * TRACKR — App: Vistas Configuración, Clientes y Facturas
  * Globales: extiende App
  * Dependencias: app.js (App base), utils.js, store.js,
  *               themes.js, colors.js, lang.js
@@ -58,14 +58,6 @@ Object.assign(App, {
             + `<div style="width:100%;height:3px;border-radius:1px;background:${th.vars.ac || th.vars.ok};margin-top:3px"></div>`
             + `</div><span class="theme-name">${t('theme.' + id)}</span></button>`;
         }).join('')}</div></div>`
-      + `<div class="cfg-section" style="margin-top:2.5rem"><div class="cfg-section-title">${t('cfg.clients')}</div>`
-      + (cls.length
-        ? `<div class="cl-list">${cls.map(c => `<div class="cl-item"><span class="cl-dot" style="background:${colorHex(c.color || 'CornflowerBlue')}"></span><span class="cl-name"${c.notas ? ` title="${esc(c.notas)}"` : ''}>${esc(c.nombre)}${c.notas ? ' <span style="color:var(--t3)">📝</span>' : ''}</span>${c.nif ? `<span class="cl-nif">${esc(c.nif)}</span>` : ''}<div class="cl-actions"><button class="cl-btn" onclick="App.budModal('${c.id}')" title="${t('bud.generate')}">&#128203;</button><button class="cl-btn" onclick="App.clModal('${c.id}')" title="${t('btn.edit')}">&#9998;</button><button class="cl-btn cl-btn-del" onclick="App.delCl('${c.id}')" title="${t('btn.delete')}">&times;</button></div></div>`).join('')}</div>`
-        : `<div style="color:var(--t3);font-size:.82rem">${t('cfg.noClients')}</div>`)
-      + `<button class="bt bt-add" style="margin-top:.75rem" onclick="App.clModal()">${t('btn.newClient')}</button></div>`
-      + `<div class="cfg-section" style="margin-top:2.5rem"><div class="cfg-section-title">${t('cfg.importOldInvoices')}</div>`
-      + `<div style="color:var(--t3);font-size:.82rem;margin-bottom:.75rem">${t('cfg.importOldDesc')}</div>`
-      + `<button class="bt bt-add" onclick="App.importOldInvoicesClick()">${t('cfg.importOldInvoices')}</button></div>`
       + this._cfgVerifactuSection()
       + (this._cfgGestoresSection ? this._cfgGestoresSection() : '')
       + this._cfgAuditSection()
@@ -248,34 +240,6 @@ Object.assign(App, {
     const facts = D.fs() || [];
     const emisor = D.d.settings.emisor?.nif || '';
     const lastH = v.lastInvoiceHash ? v.lastInvoiceHash.slice(0, 24) + '…' : '—';
-    let listHtml = '';
-    if (facts.length) {
-      const sorted = [...facts].sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
-      listHtml = `<div class="cl-list" style="margin-top:.5rem">`
-        + sorted.slice(0, 50).map(f => {
-          const hashShort = (f.hash || '').slice(0, 14) + '…';
-          const fechaShort = (f.fecha || '').slice(0, 10);
-          const esAnul = f.tipoRegistro === 'anulacion';
-          const anulada = !esAnul && (f.eventos || []).some(e => e.tipo === 'anulada');
-          let estado = '';
-          if (esAnul) estado = `<span class="cl-nif" style="font-size:.68rem;color:var(--t3)">${t('cfg.vfTipoAnulacion')}</span>`;
-          else if (anulada) estado = `<span class="cl-nif" style="font-size:.68rem;color:var(--red,#e5476d)">${t('cfg.vfAnulada')}</span>`;
-          else estado = `<button class="bt" style="font-size:.68rem;padding:.15rem .5rem" onclick="App.anularFactura('${f.id}')">${t('cfg.vfAnular')}</button>`;
-          return `<div class="cl-item">`
-            + `<span class="cl-name" style="font-family:'DM Mono',monospace;font-size:.78rem${esAnul || anulada ? ';text-decoration:line-through;opacity:.6' : ''}">${esc(f.numero)}</span>`
-            + `<span class="cl-nif" style="font-size:.72rem">${fechaShort}</span>`
-            + `<span class="cl-nif" style="font-size:.72rem">${esAnul ? '—' : fmtMoney(f.totalFactura || 0)}</span>`
-            + `<span class="cl-nif" style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--t3)">${hashShort}</span>`
-            + estado
-            + `</div>`;
-        }).join('')
-        + `</div>`;
-      if (facts.length > 50) {
-        listHtml += `<p class="small" style="margin-top:.5rem;color:var(--t3)">${t('cfg.vfShowingFirst', 50, facts.length)}</p>`;
-      }
-    } else {
-      listHtml = `<div style="color:var(--t3);font-size:.82rem">${t('cfg.vfNoneYet')}</div>`;
-    }
     return `<div class="cfg-section" style="margin-top:2.5rem"><div class="cfg-section-title">${t('cfg.vfTitle')}</div>`
       + `<p style="color:var(--t3);font-size:.82rem;margin-bottom:.75rem">${t('cfg.vfDesc')}</p>`
       + `<div style="background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:.7rem 1rem;margin-bottom:.75rem;font-size:.82rem">`
@@ -291,9 +255,6 @@ Object.assign(App, {
       + `<div class="cfg-save" style="gap:.5rem;display:flex"><button class="bt bt-p" onclick="App.saveVerifactu()">${t('btn.save')}</button>`
       + `<button class="bt" onclick="App.verifyChain()">&#128274; ${t('cfg.vfVerifyChain')}</button>`
       + `<button class="bt" onclick="App.vfSelfTest()">${t('cfg.vfSelfTest')}</button></div>`
-      + `<div style="margin-top:1.25rem"><div class="cfg-section-title" style="font-size:.85rem;margin-bottom:.5rem">${t('cfg.vfRegistry')}</div>`
-      + listHtml
-      + `</div>`
       + `</div>`;
   },
 
@@ -375,7 +336,7 @@ Object.assign(App, {
       });
       D.addFactEvent(f.id, { tipo: 'anulada', fecha: fechaHoraHuso });
       Toast.ok(t('cfg.vfAnulacionOk', f.numero));
-      this.rCfg();
+      this.go(this.cv);
     } catch (err) {
       console.warn('Verifactu anulacion failed:', err);
       Toast.error(t('cfg.vfChainBroken', 1, 1));
@@ -484,6 +445,59 @@ Object.assign(App, {
     if (this.cv === 'cal') this.rCal();
   },
 
+  /* ══════════════════════════════════════════════
+   *  VISTA CLIENTES
+   * ══════════════════════════════════════════════ */
+
+  rCli() {
+    const cls = D.cls();
+    document.getElementById('cliC').innerHTML = cls.length
+      ? `<div class="cl-list">${cls.map(c => `<div class="cl-item"><span class="cl-dot" style="background:${colorHex(c.color || 'CornflowerBlue')}"></span><span class="cl-name"${c.notas ? ` title="${esc(c.notas)}"` : ''}>${esc(c.nombre)}${c.notas ? ' <span style="color:var(--t3)">📝</span>' : ''}</span>${c.nif ? `<span class="cl-nif">${esc(c.nif)}</span>` : ''}<div class="cl-actions"><button class="cl-btn" onclick="App.budModal('${c.id}')" title="${t('bud.generate')}">&#128203;</button><button class="cl-btn" onclick="App.clModal('${c.id}')" title="${t('btn.edit')}">&#9998;</button><button class="cl-btn cl-btn-del" onclick="App.delCl('${c.id}')" title="${t('btn.delete')}">&times;</button></div></div>`).join('')}</div>`
+      : `<div style="color:var(--t3);font-size:.82rem">${t('cfg.noClients')}</div>`;
+  },
+
+  /* ══════════════════════════════════════════════
+   *  VISTA FACTURAS
+   *  Una fila por proyecto con factura emitida (facturaNum). El registro
+   *  VeriFactu (D.fs) solo aporta el estado «anulada» y el botón Anular.
+   * ══════════════════════════════════════════════ */
+
+  /** Último registro de alta VeriFactu de un proyecto (null si no se firmó) */
+  _facReg(pid) {
+    return (D.fs() || []).filter(r => r.proyectoId === pid && r.tipoRegistro === 'alta').pop() || null;
+  },
+
+  rFac() {
+    const ps = D.ps().filter(p => p.facturacion?.facturaNum)
+      .sort((a, b) => (b.facturacion.facturaFecha || '').localeCompare(a.facturacion.facturaFecha || '') || b.facturacion.facturaNum - a.facturacion.facturaNum);
+    document.getElementById('facC').innerHTML = ps.length
+      ? `<div class="cl-list">${ps.map(p => {
+          const f = p.facturacion, reg = this._facReg(p.id);
+          const anulada = !!reg && (reg.eventos || []).some(e => e.tipo === 'anulada');
+          const st = anulada ? ['void', 'var(--bad)'] : f.pagado ? ['paid', 'var(--ok)'] : ['pending', 'var(--warn)'];
+          return `<div class="cl-item">`
+            + `<span class="cl-nif" style="font-family:'DM Mono',monospace;font-size:.78rem;color:var(--t1)${anulada ? ';text-decoration:line-through;opacity:.6' : ''}">${esc(String(f.facturaNum))}/${yearShort(f.facturaFecha)}</span>`
+            + `<span class="cl-nif" style="font-size:.72rem">${fmtDate(f.facturaFecha)}</span>`
+            + `<span class="cl-name"><a href="#" onclick="event.preventDefault();App.go('det','${p.id}')" style="color:inherit;text-decoration:none">${esc(clienteName(p) || t('fac.noClient'))} <span style="color:var(--t3)">· ${esc(p.nombre)}</span></a></span>`
+            + `<span class="cl-nif" style="font-size:.78rem;color:var(--t1)">${fmtMoney(f.totalFactura || 0)}</span>`
+            + `<span class="cl-nif" style="font-size:.68rem;color:${st[1]}">${t('fac.st.' + st[0])}</span>`
+            + `<div class="cl-actions"><button class="cl-btn" onclick="App.facPdf('${p.id}')" title="${t('btn.downloadPdf')}">&#9113;</button>`
+            + (reg && !anulada ? `<button class="cl-btn cl-btn-del" onclick="App.anularFactura('${reg.id}')" title="${t('cfg.vfAnular')}">&times;</button>` : '')
+            + `</div></div>`;
+        }).join('')}</div>`
+      : `<div style="color:var(--t3);font-size:.82rem">${t('fac.none')}</div>`;
+  },
+
+  /** Vuelve a bajar el PDF de una factura ya emitida (mismo número, fecha y QR; no firma de nuevo) */
+  facPdf(pid) {
+    const p = D.p(pid); if (!p) return;
+    const f = p.facturacion, reg = this._facReg(pid);
+    const verifactu = reg && typeof V !== 'undefined'
+      ? { sifId: V.SIF_ID, softwareVersion: V.SOFTWARE_VERSION, qrPayload: reg.qrPayload, hash: reg.hash, publicUrl: V.PUBLIC_URL }
+      : null;
+    Fac.download(pid, { fecha: f.facturaFecha, num: f.facturaNum, asunto: defaultAsunto(p), verifactu });
+  },
+
   clModal(cid) {
     const isE = !!cid, c = isE ? D.cl(cid) : null;
     const clColor = c?.color || 'CornflowerBlue';
@@ -514,13 +528,13 @@ Object.assign(App, {
       if (p && !p.clienteId) D.up(this._facReturn.pid, { clienteId: savedId });
     }
     this.cm();
-    if (!fromFac && !fromProj) this.rCfg();
+    if (!fromFac && !fromProj) this.go(this.cv);
   },
 
   delCl(cid) {
     const c = D.cl(cid); if (!c) return;
     if (!confirm(t('cfg.deleteClientConfirm', c.nombre))) return;
-    D.delCl(cid); this.rCfg();
+    D.delCl(cid); this.go(this.cv);
   },
 
   /* ══════════════════════════════════════════════
@@ -668,7 +682,7 @@ Object.assign(App, {
 
     if (imported > 0) {
       Toast.ok(t('msg.invoicesImported', imported, created));
-      this.rCfg();
+      this.go(this.cv);
     } else {
       Toast.warn(t('msg.noValidInvoices'));
     }
