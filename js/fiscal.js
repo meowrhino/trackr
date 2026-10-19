@@ -133,13 +133,15 @@ const F = {
       acumIng += d.ingresos; acumGas += d.gastos; acumRet += d.retenciones;
       const c01 = acumIng;
       /* EDS: 5% de difícil justificación sobre la diferencia positiva, tope 2.000 €/año */
-      const dj = cfg.eds ? Math.min(0.05 * Math.max(c01 - acumGas, 0), 2000) : 0;
-      const c02 = acumGas + dj;
-      const c03 = c01 - c02;
-      const c04 = c03 > 0 ? c03 * 0.20 : 0;
-      const c05 = out.reduce((s, prev) => s + Math.max(prev.c07, 0), 0);
-      const c06 = acumRet;
-      const c07 = c04 - c05 - c06;
+      const dj = cfg.eds ? roundMoney(Math.min(0.05 * Math.max(c01 - acumGas, 0), 2000)) : 0;
+      const c02 = roundMoney(acumGas + dj);
+      const c03 = roundMoney(c01 - c02);
+      /* Cada casilla se redondea a céntimos antes de seguir, como en el modelo oficial:
+         si no, 04 = 321,024 daba un 07 de 40,00 donde el presentado decía 39,99. */
+      const c04 = c03 > 0 ? roundMoney(c03 * 0.20) : 0;
+      const c05 = roundMoney(out.reduce((s, prev) => s + Math.max(prev.c07, 0), 0));
+      const c06 = roundMoney(acumRet);
+      const c07 = roundMoney(c04 - c05 - c06);
       const c12 = Math.max(c07, 0);
       const c13 = minor;
       const c14 = c12 - c13;

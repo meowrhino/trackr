@@ -28,6 +28,7 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 - **Cuentas nuevas activas al momento** (opcional): en /admin, junto a «Registro de cuentas nuevas», el ajuste «Activación de cuentas nuevas» (automática o manual). En automática, quien se registra entra y sincroniza sin esperar a que el admin le active; el admin puede desactivarla después. La respuesta del registro no cambia (202, sin filtrar si el email existía): la app intenta entrar justo después y avisa «ya estás dentro», «pendiente de activación» o «si ya tenías cuenta, entra con tu contraseña». _frontend, backend_
 
 ### 🐛 Arreglado
+- **Modelo 130, redondeo**: cada casilla se redondea a céntimos antes de seguir, como en el modelo oficial. Un 04 de 321,024 daba un 07 de 40,00 donde el presentado decía 39,99. _frontend_
 - **Modelo 303, casilla 28**: los gastos sin IVA (cuota de autónomos, recibos, exentos) engordaban la base del IVA soportado sin aportar cuota. Siguen contando en el 130, pero ya no salen en el 303. Detectado contrastando con un 303 presentado. _frontend_
 
 ### 🔧 Cambiado

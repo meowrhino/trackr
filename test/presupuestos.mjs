@@ -77,6 +77,27 @@ assert.equal(B.diasVencida({}, 30, '2026-11-05'), null, 'sin factura: sin vencim
   assert.equal(Object.keys(q.ivaSop).length, 1, 'sin fila para el gasto sin IVA');
 }
 
+/* 130: cada casilla redondeada a céntimos antes de seguir (como el modelo presentado) */
+{
+  const { F } = vm.runInContext('({ F })', ctx);
+  D.d.settings.fiscal = { eds: false };
+  D.d.projects = [
+    /* B.calc recalcula los importes: la retención sale del tipo (7 % de 1500 = 105) */
+    { id: 'p1', nombre: 'A', estado: 'completado', fechas: {}, horas: [], facturacion: { modo: 'desde_base', baseImponible: 1500, iva: 21, irpf: 7, facturaNum: 1, facturaFecha: '2026-02-10' } },
+    { id: 'p1b', nombre: 'A2', estado: 'completado', fechas: {}, horas: [], facturacion: { modo: 'desde_base', baseImponible: 850, iva: 21, irpf: 0, facturaNum: 3, facturaFecha: '2026-03-10' } },
+    { id: 'p2', nombre: 'B', estado: 'completado', fechas: {}, horas: [], facturacion: { modo: 'desde_base', baseImponible: 1820, iva: 21, irpf: 0, importeIrpf: 0, facturaNum: 2, facturaFecha: '2026-05-10' } }
+  ];
+  D.d.gastos = [
+    { id: 'g1', nombre: 'T1', desgravable: true, tipoIva: 21, entradas: [{ id: 'e1', fecha: '2026-02-01', base: 944.86, iva: 198.42, total: 1143.28 }] },
+    { id: 'g2', nombre: 'T2', desgravable: true, tipoIva: 21, entradas: [{ id: 'e2', fecha: '2026-05-01', base: 1620.02, iva: 340.20, total: 1960.22 }] }
+  ];
+  const r = F.calc130Year(2026, 1);
+  assert.equal(r[0].c04, 281.03, '04 T1 = 20 % de 1405,14 redondeado');
+  assert.equal(r[0].c07, 176.03);
+  assert.equal(r[1].c04, 321.02, '04 T2 = 20 % de 1605,12 → 321,024 → 321,02');
+  assert.equal(r[1].c07, 39.99, '07 T2 = 321,02 − 176,03 − 105 (no 40,00)');
+}
+
 /* Próximo plazo fiscal */
 assert.deepEqual(JSON.parse(JSON.stringify(B.nextTaxDeadline('2026-10-19'))), { label: 'T3 2026', end: '2026-10-20', days: 1, y: 2026, q: 2 });
 assert.equal(B.nextTaxDeadline('2026-10-21').label, 'T4 2026');
