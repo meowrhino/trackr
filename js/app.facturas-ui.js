@@ -213,6 +213,40 @@ Object.assign(App, {
       + `</div>`);
   },
 
+  /** Editar un presupuesto guardado: fecha, descripción y líneas (concepto e importe). El número no cambia. */
+  budEditModal(id) {
+    const b = D.bud(id); if (!b) return;
+    const lines = b.lineas.map((l, i) => `<div class="cl-item bud-line" data-pid="${l.pid}" style="gap:.5rem">`
+      + `<input type="text" class="bud-c" value="${esc(l.concepto)}" style="flex:1">`
+      + `<input type="number" class="bud-b" step="0.01" min="0" value="${l.base}" style="width:7rem;font-family:'DM Mono',monospace">`
+      + `</div>`).join('');
+    this.om(`<div class="mt">${t('bud.edit')} · ${b.num}/${yearShort(b.fecha)}</div>`
+      + `<div class="fg"><label>${t('fac.client')}</label><div style="font-size:.9rem">${esc(D.cl(b.clienteId)?.nombre || '')}</div></div>`
+      + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="budDate" value="${b.fecha}"></div>`
+      + `<div class="fg"><label>${t('bud.projects')}</label><div class="cl-list">${lines}</div></div>`
+      + `<div class="fg"><label>${t('bud.desc')}</label><textarea id="budDesc" placeholder="${t('bud.descPh')}">${esc(b.descripcion || '')}</textarea></div>`
+      + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button>`
+      + `<button class="bt bt-p" onclick="App.budSaveEdit('${b.id}')">${t('btn.save')}</button></div>`);
+  },
+
+  budSaveEdit(id) {
+    const b = D.bud(id); if (!b) return;
+    const lineas = [...document.querySelectorAll('.bud-line')].map(el => ({
+      pid: el.dataset.pid,
+      concepto: el.querySelector('.bud-c').value.trim(),
+      base: roundMoney(parseFloat(el.querySelector('.bud-b').value) || 0)
+    }));
+    const fecha = document.getElementById('budDate').value || b.fecha;
+    const descripcion = document.getElementById('budDesc').value.trim();
+    const total = Fac._budData(b.clienteId, lineas, { num: b.num, fecha, descripcion }).data.calculos.total;
+    D.upBud(id, { lineas, fecha, descripcion, total });
+    /* La marca del proyecto lleva la fecha del presupuesto: que no se desincronice */
+    lineas.forEach(l => { const p = D.p(l.pid); if (p?.presupuesto?.num === b.num) D.up(l.pid, { presupuesto: { num: b.num, fecha } }); });
+    Toast.ok(t('bud.saved', b.num));
+    this.cm();
+    this.rBud();
+  },
+
   budGen(cid) {
     const lineas = [...document.querySelectorAll('.bud-line')]
       .filter(el => el.querySelector('input[type=checkbox]').checked)

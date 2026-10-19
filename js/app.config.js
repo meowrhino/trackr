@@ -485,6 +485,7 @@ Object.assign(App, {
             + `<span class="cl-nif" style="font-size:.78rem;color:var(--t1)">${fmtMoney(b.total || 0)}</span>`
             + `<span class="cl-nif" style="font-size:.68rem;color:${col}">${t('bud.st.' + b.estado)}</span>`
             + `<div class="cl-actions"><button class="cl-btn" onclick="App.budPdf('${b.id}')" title="${t('btn.downloadPdf')}">&#9113;</button>`
+            + `<button class="cl-btn" onclick="App.budEditModal('${b.id}')" title="${t('bud.edit')}">&#9998;</button>`
             + (b.estado === 'enviado'
               ? `<button class="cl-btn" style="color:var(--ok)" onclick="App.budEstado('${b.id}','aceptado')" title="${t('bud.accept')}">&#10003;</button><button class="cl-btn cl-btn-del" onclick="App.budEstado('${b.id}','rechazado')" title="${t('bud.reject')}">&times;</button>`
               : `<button class="cl-btn" onclick="App.budEstado('${b.id}','enviado')" title="${t('bud.reopen')}">&#8634;</button>`)
