@@ -253,6 +253,8 @@ const LANGS = {
 
     /* ── Proyectos (Dash) ── */
     'dash.external': 'Externos',
+    'dash.list': 'Lista',
+    'dash.board': 'Tablero',
     'dash.all': 'Todos',
     'dash.internal': 'Internos',
     'dash.recurring': 'Recurrentes',
@@ -681,6 +683,10 @@ const LANGS = {
     'journey.restoreConfirm': 'Esto reemplazará tus estadios y tarjetas actuales por el journey por defecto. ¿Continuar?',
     'journey.color': 'Color',
     'journey.stage': 'Estadio',
+    'journey.phase': 'Fase',
+    'journey.noBudgetTitle': 'Sin presupuesto',
+    'journey.noBudgetBody': '«{0}» está en la fase de presupuesto pero aún no tiene uno. ¿Lo generas ahora?',
+    'journey.later': 'Más tarde',
     'journey.newStage': 'Nuevo estadio',
     'journey.editStage': 'Editar estadio',
     'journey.stageName': 'Nombre del estadio',
@@ -1058,6 +1064,8 @@ const LANGS = {
 
     /* ── Proyectos (Dash) ── */
     'dash.external': 'External',
+    'dash.list': 'List',
+    'dash.board': 'Board',
     'dash.all': 'All',
     'dash.internal': 'Internal',
     'dash.recurring': 'Recurring',
@@ -1478,6 +1486,10 @@ const LANGS = {
     'journey.restoreConfirm': 'This will replace your current stages and cards with the default journey. Continue?',
     'journey.color': 'Color',
     'journey.stage': 'Stage',
+    'journey.phase': 'Phase',
+    'journey.noBudgetTitle': 'No quote yet',
+    'journey.noBudgetBody': '“{0}” is in the quote phase but has no quote yet. Create it now?',
+    'journey.later': 'Later',
     'journey.newStage': 'New stage',
     'journey.editStage': 'Edit stage',
     'journey.stageName': 'Stage name',
@@ -1855,6 +1867,8 @@ const LANGS = {
 
     /* ── Projectes (Dash) ── */
     'dash.external': 'Externs',
+    'dash.list': 'Llista',
+    'dash.board': 'Tauler',
     'dash.all': 'Tots',
     'dash.internal': 'Interns',
     'dash.recurring': 'Recurrents',
@@ -2276,6 +2290,10 @@ const LANGS = {
     'journey.restoreConfirm': 'Això reemplaçarà els teus estadis i targetes actuals pel journey per defecte. Continuar?',
     'journey.color': 'Color',
     'journey.stage': 'Estadi',
+    'journey.phase': 'Fase',
+    'journey.noBudgetTitle': 'Sense pressupost',
+    'journey.noBudgetBody': '«{0}» és a la fase de pressupost però encara no en té cap. El generes ara?',
+    'journey.later': 'Més tard',
     'journey.newStage': 'Nou estadi',
     'journey.editStage': 'Editar estadi',
     'journey.stageName': 'Nom de l’estadi',
@@ -2556,9 +2574,6 @@ function _updateNav() {
   if (facTitle) facTitle.textContent = t('nav.invoices');
   const facBtn = document.querySelector('#vFac .bt');
   if (facBtn) facBtn.textContent = t('cfg.importOldInvoices');
-
-  const jrnTitle = document.querySelector('#vJrn .pt');
-  if (jrnTitle) jrnTitle.textContent = t('nav.journey');
 
   const cfgTitle = document.querySelector('#vCfg .pt');
   if (cfgTitle) cfgTitle.textContent = t('nav.config');

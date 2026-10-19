@@ -53,11 +53,13 @@ Object.assign(App, {
   },
 
   _detInfo(p, th, wh, mh) {
+    const stage = this._jShown(p) ? D.jStage(p.journeyStage) : null;
     return `<div class="ds"><div class="dst">${t('det.info')}</div><div class="dg">`
       + `<div><div class="dfl">${t('field.start')}</div><div class="dfv">${fmtDate(p.fechas.inicio)}</div></div>`
       + `<div><div class="dfl">${t('field.estEnd')}</div><div class="dfv">${fmtDate(p.fechas.finEstimada)}</div></div>`
       + `<div><div class="dfl">${t('field.actualEnd')}</div><div class="dfv">${fmtDate(p.fechas.finReal)}</div></div>`
       + `<div><div class="dfl">${t('field.hours')}</div><div class="dfv">${th.toFixed(1)}h <span style="color:var(--t3);font-size:.72rem">💻${wh.toFixed(1)} 👥${mh.toFixed(1)}</span></div></div>`
+      + (stage ? `<div><div class="dfl">${t('journey.phase')}</div><div class="dfv" style="color:${colorHex(stage.color)}">${esc(stage.nombre)}</div></div>` : '')
       + (p.presupuesto ? `<div><div class="dfl">${t('bud.btn')}</div><div class="dfv">${p.presupuesto.num}/${yearShort(p.presupuesto.fecha)} · ${fmtDate(p.presupuesto.fecha)}</div></div>` : '')
       + `</div>${p.notas ? `<div style="margin-top:.75rem"><div class="dfl">${t('field.notes')}</div><div style="color:var(--t3);font-size:.85rem">${esc(p.notas)}</div></div>` : ''}</div>`;
   },

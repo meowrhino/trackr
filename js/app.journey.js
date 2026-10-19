@@ -96,15 +96,24 @@ Object.assign(App, {
     const f = p.facturacion || {};
     const parts = [th.toFixed(1) + ' h'];
     if (f.modo && f.modo !== 'gratis' && f.totalFactura > 0) parts.push(fmtMoney(f.totalFactura));
+    if (p.presupuesto) parts.push(t('bud.btn') + ' ' + p.presupuesto.num + '/' + yearShort(p.presupuesto.fecha));
     return parts.join('  ·  ');
   },
 
   /** Auto-estado: al mover un proyecto a la última fase, marcarlo Completado. */
   _jAutoEstado(id, toStageId) {
     const stages = D.jStages();
+    const p = D.p(id);
+    /* Al entrar en la fase de presupuesto sin tener uno: ofrecer generarlo (nada automático). */
+    const to = D.jStage(toStageId);
+    if (p && to && !p.presupuesto && p.clienteId && /presupuesto|pressupost|proposta|proposal|quote/i.test(to.nombre)) {
+      this.om(`<div class="mt">${t('journey.noBudgetTitle')}</div>`
+        + `<p style="color:var(--t3);font-size:.85rem">${t('journey.noBudgetBody', esc(p.nombre))}</p>`
+        + `<div class="ma"><button class="bt" onclick="App.cm()">${t('journey.later')}</button>`
+        + `<button class="bt bt-p" onclick="App.cm();App.budModal('${p.clienteId}','${p.id}')">${t('bud.generate')}</button></div>`);
+    }
     const last = stages.length ? stages[stages.length - 1].id : null;
     if (!last || toStageId !== last) return;
-    const p = D.p(id);
     if (p && p.estado !== 'completado') {
       p.estado = 'completado';   /* el _save del movimiento lo persiste */
       if (typeof Toast !== 'undefined') Toast.ok(t('journey.autoCompleted', p.nombre));
@@ -152,7 +161,7 @@ Object.assign(App, {
 
   /** Botones extra de la barra: crear proyecto + añadir al journey (si hay ocultos). */
   _jActions() {
-    const acts = [{ label: t('btn.newProject'), onClick: () => this.pModal() }];
+    const acts = []; /* «+ Nuevo proyecto» ya está en la cabecera de Proyectos */
     const hidden = D.ps().filter(p => !this._jShown(p)).length;
     if (hidden) acts.push({ label: t('journey.addToJourney') + ' (' + hidden + ')', onClick: () => this.jAddToJourney() });
     return acts;

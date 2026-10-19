@@ -56,7 +56,6 @@
       <div class="ni" data-v="gas" onclick="App.go('gas')"><span class="ic">€</span><span class="nt">Dineros</span></div>
       <div class="ni" data-v="cli" onclick="App.go('cli')"><span class="ic">◍</span><span class="nt">Clientes</span></div>
       <div class="ni" data-v="fac" onclick="App.go('fac')"><span class="ic">⎙</span><span class="nt">Facturas</span></div>
-      <div class="ni" data-v="jrn" onclick="App.go('jrn')"><span class="ic">◫</span><span class="nt">Journey</span></div>
       <div class="sep"></div>
       <div class="ni" data-v="cfg" onclick="App.go('cfg')"><span class="ic">⚙&#xFE0E;</span><span class="nt">Configuración</span></div>
       <div class="ni" data-v="guide" onclick="App.go('guide')"><span class="ic">?</span><span class="nt">Guía</span></div>
@@ -92,6 +91,8 @@
       <div class="tb" id="dFilt"></div>
       <div class="als" id="dAl"></div>
       <div id="dPr"></div>
+      <!-- Tablero (journey): misma vista, otro modo. Lo muestra App.rDash según App.dm -->
+      <div id="jrnC" style="display:none"></div>
     </div>
 
     <!-- ── Vista: Detalle de proyecto ── -->
@@ -132,11 +133,6 @@
     </div>
 
     <!-- ── Vista: Customer Journey ── -->
-    <div id="vJrn" class="vw">
-      <h1 class="pt">Journey</h1>
-      <div id="jrnC"></div>
-    </div>
-
     <!-- ── Vista: Configuración ── -->
     <div id="vCfg" class="vw">
       <h1 class="pt">Configuración</h1>

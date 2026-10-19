@@ -188,6 +188,8 @@ const App = {
 
   /** Navega a una vista */
   go(v, d) {
+    /* 'jrn' ya no es vista: es Proyectos en modo tablero (alias para enlaces viejos) */
+    if (v === 'jrn') { this.sm('board', true); v = 'dash'; }
     T.ev('nav', 'view', v);
     this.cv = v;
     if (this.refreshAccountNav) this.refreshAccountNav();
@@ -198,7 +200,7 @@ const App = {
 
     const viewMap = {
       info: 'vInfo', dash: 'vDash', cal: 'vCal',
-      gas: 'vGas', cli: 'vCli', fac: 'vFac', jrn: 'vJrn', cfg: 'vCfg', guide: 'vGuide', det: 'vDet'
+      gas: 'vGas', cli: 'vCli', fac: 'vFac', cfg: 'vCfg', guide: 'vGuide', det: 'vDet'
     };
     const viewEl = document.getElementById(viewMap[v]);
     if (viewEl) viewEl.classList.add('on');
@@ -212,7 +214,6 @@ const App = {
     else if (v === 'gas') this.rGas();
     else if (v === 'cli') this.rCli();
     else if (v === 'fac') this.rFac();
-    else if (v === 'jrn') this.rJourney();
     else if (v === 'cfg') this.rCfg();
     else if (v === 'guide') this.rGuide();
     else if (v === 'det') this.rDet(d);

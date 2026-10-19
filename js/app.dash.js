@@ -18,9 +18,13 @@ Object.assign(App, {
       { k: 'internos', l: t('dash.internal') },
       { k: 'recurrentes', l: t('dash.recurring') }
     ];
+    const board = this.dashMode() === 'board';
     document.getElementById('dFilt').innerHTML = filters.map(f =>
       `<button class="fb ${this.pf === f.k ? 'on' : ''}" onclick="App.sf('${f.k}')">${f.l}</button>`
-    ).join('');
+    ).join('')
+      + `<span style="flex:1"></span>`
+      + `<button class="fb ${board ? '' : 'on'}" onclick="App.sm('list')">${t('dash.list')}</button>`
+      + `<button class="fb ${board ? 'on' : ''}" onclick="App.sm('board')">${t('dash.board')}</button>`;
 
     /* ── Alertas ── */
     const als = [];
@@ -36,6 +40,11 @@ Object.assign(App, {
       + `<span style="flex:1">${esc(a.t)}</span>`
       + `<span style="color:var(--t3)">&rarr;</span></div>`
     ).join('');
+
+    /* ── Modo tablero: el journey ocupa el sitio de la lista (las alertas se quedan) ── */
+    document.getElementById('dPr').style.display = board ? 'none' : '';
+    document.getElementById('jrnC').style.display = board ? '' : 'none';
+    if (board) { this.rJourney(); return; }
 
     /* ── Filtrar ── */
     let filtered = ps;
@@ -161,6 +170,8 @@ Object.assign(App, {
     const f = p.facturacion;
 
     let flags = '';
+    const stage = this._jShown(p) ? D.jStage(p.journeyStage) : null;
+    if (stage) flags += `<span class="pc-flag" style="color:${colorHex(stage.color)};background:color-mix(in srgb,${colorHex(stage.color)} 15%,transparent)">${esc(stage.nombre)}</span>`;
     if (p.interno) flags += `<span class="pc-flag pc-flag-int">${t('dash.flagInternal')}</span>`;
     if (p.recurrente) flags += `<span class="pc-flag pc-flag-rec">${t('dash.flagRecurring')}</span>`;
     if (f.pagado) flags += `<span class="pc-flag pc-flag-paid">${t('dash.flagPaid')}</span>`;
@@ -193,6 +204,17 @@ Object.assign(App, {
   },
 
   sf(f) { this.pf = f; this.rDash(); },
+
+  /** Modo de Proyectos: 'list' (tarjetas por estado) o 'board' (tablero journey). Se recuerda por navegador. */
+  dashMode() {
+    if (!this.dm) { try { this.dm = localStorage.getItem('trackr_dash_mode') || 'list'; } catch (e) { this.dm = 'list'; } }
+    return this.dm;
+  },
+  sm(m, silent) {
+    this.dm = m;
+    try { localStorage.setItem('trackr_dash_mode', m); } catch (e) { /* sin storage: solo esta sesión */ }
+    if (!silent) this.rDash();
+  },
 
   quickPay(pid) {
     const p = D.p(pid);
