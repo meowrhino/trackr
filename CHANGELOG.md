@@ -15,7 +15,12 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 - **Dineros con pestañas**: el resumen del periodo sigue arriba y debajo se ve una sección cada vez (Ingresos, Gastos o Fiscal con 303, 130 y renta). _frontend_
 - **Los presupuestos se guardan.** Hasta ahora solo quedaba el PDF y una marca «N/AA» en cada proyecto; ahora cada presupuesto guarda sus líneas, la descripción y el total, y se lista en Facturas con estado **enviado / aceptado / rechazado**, botón para volver a bajar el PDF (mismo número y fecha) y para marcarlo aceptado (los proyectos del presupuesto que estaban en Potencial pasan a Activo). Las marcas antiguas se convierten en registros al abrir la app: aceptado si el proyecto se activó o facturó, rechazado si se abandonó. No se comparten con la gestoría. _frontend_
 
+- **Editar un presupuesto ya generado** (✎ en Facturas → Presupuestos): fecha, descripción e importes de las líneas; el número no cambia y el total se recalcula. _frontend_
+- **Recordatorio de cobro** (✉ en una factura pendiente): copia al portapapeles un texto con número, importe, fecha, vencimiento y días vencida, en el idioma de la factura, listo para pegar en un email. _frontend_
+- **La guía interna** cuenta ya el Tablero, los presupuestos guardados, el vencimiento y las pestañas de Dineros. _frontend_
+
 ### 🔧 Cambiado
+- **El vencimiento sale impreso en el PDF de la factura**, debajo de la fecha (no en el presupuesto). _frontend_
 - **En el móvil**, las filas de Clientes y Facturas ponen el nombre en su línea y el resto debajo; antes el estado y los botones se salían de la pantalla. _frontend_
 - **Los ejemplos usan las funciones nuevas**: presupuestos numerados en las propuestas y los trabajos grandes, método en cada cobro, notas en algunos clientes y una factura de profesional con retención de IRPF (Marina y Ana). Son cuentas ficticias y se irán ampliando con cada función nueva. _frontend_
 

@@ -86,8 +86,11 @@ const Fac = {
     doc.text(fmtDate(data.factura.fecha), rightX, y);
     y += 5;
 
-    /* Row 3: Emisor direccion2 */
-    if (data.emisor.direccion2) { doc.text(data.emisor.direccion2, leftX, y); y += 5; }
+    /* Row 3: Emisor direccion2 | Vencimiento (solo factura) */
+    const venc = !isBud && data.factura.vencimiento;
+    if (data.emisor.direccion2) doc.text(data.emisor.direccion2, leftX, y);
+    if (venc) doc.text(tf('fac.dueLabel', lang) + fmtDate(venc), rightX, y);
+    if (data.emisor.direccion2 || venc) y += 5;
 
     /* Row 4: Emisor NIF */
     if (data.emisor.nif) {
@@ -378,6 +381,7 @@ const Fac = {
       factura: {
         numero: numStr,
         fecha: fecha,
+        vencimiento: B.vencimiento({ facturaFecha: fecha }, s.diasVencimiento),
         asunto: opts.asunto || defaultAsunto(p)
       },
       calculos: {

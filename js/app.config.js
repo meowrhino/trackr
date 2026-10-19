@@ -524,10 +524,28 @@ Object.assign(App, {
             + `<span class="cl-nif" style="font-size:.78rem;color:var(--t1)">${fmtMoney(f.totalFactura || 0)}</span>`
             + `<span class="cl-nif" style="font-size:.68rem;color:${st[1]}">${stLabel}</span>`
             + `<div class="cl-actions"><button class="cl-btn" onclick="App.facPdf('${p.id}')" title="${t('btn.downloadPdf')}">&#9113;</button>`
+            + (!f.pagado && !anulada ? `<button class="cl-btn" onclick="App.facRecordatorio('${p.id}')" title="${t('fac.reminder')}">&#9993;</button>` : '')
             + (reg && !anulada ? `<button class="cl-btn cl-btn-del" onclick="App.anularFactura('${reg.id}')" title="${t('cfg.vfAnular')}">&times;</button>` : '')
             + `</div></div>`;
         }).join('')}</div>`
       : `<div style="color:var(--t3);font-size:.82rem">${t('fac.none')}</div>`;
+  },
+
+  /** Recordatorio de cobro al portapapeles, en el idioma de la factura, para pegarlo en un email */
+  facRecordatorio(pid) {
+    const p = D.p(pid); if (!p) return;
+    const f = p.facturacion, s = D.d.settings;
+    const lang = f.idiomaFactura || s.idioma || 'es';
+    const dv = B.diasVencida(f, s.diasVencimiento, todayStr());
+    const texto = tf('fac.reminderText', lang)
+      .replace('{0}', `${f.facturaNum}/${yearShort(f.facturaFecha)}`)
+      .replace('{1}', fmtMoney(f.totalFactura || 0))
+      .replace('{2}', fmtDate(f.facturaFecha))
+      .replace('{3}', fmtDate(B.vencimiento(f, s.diasVencimiento)))
+      .replace('{4}', dv > 0 ? tf('fac.reminderOverdue', lang).replace('{0}', dv) : '')
+      .replace('{5}', s.emisor?.nombre || '');
+    if (navigator.clipboard?.writeText) navigator.clipboard.writeText(texto).then(() => Toast.ok(t('fac.reminderCopied')), () => Toast.error(texto));
+    else Toast.error(texto);
   },
 
   /** Vuelve a bajar el PDF de una factura ya emitida (mismo número, fecha y QR; no firma de nuevo) */
