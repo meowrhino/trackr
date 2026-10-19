@@ -81,7 +81,8 @@ Object.assign(App, {
         subs: [
           { title: 'guide.projects.states.title', body: 'guide.projects.states.body' },
           { title: 'guide.projects.clients.title', body: 'guide.projects.clients.body' },
-          { title: 'guide.projects.filters.title', body: 'guide.projects.filters.body' }
+          { title: 'guide.projects.filters.title', body: 'guide.projects.filters.body' },
+          { title: 'guide.projects.board.title', body: 'guide.projects.board.body' }
         ]
       },
       {
@@ -94,7 +95,9 @@ Object.assign(App, {
         subs: [
           { title: 'guide.billing.modes.title', body: 'guide.billing.modes.body' },
           { title: 'guide.billing.tax.title', body: 'guide.billing.tax.body' },
-          { title: 'guide.billing.payments.title', body: 'guide.billing.payments.body' }
+          { title: 'guide.billing.payments.title', body: 'guide.billing.payments.body' },
+          { title: 'guide.billing.quotes.title', body: 'guide.billing.quotes.body' },
+          { title: 'guide.billing.due.title', body: 'guide.billing.due.body' }
         ]
       },
       {
@@ -111,7 +114,8 @@ Object.assign(App, {
         subs: [
           { title: 'guide.money.income.title', body: 'guide.money.income.body' },
           { title: 'guide.money.expenses.title', body: 'guide.money.expenses.body' },
-          { title: 'guide.money.taxes.title', body: 'guide.money.taxes.body' }
+          { title: 'guide.money.taxes.title', body: 'guide.money.taxes.body' },
+          { title: 'guide.money.tabs.title', body: 'guide.money.tabs.body' }
         ]
       },
       {
