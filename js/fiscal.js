@@ -79,9 +79,13 @@ const F = {
       if (baseSum > 0 || ivaSum > 0) {
         const zona = g.zonaFiscal || 'es';
         if (zona === 'es') {
-          if (!ivaSop[tipo]) ivaSop[tipo] = { base: 0, cuota: 0 };
-          ivaSop[tipo].base += baseSum;
-          ivaSop[tipo].cuota += ivaSum;
+          /* Sin IVA (cuota de autónomos, recibos, exentos): es gasto para el 130 pero no
+             va al 303. Antes su base engordaba la casilla 28 sin cuota que deducir. */
+          if (ivaSum > 0) {
+            if (!ivaSop[tipo]) ivaSop[tipo] = { base: 0, cuota: 0 };
+            ivaSop[tipo].base += baseSum;
+            ivaSop[tipo].cuota += ivaSum;
+          }
         } else {
           /* Proveedor extranjero, factura sin IVA español → ISP: se autoliquida la
              cuota al tipo del gasto (general si el usuario dejó 0%). */

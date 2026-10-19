@@ -15,7 +15,7 @@ const ctx = {
   navigator: { language: 'es' }, window: {}, document: undefined
 };
 vm.createContext(ctx);
-for (const f of ['utils.js', 'billing.js', 'store.js']) vm.runInContext(read(f), ctx, { filename: f });
+for (const f of ['utils.js', 'billing.js', 'store.js', 'fiscal.js']) vm.runInContext(read(f), ctx, { filename: f });
 /* const/let de los scripts no cuelgan del objeto contexto: se leen desde dentro */
 const { D, B } = vm.runInContext('({ D, B })', ctx);
 
@@ -61,6 +61,21 @@ assert.equal(B.diasVencida(f, 30, '2026-11-05'), 5);
 assert.equal(B.diasVencida(f, 30, '2026-10-20'), -11);
 assert.equal(B.diasVencida({ ...f, pagado: true }, 30, '2026-11-05'), null, 'pagada: sin vencimiento');
 assert.equal(B.diasVencida({}, 30, '2026-11-05'), null, 'sin factura: sin vencimiento');
+
+/* 303: un gasto sin IVA (cuota de autónomos) cuenta en el 130 pero no en la casilla 28 */
+{
+  const { F } = vm.runInContext('({ F })', ctx);
+  D.d.gastos = [
+    { id: 'g1', nombre: 'Cuota autónomos', desgravable: true, tipoIva: 0, entradas: [{ id: 'e1', fecha: '2026-05-31', base: 88.56, iva: 0, total: 88.56 }] },
+    { id: 'g2', nombre: 'Software', desgravable: true, tipoIva: 21, entradas: [{ id: 'e2', fecha: '2026-05-01', base: 100, iva: 21, total: 121 }] }
+  ];
+  D.d.deducibles = [];
+  const q = F.quarter(2026, 1);
+  assert.equal(Math.round(q.gastos * 100) / 100, 188.56, '130: los dos gastos');
+  assert.equal(q.ivaSop[21].base, 100, '303 casilla 28: solo la base con IVA');
+  assert.equal(q.ivaSop[21].cuota, 21);
+  assert.equal(Object.keys(q.ivaSop).length, 1, 'sin fila para el gasto sin IVA');
+}
 
 /* Próximo plazo fiscal */
 assert.deepEqual(JSON.parse(JSON.stringify(B.nextTaxDeadline('2026-10-19'))), { label: 'T3 2026', end: '2026-10-20', days: 1, y: 2026, q: 2 });
