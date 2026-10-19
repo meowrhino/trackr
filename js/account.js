@@ -696,7 +696,12 @@ const Acc = (() => {
   async function adminSetPaid(id, paid) { const r = await api(`/v1/admin/users/${encodeURIComponent(id)}/paid`, { method: 'POST', auth: true, body: { paid } }); return r.status === 200; }
   async function adminDelete(id) { const r = await api(`/v1/admin/users/${encodeURIComponent(id)}`, { method: 'DELETE', auth: true }); return r.status === 204; }
   async function adminGetConfig() { const r = await api('/v1/admin/config', { auth: true }); return r.status === 200 ? r.data : null; }
-  async function adminSetConfig(signupsOpen) { const r = await api('/v1/admin/config', { method: 'POST', auth: true, body: { signupsOpen: !!signupsOpen } }); return r.status === 200; }
+  /* patch: { signupsOpen?, autoActivate? } (un boolean suelto = signupsOpen, por compat) */
+  async function adminSetConfig(patch) {
+    const body = typeof patch === 'boolean' ? { signupsOpen: patch } : patch;
+    const r = await api('/v1/admin/config', { method: 'POST', auth: true, body });
+    return r.status === 200;
+  }
 
   return {
     signup, login, unlock, logout, changePassword, recover, pull, push: syncPush, resume, resolve, remembered, cloudMeta, versions, restoreVersion,

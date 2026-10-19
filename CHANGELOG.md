@@ -25,6 +25,8 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
   - **La primera factura** abre una vez una pantalla para poner los datos a salvo: guardar copia JSON, instalar TRACKR o crear cuenta.
   - **Aviso de copia** en Info si no hay cuenta, hay datos de verdad y no se ha exportado en 30 días (o nunca). Exportar lo apaga. _frontend_
 
+- **Cuentas nuevas activas al momento** (opcional): en /admin, junto a «Registro de cuentas nuevas», el ajuste «Activación de cuentas nuevas» (automática o manual). En automática, quien se registra entra y sincroniza sin esperar a que el admin le active; el admin puede desactivarla después. La respuesta del registro no cambia (202, sin filtrar si el email existía): la app intenta entrar justo después y avisa «ya estás dentro», «pendiente de activación» o «si ya tenías cuenta, entra con tu contraseña». _frontend, backend_
+
 ### 🔧 Cambiado
 - **El vencimiento sale impreso en el PDF de la factura**, debajo de la fecha (no en el presupuesto). _frontend_
 - **En el móvil**, las filas de Clientes y Facturas ponen el nombre en su línea y el resto debajo; antes el estado y los botones se salían de la pantalla. _frontend_

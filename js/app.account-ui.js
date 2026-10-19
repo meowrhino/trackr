@@ -262,8 +262,16 @@
         // Cuenta gestor: empieza VACIA (no arrastra los datos locales de este navegador).
         const r = await Acc.signup(email, pw, role === 'gestor' ? CA.emptyData() : D.d, role);
         if (r.ok && r.recoveryCode) {
+          /* 202 no dice si la cuenta es nueva (anti-enumeración). Se intenta entrar: si el servidor
+             activa al momento, ya estamos dentro; si está en manual, sale «pendiente»; si el email
+             ya tenía cuenta, la contraseña no coincide y se avisa. */
+          let msg = null;
+          if (r.pending) {
+            const lg = await Acc.login(email, pw);
+            msg = lg.ok ? (lg.active ? t('createdIn') : t('pending')) : lg.error === 'invalid_credentials' ? t('createdDup') : t('pending');
+          }
           this._accShowRecovery(r.recoveryCode, () => { if (Acc.state === 'in' && Acc.status().active) Acc.setAutoSync(true); this._accInModal = false; this.refreshAccountNav(); this.go(this.cv); });
-          if (r.pending) Toast.ok(t('pending'));
+          if (msg) Toast.ok(msg);
         } else {
           Toast.error(errMsg(r.error));
         }
