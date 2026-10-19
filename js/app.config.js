@@ -469,7 +469,43 @@ Object.assign(App, {
     return (D.fs() || []).filter(r => r.proyectoId === pid && r.tipoRegistro === 'alta').pop() || null;
   },
 
+  /* ── Presupuestos guardados (debajo de las facturas) ── */
+  rBud() {
+    const bs = [...D.buds()].sort((a, b) => (b.fecha || '').localeCompare(a.fecha || '') || b.num - a.num);
+    document.getElementById('budC').innerHTML = bs.length
+      ? `<div class="cl-list">${bs.map(b => {
+          const cl = D.cl(b.clienteId);
+          const first = D.p(b.lineas[0]?.pid);
+          const col = { enviado: 'var(--warn)', aceptado: 'var(--ok)', rechazado: 'var(--bad)' }[b.estado] || 'var(--t3)';
+          const conceptos = b.lineas.map(l => l.concepto).join(', ');
+          return `<div class="cl-item">`
+            + `<span class="cl-nif" style="font-family:'DM Mono',monospace;font-size:.78rem;color:var(--t1)">${b.num}/${yearShort(b.fecha)}</span>`
+            + `<span class="cl-nif" style="font-size:.72rem">${fmtDate(b.fecha)}</span>`
+            + `<span class="cl-name">${first ? `<a href="#" onclick="event.preventDefault();App.go('det','${first.id}')" style="color:inherit;text-decoration:none">` : ''}${esc(cl?.nombre || '')} <span style="color:var(--t3)">· ${esc(conceptos)}</span>${first ? '</a>' : ''}</span>`
+            + `<span class="cl-nif" style="font-size:.78rem;color:var(--t1)">${fmtMoney(b.total || 0)}</span>`
+            + `<span class="cl-nif" style="font-size:.68rem;color:${col}">${t('bud.st.' + b.estado)}</span>`
+            + `<div class="cl-actions"><button class="cl-btn" onclick="App.budPdf('${b.id}')" title="${t('btn.downloadPdf')}">&#9113;</button>`
+            + (b.estado === 'enviado'
+              ? `<button class="cl-btn" style="color:var(--ok)" onclick="App.budEstado('${b.id}','aceptado')" title="${t('bud.accept')}">&#10003;</button><button class="cl-btn cl-btn-del" onclick="App.budEstado('${b.id}','rechazado')" title="${t('bud.reject')}">&times;</button>`
+              : `<button class="cl-btn" onclick="App.budEstado('${b.id}','enviado')" title="${t('bud.reopen')}">&#8634;</button>`)
+            + `</div></div>`;
+        }).join('')}</div>`
+      : `<div style="color:var(--t3);font-size:.82rem">${t('bud.listNone')}</div>`;
+  },
+  budPdf(id) { Fac.presupuestoPdf(id); },
+  /** Aceptado: los proyectos del presupuesto que estaban en Potencial pasan a Activo */
+  budEstado(id, estado) {
+    const b = D.upBud(id, { estado }); if (!b) return;
+    if (estado === 'aceptado') {
+      let n = 0;
+      b.lineas.forEach(l => { const p = D.p(l.pid); if (p && p.estado === 'potencial') { D.up(p.id, { estado: 'activo' }); n++; } });
+      Toast.ok(t('bud.accepted', b.num, n));
+    }
+    this.rBud();
+  },
+
   rFac() {
+    this.rBud();
     const ps = D.ps().filter(p => p.facturacion?.facturaNum)
       .sort((a, b) => (b.facturacion.facturaFecha || '').localeCompare(a.facturacion.facturaFecha || '') || b.facturacion.facturaNum - a.facturacion.facturaNum);
     document.getElementById('facC').innerHTML = ps.length

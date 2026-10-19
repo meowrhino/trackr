@@ -558,6 +558,15 @@ const LANGS = {
     'bud.noProjects': 'Este cliente no tiene proyectos. Crea uno (por ejemplo, en estado Potencial) y vuelve aquí.',
     'bud.noClient': 'Primero crea un cliente.',
     'bud.none': 'Marca al menos un proyecto',
+    'bud.list': 'Presupuestos',
+    'bud.listNone': 'Aún no hay presupuestos. Se crean desde un cliente (📋) o desde la ficha de un proyecto.',
+    'bud.st.enviado': 'Enviado',
+    'bud.st.aceptado': 'Aceptado',
+    'bud.st.rechazado': 'Rechazado',
+    'bud.accept': 'Marcar aceptado',
+    'bud.reject': 'Marcar rechazado',
+    'bud.reopen': 'Volver a «enviado»',
+    'bud.accepted': 'Presupuesto {0} aceptado · {1} proyecto(s) pasan a Activo',
     'bud.desc': 'Descripción',
     'bud.descPh': 'Servicios, tiempo estimado, condiciones…',
     'fac.issuer': 'Emisor',
@@ -1374,6 +1383,15 @@ const LANGS = {
     'bud.noProjects': 'This client has no projects. Create one (e.g. as Potential) and come back.',
     'bud.noClient': 'Create a client first.',
     'bud.none': 'Tick at least one project',
+    'bud.list': 'Quotes',
+    'bud.listNone': 'No quotes yet. Create one from a client (📋) or from a project page.',
+    'bud.st.enviado': 'Sent',
+    'bud.st.aceptado': 'Accepted',
+    'bud.st.rechazado': 'Rejected',
+    'bud.accept': 'Mark accepted',
+    'bud.reject': 'Mark rejected',
+    'bud.reopen': 'Back to “sent”',
+    'bud.accepted': 'Quote {0} accepted · {1} project(s) set to Active',
     'bud.desc': 'Description',
     'bud.descPh': 'Services, estimated time, terms…',
     'fac.issuer': 'Issuer',
@@ -2182,6 +2200,15 @@ const LANGS = {
     'bud.noProjects': 'Aquest client no té projectes. Crea\'n un (per exemple, en estat Potencial) i torna aquí.',
     'bud.noClient': 'Primer crea un client.',
     'bud.none': 'Marca almenys un projecte',
+    'bud.list': 'Pressupostos',
+    'bud.listNone': 'Encara no hi ha pressupostos. Es creen des d\'un client (📋) o des de la fitxa d\'un projecte.',
+    'bud.st.enviado': 'Enviat',
+    'bud.st.aceptado': 'Acceptat',
+    'bud.st.rechazado': 'Rebutjat',
+    'bud.accept': 'Marcar acceptat',
+    'bud.reject': 'Marcar rebutjat',
+    'bud.reopen': 'Tornar a «enviat»',
+    'bud.accepted': 'Pressupost {0} acceptat · {1} projecte(s) passen a Actiu',
     'bud.desc': 'Descripció',
     'bud.descPh': 'Serveis, temps estimat, condicions…',
     'fac.issuer': 'Emissor',
@@ -2592,6 +2619,8 @@ function _updateNav() {
 
   const cfgTitle = document.querySelector('#vCfg .pt');
   if (cfgTitle) cfgTitle.textContent = t('nav.config');
+  const budTitle = document.getElementById('budTitle');
+  if (budTitle) budTitle.textContent = t('bud.list');
 
   if (typeof App !== 'undefined' && App._renderSaved) App._renderSaved();
 }

@@ -298,10 +298,34 @@ const Fac = {
    */
   presupuesto(cid, lineas, opts) {
     const s = D.d.settings;
+    const { data, lang, cl } = this._budData(cid, lineas, opts);
+    this._budSave(this.genPDF(data, lang), opts, cl);
+
+    lineas.forEach(l => D.up(l.pid, { presupuesto: { num: opts.num, fecha: opts.fecha } }));
+    if (opts.num >= (s.nextPresupuestoNum || 1)) { s.nextPresupuestoNum = opts.num + 1; D.save(); }
+    /* Registro propio: para listarlo, marcarlo aceptado/rechazado y volver a bajar el PDF */
+    D.addBud({ id: uid(), num: opts.num, fecha: opts.fecha, clienteId: cid, lineas, descripcion: opts.descripcion || '', total: data.calculos.total, estado: 'enviado' });
+    return { total: data.calculos.total };
+  },
+
+  /** Vuelve a bajar el PDF de un presupuesto guardado (mismo número y fecha; no toca contador ni proyectos) */
+  presupuestoPdf(id) {
+    const b = D.bud(id); if (!b) return;
+    const opts = { num: b.num, fecha: b.fecha, descripcion: b.descripcion };
+    const { data, lang, cl } = this._budData(b.clienteId, b.lineas, opts);
+    this._budSave(this.genPDF(data, lang), opts, cl);
+  },
+
+  _budSave(doc, opts, cl) {
+    doc.save(`presupuesto_${opts.num}_${yearShort(opts.fecha)}_${(cl?.nombre || '').replace(/\s+/g, '_')}.pdf`);
+  },
+
+  /** Datos del PDF de presupuesto. Tipos de cada línea: los del proyecto (o los de Configuración si es gratis o ya no existe) */
+  _budData(cid, lineas, opts) {
+    const s = D.d.settings;
     const cl = D.cl(cid);
     const first = D.p(lineas[0].pid);
     const lang = first?.facturacion?.idiomaFactura || s.idioma || 'es';
-    /* Tipos de cada línea: los del proyecto (o los de Configuración si es gratis) */
     const ivaG = {}, irpfG = {};
     let base = 0;
     lineas.forEach(l => {
@@ -325,12 +349,7 @@ const Fac = {
       beneficiarioPago: s.emisor.beneficiarioPago || '',
       instruccionesPago: s.emisor.instruccionesPago || ''
     };
-    const doc = this.genPDF(data, lang);
-    doc.save(`presupuesto_${opts.num}_${yearShort(opts.fecha)}_${(cl?.nombre || '').replace(/\s+/g, '_')}.pdf`);
-
-    lineas.forEach(l => D.up(l.pid, { presupuesto: { num: opts.num, fecha: opts.fecha } }));
-    if (opts.num >= (s.nextPresupuestoNum || 1)) { s.nextPresupuestoNum = opts.num + 1; D.save(); }
-    return { total };
+    return { data, lang, cl };
   },
 
   download(pid, opts = {}) {

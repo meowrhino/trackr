@@ -98,6 +98,31 @@ const D = {
     /* VeriFactu: registro inmutable de registros de facturación (altas + anulaciones,
        huella oficial AEAT encadenada por emisor). La remisión a AEAT es Fase 3 (trackr-api). */
     if (!d.facturas) d.facturas = [];
+    /* Presupuestos guardados (líneas, descripción y estado). Fuera del alcance fiscal de la gestoría. */
+    if (!Array.isArray(d.presupuestos)) d.presupuestos = [];
+    /* Migración: las marcas antiguas p.presupuesto {num, fecha} pasan a ser un registro por número */
+    const budNums = new Set(d.presupuestos.map(b => b.num));
+    const porNum = {};
+    (d.projects || []).forEach(p => {
+      if (p.presupuesto && p.presupuesto.num != null && !budNums.has(p.presupuesto.num)) (porNum[p.presupuesto.num] = porNum[p.presupuesto.num] || []).push(p);
+    });
+    Object.keys(porNum).forEach(num => {
+      const ps = porNum[num];
+      const f0 = ps[0].facturacion || {};
+      const lineas = ps.map(p => {
+        const f = p.facturacion || {};
+        /* por_hora: la base sale de las horas (B.calc aún no ha pasado por aquí) */
+        const base = f.modo === 'por_hora' ? (p.horas || []).reduce((s, h) => s + (h.cantidad || 0), 0) * (f.precioHora || 0) : (f.baseImponible || 0);
+        return { pid: p.id, concepto: p.nombre, base: roundMoney(base) };
+      });
+      const aceptado = ps.some(p => (p.facturacion || {}).facturaNum || p.estado === 'activo' || p.estado === 'completado');
+      const rechazado = !aceptado && ps.some(p => p.estado === 'abandonado');
+      d.presupuestos.push({
+        id: uid(), num: Number(num), fecha: ps[0].presupuesto.fecha, clienteId: ps[0].clienteId, lineas, descripcion: '',
+        total: roundMoney(lineas.reduce((s, l) => s + l.base, 0) * (1 + (f0.iva == null ? 21 : f0.iva) / 100 - (f0.irpf == null ? 15 : f0.irpf) / 100)),
+        estado: aceptado ? 'aceptado' : rechazado ? 'rechazado' : 'enviado'
+      });
+    });
     /* Customer journey (tablero kanban). Se siembra una sola vez; editable. */
     if (!d.journey || typeof d.journey !== 'object') d.journey = this._seedJourney();
     if (!Array.isArray(d.journey.stages)) d.journey.stages = [];
@@ -555,6 +580,12 @@ const D = {
    *  muta d.journey directamente y llama a save() — la vieja API CRUD de
    *  estadios/tarjetas se retiró al pasar al widget (nadie la llamaba).
    * ══════════════════════════════════════════════ */
+  /* ── Presupuestos (sin auditoría: no los ve la gestoría) ── */
+  buds() { return this.d.presupuestos; },
+  bud(id) { return this.d.presupuestos.find(b => b.id === id); },
+  addBud(b) { this.d.presupuestos.push(b); this.save(); return b; },
+  upBud(id, u) { const b = this.bud(id); if (b) { Object.assign(b, u); this.save(); } return b; },
+
   jStages() { return this.d.journey.stages; },
   jStage(id) { return this.d.journey.stages.find(s => s.id === id); },
 

@@ -243,7 +243,7 @@ const Acc = (() => {
     local = local || {}; cloud = cloud || {};
     const out = {};
     for (const k of Object.keys(cloud)) out[k] = cloud[k];
-    for (const key of ['projects', 'clientes', 'gastos', 'deducibles', 'facturas']) {
+    for (const key of ['projects', 'clientes', 'gastos', 'deducibles', 'facturas', 'presupuestos']) {
       if (local[key] || cloud[key]) out[key] = unionBy(cloud[key], local[key], (x) => x.id);
     }
     // Journey: estadios del local (es lo que se ve aqui), tarjetas de los dos. Antes la
@@ -581,7 +581,8 @@ const Acc = (() => {
        del alcance fiscal sea una decision y no una omision (ya paso con audit[] en la
        Etapa A). Lo desconocido NO se comparte (privado por defecto), pero se avisa para
        que el proximo cambio de esquema pase por aqui conscientemente. */
-    const KNOWN = ['version', 'clientes', 'projects', 'gastos', 'deducibles', 'facturas', 'settings', 'audit', 'journey'];
+    /* `presupuestos` queda fuera del alcance fiscal a propósito: no son facturas ni entran en los libros. */
+    const KNOWN = ['version', 'clientes', 'projects', 'gastos', 'deducibles', 'facturas', 'settings', 'audit', 'journey', 'presupuestos'];
     const unknown = Object.keys(d).filter(k => !KNOWN.includes(k));
     if (unknown.length) console.warn('buildShareData: campos del store fuera de la whitelist fiscal (no se comparten):', unknown);
     const s = d.settings || {};

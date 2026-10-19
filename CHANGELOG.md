@@ -10,6 +10,11 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 ### ✨ Nuevo
 - **Clientes y Facturas con vista propia** en el menú, debajo de Dineros. Facturas lista cada factura emitida con número, fecha, cliente y proyecto, total y estado (pagada, pendiente, anulada), y permite volver a bajar el PDF o anularla. Configuración se queda con los ajustes y la parte técnica de VeriFactu. _frontend@c04f752_
 
+- **Journey vive dentro de Proyectos**, como modo «Tablero» junto a «Lista» (se recuerda el último). La fase de producción se ve ahora en la ficha del proyecto y como etiqueta en cada tarjeta de la lista. Al soltar un proyecto en la fase de presupuesto sin tener uno, se ofrece generarlo (nada automático); las tarjetas del tablero muestran «Presupuesto N/AA» si existe. _frontend_
+- **Vencimiento de facturas**: Configuración → «Días para pagar una factura» (30 por defecto). Facturas muestra «vence el …» o «vencida hace N días», y la alerta de pendiente de pago en Proyectos dice cuántos días lleva vencida. _frontend_
+- **Dineros con pestañas**: el resumen del periodo sigue arriba y debajo se ve una sección cada vez (Ingresos, Gastos o Fiscal con 303, 130 y renta). _frontend_
+- **Los presupuestos se guardan.** Hasta ahora solo quedaba el PDF y una marca «N/AA» en cada proyecto; ahora cada presupuesto guarda sus líneas, la descripción y el total, y se lista en Facturas con estado **enviado / aceptado / rechazado**, botón para volver a bajar el PDF (mismo número y fecha) y para marcarlo aceptado (los proyectos del presupuesto que estaban en Potencial pasan a Activo). Las marcas antiguas se convierten en registros al abrir la app: aceptado si el proyecto se activó o facturó, rechazado si se abandonó. No se comparten con la gestoría. _frontend_
+
 ### 🔧 Cambiado
 - **En el móvil**, las filas de Clientes y Facturas ponen el nombre en su línea y el resto debajo; antes el estado y los botones se salían de la pantalla. _frontend_
 - **Los ejemplos usan las funciones nuevas**: presupuestos numerados en las propuestas y los trabajos grandes, método en cada cobro, notas en algunos clientes y una factura de profesional con retención de IRPF (Marina y Ana). Son cuentas ficticias y se irán ampliando con cada función nueva. _frontend_
