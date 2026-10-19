@@ -17,6 +17,11 @@
   .sb-foot{display:flex;justify-content:center;padding:.5rem 0}
   .sb-foot .sv-tx{display:none}
   .sb-foot .sv-dot{display:block}
+  /* Clientes y Facturas: el nombre en su línea y el resto (NIF o número, fecha, total, estado) sin partirse */
+  #cliC .cl-item,#facC .cl-item{flex-wrap:wrap;row-gap:.25rem}
+  #cliC .cl-name,#facC .cl-name{flex-basis:100%;order:-1}
+  #cliC .cl-nif,#facC .cl-nif{white-space:nowrap}
+  #cliC .cl-actions{margin-left:auto}
 
   /* Main content ajustado */
   .mc{margin-left:52px;padding:1.25rem;overflow:hidden}

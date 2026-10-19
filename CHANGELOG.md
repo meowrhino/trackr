@@ -5,6 +5,17 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-10-19 — Clientes y Facturas en el menú, ejemplos al día
+
+### ✨ Nuevo
+- **Clientes y Facturas con vista propia** en el menú, debajo de Dineros. Facturas lista cada factura emitida con número, fecha, cliente y proyecto, total y estado (pagada, pendiente, anulada), y permite volver a bajar el PDF o anularla. Configuración se queda con los ajustes y la parte técnica de VeriFactu. _frontend@c04f752_
+
+### 🔧 Cambiado
+- **En el móvil**, las filas de Clientes y Facturas ponen el nombre en su línea y el resto debajo; antes el estado y los botones se salían de la pantalla. _frontend_
+- **Los ejemplos usan las funciones nuevas**: presupuestos numerados en las propuestas y los trabajos grandes, método en cada cobro, notas en algunos clientes y una factura de profesional con retención de IRPF (Marina y Ana). Son cuentas ficticias y se irán ampliando con cada función nueva. _frontend_
+
+---
+
 ## 2026-10-14 (tarde) — Menos subidas y versiones de verdad en la nube
 
 Cada entrada del calendario creaba una versión en el servidor (de la v100 a la v200 en una hora), y el servidor solo guardaba las 10 últimas: unos minutos de trabajo. No servía para volver atrás.
