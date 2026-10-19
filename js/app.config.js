@@ -26,6 +26,7 @@ Object.assign(App, {
       + `<div class="cfg-section"><div class="cfg-section-title">${t('cfg.defaults')}</div><div class="cfg-grid">`
       + `<div class="fg"><label>${t('cfg.ivaPercent')}</label><input type="number" id="cfgIva" value="${s.defaultIva}" min="0" max="100" step="1"></div>`
       + `<div class="fg"><label>${t('cfg.irpfPercent')}</label><input type="number" id="cfgIrpf" value="${s.defaultIrpf}" min="0" max="100" step="1"></div>`
+      + `<div class="fg"><label>${t('cfg.dueDays')}</label><input type="number" id="cfgDiasVenc" value="${s.diasVencimiento || 30}" min="0" max="365" step="1"></div>`
       + `<div class="cfg-full fg"><label>${t('cfg.beneficiary')}</label><input type="text" id="cfgBenef" placeholder="${t('ph.beneficiary')}" value="${esc(em.beneficiarioPago || '')}"></div>`
       + `<div class="cfg-full fg"><label>${t('cfg.bankAccount')}</label><input type="text" id="cfgPago" placeholder="${t('ph.bankAccount')}" value="${esc(em.instruccionesPago || '')}"></div>`
       + `<div class="cfg-full fg"><label>${t('cfg.defaultSubject')}</label><input type="text" id="cfgConcepto" value="${esc(s.conceptoDefault || '')}" placeholder="${t('ph.defaultSubject')}"><label style="font-size:.82rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;margin-top:.45rem;text-transform:none;letter-spacing:0;color:var(--t2);white-space:nowrap"><input type="checkbox" id="cfgConceptoCl" style="margin:0;width:14px;height:14px;accent-color:var(--ac)" ${s.conceptoAppendCliente ? 'checked' : ''}>${t('cfg.appendClientName')}</label></div>`
@@ -385,6 +386,7 @@ Object.assign(App, {
     s.emisor.instruccionesPago = document.getElementById('cfgPago').value.trim();
     s.conceptoDefault = document.getElementById('cfgConcepto').value.trim();
     s.conceptoAppendCliente = document.getElementById('cfgConceptoCl').checked;
+    s.diasVencimiento = parseInt(document.getElementById('cfgDiasVenc').value) || 30;
 
     const oldIva = s.defaultIva;
     const oldIrpf = s.defaultIrpf;
@@ -474,13 +476,16 @@ Object.assign(App, {
       ? `<div class="cl-list">${ps.map(p => {
           const f = p.facturacion, reg = this._facReg(p.id);
           const anulada = !!reg && (reg.eventos || []).some(e => e.tipo === 'anulada');
-          const st = anulada ? ['void', 'var(--bad)'] : f.pagado ? ['paid', 'var(--ok)'] : ['pending', 'var(--warn)'];
+          const dv = B.diasVencida(f, D.d.settings.diasVencimiento, todayStr());
+          const st = anulada ? ['void', 'var(--bad)'] : f.pagado ? ['paid', 'var(--ok)'] : dv > 0 ? ['overdue', 'var(--bad)'] : ['pending', 'var(--warn)'];
+          const stLabel = t('fac.st.' + st[0])
+            + (st[0] === 'overdue' ? ' · ' + t('fac.overdueDays', dv) : st[0] === 'pending' ? ' · ' + t('fac.dueOn', fmtDate(B.vencimiento(f, D.d.settings.diasVencimiento))) : '');
           return `<div class="cl-item">`
             + `<span class="cl-nif" style="font-family:'DM Mono',monospace;font-size:.78rem;color:var(--t1)${anulada ? ';text-decoration:line-through;opacity:.6' : ''}">${esc(String(f.facturaNum))}/${yearShort(f.facturaFecha)}</span>`
             + `<span class="cl-nif" style="font-size:.72rem">${fmtDate(f.facturaFecha)}</span>`
             + `<span class="cl-name"><a href="#" onclick="event.preventDefault();App.go('det','${p.id}')" style="color:inherit;text-decoration:none">${esc(clienteName(p) || t('fac.noClient'))} <span style="color:var(--t3)">· ${esc(p.nombre)}</span></a></span>`
             + `<span class="cl-nif" style="font-size:.78rem;color:var(--t1)">${fmtMoney(f.totalFactura || 0)}</span>`
-            + `<span class="cl-nif" style="font-size:.68rem;color:${st[1]}">${t('fac.st.' + st[0])}</span>`
+            + `<span class="cl-nif" style="font-size:.68rem;color:${st[1]}">${stLabel}</span>`
             + `<div class="cl-actions"><button class="cl-btn" onclick="App.facPdf('${p.id}')" title="${t('btn.downloadPdf')}">&#9113;</button>`
             + (reg && !anulada ? `<button class="cl-btn cl-btn-del" onclick="App.anularFactura('${reg.id}')" title="${t('cfg.vfAnular')}">&times;</button>` : '')
             + `</div></div>`;

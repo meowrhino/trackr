@@ -49,6 +49,21 @@ Object.assign(App, {
     this._rDinGastos();
     this._rDinTrim();
     this._rDinRenta();
+    /* Pestañas: el resumen (dinFin) siempre arriba; debajo, una sección cada vez */
+    const tab = this.dinTab();
+    const tabs = [['ing', t('din.income'), ['dinIngresos']], ['gas', t('din.expenses'), ['dinGastos']], ['fis', t('din.tabTax'), ['dinTrim', 'dinRenta']]];
+    document.getElementById('dinTabs').innerHTML = tabs.map(([k, l]) =>
+      `<button class="fb ${tab === k ? 'on' : ''}" onclick="App.st('${k}')">${l}</button>`).join('');
+    tabs.forEach(([k, , ids]) => ids.forEach(id => { document.getElementById(id).style.display = tab === k ? '' : 'none'; }));
+  },
+  dinTab() {
+    if (!this._dt) { try { this._dt = localStorage.getItem('trackr_din_tab') || 'ing'; } catch (e) { this._dt = 'ing'; } }
+    return this._dt;
+  },
+  st(k) {
+    this._dt = k;
+    try { localStorage.setItem('trackr_din_tab', k); } catch (e) { /* sin storage: solo esta sesión */ }
+    this.rGas();
   },
 
   /* ── Helpers periodo ── */

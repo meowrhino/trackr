@@ -85,6 +85,21 @@ const B={
   },
 
   /* Cantidad pendiente de cobro */
+  /** Fecha de vencimiento: fecha de factura + días de pago. null si no hay factura. */
+  vencimiento(f, dias) {
+    if (!f || !f.facturaFecha) return null;
+    const d = new Date(f.facturaFecha + 'T00:00:00');
+    d.setDate(d.getDate() + (dias || 30));
+    /* En local, no toISOString(): en Madrid eso resta un día */
+    const pad = n => String(n).padStart(2, '0');
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  },
+  /** Días desde el vencimiento (>0 vencida, ≤0 en plazo); null si no facturada o ya pagada. */
+  diasVencida(f, dias, hoy) {
+    const v = this.vencimiento(f, dias);
+    if (!v || f.pagado) return null;
+    return Math.round((new Date(hoy + 'T00:00:00') - new Date(v + 'T00:00:00')) / 864e5);
+  },
   pendiente(p) {
     return Math.max((p.facturacion.totalFactura || 0) - this.totalCobrado(p), 0);
   },

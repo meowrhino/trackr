@@ -31,7 +31,8 @@ Object.assign(App, {
     ps.forEach(p => {
       const f = p.facturacion;
       if ((p.estado === 'completado' || p.estado === 'abandonado') && f.facturaFecha && !f.pagado) {
-        als.push({ t: t('info.pendingPaymentAlert', p.nombre), id: p.id });
+        const dv = B.diasVencida(f, D.d.settings.diasVencimiento, todayStr());
+        als.push({ t: t('info.pendingPaymentAlert', p.nombre) + (dv > 0 ? ' · ' + t('fac.overdueDays', dv) : ''), id: p.id });
       }
     });
     document.getElementById('dAl').innerHTML = als.map(a =>
