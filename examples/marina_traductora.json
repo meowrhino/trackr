@@ -7,7 +7,8 @@
       "direccion1": "Carrer de Colón 32, 3r",
       "direccion2": "46004 València",
       "nif": "B98765432",
-      "color": "Teal"
+      "color": "Teal",
+      "notas": "Pagan a 60 días desde factura, siempre puntuales. Prefieren glosario compartido en Drive. Contacto: Laura (edición)."
     },
     {
       "id": "c202-xc33-yd44",
@@ -24,7 +25,8 @@
       "direccion2": "10117 Berlin, Alemania",
       "nif": "DE312456789",
       "zonaFiscal": "ue",
-      "color": "DodgerBlue"
+      "color": "DodgerBlue",
+      "notas": "Intracomunitario (ROI). Las facturas van en inglés y sin IVA. Piden número de pedido (PO) en cada factura."
     },
     {
       "id": "c204-xg77-yh88",
@@ -49,7 +51,8 @@
       "direccion2": "0184 Oslo, Noruega",
       "nif": "NO987654321",
       "zonaFiscal": "noue",
-      "color": "SteelBlue"
+      "color": "SteelBlue",
+      "notas": "Fuera de la UE: factura sin IVA. Pagan por transferencia internacional, ~25 € de comisión que ya tengo en cuenta en el presupuesto."
     },
     {
       "id": "c207-xm33-yn44",
@@ -57,7 +60,8 @@
       "direccion1": "Rue de la Loi 175",
       "direccion2": "1048 Bruselas, Bélgica",
       "nif": "BE0123456789",
-      "color": "Gold"
+      "color": "Gold",
+      "notas": "Subcontrata: ellos facturan al cliente final. Tarifa cerrada por palabra, no por hora."
     }
   ],
   "projects": [
@@ -90,7 +94,16 @@
         "fechaPago": "2025-09-01",
         "gastos": 0,
         "facturaNum": 1,
-        "facturaFecha": "2025-08-10"
+        "facturaFecha": "2025-08-10",
+        "cobros": [
+          {
+            "id": "cb-p201-m1m1-n2n2-1",
+            "fecha": "2025-09-01",
+            "cantidad": 1484,
+            "metodo": "transferencia"
+          }
+        ],
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -464,7 +477,16 @@
         "fechaPago": "2026-10-15",
         "gastos": 0,
         "facturaNum": 6,
-        "facturaFecha": "2026-10-01"
+        "facturaFecha": "2026-10-01",
+        "cobros": [
+          {
+            "id": "cb-p203-q5q5-r6r6-1",
+            "fecha": "2026-10-15",
+            "cantidad": 636,
+            "metodo": "tarjeta"
+          }
+        ],
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -700,7 +722,22 @@
         "fechaPago": "2026-06-15",
         "gastos": 35,
         "facturaNum": 7,
-        "facturaFecha": "2026-05-15"
+        "facturaFecha": "2026-05-15",
+        "cobros": [
+          {
+            "id": "cb-p204-s7s7-t8t8-1",
+            "fecha": "2026-05-01",
+            "cantidad": 1602,
+            "metodo": "transferencia"
+          },
+          {
+            "id": "cb-p204-s7s7-t8t8-2",
+            "fecha": "2026-06-15",
+            "cantidad": 2403,
+            "metodo": "transferencia"
+          }
+        ],
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -857,7 +894,11 @@
         }
       ],
       "notas": "Novela italiana contemporánea, IT→ES. ~280 páginas. IVA reducido 4% por ser traducción literaria. Pausada por revisión editorial, retomada en abril.",
-      "journeyStage": "jst-revision"
+      "journeyStage": "jst-revision",
+      "presupuesto": {
+        "num": 2,
+        "fecha": "2025-11-11"
+      }
     },
     {
       "id": "p205-u9u9-v0v0",
@@ -888,7 +929,16 @@
         "fechaPago": "2026-10-15",
         "gastos": 0,
         "facturaNum": 8,
-        "facturaFecha": "2026-10-01"
+        "facturaFecha": "2026-10-01",
+        "cobros": [
+          {
+            "id": "cb-p205-u9u9-v0v0-1",
+            "fecha": "2026-10-15",
+            "cantidad": 477,
+            "metodo": "transferencia"
+          }
+        ],
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -1052,7 +1102,16 @@
         "fechaPago": "2025-10-15",
         "gastos": 0,
         "facturaNum": 2,
-        "facturaFecha": "2025-09-25"
+        "facturaFecha": "2025-09-25",
+        "cobros": [
+          {
+            "id": "cb-p206-w1w1-x2x2-1",
+            "fecha": "2025-10-15",
+            "cantidad": 950,
+            "metodo": "tarjeta"
+          }
+        ],
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -1345,7 +1404,11 @@
         }
       ],
       "notas": "Empresa cerró operaciones inesperadamente. 8h trabajadas sin cobrar.",
-      "journeyStage": "jst-presupuesto"
+      "journeyStage": "jst-presupuesto",
+      "presupuesto": {
+        "num": 1,
+        "fecha": "2025-08-26"
+      }
     },
     {
       "id": "p209-c7c7-d8d8",
@@ -1376,7 +1439,16 @@
         "fechaPago": "2026-12-20",
         "gastos": 0,
         "facturaNum": 9,
-        "facturaFecha": "2026-11-20"
+        "facturaFecha": "2026-11-20",
+        "cobros": [
+          {
+            "id": "cb-p209-c7c7-d8d8-1",
+            "fecha": "2026-12-20",
+            "cantidad": 2120,
+            "metodo": "transferencia"
+          }
+        ],
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -1445,7 +1517,11 @@
         }
       ],
       "notas": "Catálogo premium de vinos del Priorat para exportación. 35 fichas + textos web + tasting notes.",
-      "journeyStage": "jst-revision"
+      "journeyStage": "jst-revision",
+      "presupuesto": {
+        "num": 3,
+        "fecha": "2026-09-11"
+      }
     },
     {
       "id": "p210-e9e9-f0f0",
@@ -1710,7 +1786,16 @@
         "fechaPago": "2028-01-15",
         "gastos": 0,
         "facturaNum": 14,
-        "facturaFecha": "2028-01-02"
+        "facturaFecha": "2028-01-02",
+        "cobros": [
+          {
+            "id": "cb-p211-g1g1-h2h2-1",
+            "fecha": "2028-01-15",
+            "cantidad": 636,
+            "metodo": "transferencia"
+          }
+        ],
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -1938,7 +2023,22 @@
         "fechaPago": "2027-11-15",
         "gastos": 0,
         "facturaNum": 13,
-        "facturaFecha": "2027-10-15"
+        "facturaFecha": "2027-10-15",
+        "cobros": [
+          {
+            "id": "cb-p212-i3i3-j4j4-1",
+            "fecha": "2027-10-01",
+            "cantidad": 2136,
+            "metodo": "transferencia"
+          },
+          {
+            "id": "cb-p212-i3i3-j4j4-2",
+            "fecha": "2027-11-15",
+            "cantidad": 3204,
+            "metodo": "transferencia"
+          }
+        ],
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -2079,7 +2179,11 @@
         }
       ],
       "notas": "Segunda novela IT→ES para Mediterráneo. 350 páginas, más compleja. La primera novela recibió excelentes reseñas.",
-      "journeyStage": "jst-revision"
+      "journeyStage": "jst-revision",
+      "presupuesto": {
+        "num": 4,
+        "fecha": "2027-02-09"
+      }
     },
     {
       "id": "p213-k5k5-l6l6",
@@ -2376,7 +2480,11 @@
         }
       ],
       "notas": "App de salud digital noruega. Localización continua NO→ES, y desde 2028 también NO→CA. Segundo cliente internacional más estable.",
-      "journeyStage": "jst-presupuesto"
+      "journeyStage": "jst-presupuesto",
+      "presupuesto": {
+        "num": 5,
+        "fecha": "2027-03-12"
+      }
     },
     {
       "id": "p214-m7m7-n8n8",
@@ -2650,7 +2758,16 @@
         "fechaPago": "2029-07-15",
         "gastos": 0,
         "facturaNum": 20,
-        "facturaFecha": "2029-07-01"
+        "facturaFecha": "2029-07-01",
+        "cobros": [
+          {
+            "id": "cb-p215-o9o9-p0p0-1",
+            "fecha": "2029-07-15",
+            "cantidad": 371,
+            "metodo": "tarjeta"
+          }
+        ],
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -2830,7 +2947,16 @@
         "fechaPago": "2028-10-15",
         "gastos": 0,
         "facturaNum": 18,
-        "facturaFecha": "2028-10-01"
+        "facturaFecha": "2028-10-01",
+        "cobros": [
+          {
+            "id": "cb-p216-q1q1-r2r2-1",
+            "fecha": "2028-10-15",
+            "cantidad": 530,
+            "metodo": "bizum"
+          }
+        ],
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -3134,7 +3260,22 @@
         "fechaPago": "2029-06-15",
         "gastos": 0,
         "facturaNum": 19,
-        "facturaFecha": "2029-05-10"
+        "facturaFecha": "2029-05-10",
+        "cobros": [
+          {
+            "id": "cb-p218-u5u5-v6v6-1",
+            "fecha": "2029-05-01",
+            "cantidad": 1958,
+            "metodo": "transferencia"
+          },
+          {
+            "id": "cb-p218-u5u5-v6v6-2",
+            "fecha": "2029-06-15",
+            "cantidad": 2937,
+            "metodo": "transferencia"
+          }
+        ],
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -3251,7 +3392,11 @@
         }
       ],
       "notas": "Libro de no-ficción: gastronomía italiana. IT→ES. 250 páginas + recetas + glosario. IVA 4% literario.",
-      "journeyStage": "jst-entregado"
+      "journeyStage": "jst-entregado",
+      "presupuesto": {
+        "num": 6,
+        "fecha": "2028-07-12"
+      }
     },
     {
       "id": "p219-w7w7-x8x8",
@@ -3282,7 +3427,22 @@
         "fechaPago": "2029-12-20",
         "gastos": 0,
         "facturaNum": 22,
-        "facturaFecha": "2029-11-25"
+        "facturaFecha": "2029-11-25",
+        "cobros": [
+          {
+            "id": "cb-p219-w7w7-x8x8-1",
+            "fecha": "2029-11-05",
+            "cantidad": 3200,
+            "metodo": "transferencia"
+          },
+          {
+            "id": "cb-p219-w7w7-x8x8-2",
+            "fecha": "2029-12-20",
+            "cantidad": 4800,
+            "metodo": "transferencia"
+          }
+        ],
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -3383,7 +3543,11 @@
         }
       ],
       "notas": "Subcontrata para traducción institucional EU. Documentos de política digital + regulación IA + sostenibilidad. EN→ES y EN→FR. Exento IVA intracomunitario.",
-      "journeyStage": "jst-cobrado"
+      "journeyStage": "jst-cobrado",
+      "presupuesto": {
+        "num": 7,
+        "fecha": "2029-06-11"
+      }
     },
     {
       "id": "p220-y9y9-z0z0",
@@ -3607,7 +3771,11 @@
         }
       ],
       "notas": "Segundo proyecto EU-Translate. Regulación IA ampliada. 10.000€. EN→ES y EN→FR. Mayor que el primero.",
-      "journeyStage": "jst-contacto"
+      "journeyStage": "jst-contacto",
+      "presupuesto": {
+        "num": 8,
+        "fecha": "2029-12-26"
+      }
     },
     {
       "id": "p222-c3c3-d4d4",
@@ -3707,7 +3875,11 @@
         }
       ],
       "notas": "Cuarta traducción literaria para Mediterráneo. Novela negra IT→ES, 320 págs. 7000€. Marina se ha convertido en su traductora de referencia.",
-      "journeyStage": "jst-presupuesto"
+      "journeyStage": "jst-presupuesto",
+      "presupuesto": {
+        "num": 9,
+        "fecha": "2030-01-12"
+      }
     }
   ],
   "gastos": [
@@ -4378,64 +4550,77 @@
         {
           "id": "ge203-01",
           "fecha": "2025-09-15",
-          "cantidad": 180,
+          "cantidad": 157.69,
           "nota": "Revisión web Solera FR",
-          "total": 180,
+          "total": 157.69,
           "iva": 31.24,
           "base": 148.76,
-          "tipoIva": 21
+          "tipoIva": 21,
+          "tipoIrpf": 15,
+          "irpf": 22.31
         },
         {
           "id": "ge203-02",
           "fecha": "2027-03-20",
-          "cantidad": 250,
+          "cantidad": 219.01,
           "nota": "Revisión TechBridge FR — help center",
-          "total": 250,
+          "total": 219.01,
           "iva": 43.39,
           "base": 206.61,
-          "tipoIva": 21
+          "tipoIva": 21,
+          "tipoIrpf": 15,
+          "irpf": 30.99
         },
         {
           "id": "ge203-03",
           "fecha": "2028-06-15",
-          "cantidad": 300,
+          "cantidad": 262.81,
           "nota": "Subcontrata TechBridge FR volumen alto",
-          "total": 300,
+          "total": 262.81,
           "iva": 52.07,
           "base": 247.93,
-          "tipoIva": 21
+          "tipoIva": 21,
+          "tipoIrpf": 15,
+          "irpf": 37.19
         },
         {
           "id": "ge203-04",
           "fecha": "2028-12-10",
-          "cantidad": 350,
+          "cantidad": 306.61,
           "nota": "Subcontrata TechBridge FR Q4",
-          "total": 350,
+          "total": 306.61,
           "iva": 60.74,
           "base": 289.26,
-          "tipoIva": 21
+          "tipoIva": 21,
+          "tipoIrpf": 15,
+          "irpf": 43.39
         },
         {
           "id": "ge203-05",
           "fecha": "2029-06-15",
-          "cantidad": 400,
+          "cantidad": 350.41,
           "nota": "Subcontrata EU-Translate revisión FR",
-          "total": 400,
+          "total": 350.41,
           "iva": 69.42,
           "base": 330.58,
-          "tipoIva": 21
+          "tipoIva": 21,
+          "tipoIrpf": 15,
+          "irpf": 49.59
         },
         {
           "id": "ge203-06",
           "fecha": "2030-03-20",
-          "cantidad": 450,
+          "cantidad": 394.21,
           "nota": "Subcontrata EU-Translate proyecto 2 FR",
-          "total": 450,
+          "total": 394.21,
           "iva": 78.1,
           "base": 371.9,
-          "tipoIva": 21
+          "tipoIva": 21,
+          "tipoIrpf": 15,
+          "irpf": 55.79
         }
-      ]
+      ],
+      "tipoIrpf": 15
     },
     {
       "id": "g201-0004",
@@ -5758,7 +5943,8 @@
       "horasSemana": 30
     },
     "nextFacturaNum": 26,
-    "tema": "monokai"
+    "tema": "monokai",
+    "nextPresupuestoNum": 10
   },
   "journey": {
     "stages": [

@@ -8,7 +8,8 @@
       "direccion1": "Carrer del Rec 42",
       "direccion2": "08003 Barcelona",
       "nif": "47123456B",
-      "color": "MediumPurple"
+      "color": "MediumPurple",
+      "notas": "Paga en dos plegues: 50% a l'inici i 50% a l'entrega del màster. Sempre per transferència."
     },
     {
       "id": "c302-cc33-dd44",
@@ -26,7 +27,8 @@
       "direccion1": "Plaça del Vi 1",
       "direccion2": "17004 Girona",
       "nif": "P1707900B",
-      "color": "Gold"
+      "color": "Gold",
+      "notas": "Administració pública: cal factura electrònica (FACe) i triguen uns 90 dies a pagar."
     },
     {
       "id": "c304-gg77-hh88",
@@ -62,7 +64,8 @@
       "direccion1": "Paseo de la Castellana 77",
       "direccion2": "28046 Madrid",
       "nif": "B87990011",
-      "color": "IndianRed"
+      "color": "IndianRed",
+      "notas": "Contracte amb cessió de drets. Factura en anglès. Pagament a 45 dies, sense excepcions."
     },
     {
       "id": "c308-oo55-pp66",
@@ -116,12 +119,14 @@
           {
             "id": "cb301-01",
             "fecha": "2026-02-01",
-            "cantidad": 1500
+            "cantidad": 1500,
+            "metodo": "transferencia"
           },
           {
             "id": "cb301-02",
             "fecha": "2026-05-01",
-            "cantidad": 1475
+            "cantidad": 1475,
+            "metodo": "transferencia"
           }
         ],
         "facturaNum": 3,
@@ -227,7 +232,11 @@
         }
       ],
       "notas": "EP de 3 tracks: pop electrònic. Cobro parcial: 50% al començar, 50% al entregar master. Gran èxit!",
-      "journeyStage": "jst-mescla"
+      "journeyStage": "jst-mescla",
+      "presupuesto": {
+        "num": 1,
+        "fecha": "2025-12-26"
+      }
     },
     {
       "id": "p302-m2m2-n2n2",
@@ -261,7 +270,8 @@
           {
             "id": "cb302-01",
             "fecha": "2026-03-20",
-            "cantidad": 680
+            "cantidad": 680,
+            "metodo": "transferencia"
           }
         ],
         "facturaNum": 4,
@@ -337,7 +347,8 @@
           {
             "id": "cb303-01",
             "fecha": "2026-08-12",
-            "cantidad": 1700
+            "cantidad": 1700,
+            "metodo": "transferencia"
           }
         ],
         "facturaNum": 5,
@@ -403,7 +414,11 @@
         }
       ],
       "notas": "Actuació festival estiu. IVA 10%. Pagament a 30 dies post-event.",
-      "journeyStage": "jst-publicat"
+      "journeyStage": "jst-publicat",
+      "presupuesto": {
+        "num": 2,
+        "fecha": "2026-01-12"
+      }
     },
     {
       "id": "p304-m4m4-n4n4",
@@ -437,7 +452,8 @@
           {
             "id": "cb304-01",
             "fecha": "2025-12-15",
-            "cantidad": 510
+            "cantidad": 510,
+            "metodo": "transferencia"
           }
         ],
         "facturaNum": 2,
@@ -1077,12 +1093,14 @@
           {
             "id": "cb307-01",
             "fecha": "2026-06-15",
-            "cantidad": 2125
+            "cantidad": 2125,
+            "metodo": "transferencia"
           },
           {
             "id": "cb307-02",
             "fecha": "2027-04-15",
-            "cantidad": 2125
+            "cantidad": 2125,
+            "metodo": "transferencia"
           }
         ],
         "facturaNum": 7,
@@ -1220,7 +1238,11 @@
         }
       ],
       "notas": "Àlbum complet 10 tracks. Cantautor electrònic. Recomanat per Samantha Vega. Gran producció.",
-      "journeyStage": "jst-publicat"
+      "journeyStage": "jst-publicat",
+      "presupuesto": {
+        "num": 3,
+        "fecha": "2026-05-12"
+      }
     },
     {
       "id": "p308-m8m8-n8n8",
@@ -1250,10 +1272,18 @@
         "pagado": true,
         "fechaPago": "2029-07-15",
         "gastos": 0,
-        "cobros": [],
+        "cobros": [
+          {
+            "id": "cb-p308-m8m8-n8n8-1",
+            "fecha": "2029-07-15",
+            "cantidad": 570,
+            "metodo": "transferencia"
+          }
+        ],
         "facturaNum": 20,
         "facturaFecha": "2029-07-01",
-        "idiomaFactura": null
+        "idiomaFactura": null,
+        "_cobrosV3": true
       },
       "horas": [
         {
@@ -1532,7 +1562,8 @@
           {
             "id": "cb309-01",
             "fecha": "2027-08-10",
-            "cantidad": 2125
+            "cantidad": 2125,
+            "metodo": "transferencia"
           }
         ],
         "facturaNum": 8,
@@ -1582,7 +1613,11 @@
         }
       ],
       "notas": "Segon any al Cruïlla. Escenari més gran, slot de 90 min. 2500€.",
-      "journeyStage": "jst-entrega"
+      "journeyStage": "jst-entrega",
+      "presupuesto": {
+        "num": 4,
+        "fecha": "2027-02-09"
+      }
     },
     {
       "id": "p310-m10m-n10n",
@@ -1616,7 +1651,8 @@
           {
             "id": "cb310-01",
             "fecha": "2027-09-15",
-            "cantidad": 1020
+            "cantidad": 1020,
+            "metodo": "transferencia"
           }
         ],
         "facturaNum": 9,
@@ -1716,12 +1752,14 @@
           {
             "id": "cb311-01",
             "fecha": "2027-04-15",
-            "cantidad": 1700
+            "cantidad": 1700,
+            "metodo": "transferencia"
           },
           {
             "id": "cb311-02",
             "fecha": "2027-12-15",
-            "cantidad": 1700
+            "cantidad": 1700,
+            "metodo": "transferencia"
           }
         ],
         "facturaNum": 10,
@@ -1819,7 +1857,11 @@
         }
       ],
       "notas": "Primer àlbum per Llum Records. Artista: Noa Serra. Pop indie, 8 tracks.",
-      "journeyStage": "jst-mescla"
+      "journeyStage": "jst-mescla",
+      "presupuesto": {
+        "num": 5,
+        "fecha": "2027-03-12"
+      }
     },
     {
       "id": "p312-m12m-n12n",
@@ -1853,7 +1895,8 @@
           {
             "id": "cb312-01",
             "fecha": "2028-08-12",
-            "cantidad": 2550
+            "cantidad": 2550,
+            "metodo": "transferencia"
           }
         ],
         "facturaNum": 12,
@@ -1911,7 +1954,11 @@
         }
       ],
       "notas": "Tercer Cruïlla. Doble funció: actuació + sound design escenari electrònic. 3000€.",
-      "journeyStage": "jst-entrega"
+      "journeyStage": "jst-entrega",
+      "presupuesto": {
+        "num": 7,
+        "fecha": "2028-02-10"
+      }
     },
     {
       "id": "p313-m13m-n13n",
@@ -1945,12 +1992,14 @@
           {
             "id": "cb313-01",
             "fecha": "2028-10-15",
-            "cantidad": 3400
+            "cantidad": 3400,
+            "metodo": "transferencia"
           },
           {
             "id": "cb313-02",
             "fecha": "2029-02-28",
-            "cantidad": 3400
+            "cantidad": 3400,
+            "metodo": "transferencia"
           }
         ],
         "facturaNum": 14,
@@ -2032,7 +2081,11 @@
         }
       ],
       "notas": "Primer encàrrec Netflix — via contacte Llum Records. Soundtrack curt documental sobre música urbana BCN. 8000€!",
-      "journeyStage": "jst-publicat"
+      "journeyStage": "jst-publicat",
+      "presupuesto": {
+        "num": 8,
+        "fecha": "2028-09-11"
+      }
     },
     {
       "id": "p314-m14m-n14n",
@@ -2066,12 +2119,14 @@
           {
             "id": "cb314-01",
             "fecha": "2028-02-15",
-            "cantidad": 1487.5
+            "cantidad": 1487.5,
+            "metodo": "transferencia"
           },
           {
             "id": "cb314-02",
             "fecha": "2028-10-15",
-            "cantidad": 1487.5
+            "cantidad": 1487.5,
+            "metodo": "transferencia"
           }
         ],
         "facturaNum": 11,
@@ -2137,7 +2192,11 @@
         }
       ],
       "notas": "Lot de singles per artistes Llum 2028. 3 singles + 1 remix.",
-      "journeyStage": "jst-mescla"
+      "journeyStage": "jst-mescla",
+      "presupuesto": {
+        "num": 6,
+        "fecha": "2028-01-12"
+      }
     },
     {
       "id": "p315-m15m-n15n",
@@ -2171,7 +2230,8 @@
           {
             "id": "cb315-01",
             "fecha": "2029-04-15",
-            "cantidad": 425
+            "cantidad": 425,
+            "metodo": "transferencia"
           }
         ],
         "facturaNum": 16,
@@ -2231,7 +2291,8 @@
           {
             "id": "cb316-01",
             "fecha": "2029-07-07",
-            "cantidad": 2550
+            "cantidad": 2550,
+            "metodo": "transferencia"
           }
         ],
         "facturaNum": 17,
@@ -2281,7 +2342,11 @@
         }
       ],
       "notas": "Primera actuació al Primavera Sound. Escenari electrònic. 3000€. Gran fita!",
-      "journeyStage": "jst-publicat"
+      "journeyStage": "jst-publicat",
+      "presupuesto": {
+        "num": 9,
+        "fecha": "2029-02-09"
+      }
     },
     {
       "id": "p317-m17m-n17n",
@@ -2315,17 +2380,20 @@
           {
             "id": "cb317-01",
             "fecha": "2029-07-15",
-            "cantidad": 3400
+            "cantidad": 3400,
+            "metodo": "transferencia"
           },
           {
             "id": "cb317-02",
             "fecha": "2029-09-15",
-            "cantidad": 3400
+            "cantidad": 3400,
+            "metodo": "transferencia"
           },
           {
             "id": "cb317-03",
             "fecha": "2029-12-20",
-            "cantidad": 3400
+            "cantidad": 3400,
+            "metodo": "transferencia"
           }
         ],
         "facturaNum": 19,
@@ -2423,7 +2491,11 @@
         }
       ],
       "notas": "Segon Netflix — sèrie documental 4 episodis sobre cultura mediterrània. 12.000€. Gran projecte!",
-      "journeyStage": "jst-mescla"
+      "journeyStage": "jst-mescla",
+      "presupuesto": {
+        "num": 11,
+        "fecha": "2029-06-11"
+      }
     },
     {
       "id": "p318-m18m-n18n",
@@ -2457,7 +2529,8 @@
           {
             "id": "cb318-01",
             "fecha": "2029-08-12",
-            "cantidad": 2975
+            "cantidad": 2975,
+            "metodo": "transferencia"
           }
         ],
         "facturaNum": 18,
@@ -2515,7 +2588,11 @@
         }
       ],
       "notas": "Quart any al Cruïlla. Headliner escenari electrònic! 3500€.",
-      "journeyStage": "jst-entrega"
+      "journeyStage": "jst-entrega",
+      "presupuesto": {
+        "num": 10,
+        "fecha": "2029-03-12"
+      }
     },
     {
       "id": "p319-m19m-n19n",
@@ -2549,7 +2626,8 @@
           {
             "id": "cb319-01",
             "fecha": "2030-02-01",
-            "cantidad": 2550
+            "cantidad": 2550,
+            "metodo": "transferencia"
           }
         ],
         "facturaNum": null,
@@ -2631,7 +2709,11 @@
         }
       ],
       "notas": "Gran àlbum per l'artista estrella de Llum Records. 12 tracks. 6000€. La producció més gran fins ara.",
-      "journeyStage": "jst-proposta"
+      "journeyStage": "jst-proposta",
+      "presupuesto": {
+        "num": 12,
+        "fecha": "2029-12-26"
+      }
     },
     {
       "id": "p320-m20m-n20n",
@@ -2693,7 +2775,11 @@
         }
       ],
       "notas": "Segon Primavera Sound. Escenari més gran. 4000€. Puja de caché!",
-      "journeyStage": "jst-preprod"
+      "journeyStage": "jst-preprod",
+      "presupuesto": {
+        "num": 13,
+        "fecha": "2030-02-09"
+      }
     },
     {
       "id": "p321-m21m-n21n",
@@ -2727,7 +2813,8 @@
           {
             "id": "cb321-01",
             "fecha": "2030-03-15",
-            "cantidad": 4250
+            "cantidad": 4250,
+            "metodo": "transferencia"
           }
         ],
         "facturaNum": null,
@@ -2785,7 +2872,11 @@
         }
       ],
       "notas": "Tercer Netflix — llargmetratge documental. 15.000€. Consolidació com a compositora audiovisual.",
-      "journeyStage": "jst-gravacio"
+      "journeyStage": "jst-gravacio",
+      "presupuesto": {
+        "num": 14,
+        "fecha": "2030-02-09"
+      }
     }
   ],
   "gastos": [
@@ -4505,126 +4596,153 @@
       "entradas": [
         {
           "fecha": "2029-06-01",
-          "cantidad": 300,
+          "cantidad": 262.81,
           "nota": "Primer mes",
-          "total": 300,
+          "total": 262.81,
           "iva": 52.07,
           "base": 247.93,
-          "tipoIva": 21
+          "tipoIva": 21,
+          "tipoIrpf": 15,
+          "irpf": 37.19
         },
         {
           "fecha": "2029-07-01",
-          "cantidad": 300,
+          "cantidad": 262.81,
           "nota": "",
-          "total": 300,
+          "total": 262.81,
           "iva": 52.07,
           "base": 247.93,
-          "tipoIva": 21
+          "tipoIva": 21,
+          "tipoIrpf": 15,
+          "irpf": 37.19
         },
         {
           "fecha": "2029-08-01",
-          "cantidad": 300,
+          "cantidad": 262.81,
           "nota": "",
-          "total": 300,
+          "total": 262.81,
           "iva": 52.07,
           "base": 247.93,
-          "tipoIva": 21
+          "tipoIva": 21,
+          "tipoIrpf": 15,
+          "irpf": 37.19
         },
         {
           "fecha": "2029-09-01",
-          "cantidad": 300,
+          "cantidad": 262.81,
           "nota": "",
-          "total": 300,
+          "total": 262.81,
           "iva": 52.07,
           "base": 247.93,
-          "tipoIva": 21
+          "tipoIva": 21,
+          "tipoIrpf": 15,
+          "irpf": 37.19
         },
         {
           "fecha": "2029-10-01",
-          "cantidad": 300,
+          "cantidad": 262.81,
           "nota": "",
-          "total": 300,
+          "total": 262.81,
           "iva": 52.07,
           "base": 247.93,
-          "tipoIva": 21
+          "tipoIva": 21,
+          "tipoIrpf": 15,
+          "irpf": 37.19
         },
         {
           "fecha": "2029-11-01",
-          "cantidad": 300,
+          "cantidad": 262.81,
           "nota": "",
-          "total": 300,
+          "total": 262.81,
           "iva": 52.07,
           "base": 247.93,
-          "tipoIva": 21
+          "tipoIva": 21,
+          "tipoIrpf": 15,
+          "irpf": 37.19
         },
         {
           "fecha": "2029-12-01",
-          "cantidad": 300,
+          "cantidad": 262.81,
           "nota": "",
-          "total": 300,
+          "total": 262.81,
           "iva": 52.07,
           "base": 247.93,
-          "tipoIva": 21
+          "tipoIva": 21,
+          "tipoIrpf": 15,
+          "irpf": 37.19
         },
         {
           "fecha": "2030-01-01",
-          "cantidad": 350,
+          "cantidad": 306.61,
           "nota": "Puja 2030",
-          "total": 350,
+          "total": 306.61,
           "iva": 60.74,
           "base": 289.26,
-          "tipoIva": 21
+          "tipoIva": 21,
+          "tipoIrpf": 15,
+          "irpf": 43.39
         },
         {
           "fecha": "2030-02-01",
-          "cantidad": 350,
+          "cantidad": 306.61,
           "nota": "",
-          "total": 350,
+          "total": 306.61,
           "iva": 60.74,
           "base": 289.26,
-          "tipoIva": 21
+          "tipoIva": 21,
+          "tipoIrpf": 15,
+          "irpf": 43.39
         },
         {
           "fecha": "2030-03-01",
-          "cantidad": 350,
+          "cantidad": 306.61,
           "nota": "",
-          "total": 350,
+          "total": 306.61,
           "iva": 60.74,
           "base": 289.26,
-          "tipoIva": 21
+          "tipoIva": 21,
+          "tipoIrpf": 15,
+          "irpf": 43.39
         },
         {
           "fecha": "2030-04-01",
-          "cantidad": 350,
+          "cantidad": 306.61,
           "nota": "",
-          "total": 350,
+          "total": 306.61,
           "iva": 60.74,
           "base": 289.26,
-          "tipoIva": 21
+          "tipoIva": 21,
+          "tipoIrpf": 15,
+          "irpf": 43.39
         },
         {
           "fecha": "2030-05-01",
-          "cantidad": 350,
+          "cantidad": 306.61,
           "nota": "",
-          "total": 350,
+          "total": 306.61,
           "iva": 60.74,
           "base": 289.26,
-          "tipoIva": 21
+          "tipoIva": 21,
+          "tipoIrpf": 15,
+          "irpf": 43.39
         },
         {
           "fecha": "2030-06-01",
-          "cantidad": 350,
+          "cantidad": 306.61,
           "nota": "",
-          "total": 350,
+          "total": 306.61,
           "iva": 60.74,
           "base": 289.26,
-          "tipoIva": 21
+          "tipoIva": 21,
+          "tipoIrpf": 15,
+          "irpf": 43.39
         }
       ],
       "color": "CadetBlue",
       "categoria": "personal",
       "periodicidad": "mensual",
-      "desgravable": true
+      "desgravable": true,
+      "tipoIrpf": 15
     },
     {
       "id": "g310-jj10",
@@ -4698,7 +4816,8 @@
     "nombreCompleto": "Ana Ríos García",
     "nif": "43987654K",
     "direccion1": "Carrer de Verdi 78, 2n 1a",
-    "direccion2": "08012 Barcelona"
+    "direccion2": "08012 Barcelona",
+    "nextPresupuestoNum": 15
   },
   "journey": {
     "stages": [
