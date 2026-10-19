@@ -18,6 +18,12 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 - **Editar un presupuesto ya generado** (✎ en Facturas → Presupuestos): fecha, descripción e importes de las líneas; el número no cambia y el total se recalcula. _frontend_
 - **Recordatorio de cobro** (✉ en una factura pendiente): copia al portapapeles un texto con número, importe, fecha, vencimiento y días vencida, en el idioma de la factura, listo para pegar en un email. _frontend_
 - **La guía interna** cuenta ya el Tablero, los presupuestos guardados, el vencimiento y las pestañas de Dineros. _frontend_
+- **Arranque y vuelta** (primera visita y fidelización):
+  - **Lista «Para empezar»** en Info: tus datos de emisor → tu primer cliente y proyecto → tu primera hora o factura. Cada paso abre lo que toca y la lista desaparece sola al completarla (o con la ×).
+  - **Cuenta de ejemplo honesta**: al cargar a Marina, Ana o Dani aparece una banda arriba («Estás viendo el ejemplo de…») con «Empezar con mis datos», que vacía el ejemplo sin volver a enseñar la bienvenida, o × para quedarse con esos datos.
+  - **Próximo plazo del 303/130** en Info («T3 2026: último día mañana»), en ámbar cuando la ventana está abierta; al tocarlo abre Dineros → Fiscal en ese trimestre.
+  - **La primera factura** abre una vez una pantalla para poner los datos a salvo: guardar copia JSON, instalar TRACKR o crear cuenta.
+  - **Aviso de copia** en Info si no hay cuenta, hay datos de verdad y no se ha exportado en 30 días (o nunca). Exportar lo apaga. _frontend_
 
 ### 🔧 Cambiado
 - **El vencimiento sale impreso en el PDF de la factura**, debajo de la fecha (no en el presupuesto). _frontend_

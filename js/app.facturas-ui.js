@@ -175,6 +175,25 @@ Object.assign(App, {
     Fac.download(pid, { fecha, asunto: asunto || defaultAsunto(p), num, verifactu });
     T.ev('action', 'invoice_generate');
     this.cm(); this.rDet(pid);
+    this._firstInvoice();
+  },
+
+  /** La primera factura: el momento de más confianza. Una sola vez: poner los datos a salvo. */
+  _firstInvoice() {
+    let seen = false;
+    try { seen = localStorage.getItem('trackr_first_invoice') === '1'; } catch (e) { /* noop */ }
+    if (seen || D.ps().filter(p => p.facturacion?.facturaNum).length !== 1) return;
+    try { localStorage.setItem('trackr_first_invoice', '1'); } catch (e) { /* noop */ }
+    T.ev('action', 'first_invoice');
+    const pwa = typeof PWA !== 'undefined' && PWA.offerable && PWA.offerable();
+    this.om(`<div class="mt">${t('first.title')}</div>`
+      + `<p style="font-size:.9rem;color:var(--t2);line-height:1.5;margin-bottom:1rem">${t('first.body')}</p>`
+      + `<div style="display:flex;flex-direction:column;gap:.5rem">`
+      + `<button class="bt bt-p" onclick="App.expJson()">${t('first.export')}</button>`
+      + (pwa ? `<button class="bt" onclick="App.cm();PWA.install()">${t('first.install')}</button>` : '')
+      + `<button class="bt" onclick="App.cm();App.accModal()">${t('first.account')}</button>`
+      + `</div>`
+      + `<div class="ma"><button class="bt" onclick="App.cm()">${t('first.later')}</button></div>`);
   },
 
 

@@ -62,5 +62,12 @@ assert.equal(B.diasVencida(f, 30, '2026-10-20'), -11);
 assert.equal(B.diasVencida({ ...f, pagado: true }, 30, '2026-11-05'), null, 'pagada: sin vencimiento');
 assert.equal(B.diasVencida({}, 30, '2026-11-05'), null, 'sin factura: sin vencimiento');
 
+/* Próximo plazo fiscal */
+assert.deepEqual(JSON.parse(JSON.stringify(B.nextTaxDeadline('2026-10-19'))), { label: 'T3 2026', end: '2026-10-20', days: 1, y: 2026, q: 2 });
+assert.equal(B.nextTaxDeadline('2026-10-21').label, 'T4 2026');
+assert.equal(B.nextTaxDeadline('2026-10-21').end, '2027-01-30');
+assert.equal(B.nextTaxDeadline('2027-01-30').days, 0, 'último día cuenta como plazo abierto');
+assert.equal(B.nextTaxDeadline('2027-02-01').label, 'T1 2027');
+
 function roundMoney(v) { return Math.round(v * 100) / 100; }
 console.log('presupuestos.mjs: ok');

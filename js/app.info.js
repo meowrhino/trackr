@@ -7,6 +7,59 @@
 
 Object.assign(App, {
 
+  /* ── Lista de arranque: tres pasos hasta la primera factura. Desaparece sola al completarlos. ── */
+  _onbHtml() {
+    try { if (localStorage.getItem('trackr_onboard_hidden') === '1') return ''; } catch (e) { /* noop */ }
+    const em = D.d.settings.emisor || {};
+    const ps = D.ps();
+    const steps = [
+      { ok: !!(em.nombre && em.nif), key: 'onb.emisor', go: "App.go('cfg')" },
+      { ok: D.d.clientes.length > 0 && ps.length > 0, key: 'onb.project', go: 'App.pModal()' },
+      { ok: ps.some(p => p.horas.length || p.facturacion?.facturaNum), key: 'onb.first', go: "App.go('cal')" }
+    ];
+    if (steps.every(s => s.ok)) return '';
+    return `<div class="info-section"><div class="info-section-title" style="display:flex;justify-content:space-between;align-items:center">`
+      + `<span>${t('onb.title')}</span><span class="pwa-x" onclick="App.onbHide()" title="${t('onb.hide')}" style="cursor:pointer">&times;</span></div><div class="hl">`
+      + steps.map(s => `<div class="hr${s.ok ? '' : ' hr-click'}"${s.ok ? '' : ` onclick="${s.go}"`}>`
+        + `<span class="hr-t">${s.ok ? '✓' : '○'}</span><span class="hr-n"${s.ok ? ' style="opacity:.5;text-decoration:line-through"' : ''}>${t(s.key)}</span>`
+        + (s.ok ? '' : `<span style="color:var(--t3)">&rarr;</span>`) + `</div>`).join('')
+      + `</div></div>`;
+  },
+  onbHide() {
+    try { localStorage.setItem('trackr_onboard_hidden', '1'); } catch (e) { /* noop */ }
+    this.rInfo();
+  },
+
+  /* ── Próximo plazo de 303/130: lo que trae de vuelta cada trimestre ── */
+  _taxHtml(today) {
+    const d = B.nextTaxDeadline(today);
+    const when = d.days === 0 ? t('info.taxToday') : d.days === 1 ? t('info.taxTomorrow', fmtDate(d.end)) : t('info.taxDays', d.days, fmtDate(d.end));
+    const open = d.days <= 20; /* ventana de presentación abierta */
+    return `<div class="als"><div class="al" style="border-left-color:${open ? 'var(--warn)' : 'var(--b2)'}" onclick="App.goTax(${d.y},${d.q})">`
+      + `<span style="color:${open ? 'var(--warn)' : 'var(--t3)'}">${open ? '!' : '◔'}</span>`
+      + `<span style="flex:1">${t('info.taxNext', d.label, when)}</span><span style="color:var(--t3)">&rarr;</span></div></div>`;
+  },
+  goTax(y, q) {
+    this.dinPeriod = 'trim'; this.dinY = y; this.dinM = q * 3;
+    this.st('fis');
+    this.go('gas');
+  },
+
+  /* ── Copia de seguridad: datos solo aquí, sin cuenta y sin exportar en 30 días ── */
+  _backupHtml() {
+    if (this._exampleName()) return '';
+    const hasAccount = typeof Acc !== 'undefined' && Acc.status && Acc.status().email;
+    if (hasAccount) return '';
+    const ps = D.ps();
+    if (ps.length < 2 && !ps.some(p => p.facturacion?.facturaNum)) return '';
+    let last = 0;
+    try { last = parseInt(localStorage.getItem('trackr_last_export'), 10) || 0; } catch (e) { /* noop */ }
+    const days = last ? Math.floor((Date.now() - last) / 864e5) : null;
+    if (days !== null && days < 30) return '';
+    return `<div class="als"><div class="al" onclick="App.expJson()"><span style="color:var(--warn)">!</span>`
+      + `<span style="flex:1">${t('backup.alert', days === null ? '' : t('backup.since', days))}</span><span style="color:var(--t3)">&rarr;</span></div></div>`;
+  },
+
   rInfo() {
     const ps = D.ps();
     const gs = D.gs();
@@ -48,8 +101,8 @@ Object.assign(App, {
     const mainEl = document.getElementById('infoMain');
 
     if (!hasData) {
-      statusEl.innerHTML =
-        `<div class="info-cta">`
+      statusEl.innerHTML = this._onbHtml()
+        + `<div class="info-cta">`
         + `<p class="info-cta-text">${t('info.noProjects')}</p>`
         + `<div class="info-cta-actions">`
         +   `<button class="bt bt-p" onclick="App.pModal()">${t('btn.newProject')}</button>`
@@ -182,7 +235,7 @@ Object.assign(App, {
       dlHtml += `</div></div>`;
     }
 
-    mainEl.innerHTML = actHtml + dlHtml;
+    mainEl.innerHTML = this._taxHtml(today) + this._backupHtml() + this._onbHtml() + actHtml + dlHtml;
 
     /* ── Resumen financiero (reutilizamos el existente) ── */
     this._rInfoFinancial();

@@ -219,6 +219,30 @@ const App = {
     else if (v === 'det') this.rDet(d);
 
     if (viewEl) this._linkLabels(viewEl);
+    this._exampleBanner();
+  },
+
+  /* ── Cuenta de ejemplo: banda arriba mientras se mira, con salida clara ── */
+  EXAMPLE_NAMES: { marina_traductora: 'Marina', ana_musica: 'Ana', dani_formador: 'Dani' },
+  _exampleName() { try { return localStorage.getItem('trackr_example') || ''; } catch (e) { return ''; } },
+  _exampleBanner() {
+    const el = document.getElementById('exampleBanner'); if (!el) return;
+    const name = this._exampleName();
+    if (!name || !D.ps().length) { el.style.display = 'none'; el.innerHTML = ''; return; }
+    el.style.display = '';
+    el.innerHTML = `<span class="pwa-ico">👀</span><span class="pwa-txt">${t('ex.banner', this.EXAMPLE_NAMES[name] || name)}</span>`
+      + `<button class="bt bt-p bt-s" onclick="App.exampleStart()">${t('ex.start')}</button>`
+      + `<button class="pwa-x" onclick="App.exampleKeep()" title="${t('ex.keep')}" aria-label="${t('ex.keep')}">&times;</button>`;
+  },
+  /** Vacía el ejemplo y deja la app lista para los datos propios (sin volver a mostrar la bienvenida) */
+  exampleStart() {
+    T.ev('action', 'example_start_own');
+    try { localStorage.removeItem('trackr_data'); localStorage.removeItem('trackr_example'); localStorage.setItem('trackr_welcomed', '1'); } catch (e) { /* noop */ }
+    location.reload();
+  },
+  exampleKeep() {
+    try { localStorage.removeItem('trackr_example'); } catch (e) { /* noop */ }
+    this._exampleBanner();
   },
 
 
@@ -294,7 +318,9 @@ const App = {
     const now = new Date();
     const ts = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}`;
     a.href = u; a.download = `trackr_backup_${ts}.json`; a.click(); URL.revokeObjectURL(u);
+    try { localStorage.setItem('trackr_last_export', String(Date.now())); } catch (e) { /* noop */ }
     this.cm();
+    if (this.cv === 'info') this.rInfo();
   },
 
   expLibros() {
@@ -343,6 +369,7 @@ const App = {
   resetData() {
     if (!confirm(t('msg.resetConfirm'))) return;
     localStorage.removeItem('trackr_data');
+    localStorage.removeItem('trackr_example');
     location.reload();
   },
 
@@ -365,6 +392,7 @@ const App = {
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
       D.load(data);
+      try { localStorage.setItem('trackr_example', name); } catch (e) { /* noop */ }
       this._applyPrefs();
       Toast.ok(t('msg.exampleLoaded'));
       this.go('info');

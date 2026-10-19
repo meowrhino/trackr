@@ -100,6 +100,18 @@ const B={
     if (!v || f.pagado) return null;
     return Math.round((new Date(hoy + 'T00:00:00') - new Date(v + 'T00:00:00')) / 864e5);
   },
+  /** Próximo plazo de 303/130 (autónomos): T1 → 20 abr, T2 → 20 jul, T3 → 20 oct, T4 → 30 ene.
+   *  Devuelve { label:'T3 2026', end:'2026-10-20', days, y, q } con el primer plazo que aún no ha pasado. */
+  nextTaxDeadline(hoy) {
+    const y = parseInt(hoy.slice(0, 4), 10);
+    const cands = [
+      { y: y - 1, q: 3, end: `${y}-01-30` }, { y, q: 0, end: `${y}-04-20` }, { y, q: 1, end: `${y}-07-20` },
+      { y, q: 2, end: `${y}-10-20` }, { y, q: 3, end: `${y + 1}-01-30` }
+    ];
+    const c = cands.find(x => x.end >= hoy);
+    const days = Math.round((new Date(c.end + 'T00:00:00') - new Date(hoy + 'T00:00:00')) / 864e5);
+    return { label: `T${c.q + 1} ${c.y}`, end: c.end, days, y: c.y, q: c.q };
+  },
   pendiente(p) {
     return Math.max((p.facturacion.totalFactura || 0) - this.totalCobrado(p), 0);
   },
