@@ -234,23 +234,40 @@ const Acc = (() => {
   // mismo id la pisa el local. Borrado/edicion fiables multi-dispositivo necesitan tombstones + reloj
   // por registro (futuro). Para 1 dispositivo (caso comun ahora) no aplica. El 409 hace H.snapshot.
   // Union de dos listas por clave; en colision gana la local.
-  function unionBy(cloudArr, localArr, key) {
+  // Union por clave. Si esta en los dos, gana `pick(cloudItem, localItem)` (por defecto el local).
+  function unionBy(cloudArr, localArr, key, pick) {
     const m = new Map();
-    for (const x of [...(cloudArr || []), ...(localArr || [])]) { const k = x && key(x); if (k != null) m.set(k, x); }
+    for (const x of (cloudArr || [])) { const k = x && key(x); if (k != null) m.set(k, x); }
+    for (const x of (localArr || [])) {
+      const k = x && key(x); if (k == null) continue;
+      m.set(k, (pick && m.has(k)) ? pick(m.get(k), x) : x);
+    }
     return [...m.values()];
+  }
+  // Ultimo crear/editar por id en un registro de auditoria: el reloj por registro.
+  function lastTouch(audit) {
+    const m = new Map();
+    (audit || []).forEach((e) => { if (e && e.entidadId && e.accion !== 'borrar') m.set(e.entidadId, Math.max(m.get(e.entidadId) || 0, e.ts || 0)); });
+    return m;
   }
   function mergeData(local, cloud) {
     local = local || {}; cloud = cloud || {};
     const out = {};
     for (const k of Object.keys(cloud)) out[k] = cloud[k];
+    // La auditoria hace de reloj: por id, gana el lado que lo toco mas tarde, y un
+    // 'borrar' posterior al ultimo toque de ambos lados lo quita (antes resucitaba).
+    // shortcut: el anillo de auditoria guarda 500 eventos; un borrado mas viejo que eso
+    // puede volver si el otro dispositivo aun lo tenia. Subir a tombstones propios si pasa.
+    const tl = lastTouch(local.audit), tc = lastTouch(cloud.audit);
+    const touched = (id) => Math.max(tl.get(id) || 0, tc.get(id) || 0);
+    const borradoTs = new Map();
+    [...(local.audit || []), ...(cloud.audit || [])].forEach((e) => {
+      if (e && e.accion === 'borrar' && e.entidadId) borradoTs.set(e.entidadId, Math.max(borradoTs.get(e.entidadId) || 0, e.ts || 0));
+    });
+    const newer = (c, l) => ((tc.get(c.id) || 0) > (tl.get(l.id) || 0) ? c : l);
+    const vivo = (x) => !(borradoTs.has(x.id) && borradoTs.get(x.id) > touched(x.id));
     for (const key of ['projects', 'clientes', 'gastos', 'deducibles', 'facturas', 'presupuestos']) {
-      if (local[key] || cloud[key]) out[key] = unionBy(cloud[key], local[key], (x) => x.id);
-    }
-    // Journey: estadios del local (es lo que se ve aqui), tarjetas de los dos. Antes la
-    // nube pisaba el objeto entero y se perdian las tarjetas creadas en este dispositivo.
-    if (local.journey || cloud.journey) {
-      out.journey = { ...(cloud.journey || {}), ...(local.journey || {}),
-        cards: unionBy(cloud.journey?.cards, local.journey?.cards, (c) => c.id) };
+      if (local[key] || cloud[key]) out[key] = unionBy(cloud[key], local[key], (x) => x.id, newer).filter(vivo);
     }
     // Auditoria: los eventos de los dos, en orden, con el mismo tope que D._auditAs.
     if (local.audit || cloud.audit) {

@@ -19,7 +19,9 @@ const F = {
     return {
       eds: f.eds !== false,
       rendAnterior: (f.rendAnterior == null || f.rendAnterior === '') ? null : +f.rendAnterior,
-      saldoIvaInicial: +f.saldoIvaInicial || 0
+      saldoIvaInicial: +f.saldoIvaInicial || 0,
+      /* Años en cuyo 4T se pidió la devolución del saldo (en vez de compensar): { 2026: true } */
+      devolver: f.devolver || {}
     };
   },
 
@@ -160,7 +162,8 @@ const F = {
   /**
    * Modelo 303 de (y, q) con arrastre de saldo a compensar (casillas 110/78/87)
    * desde el primer dato registrado + saldo inicial configurable.
-   * Asume "a compensar" siempre (no modela solicitar devolución en 4T) ni caducidad (4 años).
+   * En el 4T de un año marcado en cfg.devolver se pide la devolución de todo el saldo
+   * (c98) y el arrastre al año siguiente empieza en cero. No modela la caducidad (4 años).
    */
   calc303(y, q, qDataOfY) {
     const cfg = this.cfg();
@@ -187,7 +190,11 @@ const F = {
         const c87 = c110 - c78;                            /* saldo viejo que sigue pendiente */
         const c69 = c46 - c78;                             /* resultado (= c71 en nuestro perfil) */
         if (c46 < 0) carryCur += -c46;                     /* el negativo nuevo alimenta el 110 siguiente */
-        res = { c46, c110, c78, c78Prev, c87, c69, c71: c69, pendCur: carryCur, carryNext: carryPrev + carryCur };
+        let c98 = 0;
+        if (qq === 3 && cfg.devolver[yy] && carryPrev + carryCur > 0) {   /* 4T: devolución de todo el saldo */
+          c98 = roundMoney(carryPrev + carryCur); carryPrev = 0; carryCur = 0;
+        }
+        res = { c46, c110, c78, c78Prev, c87, c69, c71: c69, c98, pendCur: carryCur, carryNext: carryPrev + carryCur };
       }
     }
     return res;
@@ -238,12 +245,13 @@ const F = {
     }
     c85 = roundMoney(c85); c95 = roundMoney(c95);
     const c86 = roundMoney(c65 - c85);
-    const c97 = last.c71 < 0 ? roundMoney(-last.c71) : 0;        /* a compensar en el último periodo */
-    const c662 = roundMoney(Math.max(0, last.pendCur - c97));   /* pendiente del año fuera del 97 */
+    const c98 = last.c98 || 0;                                               /* devolución pedida en el 4T */
+    const c97 = !c98 && last.c71 < 0 ? roundMoney(-last.c71) : 0;           /* a compensar en el último periodo */
+    const c662 = c98 ? 0 : roundMoney(Math.max(0, last.pendCur - c97));     /* pendiente del año fuera del 97 */
     const c99 = sum(rep, 'base');
     const c108 = roundMoney(c99 + extUE + extNoUE);
     return { rep, ispUE, sop, noUE: { base: roundMoney(noUEBase), cuota: roundMoney(noUECuota) },
-      c33, c47, c48, c49, c597, c598, c64, c65, c84: c65, c85, c86, c95, c97, c662,
+      c33, c47, c48, c49, c597, c598, c64, c65, c84: c65, c85, c86, c95, c97, c98, c662,
       c99, c103: roundMoney(extUE), c110: roundMoney(extNoUE), c108,
       empty: c33 === 0 && c48 === 0 && c597 === 0 && c108 === 0 };
   }

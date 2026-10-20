@@ -54,4 +54,14 @@ assert.equal(r.c99, 1100); assert.equal(r.c103, 300); assert.equal(r.c108, 1400)
 /* los 303 trimestrales no cambian con la separación de bolsas */
 const q2 = F.calc303(2026, 1);
 assert.equal(q2.c110, 26); assert.equal(q2.c78, 26); assert.equal(q2.c71, 182); assert.equal(q2.c78Prev, 5);
+/* 4T marcado como devolución: el saldo va a la 98 y el año siguiente arranca en cero */
+D.d.settings.fiscal.devolver = { 2026: true };
+D.d.gastos.push({ id: 'g4', nombre: 'Grande', categoria: 'otro', desgravable: true, tipoIva: 21, zonaFiscal: 'es',
+  entradas: [{ id: 'e4', fecha: '2026-11-15', base: 2000, iva: 420, irpf: 0, total: 2420, tipoIva: 21 }] });   /* 4T: −420 */
+const r4 = F.calc390(2026);
+assert.equal(r4.c98, 420); assert.equal(r4.c97, 0); assert.equal(r4.c662, 0);
+assert.equal(F.calc303(2026, 3).carryNext, 0);
+assert.equal(F.calc303(2027, 0).c110, 0, 'nada se arrastra tras pedir la devolución');
+delete D.d.settings.fiscal.devolver;
+assert.equal(F.calc303(2027, 0).c110, 420, 'compensando, el saldo pasa al 1T siguiente');
 console.log('modelo-390.mjs: ok');

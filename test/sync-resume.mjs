@@ -101,16 +101,30 @@ for (const [choice, ids] of [['cloud', ['c1']], ['local', ['l1']], ['merge', ['c
   console.log('ok - logout: meta y role');
 }
 
-// mergeData: journey y audit ya no los pisa la nube
+// mergeData: la auditoria se une y hace de reloj: borrados que se propagan, edicion mas reciente gana
 {
   const { Acc } = setup({ meta: null, cloudVersion: 1, local: empty, lastSaved: 1 });
-  const local = { projects: [], journey: { stages: [{ id: 's1' }], cards: [{ id: 'jl' }] }, audit: [{ ts: 2, accion: 'crear', entidad: 'cliente', entidadId: 'x' }] };
-  const cloud = { projects: [], journey: { stages: [{ id: 's1' }, { id: 's2' }], cards: [{ id: 'jc' }] }, audit: [{ ts: 1, accion: 'crear', entidad: 'gasto', entidadId: 'y' }] };
+  const local = {
+    projects: [{ id: 'p1', nombre: 'viejo' }, { id: 'p3', nombre: 'solo local' }],
+    gastos: [{ id: 'g1', nombre: 'borrado en la nube pero editado aqui despues' }],
+    audit: [{ ts: 2, accion: 'crear', entidad: 'cliente', entidadId: 'x' }, { ts: 10, accion: 'editar', entidad: 'proyecto', entidadId: 'p1' },
+            { ts: 50, accion: 'editar', entidad: 'gasto', entidadId: 'g1' }]
+  };
+  const cloud = {
+    projects: [{ id: 'p1', nombre: 'nuevo' }, { id: 'p2', nombre: 'borrado en local' }],
+    gastos: [],
+    audit: [{ ts: 1, accion: 'crear', entidad: 'gasto', entidadId: 'y' }, { ts: 20, accion: 'editar', entidad: 'proyecto', entidadId: 'p1' },
+            { ts: 40, accion: 'borrar', entidad: 'gasto', entidadId: 'g1' }]
+  };
+  local.audit.push({ ts: 30, accion: 'borrar', entidad: 'proyecto', entidadId: 'p2' });
   const m = Acc._mergeData(local, cloud);
-  assert.equal(JSON.stringify(m.journey.cards.map((c) => c.id).sort()), '["jc","jl"]');
-  assert.equal(m.journey.stages.length, 1); // estadios: gana el local
-  assert.equal(JSON.stringify(m.audit.map((e) => e.ts)), '[1,2]');
-  console.log('ok - merge: journey y audit');
+  assert.equal(m.projects.find((p) => p.id === 'p1').nombre, 'nuevo');        // edicion mas reciente (nube) gana
+  assert.equal(m.projects.some((p) => p.id === 'p2'), false);                 // borrado local se propaga
+  assert.equal(m.projects.some((p) => p.id === 'p3'), true);                  // lo nuevo de cada lado se queda
+  assert.equal(m.gastos.length, 1);                                           // borrado viejo no mata una edicion posterior
+  assert.equal(m.journey, undefined);
+  assert.equal(JSON.stringify(m.audit.map((e) => e.ts)), '[1,2,10,20,30,40,50]');
+  console.log('ok - merge: reloj por registro y borrados');
 }
 
 // alcance fiscal de la gestoría: las notas del cliente no viajan

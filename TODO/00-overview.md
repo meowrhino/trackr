@@ -33,8 +33,8 @@ Orden de implementación. Cada archivo tiene el detalle.
 | 27 | Modelo 111 (retenciones practicadas) | — | ❌ descartado por ahora — meowrhino no lo presenta; el dato se guarda por si algún día |
 | 28 | Ingresos sin factura ("en B") separados en Dineros | `28-ingresos-b.md` | 💡 diseñado (17 sep 2026) |
 | 29 | Historial en la nube + sync que avisa al caducar | `29-historial-nube.md` | ✅ hecho — B: versiones con Restaurar (14 oct, `e76337f`); A: el 401 bloquea y avisa (19 oct, `df3dd81`) |
-| 30 | Dineros abre en trimestre vacío y parece no declarado | `30-trimestre-vacio.md` | 🐛 diagnosticado (17 sep 2026) — arreglo pequeño |
-| 31 | Al iniciar sesión, comparar en vez de pisar | `31-reconciliacion-login.md` | 🟡 etapa A hecha (19 oct, `cc04e3c`: resume compara y pregunta); B y C pendientes |
+| 30 | Dineros abre en trimestre vacío y parece no declarado | `30-trimestre-vacio.md` | ✅ hecho (20 oct 2026) — abre en el último mes con datos |
+| 31 | Al iniciar sesión, comparar en vez de pisar | `31-reconciliacion-login.md` | ✅ A (19 oct) + C vía auditoría como reloj (20 oct); B («combinar» = merge por id con reloj) cubierta por C |
 
 ---
 

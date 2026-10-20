@@ -1,6 +1,6 @@
 # 30 — Dineros abre en un trimestre vacío y parece que no hay nada declarado
 
-## Estado: 🐛 diagnosticado (17 sep 2026) · arreglo pequeño
+## Estado: ✅ hecho el 20 oct 2026 — `App._dinStart()` abre Dineros en el último mes con datos si el de hoy está vacío
 
 ## El caso real
 

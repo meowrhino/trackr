@@ -95,7 +95,7 @@ Object.assign(App, {
       iva = roundMoney(desglose.reduce((s, l) => s + l.iva, 0));
       total = roundMoney(base + iva - irpf);
     }
-    return { base, iva, irpf, total, cantidad: total, tipoIva, tipoIrpf, desglose };
+    return { base, iva, irpf, total, tipoIva, tipoIrpf, desglose };
   },
 
   /** Al cambiar un tipo (IVA/IRPF) recalcula desde donde haya datos: si hay base
@@ -266,7 +266,7 @@ Object.assign(App, {
     const { base, importeIva: iva, importeIrpf: irpf } = B.desglosarTotal(total, tipoIva, tipoIrpf);
     const fecha = todayStr();
     if (!g.entradas) g.entradas = [];
-    g.entradas.push({ id: uid(), fecha, base, iva, irpf, total, cantidad: total, tipoIva, tipoIrpf, nota: '' });
+    g.entradas.push({ id: uid(), fecha, base, iva, irpf, total, tipoIva, tipoIrpf, nota: '' });
     D.upG(gid, { entradas: g.entradas });
     Toast.ok(t('gas.entryAdded'));
     this.rGas();

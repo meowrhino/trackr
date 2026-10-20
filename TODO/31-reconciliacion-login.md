@@ -1,6 +1,6 @@
 # 31 — Al iniciar sesión, comparar en vez de pisar
 
-## Estado: 🟡 etapa A hecha el 19 oct 2026 (`cc04e3c`: al entrar se compara y, si cambiaron los dos, pregunta con copia previa) · B y C pendientes
+## Estado: ✅ A el 19 oct 2026 (`cc04e3c`) · C el 20 oct 2026 (mergeData usa la auditoría como reloj por registro: borrados que se propagan y edición más reciente gana; límite: 500 eventos de auditoría)
 
 ## El caso
 

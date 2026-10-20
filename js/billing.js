@@ -37,6 +37,9 @@ const B={
     f.netoRecibido=tax.netoRecibido;
     if(f.modo==='desde_total'){
       f.totalFactura=f.total||0;
+      /* La base sale redondeada de dividir el total: la cuota absorbe el céntimo
+         para que base + IVA − IRPF sea exactamente el total impreso (303 y libros). */
+      if(iv>0) f.importeIva=roundMoney(f.totalFactura-f.baseImponible+f.importeIrpf);
     } else {
       f.totalFactura=tax.totalFactura;
       f.total=f.totalFactura;
@@ -169,17 +172,23 @@ const B={
     incomeSegs.sort((a, b) => (a.firstDate || '').localeCompare(b.firstDate || ''));
 
     const gastoSegs = [];
+    let ivaDeducible = 0;
     D.gs().forEach(g => {
       let tot = 0;
       (g.entradas || []).forEach(e => {
-        if (e.fecha && inPeriod(e.fecha, type, y, m)) tot += gastoCoste(e);
+        if (e.fecha && inPeriod(e.fecha, type, y, m)) {
+          tot += gastoCoste(e);
+          /* Proveedor español y gasto desgravable: ese IVA vuelve por el 303 */
+          if (g.desgravable && (g.zonaFiscal || 'es') === 'es') ivaDeducible += e.iva || 0;
+        }
       });
       if (tot > 0) gastoSegs.push({ nombre: g.nombre, total: tot, color: colorHex(g.color || 'Salmon') });
     });
     const gastosTotal = gastoSegs.reduce((s, seg) => s + seg.total, 0);
 
-    const neto = bruto - ivaTotal - gastosTotal;
+    /* Neto = lo cobrado sin el IVA que se paga, menos los gastos sin el IVA que se recupera */
+    const neto = bruto - ivaTotal - gastosTotal + ivaDeducible;
 
-    return { bruto, ivaTotal, gastosTotal, neto, incomeSegs, gastoSegs };
+    return { bruto, ivaTotal, gastosTotal, ivaDeducible, neto, incomeSegs, gastoSegs };
   }
 };

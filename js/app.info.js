@@ -166,7 +166,7 @@ Object.assign(App, {
         activity.push({
           type: 'gasto', fecha: e.fecha, sort: e.fecha + '99:99',
           icon: '€',
-          text: `${fmtMoney(e.cantidad || 0)} — ${g.nombre}`,
+          text: `${fmtMoney(e.total ?? e.cantidad ?? 0)} — ${g.nombre}`,
           note: e.nota || '', color: gc
         });
       });

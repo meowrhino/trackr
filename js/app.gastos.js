@@ -11,6 +11,18 @@ Object.assign(App, {
   dinM: new Date().getMonth(),
   dinPeriod: 'mes',
 
+  /** Primera vez en Dineros: si hoy no hay nada y antes sí, abrir en el último mes con
+   *  datos. En los primeros días de un trimestre el 303 salía a cero y parecía «no declarado». */
+  _dinStart() {
+    if (this._dinStarted) return;
+    this._dinStarted = true;
+    const hoy = todayStr(); let last = '';
+    const touch = f => { if (f && f <= hoy && f > last) last = f; };
+    D.ps().forEach(p => { touch(p.facturacion?.facturaFecha); (p.facturacion?.cobros || []).forEach(c => touch(c.fecha)); });
+    D.gs().forEach(g => (g.entradas || []).forEach(e => touch(e.fecha)));
+    if (last && last.slice(0, 7) < hoy.slice(0, 7)) { this.dinY = +last.slice(0, 4); this.dinM = +last.slice(5, 7) - 1; }
+  },
+
   _buildBarSegments(segs, total) {
     if (total <= 0) return '';
     return segs.map(seg => {
@@ -44,6 +56,7 @@ Object.assign(App, {
   },
 
   rGas() {
+    this._dinStart();
     this._rDinFin();
     this._rDinIngresos();
     this._rDinGastos();
@@ -392,10 +405,20 @@ Object.assign(App, {
           if (t303.c78 > 0) html303 += `<div class="casilla-row"><span class="casilla-num">78</span><span class="casilla-label">${t('din.compApplied')}</span><span class="casilla-val">&minus;${fmtMoney(t303.c78)}</span></div>`;
           if (t303.c87 > 0) html303 += `<div class="casilla-row"><span class="casilla-num">87</span><span class="casilla-label">${t('din.compPending')}</span><span class="casilla-val">${fmtMoney(t303.c87)}</span></div>`;
         }
-        if (t303.c71 >= 0) {
+        if (t303.c98 > 0) {
+          html303 += `<div class="casilla-row casilla-result"><span class="casilla-num">73</span><span class="casilla-label">${t('din.toRefund')}</span><span class="casilla-val" style="color:var(--ok)">${fmtMoney(t303.c98)}</span></div>`;
+        } else if (t303.c71 >= 0) {
           html303 += `<div class="casilla-row casilla-result"><span class="casilla-num">71</span><span class="casilla-label">${t('din.toPay')}</span><span class="casilla-val" style="color:${t303.c71 > 0 ? 'var(--warn)' : 'var(--ok)'}">${fmtMoney(t303.c71)}</span></div>`;
         } else {
           html303 += `<div class="casilla-row casilla-result"><span class="casilla-num">72</span><span class="casilla-label">${t('din.toCompensate')}</span><span class="casilla-val" style="color:var(--ok)">${fmtMoney(-t303.c71)}</span></div>`;
+        }
+        /* 4T con saldo a favor: en el 303 real se elige compensar o pedir la devolución */
+        if (q === 3 && (t303.c98 > 0 || t303.carryNext > 0)) {
+          const dev = !!t303.c98;
+          html303 += `<div style="font-size:.72rem;color:var(--t3);margin:.5rem 0 .2rem">${t('din.q4Choice')}</div>`
+            + `<div style="display:flex;gap:.35rem"><button class="fb ${dev ? '' : 'on'}" onclick="App.setDevolver(${y}, false)">${t('din.toCompensate')}</button>`
+            + `<button class="fb ${dev ? 'on' : ''}" onclick="App.setDevolver(${y}, true)">${t('din.askRefund')}</button></div>`
+            + `<div style="font-size:.7rem;color:var(--t3);margin-top:.3rem">${t(dev ? 'din.q4RefundHelp' : 'din.q4CompHelp')}</div>`;
         }
       }
       /* Informativas (no suman al resultado) */
@@ -486,6 +509,7 @@ Object.assign(App, {
     rows.push(['86', t('din.c390.result86'), r.c86, 'casilla-result']);
     rows.push(['95', t('din.c390.ingresado'), r.c95]);
     if (r.c97 > 0) rows.push(['97', t('din.c390.c97'), r.c97]);
+    if (r.c98 > 0) rows.push(['98', t('din.toRefund'), r.c98]);
     if (r.c662 > 0) rows.push(['662', t('din.c390.c662'), r.c662]);
     sec(t('din.c390.volumen'));
     rows.push(['99', t('din.c390.vol99'), r.c99]);
@@ -516,6 +540,15 @@ Object.assign(App, {
     const lines = [`Modelo 390 — ${d.label}`];
     this._rows390(d.r390).forEach(([num, label, val]) => lines.push(num == null ? `— ${label}` : `${num}  ${label}: ${fmtMoney(val)}`));
     this._copyToClipboard(lines.join('\n'));
+  },
+
+  /** 4T: pedir la devolución del saldo de IVA de ese año (o volver a compensar). */
+  setDevolver(y, on) {
+    const f = D.d.settings.fiscal || (D.d.settings.fiscal = {});
+    f.devolver = f.devolver || {};
+    if (on) f.devolver[y] = true; else delete f.devolver[y];
+    D._audit('editar', 'settings', null, { fiscal: { devolver: f.devolver } });
+    D.save(); this.rGas();
   },
 
   /** Copia las casillas del 303 al portapapeles en formato leíble */
@@ -558,7 +591,7 @@ Object.assign(App, {
         if (t3.c78 > 0) lines.push(`78  Compensado este periodo: ${fmtMoney(t3.c78)}`);
         if (t3.c87 > 0) lines.push(`87  Pendiente para periodos siguientes: ${fmtMoney(t3.c87)}`);
       }
-      lines.push(t3.c71 >= 0 ? `71  A ingresar: ${fmtMoney(t3.c71)}` : `72  A compensar: ${fmtMoney(-t3.c71)}`);
+      lines.push(t3.c98 > 0 ? `73  A devolver: ${fmtMoney(t3.c98)}` : t3.c71 >= 0 ? `71  A ingresar: ${fmtMoney(t3.c71)}` : `72  A compensar: ${fmtMoney(-t3.c71)}`);
     }
     if (d.extUE > 0) lines.push(`59  Servicios a clientes UE (informativa): ${fmtMoney(d.extUE)}`);
     if (d.extNoUE > 0) lines.push(`120 Servicios fuera de la UE (informativa): ${fmtMoney(d.extNoUE)}`);
