@@ -22,6 +22,7 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 - **El «Neto» de Info y Dineros** restaba el IVA de los cobros pero no devolvía el IVA deducible de los gastos: un gasto de 121 € restaba 121 aunque 21 vuelvan por el 303. Ahora suma el IVA deducible de los gastos desgravables de proveedor español. _frontend_
 - **Facturas «desde total»**: la cuota de IVA absorbe el céntimo de redondeo para que base + IVA − IRPF sea exactamente el total impreso; el 303 y los libros ya no pueden bailar un céntimo con la factura. _frontend_
 - **Dineros abre en el último periodo con datos** cuando el mes de hoy está vacío (ficha 30): en los primeros días de un trimestre el 303 salía a cero y parecía «no declarado». _frontend_
+- Fuera `customer-journey.html` (la demo suelta del widget kanban editable: ya no existe el journey editable en la app). _frontend_
 - Modelo 130 con test propio (`test/modelo-130.mjs`: casillas 05, 13 y 15 con dos trimestres negativos). Las entradas de gasto dejan de escribir el campo duplicado `cantidad` (se sigue leyendo en saves viejos). _frontend_
 
 ### 🔧 Cambiado
