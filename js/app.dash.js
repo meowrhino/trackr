@@ -171,8 +171,6 @@ Object.assign(App, {
     const f = p.facturacion;
 
     let flags = '';
-    const stage = this._jShown(p) ? D.jStage(p.journeyStage) : null;
-    if (stage) flags += `<span class="pc-flag" style="color:${colorHex(stage.color)};background:color-mix(in srgb,${colorHex(stage.color)} 15%,transparent)">${esc(stage.nombre)}</span>`;
     if (p.interno) flags += `<span class="pc-flag pc-flag-int">${t('dash.flagInternal')}</span>`;
     if (p.recurrente) flags += `<span class="pc-flag pc-flag-rec">${t('dash.flagRecurring')}</span>`;
     if (f.pagado) flags += `<span class="pc-flag pc-flag-paid">${t('dash.flagPaid')}</span>`;

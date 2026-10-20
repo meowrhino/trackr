@@ -105,15 +105,15 @@ Object.assign(App, {
    *  MODAL PROYECTO (crear/editar)
    * ══════════════════════════════════════════════ */
 
-  pModal(eid, journeyStage) {
+  pModal(eid, estadoInicial) {
     this._editPid = eid || null;
-    /* Fase del journey para un proyecto NUEVO creado desde una columna concreta.
-       Se resetea en cada apertura, así el alta normal (barra/dashboard) no la hereda. */
-    this._pendNewStage = journeyStage || null;
+    /* Estado para un proyecto NUEVO creado desde una columna del Tablero.
+       Se resetea en cada apertura, así el alta normal (barra/dashboard) no lo hereda. */
+    this._pendNewEstado = EST[estadoInicial] ? estadoInicial : null;
     const isE = !!eid, p = isE ? D.p(eid) : null, st = D.d.settings, cls = D.cls();
     const df = {
       nombre: p?.nombre || '', clienteId: p?.clienteId || '', color: p?.color || 'CornflowerBlue',
-      estado: p?.estado || 'activo', interno: p?.interno || false, recurrente: p?.recurrente || false,
+      estado: p?.estado || this._pendNewEstado || 'activo', interno: p?.interno || false, recurrente: p?.recurrente || false,
       inicio: p?.fechas?.inicio || '', finEst: p?.fechas?.finEstimada || '', finR: p?.fechas?.finReal || '',
       modo: p?.facturacion?.modo || 'desde_base', base: p?.facturacion?.baseImponible || '', total: p?.facturacion?.total || '', precioHora: p?.facturacion?.precioHora || '',
       iva: p?.facturacion?.iva ?? st.defaultIva, irpf: p?.facturacion?.irpf ?? st.defaultIrpf,
@@ -307,8 +307,6 @@ Object.assign(App, {
       },
       horas: prev?.horas || [], notas: document.getElementById('mpNo').value.trim()
     };
-    /* Proyecto nuevo creado desde una columna del journey → nace en esa fase */
-    if (!eid && this._pendNewStage) proj.journeyStage = this._pendNewStage;
     B.calc(proj);
     if (eid) { D.up(eid, proj); T.ev('action', 'project_edit'); } else { D.add(proj); T.ev('action', 'project_create'); }
     this.cm();

@@ -32,7 +32,7 @@ const GOps = (() => {
     /* noDelete: borrar el proyecto entero se llevaría las horas por dentro, y las horas
        están fuera del alcance del gestor (hallazgo #3 de la revisión). Puede vaciarlo o
        marcarlo, pero borrarlo es de la persona. */
-    proyecto:  { list: 'projects',   deny: ['horas', 'journeyStage'], noDelete: true },
+    proyecto:  { list: 'projects',   deny: ['horas'], noDelete: true },
     cliente:   { list: 'clientes',   deny: [] },
     gasto:     { list: 'gastos',     deny: [] },
     deducible: { list: 'deducibles', deny: [] },

@@ -11,7 +11,8 @@
  *     strings: { addStage:'…', … },        // textos (opcional, por defecto ES)
  *     actions:      [{label, onClick}],     // botones extra en la barra
  *     emptyActions: [{label, onClick}],     // botones extra cuando no hay estadios
- *     notify(msg, level) { … }              // feedback (opcional; def. alert)
+ *     notify(msg, level) { … },             // feedback (opcional; def. alert)
+ *     fixedStages: true                     // columnas dadas por fuera: solo plegar
  *   });
  *   board.setData(d); board.render();        // refresco externo
  *
@@ -89,6 +90,9 @@
        (arrastrando o por el menú "mover a"). */
     this.onCardMove = typeof opts.onCardMove === 'function' ? opts.onCardMove : null;
     this.showAddCard = opts.showAddCard !== false;
+    /* fixedStages=true: las columnas vienen dadas por fuera (no se crean, editan,
+       reordenan ni borran desde el tablero). Plegar sí. */
+    this.fixedStages = !!opts.fixedStages;
     /* Vista compacta (columnas/tarjetas más estrechas). onCompactToggle(bool) para persistir fuera. */
     this.compact = !!opts.compact;
     this.onCompactToggle = typeof opts.onCompactToggle === 'function' ? opts.onCompactToggle : null;
@@ -140,7 +144,7 @@
 
     /* Barra: añadir estadio + acciones extra + toggle compacto */
     html += '<div class="jrn-bar">'
-      + '<button class="jrn-bt jrn-bt-p" data-act="add-stage">+ ' + esc(this.t('addStage')) + '</button>'
+      + (this.fixedStages ? '' : '<button class="jrn-bt jrn-bt-p" data-act="add-stage">+ ' + esc(this.t('addStage')) + '</button>')
       + this.actions.map(function (a, i) { return '<button class="jrn-bt" data-act="action" data-idx="' + i + '">' + esc(a.label) + '</button>'; }).join('')
       + (stages.length ? '<button class="jrn-bt" data-act="toggle-compact">' + esc(this.t(this.compact ? 'expand' : 'compact')) + '</button>' : '')
       + '</div>';
@@ -159,7 +163,7 @@
 
     var self = this;
     var cols = stages.map(function (s, i) { return self._column(s, i, stages.length); }).join('');
-    var ghost = '<div class="jrn-col-ghost" role="button" tabindex="0" data-act="add-stage">+ ' + esc(this.t('addStage')) + '</div>';
+    var ghost = this.fixedStages ? '' : '<div class="jrn-col-ghost" role="button" tabindex="0" data-act="add-stage">+ ' + esc(this.t('addStage')) + '</div>';
     html += '<div class="jrn-board">' + cols + ghost + '</div>';
     this.el.innerHTML = html;
     return this;
@@ -185,10 +189,10 @@
       +   '<span class="jrn-col-count">' + cards.length + '</span>'
       +   '<span class="jrn-col-actions">'
       +     '<button class="jrn-ica" title="' + esc(this.t('collapse')) + '" data-act="toggle-collapse" data-id="' + esc(stage.id) + '">–</button>'
-      +     '<button class="jrn-ica" title="' + esc(this.t('moveLeft')) + '" data-act="move-stage" data-id="' + esc(stage.id) + '" data-dir="-1"' + (idx === 0 ? ' disabled' : '') + '>◂</button>'
+      +     (this.fixedStages ? '' : '<button class="jrn-ica" title="' + esc(this.t('moveLeft')) + '" data-act="move-stage" data-id="' + esc(stage.id) + '" data-dir="-1"' + (idx === 0 ? ' disabled' : '') + '>◂</button>'
       +     '<button class="jrn-ica" title="' + esc(this.t('moveRight')) + '" data-act="move-stage" data-id="' + esc(stage.id) + '" data-dir="1"' + (idx === total - 1 ? ' disabled' : '') + '>▸</button>'
       +     '<button class="jrn-ica" title="' + esc(this.t('edit')) + '" data-act="edit-stage" data-id="' + esc(stage.id) + '">✎</button>'
-      +     '<button class="jrn-ica jrn-ica-d" title="' + esc(this.t('delete')) + '" data-act="del-stage" data-id="' + esc(stage.id) + '">✕</button>'
+      +     '<button class="jrn-ica jrn-ica-d" title="' + esc(this.t('delete')) + '" data-act="del-stage" data-id="' + esc(stage.id) + '">✕</button>')
       +   '</span>'
       + '</div>'
       + '<div class="jrn-col-body">'

@@ -29,27 +29,6 @@ const D = {
     return false;
   },
 
-  /**
-   * Customer journey por defecto (tablero kanban).
-   * Plantilla genérica reutilizable: estadios editables + tarjetas libres
-   * (no atadas a las entidades `clientes`). Se siembra una sola vez.
-   */
-  _seedJourney() {
-    return {
-      stages: [
-        { id: 'jst-contacto',    nombre: 'Primer contacto',      color: 'SkyBlue' },
-        { id: 'jst-presupuesto', nombre: 'Presupuesto',          color: 'Goldenrod' },
-        { id: 'jst-diseno',      nombre: 'Reunión de diseño',    color: 'MediumPurple' },
-        { id: 'jst-disenook',    nombre: 'Diseño verificado',    color: 'Orchid' },
-        { id: 'jst-materiales',  nombre: 'Me envían las cosas',  color: 'SandyBrown' },
-        { id: 'jst-programando', nombre: 'Programando',          color: 'LightSeaGreen' },
-        { id: 'jst-entrega',     nombre: 'Reunión de entrega',   color: 'MediumSeaGreen' },
-        { id: 'jst-publicado',   nombre: 'Post de Instagram',    color: 'DeepPink' }
-      ],
-      cards: []
-    };
-  },
-
   /** Crea estructura de datos vacía (formato v2) */
   create() {
     this.d = {
@@ -58,7 +37,6 @@ const D = {
       projects: [],
       gastos: [],
       audit: [],
-      journey: this._seedJourney(),
       settings: {
         emisor: { nombre: '', direccion1: '', direccion2: '', nif: '' },
         defaultIva: 21,
@@ -123,22 +101,8 @@ const D = {
         estado: aceptado ? 'aceptado' : rechazado ? 'rechazado' : 'enviado'
       });
     });
-    /* Customer journey (tablero kanban). Se siembra una sola vez; editable. */
-    if (!d.journey || typeof d.journey !== 'object') d.journey = this._seedJourney();
-    if (!Array.isArray(d.journey.stages)) d.journey.stages = [];
-    if (!Array.isArray(d.journey.cards)) d.journey.cards = [];
-    /* Tarjetas huérfanas (su estadio fue borrado) → al primer estadio existente */
-    if (d.journey.stages.length) {
-      const validStage = new Set(d.journey.stages.map(s => s.id));
-      d.journey.cards.forEach(c => {
-        if (!validStage.has(c.stageId)) c.stageId = d.journey.stages[0].id;
-      });
-    }
-    /* Refs de estadios para asignar la fase de journey a cada proyecto (abajo) */
-    const _jStages = d.journey.stages;
-    const _jFirst = _jStages.length ? _jStages[0].id : null;
-    const _jLast = _jStages.length ? _jStages[_jStages.length - 1].id : null;
-    const _jValid = new Set(_jStages.map(s => s.id));
+    /* `journey` y `journeyStage` (fases de producción, hasta oct 2026) se conservan
+       en el save por compatibilidad, pero ya no se leen: el Tablero usa el estado. */
     /* Migrar deducibles: año → fecha */
     d.deducibles.forEach(dd => {
       if (dd.año && !dd.fecha) dd.fecha = `${dd.año}-01-01`;
@@ -222,14 +186,6 @@ const D = {
       /* Flags por defecto */
       if (p.interno == null) p.interno = false;
       if (p.recurrente == null) p.recurrente = false;
-
-      /* Customer journey: fase de producción (eje aparte del estado).
-         Completados → última fase; el resto → primera. Reasigna si apunta
-         a un estadio borrado. */
-      if (_jFirst) {
-        if (p.journeyStage == null) p.journeyStage = (p.estado === 'completado') ? _jLast : _jFirst;
-        else if (!_jValid.has(p.journeyStage)) p.journeyStage = _jFirst;
-      }
 
       /* Campos de facturación v2 */
       if (p.facturacion) {
@@ -574,20 +530,12 @@ const D = {
     }
   },
 
-  /* ══════════════════════════════════════════════
-   *  CUSTOMER JOURNEY (tablero kanban)
-   *  Solo lectura desde aquí: el widget (journey/journey.js vía app.journey.js)
-   *  muta d.journey directamente y llama a save() — la vieja API CRUD de
-   *  estadios/tarjetas se retiró al pasar al widget (nadie la llamaba).
-   * ══════════════════════════════════════════════ */
+
   /* ── Presupuestos (sin auditoría: no los ve la gestoría) ── */
   buds() { return this.d.presupuestos; },
   bud(id) { return this.d.presupuestos.find(b => b.id === id); },
   addBud(b) { this.d.presupuestos.push(b); this.save(); return b; },
   upBud(id, u) { const b = this.bud(id); if (b) { Object.assign(b, u); this.save(); } return b; },
-
-  jStages() { return this.d.journey.stages; },
-  jStage(id) { return this.d.journey.stages.find(s => s.id === id); },
 
   /* ══════════════════════════════════════════════
    *  IMPORT
