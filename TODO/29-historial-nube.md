@@ -1,6 +1,6 @@
 # 29 — Historial en la nube + sync que no se muere en silencio
 
-## Estado: 🚨 detectado el 17 sep 2026 · la segunda parte es urgente
+## Estado: ✅ hecho — parte B el 14 oct 2026 (`e76337f`, versiones en la nube con Restaurar), parte A el 19 oct (`df3dd81`, el 401 bloquea la sesión y lo dice)
 
 ## Hallazgo (17 sep 2026)
 

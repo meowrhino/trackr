@@ -1,6 +1,6 @@
 # 31 — Al iniciar sesión, comparar en vez de pisar
 
-## Estado: 💡 diseñado (17 sep 2026) · disparado por un caso real
+## Estado: 🟡 etapa A hecha el 19 oct 2026 (`cc04e3c`: al entrar se compara y, si cambiaron los dos, pregunta con copia previa) · B y C pendientes
 
 ## El caso
 

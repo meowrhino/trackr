@@ -32,9 +32,9 @@ Orden de implementación. Cada archivo tiene el detalle.
 | 26 | Retención de IRPF en gastos | — | ✅ hecho (2 sep 2026) — captura, cálculo en ambos sentidos y columnas AK/AL en los libros |
 | 27 | Modelo 111 (retenciones practicadas) | — | ❌ descartado por ahora — meowrhino no lo presenta; el dato se guarda por si algún día |
 | 28 | Ingresos sin factura ("en B") separados en Dineros | `28-ingresos-b.md` | 💡 diseñado (17 sep 2026) |
-| 29 | Historial en la nube + sync que avisa al caducar | `29-historial-nube.md` | 🚨 detectado (17 sep 2026) — parte A urgente |
+| 29 | Historial en la nube + sync que avisa al caducar | `29-historial-nube.md` | ✅ hecho — B: versiones con Restaurar (14 oct, `e76337f`); A: el 401 bloquea y avisa (19 oct, `df3dd81`) |
 | 30 | Dineros abre en trimestre vacío y parece no declarado | `30-trimestre-vacio.md` | 🐛 diagnosticado (17 sep 2026) — arreglo pequeño |
-| 31 | Al iniciar sesión, comparar en vez de pisar | `31-reconciliacion-login.md` | 💡 diseñado (17 sep 2026) — etapa A urgente |
+| 31 | Al iniciar sesión, comparar en vez de pisar | `31-reconciliacion-login.md` | 🟡 etapa A hecha (19 oct, `cc04e3c`: resume compara y pregunta); B y C pendientes |
 
 ---
 

@@ -5,6 +5,16 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-10-20 — Tablero por estado y tickets con varios tipos de IVA
+
+### ✨ Nuevo
+- **Varios tipos de IVA en una misma entrada de gasto.** Un ticket mixto (papelería al 21 % y 4 %) se registra como una sola entrada: en la ficha del gasto, «+ otro tipo de IVA» añade una fila por tipo y el total pasa a ser la suma. El 303 reparte cada línea en su tipo y los libros registro sacan una fila por tipo con el mismo número de factura, como pide la plantilla de la AEAT. Las entradas de siempre no cambian. Test: `test/gastos-desglose.mjs`. _frontend_
+
+### 🔧 Cambiado
+- **El Tablero de Proyectos va por estado.** Las columnas son los cinco estados (Potencial, Activo, Pausado, Completado, Abandonado) y arrastrar una tarjeta cambia el estado del proyecto; soltarla en Potencial sin presupuesto ofrece generarlo. Desaparecen las «fases de producción» editables (y la etiqueta «Fase» en ficha y tarjeta): duplicaban el estado y en la práctica casi ningún proyecto tenía fase. Los saves conservan `journey`/`journeyStage` sin leerse. _frontend_
+
+---
+
 ## 2026-10-19 — Clientes y Facturas en el menú, ejemplos al día
 
 ### ✨ Nuevo
