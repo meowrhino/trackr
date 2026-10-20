@@ -35,6 +35,7 @@ Orden de implementación. Cada archivo tiene el detalle.
 | 29 | Historial en la nube + sync que avisa al caducar | `29-historial-nube.md` | ✅ hecho — B: versiones con Restaurar (14 oct, `e76337f`); A: el 401 bloquea y avisa (19 oct, `df3dd81`) |
 | 30 | Dineros abre en trimestre vacío y parece no declarado | `30-trimestre-vacio.md` | ✅ hecho (20 oct 2026) — abre en el último mes con datos |
 | 31 | Al iniciar sesión, comparar en vez de pisar | `31-reconciliacion-login.md` | ✅ A (19 oct) + C vía auditoría como reloj (20 oct); B («combinar» = merge por id con reloj) cubierta por C |
+| 32 | Perfil fiscal: marcar qué modelos presentas (111/190, 347, 115…) y abrir opciones según eso | `32-perfil-fiscal.md` | 💡 idea (20 oct 2026) — ver con calma |
 
 ---
 

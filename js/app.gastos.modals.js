@@ -58,7 +58,15 @@ Object.assign(App, {
       + `<button type="button" class="bt bt-s" title="${t('btn.delete')}" onclick="this.closest('.gdesg-row').remove();App._gDesgCalc('${prefix}')">×</button></div></div></div>`;
   },
   _gDesgOn(prefix) { return !!document.getElementById(prefix + 'DesgOn')?.checked; },
-  _gMainTipo(prefix) { return parseInt(document.getElementById(prefix === 'g' ? 'gIva' : 'geIva')?.value) || 0; },
+  _gMainTipo(prefix) { const v = parseInt(document.getElementById(prefix === 'g' ? 'gIva' : 'geIva')?.value); return isNaN(v) ? 21 : v; },
+  /** Tipo de IVA del gasto: «Mixto» = marcar «Varios tipos»; un tipo normal = desmarcarlo. */
+  _gIvaChange() {
+    const sel = document.getElementById('gIva'), chk = document.getElementById('gDesgOn');
+    if (!sel || !chk) return;
+    const mixto = sel.value === 'mixto';
+    if (chk.checked !== mixto) { chk.checked = mixto; this._gDesgToggle('g', mixto); }
+    if (!mixto) this._gCalcAuto();
+  },
   /** Activar: la base/IVA de arriba pasan a ser la primera fila y se añade otra vacía.
    *  Desactivar: se vacían las filas y los totales vuelven a editarse a mano. */
   _gDesgToggle(prefix, on) {
@@ -72,6 +80,12 @@ Object.assign(App, {
         + this._gDesgRow(prefix, { tipoIva: tipo === 10 ? 21 : 10, base: '', iva: '' }));
     }
     if (!on) rows.innerHTML = '';
+    /* El desplegable de arriba dice lo mismo que el checkbox */
+    const sel = prefix === 'g' ? document.getElementById('gIva') : null;
+    if (sel) {
+      if (on) sel.value = 'mixto';
+      else if (sel.value === 'mixto') sel.value = String(TIPOS_IVA[21] ? 21 : Object.keys(TIPOS_IVA)[0]);
+    }
     this._gDesgCalc(prefix);
   },
   _gDesgAdd(prefix) {
@@ -149,7 +163,7 @@ Object.assign(App, {
     this.om(`<div class="mt">${isE ? t('gas.editExpense') : t('gas.newExpense')}</div>`
       + `<div class="fg"><label>${t('field.name')}</label><input type="text" id="gN" value="${esc(g?.nombre || '')}" placeholder="${t('ph.expenseName')}"></div>`
       + `<div class="fr fr-3"><div class="fg"><label>${t('field.category')}</label><select id="gCat">${Object.entries(GASTO_CAT).map(([k, v]) => `<option value="${k}" ${g?.categoria === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
-      + `<div class="fg"><label>${t('field.ivaRate')}</label><select id="gIva" onchange="App._gCalcAuto()">${Object.entries(TIPOS_IVA).map(([k, v]) => `<option value="${k}" ${(g?.tipoIva ?? 21) == k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
+      + `<div class="fg"><label>${t('field.ivaRate')}</label><select id="gIva" onchange="App._gIvaChange()">${Object.entries(TIPOS_IVA).map(([k, v]) => `<option value="${k}" ${!lines.length && (g?.tipoIva ?? 21) == k ? 'selected' : ''}>${v}</option>`).join('')}<option value="mixto" ${lines.length ? 'selected' : ''}>${t('iva.mixto')}</option></select></div>`
       + `<div class="fg"><label>${t('field.irpfRate')}</label><input type="number" id="gIrpf" min="0" max="100" step="1" value="${g?.tipoIrpf || ''}" placeholder="0" onchange="App._gCalcAuto()"></div></div>`
       + `<div class="fr"><div class="fg"><label>${t('field.recurrence')}</label><select id="gRec" onchange="App._toggleGasRec(this.value)">${Object.entries(RECURRENCIA).map(([k, v]) => `<option value="${k}" ${g?.recurrente === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
       + `<div class="fg" style="display:flex;align-items:end"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;padding:.45rem 0"><input type="checkbox" id="gDes" ${g?.desgravable ? 'checked' : ''}> ${t('gas.deductibleBadge')}</label></div></div>`
@@ -192,6 +206,7 @@ Object.assign(App, {
       const wasPuntual = !g?.recurrente || g.recurrente === 'no';
       if (data.recurrente === 'no' && wasPuntual) {
         const imp = this._gReadEntry('g', data.tipoIva, data.tipoIrpf);
+        if (imp.desglose) data.tipoIva = imp.tipoIva = imp.desglose[0].tipoIva;   /* «Mixto»: el tipo del gasto es el de la primera fila */
         const fecha = document.getElementById('gED')?.value || todayStr();
         const numFactura = document.getElementById('gENF')?.value.trim() || '';
         const entradas = g?.entradas ? [...g.entradas] : [];
@@ -206,6 +221,7 @@ Object.assign(App, {
     } else {
       data.id = uid(); data.entradas = [];
       const imp = this._gReadEntry('g', data.tipoIva, data.tipoIrpf);
+      if (imp.desglose) data.tipoIva = imp.tipoIva = imp.desglose[0].tipoIva;
       if (imp.total > 0) {
         data.entradas.push({ id: uid(), fecha: document.getElementById('gED')?.value || todayStr(), ...imp, nota: '', numFactura: document.getElementById('gENF')?.value.trim() || '' });
       }
