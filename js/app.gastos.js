@@ -341,16 +341,12 @@ Object.assign(App, {
       extUE = dQ.extUE; extNoUE = dQ.extNoUE;
       ispUE = dQ.ispUE; ispNoUE = dQ.ispNoUE;
     }
-    const iva303Year = isYear ? qData.reduce((s, d) =>
-      s + Object.values(d.ivaRep).reduce((a, x) => a + x.cuota, 0)
-        - Object.values(d.ivaSop).reduce((a, x) => a + x.cuota, 0), 0) : 0;
-
     const qLabel = isYear ? `${y}` : `T${q + 1} ${y}`;
     const dedsShown = isYear ? qData.flatMap(d => d.deds) : dQ.deds;
     const dedsHtml = this._renderDedList(dedsShown);
 
     /* Stash datos para botones copiar */
-    this._lastTrimData = { label: qLabel, isYear, q, ivaRep, ivaSop, iva303Year, t303, t130, extUE, extNoUE, ispUE, ispNoUE };
+    this._lastTrimData = { label: qLabel, isYear, q, ivaRep, ivaSop, t303, t130, extUE, extNoUE, ispUE, ispNoUE, r390: isYear ? F.calc390(y) : null };
 
     /* Render casillas 303 (numeración en F.CODES303) */
     const codes303 = F.CODES303;
@@ -389,9 +385,7 @@ Object.assign(App, {
         html303 += `<div class="casilla-row"><span class="casilla-num">36</span><span class="casilla-label">${t('din.intraDedBase')}</span><span class="casilla-val">${fmtMoney(ispUE.base)}</span></div>`;
         html303 += `<div class="casilla-row"><span class="casilla-num">37</span><span class="casilla-label">${t('din.intraDedCuota')}</span><span class="casilla-val">${fmtMoney(ispUE.cuota)}</span></div>`;
       }
-      if (isYear) {
-        html303 += `<div class="casilla-row casilla-result"><span class="casilla-num">&Sigma;46</span><span class="casilla-label">${t('din.result46')}</span><span class="casilla-val" style="color:${iva303Year > 0 ? 'var(--warn)' : 'var(--ok)'}">${fmtMoney(iva303Year)}</span></div>`;
-      } else {
+      {
         html303 += `<div class="casilla-row casilla-sep"><span class="casilla-num">46</span><span class="casilla-label">${t('din.result46')}</span><span class="casilla-val">${fmtMoney(t303.c46)}</span></div>`;
         if (t303.c110 > 0) {
           html303 += `<div class="casilla-row"><span class="casilla-num">110</span><span class="casilla-label">${t('din.prevBalance')}</span><span class="casilla-val">${fmtMoney(t303.c110)}</span></div>`;
@@ -450,11 +444,11 @@ Object.assign(App, {
       + `</div>`
       + warnHtml
       + `<div class="din-trim-grid">`
-      +   `<div class="din-trim-card">`
+      +   (isYear ? this._html390(this._lastTrimData.r390) : `<div class="din-trim-card">`
       +     `<div class="din-trim-title">${t('din.model303')}</div>`
       +     html303
       +     `<div class="din-trim-actions"><button class="bt bt-s" onclick="App.copyTrim303()" title="${t('din.copyBoxes')}">&#128203; ${t('din.copyBoxes')}</button></div>`
-      +   `</div>`
+      +   `</div>`)
       +   `<div class="din-trim-card">`
       +     `<div class="din-trim-title">${t('din.model130')}</div>`
       +     html130
@@ -463,6 +457,65 @@ Object.assign(App, {
       + `</div>`
       + dedsHtml
       + `</div>`;
+  },
+
+  /** Filas del 390: [casilla, etiqueta, importe, clase]. Solo lo que tiene importe,
+   *  más los totales. Sirve para pintar y para copiar. */
+  _rows390(r) {
+    const C = F.CODES390, rows = [];
+    const sec = (label) => rows.push([null, label]);
+    const byTipo = (obj, codes, lbl, lblCuota) => Object.keys(obj).map(Number).sort((a, b) => b - a).forEach(tp => {
+      const c = codes[tp]; if (!c || !(obj[tp].base > 0 || obj[tp].cuota > 0)) return;
+      rows.push([c[0], `${lbl} ${tp}%`, obj[tp].base]); rows.push([c[1], lblCuota, obj[tp].cuota]);
+    });
+    sec(t('din.c390.devengado'));
+    byTipo(r.rep, C.rep, t('din.taxBase'), t('din.vatChargedAmt'));
+    byTipo(r.ispUE, C.ispUE, t('din.intraBase'), t('din.intraCuota'));
+    if (r.noUE.base > 0) { rows.push(['27', t('din.ispNoUEBase'), r.noUE.base]); rows.push(['28', t('din.ispNoUECuota'), r.noUE.cuota]); }
+    rows.push(['33', t('din.c390.totalBases'), r.c33]); rows.push(['47', t('din.c390.totalCuotas'), r.c47, 'casilla-sep']);
+    sec(t('din.c390.deducible'));
+    byTipo(r.sop, C.sop, t('din.inputBase'), t('din.inputVat'));
+    if (r.c48 > 0) { rows.push(['48', t('din.c390.totalBases'), r.c48]); rows.push(['49', t('din.c390.totalCuotas'), r.c49]); }
+    byTipo(r.ispUE, C.ispDed, t('din.intraDedBase'), t('din.intraDedCuota'));
+    if (r.c597 > 0) { rows.push(['597', t('din.c390.totalBases'), r.c597]); rows.push(['598', t('din.c390.totalCuotas'), r.c598]); }
+    rows.push(['64', t('din.c390.sumaDeducciones'), r.c64, 'casilla-sep']);
+    rows.push(['65', t('din.result46'), r.c65, 'casilla-result']);
+    sec(t('din.c390.liquidacion'));
+    rows.push(['84', t('din.c390.sumaResultados'), r.c84]);
+    if (r.c85 > 0) rows.push(['85', t('din.c390.compPrev'), r.c85]);
+    rows.push(['86', t('din.c390.result86'), r.c86, 'casilla-result']);
+    rows.push(['95', t('din.c390.ingresado'), r.c95]);
+    if (r.c97 > 0) rows.push(['97', t('din.c390.c97'), r.c97]);
+    if (r.c662 > 0) rows.push(['662', t('din.c390.c662'), r.c662]);
+    sec(t('din.c390.volumen'));
+    rows.push(['99', t('din.c390.vol99'), r.c99]);
+    if (r.c103 > 0) rows.push(['103', t('din.box59'), r.c103]);
+    if (r.c110 > 0) rows.push(['110', t('din.box120'), r.c110]);
+    rows.push(['108', t('din.c390.vol108'), r.c108, 'casilla-result']);
+    return rows;
+  },
+
+  _html390(r) {
+    let body = '';
+    if (r.empty) body = `<div style="font-size:.78rem;color:var(--t3);padding:.5rem 0">${t('din.noInvoicesThisPeriod')}</div>`;
+    else {
+      this._rows390(r).forEach(([num, label, val, cls]) => {
+        body += num == null
+          ? `<div style="font-size:.7rem;color:var(--t3);margin:.5rem 0 .1rem">${label}</div>`
+          : `<div class="casilla-row${cls ? ' ' + cls : ''}"><span class="casilla-num">${num}</span><span class="casilla-label">${label}</span><span class="casilla-val">${fmtMoney(val)}</span></div>`;
+      });
+      body += `<div style="font-size:.7rem;color:var(--t3);margin-top:.5rem">${t('din.c390.note')}</div>`;
+    }
+    return `<div class="din-trim-card"><div class="din-trim-title">${t('din.model390')}</div>${body}`
+      + `<div class="din-trim-actions"><button class="bt bt-s" onclick="App.copyTrim390()" title="${t('din.copyBoxes')}">&#128203; ${t('din.copyBoxes')}</button></div></div>`;
+  },
+
+  copyTrim390() {
+    const d = this._lastTrimData;
+    if (!d || !d.r390) return;
+    const lines = [`Modelo 390 — ${d.label}`];
+    this._rows390(d.r390).forEach(([num, label, val]) => lines.push(num == null ? `— ${label}` : `${num}  ${label}: ${fmtMoney(val)}`));
+    this._copyToClipboard(lines.join('\n'));
   },
 
   /** Copia las casillas del 303 al portapapeles en formato leíble */
@@ -497,9 +550,7 @@ Object.assign(App, {
       lines.push(`36  Adquis. intracomunitarias deducibles (base): ${fmtMoney(d.ispUE.base)}`);
       lines.push(`37  Adquis. intracomunitarias deducibles (cuota): ${fmtMoney(d.ispUE.cuota)}`);
     }
-    if (d.isYear) {
-      lines.push(`Σ46 Resultado del año: ${fmtMoney(d.iva303Year)}`);
-    } else {
+    {
       const t3 = d.t303;
       lines.push(`46  Resultado régimen general: ${fmtMoney(t3.c46)}`);
       if (t3.c110 > 0) {

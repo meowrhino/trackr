@@ -10,6 +10,9 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 ### ✨ Nuevo
 - **Varios tipos de IVA en una misma entrada de gasto.** Un ticket mixto (papelería al 21 % y 4 %) se registra como una sola entrada: en la ficha del gasto, «+ otro tipo de IVA» añade una fila por tipo y el total pasa a ser la suma. El 303 reparte cada línea en su tipo y los libros registro sacan una fila por tipo con el mismo número de factura, como pide la plantilla de la AEAT. Las entradas de siempre no cambian. Test: `test/gastos-desglose.mjs`. _frontend_
 
+- **Modelo 390 (resumen anual de IVA)** en Dineros → Fiscal con el periodo en «Año», en el sitio de la tarjeta del 303: devengado y deducible por tipo con sus casillas (01-06, 190/191, 603-606…), adquisiciones intracomunitarias de servicios (545-552, 587-638), totales 33/47/48/49/64, resultado 65, liquidación anual (84, 85 compensación de años anteriores, 86), resultado de las liquidaciones (95 ingresado, 97 a compensar en el último periodo, 662 pendiente del año) y volumen de operaciones (99, 103, 110, 108). Con botón «Copiar casillas». Perfil: régimen general, servicios, territorio común; datos estadísticos (IAE), bienes de inversión y modificaciones de bases quedan a mano. Contrastado con la estructura del 390 de 2025 presentado. Test: `test/modelo-390.mjs`. _frontend_
+- **El 303 separa el saldo a compensar** en «de años anteriores» y «del año» (mismas casillas 110/78/87; lo necesita el 390 para la 85 y la 662). _frontend_
+
 ### 🔧 Cambiado
 - **El Tablero de Proyectos va por estado.** Las columnas son los cinco estados (Potencial, Activo, Pausado, Completado, Abandonado) y arrastrar una tarjeta cambia el estado del proyecto; soltarla en Potencial sin presupuesto ofrece generarlo. Desaparecen las «fases de producción» editables (y la etiqueta «Fase» en ficha y tarjeta): duplicaban el estado y en la práctica casi ningún proyecto tenía fase. Los saves conservan `journey`/`journeyStage` sin leerse. _frontend_
 

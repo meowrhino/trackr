@@ -37,7 +37,7 @@ const F = {
        (informativas 59/120); ispUE/ispNoUE = inversión del sujeto pasivo de gastos
        con proveedor extranjero (devengado 10-13, deducible 36-37 o 28-29). */
     let extUE = 0, extNoUE = 0;
-    const ispUE = { base: 0, cuota: 0 }, ispNoUE = { base: 0, cuota: 0 };
+    const ispUE = { base: 0, cuota: 0, tipos: {} }, ispNoUE = { base: 0, cuota: 0, tipos: {} };
     const sinFecha = [];
     D.ps().forEach(p => {
       B.calc(p);
@@ -89,8 +89,11 @@ const F = {
                cuota al tipo del gasto (general si el usuario dejó 0%). */
             const rate = [21, 10, 4].includes(tipo) ? tipo : 21;
             const isp = zona === 'ue' ? ispUE : ispNoUE;
+            const cuota = roundMoney(base * rate / 100);
             isp.base += base;
-            isp.cuota += roundMoney(base * rate / 100);
+            isp.cuota += cuota;
+            if (!isp.tipos[rate]) isp.tipos[rate] = { base: 0, cuota: 0 };
+            isp.tipos[rate].base += base; isp.tipos[rate].cuota += cuota;   /* el 390 lo pide por tipo */
           }
           gastos += gastoImporteFiscal(zona, base, iva);
         });
@@ -161,10 +164,14 @@ const F = {
    */
   calc303(y, q, qDataOfY) {
     const cfg = this.cfg();
-    let carry = cfg.saldoIvaInicial;
+    /* El saldo pendiente se lleva en dos bolsas: lo generado en años anteriores y lo
+       del año en curso. Al 303 le da igual; el 390 lo separa (85 y 662). Se consume
+       primero lo más viejo (caduca a los 4 años). */
+    let carryPrev = cfg.saldoIvaInicial, carryCur = 0;
     const first = this.firstYear() ?? y;
     let res = null;
     for (let yy = Math.min(first, y); yy <= y; yy++) {
+      carryPrev += carryCur; carryCur = 0;
       const lastQ = yy === y ? q : 3;
       for (let qq = 0; qq <= lastQ; qq++) {
         const d = (yy === y && qDataOfY && qDataOfY[qq]) || this.quarter(yy, qq);
@@ -173,14 +180,71 @@ const F = {
         /* Las cuotas ISP (10-13) no entran: se devengan y deducen por el mismo
            importe (36-37 / 28-29), así que el 46 no cambia. Se muestran aparte. */
         const c46 = repCuota - sopCuota;
-        const c110 = carry;
-        const c78 = c46 > 0 ? Math.min(carry, c46) : 0;   /* compensación aplicada */
+        const c110 = carryPrev + carryCur;
+        const c78 = c46 > 0 ? Math.min(c110, c46) : 0;    /* compensación aplicada */
+        const c78Prev = Math.min(c78, carryPrev);          /* …de la que viene de años anteriores */
+        carryPrev -= c78Prev; carryCur -= c78 - c78Prev;
         const c87 = c110 - c78;                            /* saldo viejo que sigue pendiente */
         const c69 = c46 - c78;                             /* resultado (= c71 en nuestro perfil) */
-        carry = c87 + (c46 < 0 ? -c46 : 0);                /* el negativo nuevo alimenta el 110 siguiente */
-        res = { c46, c110, c78, c87, c69, c71: c69, carryNext: carry };
+        if (c46 < 0) carryCur += -c46;                     /* el negativo nuevo alimenta el 110 siguiente */
+        res = { c46, c110, c78, c78Prev, c87, c69, c71: c69, pendCur: carryCur, carryNext: carryPrev + carryCur };
       }
     }
     return res;
+  },
+
+  /** Casillas del 390 (resumen anual) por tipo: régimen general devengado, adquisiciones
+   *  intracomunitarias de servicios, deducible interior y deducible intracomunitario. */
+  CODES390: {
+    rep:    { 4: ['01', '02'], 10: ['03', '04'], 21: ['05', '06'], 0: ['700', '701'], 5: ['702', '703'] },
+    ispUE:  { 4: ['545', '546'], 10: ['547', '548'], 21: ['551', '552'] },
+    sop:    { 4: ['190', '191'], 10: ['603', '604'], 21: ['605', '606'], 5: ['724', '725'] },
+    ispDed: { 4: ['587', '588'], 10: ['635', '636'], 21: ['637', '638'] }
+  },
+
+  /**
+   * Modelo 390 del año y (perfil: régimen general, servicios, territorio común, sin
+   * bienes de inversión ni prorrata). Devuelve importes por tipo y las casillas de
+   * totales; la vista pone números y etiquetas. Lo que no se modela queda a 0 y a mano:
+   * datos estadísticos (IAE), modificaciones de bases, bienes de inversión, prorrata.
+   */
+  calc390(y) {
+    const qData = [0, 1, 2, 3].map(i => this.quarter(y, i));
+    const add = (acc, src) => Object.entries(src).forEach(([tp, v]) => {
+      if (!acc[tp]) acc[tp] = { base: 0, cuota: 0 };
+      acc[tp].base += v.base; acc[tp].cuota += v.cuota;
+    });
+    const rep = {}, sop = {}, ispUE = {};
+    let noUEBase = 0, noUECuota = 0, extUE = 0, extNoUE = 0;
+    qData.forEach(d => {
+      add(rep, d.ivaRep); add(sop, d.ivaSop); add(ispUE, d.ispUE.tipos);
+      add(sop, d.ispNoUE.tipos);                 /* ISP no UE se deduce como interior (28/29 del 303) */
+      noUEBase += d.ispNoUE.base; noUECuota += d.ispNoUE.cuota;
+      extUE += d.extUE; extNoUE += d.extNoUE;
+    });
+    const sum = (o, k) => roundMoney(Object.values(o).reduce((s, x) => s + x[k], 0));
+    const c33 = roundMoney(sum(rep, 'base') + sum(ispUE, 'base') + noUEBase);
+    const c47 = roundMoney(sum(rep, 'cuota') + sum(ispUE, 'cuota') + noUECuota);   /* = 34: sin recargo de equivalencia */
+    const c48 = sum(sop, 'base'), c49 = sum(sop, 'cuota');
+    const c597 = sum(ispUE, 'base'), c598 = sum(ispUE, 'cuota');
+    const c64 = roundMoney(c49 + c598);
+    const c65 = roundMoney(c47 - c64);
+    /* Resultado de las liquidaciones: lo que dijeron los cuatro 303 */
+    let c85 = 0, c95 = 0, last = null;
+    for (let q = 0; q < 4; q++) {
+      last = this.calc303(y, q, qData);
+      c85 += last.c78Prev;
+      if (last.c71 > 0) c95 += last.c71;
+    }
+    c85 = roundMoney(c85); c95 = roundMoney(c95);
+    const c86 = roundMoney(c65 - c85);
+    const c97 = last.c71 < 0 ? roundMoney(-last.c71) : 0;        /* a compensar en el último periodo */
+    const c662 = roundMoney(Math.max(0, last.pendCur - c97));   /* pendiente del año fuera del 97 */
+    const c99 = sum(rep, 'base');
+    const c108 = roundMoney(c99 + extUE + extNoUE);
+    return { rep, ispUE, sop, noUE: { base: roundMoney(noUEBase), cuota: roundMoney(noUECuota) },
+      c33, c47, c48, c49, c597, c598, c64, c65, c84: c65, c85, c86, c95, c97, c662,
+      c99, c103: roundMoney(extUE), c110: roundMoney(extNoUE), c108,
+      empty: c33 === 0 && c48 === 0 && c597 === 0 && c108 === 0 };
   }
 };
