@@ -391,6 +391,17 @@ const D = {
 
   /** Proyecto por ID */
   p(id) { return this.d.projects.find(p => p.id === id); },
+  /** Otro proyecto (distinto de pid) que ya usa ese nº de factura, o undefined. Una anulada sigue gastando su número. */
+  facturaNumTaken(num, pid) { return this.d.projects.find(p => p.id !== pid && p.facturacion?.facturaNum === num); },
+  /** ¿Tiene factura emitida y no anulada? (anulada = su registro de alta lleva el evento 'anulada') */
+  facturaVigente(pid) {
+    const p = this.p(pid);
+    if (!p?.facturacion?.facturaNum) return false;
+    const reg = (this.d.facturas || []).filter(r => r.proyectoId === pid && r.tipoRegistro === 'alta').pop();
+    return !(reg && (reg.eventos || []).some(e => e.tipo === 'anulada'));
+  },
+  /** ¿Algún proyecto de este cliente tiene factura emitida (vigente o anulada)? */
+  clienteFacturado(cid) { return this.d.projects.some(p => p.clienteId === cid && p.facturacion?.facturaNum); },
 
   /** Añade un proyecto */
   add(p) { this.d.projects.push(p); this._audit('crear', 'proyecto', p.id, p); this.save(); },

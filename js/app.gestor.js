@@ -27,7 +27,7 @@
       confirmBtn: 'Compartir', cancel: 'Cancelar', linked: 'Vinculado con', revoke: 'Revocar acceso', revokeConfirm: '¿Revocar el acceso de tu gestoría? Dejará de ver tus datos inmediatamente.', revoked: 'Acceso revocado', lastShared: 'última copia',
       gestTitle: 'Cartera de gestoría', gestDesc: 'Comparte tu código con tus clientes de TRACKR: ellos lo introducen en su Configuración para darte acceso cifrado a sus datos.',
       yourCode: 'Tu código', copy: 'Copiar', copied: 'Copiado', clients: 'Clientes vinculados', noClients: 'Ningún cliente vinculado todavía.', refresh: 'Refrescar', open: 'Ver datos', noBlob: 'sin datos aún', updated: 'actualizado',
-      viewing: 'Viendo los datos de', viewingRO: '(solo lectura: los cambios NO se guardan ni se suben)', back: '← Volver a mis datos', backOk: 'De vuelta a tus datos', openErr: 'No se pudieron descifrar los datos',
+      viewing: 'Viendo los datos de', viewingRO: '(solo lectura: los cambios NO se guardan ni se suben)', back: '← Volver a mis datos', backOk: 'De vuelta a tus datos', openErr: 'No se pudieron descifrar los datos', badIds: 'Los datos del cliente tienen identificadores no válidos',
       keyPublished: 'Clave de gestoría publicada', keyErr: 'No se pudo publicar la clave de gestoría',
       /* Etapa B */
       canEdit: 'Dejar que edite mis datos', canEditHelp: 'Podrá corregir gastos, clientes, proyectos (incluida su facturación), deducibles y tus casillas fiscales. No puede tocar tus horas, ni borrar proyectos, ni tocar tus facturas firmadas. Cada cambio queda firmado con su nombre en el historial y lo puedes deshacer.',
@@ -46,7 +46,7 @@
       confirmBtn: 'Share', cancel: 'Cancel', linked: 'Linked with', revoke: 'Revoke access', revokeConfirm: 'Revoke your advisor\'s access? They will stop seeing your data immediately.', revoked: 'Access revoked', lastShared: 'last copy',
       gestTitle: 'Advisor portfolio', gestDesc: 'Share your code with your TRACKR clients: they enter it in their Settings to give you encrypted access to their data.',
       yourCode: 'Your code', copy: 'Copy', copied: 'Copied', clients: 'Linked clients', noClients: 'No linked clients yet.', refresh: 'Refresh', open: 'View data', noBlob: 'no data yet', updated: 'updated',
-      viewing: 'Viewing data of', viewingRO: '(read-only: changes are NOT saved or uploaded)', back: '← Back to my data', backOk: 'Back to your data', openErr: 'Could not decrypt the data',
+      viewing: 'Viewing data of', viewingRO: '(read-only: changes are NOT saved or uploaded)', back: '← Back to my data', backOk: 'Back to your data', openErr: 'Could not decrypt the data', badIds: 'The client data has invalid identifiers',
       keyPublished: 'Advisor key published', keyErr: 'Could not publish advisor key',
       /* Etapa B */
       canEdit: 'Let them edit my data', canEditHelp: 'They will be able to fix expenses, clients, projects (including their billing), deductibles and your tax fields. They cannot touch your hours, delete projects, or touch your signed invoices. Every change is signed with their name in the history and you can undo it.',
@@ -65,7 +65,7 @@
       confirmBtn: 'Compartir', cancel: 'Cancel·lar', linked: 'Vinculat amb', revoke: 'Revocar accés', revokeConfirm: 'Revocar l\'accés de la teva gestoria? Deixarà de veure les teves dades immediatament.', revoked: 'Accés revocat', lastShared: 'última còpia',
       gestTitle: 'Cartera de gestoria', gestDesc: 'Comparteix el teu codi amb els teus clients de TRACKR: ells l\'introdueixen a la seva Configuració per donar-te accés xifrat a les seves dades.',
       yourCode: 'El teu codi', copy: 'Copiar', copied: 'Copiat', clients: 'Clients vinculats', noClients: 'Cap client vinculat encara.', refresh: 'Refrescar', open: 'Veure dades', noBlob: 'sense dades encara', updated: 'actualitzat',
-      viewing: 'Veient les dades de', viewingRO: '(només lectura: els canvis NO es desen ni es pugen)', back: '← Tornar a les meves dades', backOk: 'De tornada a les teves dades', openErr: 'No s\'han pogut desxifrar les dades',
+      viewing: 'Veient les dades de', viewingRO: '(només lectura: els canvis NO es desen ni es pugen)', back: '← Tornar a les meves dades', backOk: 'De tornada a les teves dades', openErr: 'No s\'han pogut desxifrar les dades', badIds: 'Les dades del client tenen identificadors no vàlids',
       keyPublished: 'Clau de gestoria publicada', keyErr: 'No s\'ha pogut publicar la clau de gestoria',
       /* Etapa B */
       canEdit: 'Deixar que editi les meves dades', canEditHelp: 'Podrà corregir despeses, clients, projectes (inclosa la seva facturació), deduïbles i les teves caselles fiscals. No pot tocar les teves hores, ni esborrar projectes, ni tocar les teves factures signades. Cada canvi queda signat amb el seu nom a l\'historial i el pots desfer.',
@@ -252,6 +252,11 @@
         // ediciones propias del gestor dejarían de subir en silencio (revisión #5).
         Acc.setAutoSync(true);
         return Toast.error(`${t('openErr')} (${r.error || '?'})`);
+      }
+      // Los ids acaban en atributos onclick: unos datos con ids raros no se cargan.
+      if (badIds(r.data).length) {
+        Acc.setAutoSync(true);
+        return Toast.error(t('badIds'));
       }
       // Marca de visor solo para re-mostrar el banner si se recarga la pestaña. NO guarda
       // datos: D.loadView carga en memoria sin persistir, así el localStorage/nube del

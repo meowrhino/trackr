@@ -223,6 +223,7 @@ Object.assign(App, {
 
   xProj(id) {
     const p = D.p(id); if (!p) return;
+    if (D.facturaVigente(id)) { Toast.warn(t('det.cannotDeleteInvoiced', `${p.facturacion.facturaNum}/${yearShort(p.facturacion.facturaFecha || todayStr())}`)); return; }
     if (confirm(t('det.deleteProjectConfirm', p.nombre))) { D.del(id); this.go('dash'); }
   },
 

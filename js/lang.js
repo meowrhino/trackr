@@ -298,6 +298,9 @@ const LANGS = {
     'det.editHour': 'Editar hora',
     'det.addHours': 'Añadir horas',
     'det.deleteHourConfirm': '¿Eliminar esta entrada de horas?',
+    'fac.numTaken': 'El número {0} ya está usado por «{1}»',
+    'det.cannotDeleteInvoiced': 'Tiene la factura {0} emitida: anúlala desde Facturas en vez de borrar el proyecto',
+    'cli.cannotDeleteInvoiced': '«{0}» tiene facturas emitidas: no se puede borrar el cliente',
     'det.deleteProjectConfirm': '¿Eliminar "{0}"?',
 
     /* ── Calendario ── */
@@ -628,6 +631,7 @@ const LANGS = {
     'msg.invalidJsonHoras': 'JSON no válido: "horas" no es un array',
     'msg.invalidJsonClientes': 'JSON no válido: "clientes" no es un array',
     'msg.invalidJsonGastos': 'JSON no válido: "gastos" no es un array',
+    'msg.invalidJsonIds': 'El archivo tiene identificadores no válidos',
     'msg.importSuccess': 'Datos importados correctamente',
     'msg.importError': 'Error al importar: ',
     'msg.resetConfirm': '¿Borrar los datos de este navegador y empezar de cero? Las copias de seguridad se conservan.',
@@ -1148,6 +1152,9 @@ const LANGS = {
     'det.editHour': 'Edit hour',
     'det.addHours': 'Add hours',
     'det.deleteHourConfirm': 'Delete this time entry?',
+    'fac.numTaken': 'Number {0} is already used by “{1}”',
+    'det.cannotDeleteInvoiced': 'It has invoice {0} issued: void it from Invoices instead of deleting the project',
+    'cli.cannotDeleteInvoiced': '“{0}” has issued invoices: the client can\'t be deleted',
     'det.deleteProjectConfirm': 'Delete "{0}"?',
 
     /* ── Calendario ── */
@@ -1478,6 +1485,7 @@ const LANGS = {
     'msg.invalidJsonHoras': 'Invalid JSON: "horas" is not an array',
     'msg.invalidJsonClientes': 'Invalid JSON: "clientes" is not an array',
     'msg.invalidJsonGastos': 'Invalid JSON: "gastos" is not an array',
+    'msg.invalidJsonIds': 'The file has invalid identifiers',
     'msg.importSuccess': 'Data imported successfully',
     'msg.importError': 'Import error: ',
     'msg.resetConfirm': 'Clear this browser\'s data and start over? Your backups are kept.',
@@ -1990,6 +1998,9 @@ const LANGS = {
     'det.editHour': 'Editar hora',
     'det.addHours': 'Afegir hores',
     'det.deleteHourConfirm': 'Eliminar aquesta entrada d\'hores?',
+    'fac.numTaken': 'El número {0} ja l\'està fent servir «{1}»',
+    'det.cannotDeleteInvoiced': 'Té la factura {0} emesa: anul·la-la des de Factures en lloc d\'esborrar el projecte',
+    'cli.cannotDeleteInvoiced': '«{0}» té factures emeses: no es pot esborrar el client',
     'det.deleteProjectConfirm': 'Eliminar "{0}"?',
 
     /* ── Calendari ── */
@@ -2320,6 +2331,7 @@ const LANGS = {
     'msg.invalidJsonHoras': 'JSON no vàlid: "horas" no és un array',
     'msg.invalidJsonClientes': 'JSON no vàlid: "clientes" no és un array',
     'msg.invalidJsonGastos': 'JSON no vàlid: "gastos" no és un array',
+    'msg.invalidJsonIds': 'El fitxer té identificadors no vàlids',
     'msg.importSuccess': 'Dades importades correctament',
     'msg.importError': 'Error en importar: ',
     'msg.resetConfirm': 'Vols esborrar les dades d\'aquest navegador i començar de zero? Les còpies de seguretat es conserven.',

@@ -593,6 +593,7 @@ Object.assign(App, {
 
   delCl(cid) {
     const c = D.cl(cid); if (!c) return;
+    if (D.clienteFacturado(cid)) { Toast.warn(t('cli.cannotDeleteInvoiced', c.nombre)); return; }
     if (!confirm(t('cfg.deleteClientConfirm', c.nombre))) return;
     D.delCl(cid); this.go(this.cv);
   },

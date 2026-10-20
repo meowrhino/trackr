@@ -133,6 +133,28 @@ function uid() {
   );
 }
 
+/** Ids no seguros de datos que vienen de fuera (JSON importado, datos de un cliente):
+ *  se interpolan en atributos onclick, así que solo se admite [A-Za-z0-9_-]{1,64}.
+ *  Un id ausente no cuenta (el store los rellena). */
+function badIds(d) {
+  const bad = [], arr = x => (Array.isArray(x) ? x : []);
+  const chk = o => {
+    if (!o || o.id == null) return;
+    if (!/^[A-Za-z0-9_-]{1,64}$/.test(String(o.id))) bad.push(o.id);
+  };
+  const ref = v => chk(v == null ? null : { id: v });   /* referencias: también acaban en onclick */
+  for (const p of arr(d?.projects)) {
+    chk(p); ref(p?.clienteId);
+    arr(p?.horas).forEach(chk);
+    arr(p?.facturacion?.cobros).forEach(chk);
+  }
+  for (const k of ['clientes', 'deducibles']) arr(d?.[k]).forEach(chk);
+  for (const f of arr(d?.facturas)) { chk(f); ref(f?.proyectoId); }
+  for (const g of arr(d?.gastos)) { chk(g); arr(g?.entradas).forEach(chk); }
+  for (const b of arr(d?.presupuestos)) { chk(b); ref(b?.clienteId); arr(b?.lineas).forEach(chk); }
+  return bad;
+}
+
 /** Escapa HTML para prevenir XSS. Incluye comillas: es seguro tanto en
  *  contenido de texto como dentro de atributos (value="${esc(...)}"). */
 function esc(s) {

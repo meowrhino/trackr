@@ -16,6 +16,10 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 ### 🔧 Cambiado
 - **El Tablero de Proyectos va por estado.** Las columnas son los cinco estados (Potencial, Activo, Pausado, Completado, Abandonado) y arrastrar una tarjeta cambia el estado del proyecto; soltarla en Potencial sin presupuesto ofrece generarlo. Desaparecen las «fases de producción» editables (y la etiqueta «Fase» en ficha y tarjeta): duplicaban el estado y en la práctica casi ningún proyecto tenía fase. Los saves conservan `journey`/`journeyStage` sin leerse. _frontend_
 
+### 🐛 Arreglado
+- **Tres guardas de facturación.** El modal de factura rechaza un número ya usado por otro proyecto (también si estaba anulada: su número no se recicla); no se puede borrar un proyecto con factura emitida sin anular (se anula desde Facturas); y no se puede borrar un cliente con proyectos facturados, para que la factura no pierda nombre ni NIF. Test: `test/facturas-guard.mjs`. _frontend_
+- **Ids con comillas en datos de fuera.** Un JSON importado, o los datos de un cliente abiertos desde la gestoría, con un id tipo `x'); …` podían ejecutar JS al interpolarse en los `onclick`. Ahora se rechaza la carga si algún id no es `[A-Za-z0-9_-]{1,64}` (`badIds` en `utils.js`, comprobado en Importar y en «Ver datos» de la cartera). Test: `test/ids.mjs`. _frontend_
+
 ---
 
 ## 2026-10-19 — Clientes y Facturas en el menú, ejemplos al día

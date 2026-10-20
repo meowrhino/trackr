@@ -356,6 +356,7 @@ const App = {
         }
         if (d.clientes && !Array.isArray(d.clientes)) { Toast.error(t('msg.invalidJsonClientes')); return; }
         if (d.gastos && !Array.isArray(d.gastos)) { Toast.error(t('msg.invalidJsonGastos')); return; }
+        if (badIds(d).length) { Toast.error(t('msg.invalidJsonIds')); return; }
         if (!d.settings) d.settings = { defaultIva: 21, defaultIrpf: 15 };
         D.load(d); T.ev('action', 'import');
         this._applyPrefs();

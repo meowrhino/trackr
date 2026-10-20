@@ -85,6 +85,9 @@ Object.assign(App, {
     const num = parseInt(document.getElementById('facNum').value) || null;
     const p = D.p(pid);
     if (!p) return;
+    const numEf = num || p.facturacion.facturaNum || D.d.settings.nextFacturaNum || 1;
+    const otro = D.facturaNumTaken(numEf, pid);
+    if (otro) { Toast.error(t('fac.numTaken', numEf, otro.nombre)); return; }
 
     /* Guardar asunto en el proyecto si difiere del default; borrar si vacío o igual al default */
     const def = defaultAsunto(Object.assign({}, p, { facturacion: Object.assign({}, p.facturacion, { asuntoFactura: '' }) }));
