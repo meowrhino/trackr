@@ -68,34 +68,33 @@ const F = {
     });
     D.gs().forEach(g => {
       if (!g.desgravable) return;
-      const tipo = g.tipoIva || 21;
-      let baseSum = 0, ivaSum = 0;
+      const zona = g.zonaFiscal || 'es';
+      /* Una línea por tipo de IVA (ticket mixto → varias líneas de la misma entrada) */
       (g.entradas || []).forEach(e => {
-        if (e.fecha && inPeriod(e.fecha, 'trim', y, m)) {
-          baseSum += e.base || 0;
-          ivaSum += e.iva || 0;
-        }
-      });
-      if (baseSum > 0 || ivaSum > 0) {
-        const zona = g.zonaFiscal || 'es';
-        if (zona === 'es') {
-          /* Sin IVA (cuota de autónomos, recibos, exentos): es gasto para el 130 pero no
-             va al 303. Antes su base engordaba la casilla 28 sin cuota que deducir. */
-          if (ivaSum > 0) {
-            if (!ivaSop[tipo]) ivaSop[tipo] = { base: 0, cuota: 0 };
-            ivaSop[tipo].base += baseSum;
-            ivaSop[tipo].cuota += ivaSum;
+        if (!e.fecha || !inPeriod(e.fecha, 'trim', y, m)) return;
+        gastoLineasIva(g, e).forEach(l => {
+          const base = l.base || 0, iva = l.iva || 0;
+          if (!(base > 0 || iva > 0)) return;
+          const tipo = l.tipoIva || 21;
+          if (zona === 'es') {
+            /* Sin IVA (cuota de autónomos, recibos, exentos): es gasto para el 130 pero no
+               va al 303. Antes su base engordaba la casilla 28 sin cuota que deducir. */
+            if (iva > 0) {
+              if (!ivaSop[tipo]) ivaSop[tipo] = { base: 0, cuota: 0 };
+              ivaSop[tipo].base += base;
+              ivaSop[tipo].cuota += iva;
+            }
+          } else {
+            /* Proveedor extranjero, factura sin IVA español → ISP: se autoliquida la
+               cuota al tipo del gasto (general si el usuario dejó 0%). */
+            const rate = [21, 10, 4].includes(tipo) ? tipo : 21;
+            const isp = zona === 'ue' ? ispUE : ispNoUE;
+            isp.base += base;
+            isp.cuota += roundMoney(base * rate / 100);
           }
-        } else {
-          /* Proveedor extranjero, factura sin IVA español → ISP: se autoliquida la
-             cuota al tipo del gasto (general si el usuario dejó 0%). */
-          const rate = [21, 10, 4].includes(tipo) ? tipo : 21;
-          const isp = zona === 'ue' ? ispUE : ispNoUE;
-          isp.base += baseSum;
-          isp.cuota += roundMoney(baseSum * rate / 100);
-        }
-        gastos += gastoImporteFiscal(zona, baseSum, ivaSum);
-      }
+          gastos += gastoImporteFiscal(zona, base, iva);
+        });
+      });
     });
     const deds = D.deds().filter(d => d.fecha && inPeriod(d.fecha, 'trim', y, m));
     gastos += deds.reduce((s, d) => s + (d.cantidad || 0), 0);

@@ -105,27 +105,33 @@ const LR = {
     D.gs().forEach((g) => {
       if (!g.desgravable) return;
       const zona = g.zonaFiscal || 'es';
-      const tipo = [21, 10, 4].includes(g.tipoIva) ? g.tipoIva : (zona === 'es' ? (g.tipoIva || 0) : 21);
       const n3 = this._nif3(zona, g.nifProveedor);
       (g.entradas || []).forEach((e) => {
         if (!enRango(e.fecha)) return;
-        const base = e.base || 0, iva = e.iva || 0, irpf = e.irpf || 0;
-        if (!(base > 0 || iva > 0)) return;
-        const ext = zona !== 'es';
-        const cuotaISP = ext ? this._r2(base * tipo / 100) : 0;
-        if (!g.nifProveedor) avisos.push(`Gasto "${g.nombre}": sin NIF del proveedor → F2`);
-        rec.push({
-          A: y, B: this._trim(e.fecha), C: act.C, D: act.D, E: act.E,
-          F: n3.id ? 'F1' : 'F2', G: this.GASTO_G[g.categoria] || 'G22',
-          H: this._r2(gastoImporteFiscal(zona, base, iva)),
-          I: this._fmtFecha(e.fecha), K: e.numFactura || '',
-          P: n3.t, Q: n3.pais, R: n3.id, S: String(g.nombre || '').slice(0, 40),
-          T: zona === 'ue' ? '09' : '01',
-          V: ext ? 'S' : '',                                    /* inversión del sujeto pasivo */
-          Z: this._r2(e.total || base + iva - irpf), AA: this._r2(base),
-          AB: ext ? tipo : (g.tipoIva || 0),
-          AC: ext ? cuotaISP : this._r2(iva), AD: ext ? cuotaISP : this._r2(iva),
-          AK: irpf > 0 ? (e.tipoIrpf || g.tipoIrpf || 0) : '', AL: irpf > 0 ? this._r2(irpf) : '',
+        const irpf = e.irpf || 0;
+        const total = this._r2(e.total || (e.base || 0) + (e.iva || 0) - irpf);
+        /* Factura con varios tipos: una fila por tipo, repitiendo los datos de la
+           factura (como pide la plantilla AEAT); la retención solo en la primera. */
+        gastoLineasIva(g, e).forEach((l, i) => {
+          const base = l.base || 0, iva = l.iva || 0;
+          if (!(base > 0 || iva > 0)) return;
+          const tipo = [21, 10, 4].includes(l.tipoIva) ? l.tipoIva : (zona === 'es' ? (l.tipoIva || 0) : 21);
+          const ext = zona !== 'es';
+          const cuotaISP = ext ? this._r2(base * tipo / 100) : 0;
+          if (!g.nifProveedor && i === 0) avisos.push(`Gasto "${g.nombre}": sin NIF del proveedor → F2`);
+          rec.push({
+            A: y, B: this._trim(e.fecha), C: act.C, D: act.D, E: act.E,
+            F: n3.id ? 'F1' : 'F2', G: this.GASTO_G[g.categoria] || 'G22',
+            H: this._r2(gastoImporteFiscal(zona, base, iva)),
+            I: this._fmtFecha(e.fecha), K: e.numFactura || '',
+            P: n3.t, Q: n3.pais, R: n3.id, S: String(g.nombre || '').slice(0, 40),
+            T: zona === 'ue' ? '09' : '01',
+            V: ext ? 'S' : '',                                    /* inversión del sujeto pasivo */
+            Z: total, AA: this._r2(base),
+            AB: tipo,
+            AC: ext ? cuotaISP : this._r2(iva), AD: ext ? cuotaISP : this._r2(iva),
+            AK: irpf > 0 && i === 0 ? (e.tipoIrpf || g.tipoIrpf || 0) : '', AL: irpf > 0 && i === 0 ? this._r2(irpf) : '',
+          });
         });
       });
     });

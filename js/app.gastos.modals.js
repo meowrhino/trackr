@@ -35,6 +35,67 @@ Object.assign(App, {
     iEl.value = importeIva || '';
     if (rEl) rEl.value = importeIrpf || '';
     if (from !== 'total') tEl.value = totalFactura || '';
+    this._gDesgCalc(prefix);
+  },
+
+  /* ── Desglose por tipos de IVA (ticket mixto 21 % + 4 % en una sola entrada) ──
+     La fila principal (Base/IVA de arriba) va al tipo del gasto; cada fila extra
+     lleva su propio tipo. Con filas extra, el Total es la suma y no se edita. */
+  _gDesgHtml(prefix, extras) {
+    return `<div id="${prefix}Desg">${(extras || []).map(l => this._gDesgRow(prefix, l)).join('')}</div>`
+      + `<button type="button" class="bt bt-s" style="margin:-.3rem 0 .75rem" onclick="App._gDesgAdd('${prefix}')">+ ${t('gas.addIvaRate')}</button>`;
+  },
+  _gDesgRow(prefix, l) {
+    const opts = Object.entries(TIPOS_IVA).map(([k, v]) => `<option value="${k}" ${l.tipoIva == k ? 'selected' : ''}>${v}</option>`).join('');
+    return `<div class="fr fr-3 gdesg-row"><div class="fg"><label>${t('field.ivaRate')}</label><select class="dT" onchange="App._gDesgCalc('${prefix}', this)">${opts}</select></div>`
+      + `<div class="fg"><label>${t('field.base')}</label><input type="number" class="dB" min="0" step="0.01" value="${l.base ?? ''}" placeholder="0,00" onchange="App._gDesgCalc('${prefix}', this)"></div>`
+      + `<div class="fg"><label>${t('field.ivaAmount')}</label><div style="display:flex;gap:.4rem"><input type="number" class="dI" min="0" step="0.01" value="${l.iva ?? ''}" placeholder="0,00" onchange="App._gDesgCalc('${prefix}')">`
+      + `<button type="button" class="bt bt-s" title="${t('btn.delete')}" onclick="this.closest('.gdesg-row').remove();App._gDesgCalc('${prefix}')">×</button></div></div></div>`;
+  },
+  _gDesgAdd(prefix) {
+    const box = document.getElementById(prefix + 'Desg'); if (!box) return;
+    const mainTipo = parseInt(document.getElementById(prefix === 'g' ? 'gIva' : 'geIva')?.value) || 0;
+    box.insertAdjacentHTML('beforeend', this._gDesgRow(prefix, { tipoIva: mainTipo === 10 ? 21 : 10, base: '', iva: '' }));
+    this._gDesgCalc(prefix);
+  },
+  /** Recalcula el IVA de la fila tocada (base × tipo) y el total de la entrada. */
+  _gDesgCalc(prefix, changed) {
+    const rows = [...document.querySelectorAll(`#${prefix}Desg .gdesg-row`)];
+    if (changed) {
+      const row = changed.closest('.gdesg-row');
+      const b = parseFloat(row.querySelector('.dB').value) || 0;
+      row.querySelector('.dI').value = roundMoney(b * (parseInt(row.querySelector('.dT').value) || 0) / 100) || '';
+    }
+    const tEl = document.getElementById(prefix + 'EA'); if (!tEl) return;
+    tEl.readOnly = rows.length > 0;
+    if (!rows.length) return;
+    const n = id => parseFloat(document.getElementById(prefix + id)?.value) || 0;
+    const extras = this._gDesgRead(prefix).reduce((s, l) => s + l.base + l.iva, 0);
+    tEl.value = roundMoney(n('EB') + n('EI') + extras - n('ER')) || '';
+  },
+  _gDesgRead(prefix) {
+    return [...document.querySelectorAll(`#${prefix}Desg .gdesg-row`)].map(row => ({
+      tipoIva: parseInt(row.querySelector('.dT').value) || 0,
+      base: parseFloat(row.querySelector('.dB').value) || 0,
+      iva: parseFloat(row.querySelector('.dI').value) || 0
+    })).filter(l => l.base > 0 || l.iva > 0);
+  },
+  /** Lee los importes de la ficha (prefijo g = gasto puntual, ge = entrada) y
+   *  devuelve los campos de la entrada; con filas extra, base/iva son la suma y
+   *  `desglose` guarda cada tipo (la fila principal primero). */
+  _gReadEntry(prefix, tipoIva, tipoIrpf) {
+    const n = id => parseFloat(document.getElementById(prefix + id)?.value) || 0;
+    let base = n('EB'), iva = n('EI'), total = n('EA');
+    const irpf = n('ER');
+    const extras = this._gDesgRead(prefix);
+    let desglose;
+    if (extras.length) {
+      desglose = [{ tipoIva, base, iva }, ...extras];
+      base = roundMoney(desglose.reduce((s, l) => s + l.base, 0));
+      iva = roundMoney(desglose.reduce((s, l) => s + l.iva, 0));
+      total = roundMoney(base + iva - irpf);
+    }
+    return { base, iva, irpf, total, cantidad: total, tipoIva, tipoIrpf, desglose };
   },
 
   /** Al cambiar un tipo (IVA/IRPF) recalcula desde donde haya datos: si hay base
@@ -48,11 +109,13 @@ Object.assign(App, {
     const gColor = g?.color || 'Salmon';
     const isPuntual = !isE || !g?.recurrente || g.recurrente === 'no';
     const e0 = isPuntual && isE ? (g.entradas || [])[0] : null;
+    const l0 = e0?.desglose?.[0] || e0, extras = e0?.desglose?.slice(1) || [];
     const entryFields = `<div id="gEntryRow"${isPuntual ? '' : ' style="display:none"'}>`
-      + `<div class="fr fr-3"><div class="fg"><label>${t('field.base')}</label><input type="number" id="gEB" min="0" step="0.01" value="${e0?.base ?? ''}" placeholder="0,00" onchange="App._gCalc('base')"></div>`
-      + `<div class="fg"><label>${t('field.ivaAmount')}</label><input type="number" id="gEI" min="0" step="0.01" value="${e0?.iva ?? ''}" placeholder="0,00"></div>`
-      + `<div class="fg"><label>${t('field.irpfAmount')}</label><input type="number" id="gER" min="0" step="0.01" value="${e0?.irpf ?? ''}" placeholder="0,00"></div></div>`
-      + `<div class="fr"><div class="fg"><label>${t('field.totalAmount')}</label><input type="number" id="gEA" min="0.01" step="0.01" value="${e0?.total ?? e0?.cantidad ?? ''}" placeholder="0,00" onchange="App._gCalc('total')"></div>`
+      + `<div class="fr fr-3"><div class="fg"><label>${t('field.base')}</label><input type="number" id="gEB" min="0" step="0.01" value="${l0?.base ?? ''}" placeholder="0,00" onchange="App._gCalc('base')"></div>`
+      + `<div class="fg"><label>${t('field.ivaAmount')}</label><input type="number" id="gEI" min="0" step="0.01" value="${l0?.iva ?? ''}" placeholder="0,00" onchange="App._gDesgCalc('g')"></div>`
+      + `<div class="fg"><label>${t('field.irpfAmount')}</label><input type="number" id="gER" min="0" step="0.01" value="${e0?.irpf ?? ''}" placeholder="0,00" onchange="App._gDesgCalc('g')"></div></div>`
+      + this._gDesgHtml('g', extras)
+      + `<div class="fr"><div class="fg"><label>${t('field.totalAmount')}</label><input type="number" id="gEA" min="0.01" step="0.01" value="${e0?.total ?? e0?.cantidad ?? ''}" placeholder="0,00" ${extras.length ? 'readonly' : ''} onchange="App._gCalc('total')"></div>`
       + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="gED" value="${e0?.fecha || todayStr()}"></div></div>`
       + `<div class="fr"><div class="fg"><label>${t('field.numFactura')}</label><input type="text" id="gENF" value="${esc(e0?.numFactura || '')}" placeholder="${t('ph.optional')}"></div></div></div>`;
     const recurringFields = `<div id="gRecFields"${isPuntual ? ' style="display:none"' : ''}>`
@@ -104,16 +167,13 @@ Object.assign(App, {
       const g = D.g(gid);
       const wasPuntual = !g?.recurrente || g.recurrente === 'no';
       if (data.recurrente === 'no' && wasPuntual) {
-        const total = parseFloat(document.getElementById('gEA')?.value) || 0;
-        const base = parseFloat(document.getElementById('gEB')?.value) || 0;
-        const iva = parseFloat(document.getElementById('gEI')?.value) || 0;
-        const irpf = parseFloat(document.getElementById('gER')?.value) || 0;
+        const imp = this._gReadEntry('g', data.tipoIva, data.tipoIrpf);
         const fecha = document.getElementById('gED')?.value || todayStr();
         const numFactura = document.getElementById('gENF')?.value.trim() || '';
         const entradas = g?.entradas ? [...g.entradas] : [];
-        if (total > 0) {
-          if (entradas[0]) { Object.assign(entradas[0], { base, iva, irpf, total, cantidad: total, tipoIva: data.tipoIva, tipoIrpf: data.tipoIrpf, fecha, numFactura }); }
-          else entradas.push({ id: uid(), fecha, base, iva, irpf, total, cantidad: total, tipoIva: data.tipoIva, tipoIrpf: data.tipoIrpf, nota: '', numFactura });
+        if (imp.total > 0) {
+          if (entradas[0]) { Object.assign(entradas[0], imp, { fecha, numFactura }); }
+          else entradas.push({ id: uid(), fecha, ...imp, nota: '', numFactura });
         }
         data.entradas = entradas;
       }
@@ -121,12 +181,9 @@ Object.assign(App, {
       D.upG(gid, data);
     } else {
       data.id = uid(); data.entradas = [];
-      const initTotal = parseFloat(document.getElementById('gEA')?.value) || 0;
-      if (initTotal > 0) {
-        const initBase = parseFloat(document.getElementById('gEB')?.value) || 0;
-        const initIva = parseFloat(document.getElementById('gEI')?.value) || 0;
-        const initIrpf = parseFloat(document.getElementById('gER')?.value) || 0;
-        data.entradas.push({ id: uid(), fecha: document.getElementById('gED')?.value || todayStr(), base: initBase, iva: initIva, irpf: initIrpf, total: initTotal, cantidad: initTotal, tipoIva: data.tipoIva, tipoIrpf: data.tipoIrpf, nota: '', numFactura: document.getElementById('gENF')?.value.trim() || '' });
+      const imp = this._gReadEntry('g', data.tipoIva, data.tipoIrpf);
+      if (imp.total > 0) {
+        data.entradas.push({ id: uid(), fecha: document.getElementById('gED')?.value || todayStr(), ...imp, nota: '', numFactura: document.getElementById('gENF')?.value.trim() || '' });
       }
       D.addG(data);
     }
@@ -150,16 +207,18 @@ Object.assign(App, {
       const d = B.desglosarTotal(prefillTotal, tipoIva, tipoIrpf);
       prefillBase = d.base; prefillIva = d.importeIva; prefillIrpf = d.importeIrpf;
     }
-    const valBase = e?.base ?? prefillBase;
-    const valIva = e?.iva ?? prefillIva;
+    const l0 = e?.desglose?.[0] || e, extras = e?.desglose?.slice(1) || [];
+    const valBase = l0?.base ?? prefillBase;
+    const valIva = l0?.iva ?? prefillIva;
     const valIrpf = e?.irpf ?? prefillIrpf;
     const valTotal = e?.total ?? e?.cantidad ?? prefillTotal;
     this.om(`<div class="mt">${isE ? t('gas.editEntry') : t('gas.addEntry')}</div>`
       + `<div class="fr fr-3"><div class="fg"><label>${t('field.base')}</label><input type="number" id="geEB" min="0" step="0.01" value="${valBase}" placeholder="0,00" onchange="App._gCalc('base','ge')"></div>`
-      + `<div class="fg"><label>${t('field.ivaAmount')}</label><input type="number" id="geEI" min="0" step="0.01" value="${valIva}" placeholder="0,00"></div>`
-      + `<div class="fg"><label>${t('field.irpfAmount')}</label><input type="number" id="geER" min="0" step="0.01" value="${valIrpf}" placeholder="0,00"></div></div>`
+      + `<div class="fg"><label>${t('field.ivaAmount')}</label><input type="number" id="geEI" min="0" step="0.01" value="${valIva}" placeholder="0,00" onchange="App._gDesgCalc('ge')"></div>`
+      + `<div class="fg"><label>${t('field.irpfAmount')}</label><input type="number" id="geER" min="0" step="0.01" value="${valIrpf}" placeholder="0,00" onchange="App._gDesgCalc('ge')"></div></div>`
       + `<input type="hidden" id="geIva" value="${tipoIva}"><input type="hidden" id="geIrpf" value="${tipoIrpf}">`
-      + `<div class="fr"><div class="fg"><label>${t('field.totalAmount')}</label><input type="number" id="geEA" min="0.01" step="0.01" value="${valTotal}" placeholder="0,00" onchange="App._gCalc('total','ge')"></div>`
+      + this._gDesgHtml('ge', extras)
+      + `<div class="fr"><div class="fg"><label>${t('field.totalAmount')}</label><input type="number" id="geEA" min="0.01" step="0.01" value="${valTotal}" placeholder="0,00" ${extras.length ? 'readonly' : ''} onchange="App._gCalc('total','ge')"></div>`
       + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="geD" value="${e?.fecha || todayStr()}"></div></div>`
       + `<div class="fr"><div class="fg"><label>${t('field.note')}</label><input type="text" id="geN" value="${esc(e?.nota || '')}" placeholder="${t('ph.detail')}"></div>`
       + `<div class="fg"><label>${t('field.numFactura')}</label><input type="text" id="geNF" value="${esc(e?.numFactura || '')}" placeholder="${t('ph.optional')}"></div></div>`
@@ -168,23 +227,18 @@ Object.assign(App, {
   },
 
   saveGE(gid, eid) {
-    const total = parseFloat(document.getElementById('geEA').value) || 0;
-    if (total <= 0) return;
     const g = D.g(gid); if (!g) return;
+    const imp = this._gReadEntry('ge', g.tipoIva || 0, g.tipoIrpf || 0);
+    if (imp.total <= 0) return;
     if (!g.entradas) g.entradas = [];
-    const base = parseFloat(document.getElementById('geEB').value) || 0;
-    const iva = parseFloat(document.getElementById('geEI').value) || 0;
-    const irpf = parseFloat(document.getElementById('geER')?.value) || 0;
     const fecha = document.getElementById('geD').value || todayStr();
     const nota = document.getElementById('geN').value.trim();
     const numFactura = document.getElementById('geNF').value.trim();
-    const tipoIva = g.tipoIva || 0;
-    const tipoIrpf = g.tipoIrpf || 0;
     if (eid) {
       const e = g.entradas.find(x => x.id === eid);
-      if (e) { Object.assign(e, { fecha, base, iva, irpf, total, cantidad: total, tipoIva, tipoIrpf, nota, numFactura }); }
+      if (e) { Object.assign(e, imp, { fecha, nota, numFactura }); }
     } else {
-      g.entradas.push({ id: uid(), fecha, base, iva, irpf, total, cantidad: total, tipoIva, tipoIrpf, nota, numFactura });
+      g.entradas.push({ id: uid(), fecha, ...imp, nota, numFactura });
     }
     const update = { entradas: g.entradas };
     const ultCheck = document.getElementById('geUlt');

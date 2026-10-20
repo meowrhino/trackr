@@ -110,6 +110,14 @@ function gastoImporteFiscal(zona, base, iva) {
   return (zona || 'es') === 'es' ? base : base + iva;
 }
 
+/** Líneas de IVA de una entrada de gasto: una por tipo. Una factura con varios
+ *  tipos (ticket mixto 21 % + 4 %) guarda `e.desglose = [{tipoIva, base, iva}]`;
+ *  sin desglose, la entrada entera va al tipo del gasto. */
+function gastoLineasIva(g, e) {
+  if (Array.isArray(e.desglose) && e.desglose.length) return e.desglose;
+  return [{ tipoIva: g.tipoIva || 0, base: e.base || 0, iva: e.iva || 0 }];
+}
+
 /** Coste real de una entrada de gasto: base + IVA. La retención de IRPF no
  *  abarata el gasto (ese dinero lo ingresas tú en el 111), así que el total
  *  de la factura (base + IVA − IRPF) no sirve como coste. */
