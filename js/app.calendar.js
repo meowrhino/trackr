@@ -62,13 +62,14 @@ Object.assign(App, {
       const cl = ['cal-day'];
       if (!c.in) cl.push('out');
       if (c.today) cl.push('today');
+      const dayTotal = (hm[c.date] || []).reduce((s, e) => s + e.cant, 0);
       const es = (hm[c.date] || []).map(e =>
         `<div class="cal-entry" style="border-left-color:${e.pc}"><span class="cal-e-ico">${e.tipo === 'trabajo' ? '💻' : '👥'}</span><span class="cal-e-h m">${e.cant}h</span><span class="cal-e-p">${esc(e.pn)}</span></div>`
       ).join('');
       const ge = (gm[c.date] || []).map(e =>
         `<div class="cal-entry cal-entry-gasto" style="border-left-color:${e.gc}"><span class="cal-e-ico">€</span><span class="cal-e-h m">${fmtMoney(e.cant)}</span><span class="cal-e-p">${esc(e.gn)}</span></div>`
       ).join('');
-      g += `<div class="${cl.join(' ')}" onclick="App.calDetail('${c.date}')"><div class="cal-num">${c.num}</div>${es}${ge}</div>`;
+      g += `<div class="${cl.join(' ')}" onclick="App.calDetail('${c.date}')"><div class="cal-day-header"><span class="cal-num">${c.num}</span>${dayTotal ? `<span class="cal-day-total m">${dayTotal.toFixed(1)}h</span>` : ''}</div>${es}${ge}</div>`;
     });
 
     /* ── Lista de gastos del mes ── */
@@ -185,7 +186,10 @@ Object.assign(App, {
     const colEndMins = colStartMins + 24 * 60;
 
     let hdr = '<div class="cal-wc"></div>';
-    days.forEach(d => { hdr += `<div class="cal-wh${d.today ? ' today' : ''}"><span class="cal-wh-dow">${d.dow}</span><span class="cal-wh-num">${d.num}</span></div>`; });
+    days.forEach(d => {
+      const dayTotal = (hm[d.date] || []).reduce((s, e) => s + e.cant, 0);
+      hdr += `<div class="cal-wh${d.today ? ' today' : ''}"><span class="cal-wh-dow">${d.dow}</span><span class="cal-wh-num">${d.num}</span>${dayTotal ? `<span class="cal-wh-total m">${dayTotal.toFixed(1)}h</span>` : ''}</div>`;
+    })
 
     /* Pushear noTime entries solo una vez por evento (su columna natural di) */
     const noTimeEntries = [];
