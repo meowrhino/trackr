@@ -680,6 +680,8 @@ Object.assign(App, {
       + `<div class="fr"><div class="fg"><label>${t('field.startTime')}</label><input type="time" id="chHI" value="${hora || ''}"></div><div class="fg"><label>${t('field.amount')}</label><input type="number" id="chMo" min="0" step="0.01" placeholder="0"></div></div>`
       + `<div class="fg"><label>${t('field.note')}</label><input type="text" id="chN" placeholder="${t('ph.whatDidYouDo')}"></div>`
       + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveCalH()">${t('btn.save')}</button></div>`);
+    // Sin proyectos, "_new" ya viene seleccionado y onchange no dispara: mostrar el bloque del nombre.
+    this._onCalProjChange(document.getElementById('chP').value);
   },
 
   _onCalProjChange(val) {
