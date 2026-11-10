@@ -175,8 +175,8 @@ const F = {
   /** Compensación del 303: con saldo a compensar c110, cuánto se aplica (78), lo que queda (87)
    *  y el resultado (69 = 71 en nuestro perfil). */
   compensar303(c46, c110) {
-    const c78 = c46 > 0 ? Math.min(c110, c46) : 0;
-    return { c78, c87: c110 - c78, c69: c46 - c78 };
+    const c78 = c46 > 0 ? roundMoney(Math.min(c110, c46)) : 0;
+    return { c78, c87: roundMoney(c110 - c78), c69: roundMoney(c46 - c78) };
   },
 
   calc130Year(y, uptoQ, qData) {
@@ -220,11 +220,13 @@ const F = {
         const sopCuota = Object.values(d.ivaSop).reduce((s, x) => s + x.cuota, 0);
         /* Las cuotas ISP (10-13) no entran: se devengan y deducen por el mismo
            importe (36-37 / 28-29), así que el 46 no cambia. Se muestran aparte. */
-        const c46 = repCuota - sopCuota;
-        const c110 = carryPrev + carryCur;
+        /* A céntimos: sumar muchas cuotas en coma flotante dejaba restos (0,1 + 0,2 = 0,30000000000000004)
+           que podían hacer aparecer una casilla 110 «con saldo» de 0,00 € */
+        const c46 = roundMoney(repCuota - sopCuota);
+        const c110 = roundMoney(carryPrev + carryCur);
         const { c78, c87, c69 } = this.compensar303(c46, c110);  /* 78 aplicada, 87 pendiente, 69 resultado */
         const c78Prev = Math.min(c78, carryPrev);          /* …de la que viene de años anteriores */
-        carryPrev -= c78Prev; carryCur -= c78 - c78Prev;
+        carryPrev = roundMoney(carryPrev - c78Prev); carryCur = roundMoney(carryCur - (c78 - c78Prev));
         if (c46 < 0) carryCur += -c46;                     /* el negativo nuevo alimenta el 110 siguiente */
         let c98 = 0;
         if (qq === 3 && cfg.devolver[yy] && carryPrev + carryCur > 0) {   /* 4T: devolución de todo el saldo */

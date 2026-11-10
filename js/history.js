@@ -42,14 +42,18 @@ const H = {
     return this._read().map(s => ({
       id: s.id,
       ts: s.ts,
-      auto: !!s.auto,
+      auto: !!(s.auto || s.safety),
       sizeKB: s.data ? Math.max(1, Math.round((s.data.length * 2) / 1024)) : 0 // UTF-16 ≈ 2 bytes/char
     }));
   },
 
+  /** Minutos durante los que una red de seguridad nueva sustituye a la anterior. */
+  SAFETY_MIN: 10,
+
   /**
    * Crea un snapshot del estado actual de D.d.
-   * @param {Object} opts { auto } — marca si es automático
+   * @param {Object} opts { auto } — la del día al arrancar; { safety } — red de seguridad que
+   *   pone el sistema (fusión entre dispositivos, ops de la gestoría, entrar con la cuenta)
    * @returns {string|null} id del snapshot, o null si no se pudo
    */
   snapshot(opts = {}) {
@@ -59,11 +63,21 @@ const H = {
       id: 'sv_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
       ts: new Date().toISOString(),
       auto: !!opts.auto,
+      safety: !!opts.safety,
       data: compressed
     };
     const arr = this._read();
+    /* Las redes de seguridad seguidas (dos pestañas abiertas, varias fusiones) llenaban las 10
+       plazas en minutos con copias casi iguales: si la última también lo es y es reciente,
+       se sustituye en vez de añadir otra. */
+    if (entry.safety && arr[0] && arr[0].safety && Date.now() - new Date(arr[0].ts).getTime() < this.SAFETY_MIN * 60000) arr.shift();
     arr.unshift(entry);                       // el nuevo se pone el primero
-    while (arr.length > this.MAX) arr.pop();   // el más viejo se descarta para siempre
+    /* Sobran: se va primero la red de seguridad más vieja; la del día y las manuales, al final */
+    while (arr.length > this.MAX) {
+      let i = -1;
+      for (let k = arr.length - 1; k > 0; k--) if (arr[k].safety) { i = k; break; }
+      arr.splice(i > 0 ? i : arr.length - 1, 1);
+    }
     return this._write(arr) ? entry.id : null;
   },
 
@@ -110,15 +124,8 @@ const H = {
     const data = this._data(id);
     if (!data) return false;
     const s = this._read().find(x => x.id === id);
-    const json = JSON.stringify(data, null, 2);
-    const blob = new Blob([json], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
     const ts = (s.ts || '').slice(0, 16).replace(/[:T]/g, '-');
-    a.href = url;
-    a.download = `trackr_${ts}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadFile(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }), `trackr_${ts}.json`);
     return true;
   },
 

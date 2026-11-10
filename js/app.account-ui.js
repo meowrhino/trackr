@@ -343,7 +343,7 @@
            (antes se bajaba la nube encima y lo fusionado quedaba solo en una copia). */
         const r2 = await Acc.push();
         if (r2.ok) Toast.ok(`${t('synced')} · v${r2.version}`);
-        else { if (typeof H !== 'undefined') H.snapshot(); await this._accPull(); Toast.warn(`${t('synced')} (${t('version')} ${r.currentVersion})`); }
+        else { if (typeof H !== 'undefined') H.snapshot({ safety: true }); await this._accPull(); Toast.warn(`${t('synced')} (${t('version')} ${r.currentVersion})`); }
       }
       else Toast.error(t('syncErr') + (r.error ? ` (${r.error})` : ''));
       this.rCfg();
@@ -352,7 +352,7 @@
     // Tras login/desbloqueo/recuperacion con cuenta activa: reconciliar local <-> nube
     // (Acc.resume decide; si ambos cambiaron, pregunta), y luego auto-sync + gestoria.
     async _accAfterAuth() {
-      if (typeof H !== 'undefined') H.snapshot(); // red de seguridad: pase lo que pase, lo local queda en el historial
+      if (typeof H !== 'undefined') H.snapshot({ safety: true }); // red de seguridad: pase lo que pase, lo local queda en el historial
       let r = await Acc.resume();
       if (r.action === 'conflict') {
         const choice = await this._accAskConflict(r);
@@ -406,7 +406,7 @@
 
     async accRestore(v, current, ts) {
       if (!confirm(t('verConfirm', v, new Date(ts).toLocaleString(L(), { dateStyle: 'medium', timeStyle: 'short' })))) return;
-      if (typeof H !== 'undefined') H.snapshot(); // lo de ahora, a salvo en este navegador
+      if (typeof H !== 'undefined') H.snapshot({ safety: true }); // lo de ahora, a salvo en este navegador
       const r = await Acc.restoreVersion(v, current);
       if (!r.ok) return Toast.error(t('syncErr') + ` (${errMsg(r.error)})`);
       Toast.ok(t('verDone', v, r.version));
@@ -476,7 +476,7 @@
     },
     accDownloadRec() {
       const blob = new Blob([`TRACKR recovery code\n${this._recCode}\n\nGuárdalo offline. Es la única forma de recuperar tus datos si olvidas la contraseña.`], { type: 'text/plain' });
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'trackr-recovery-code.txt'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      downloadFile(blob, 'trackr-recovery-code.txt');
     },
     accDoneRecovery() { const cb = this._recDone; this._recCode = null; this._recDone = null; this.cm(); if (cb) cb(); },
 

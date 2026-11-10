@@ -33,6 +33,9 @@ for (let i = 0; i < 5000; i++) {
   const c46 = rnd(4000) - 2000, c110 = rnd(3000);
   const c78 = c46 > 0 ? Math.min(c110, c46) : 0;
   const n = F.compensar303(c46, c110);
-  assert.equal(n.c78, c78); assert.equal(r2(n.c87), r2(c110 - c78)); assert.equal(r2(n.c69), r2(c46 - c78));
+  assert.equal(n.c78, r2(c78)); assert.equal(n.c87, r2(c110 - c78)); assert.equal(n.c69, r2(c46 - c78)); // a céntimos
 }
+/* Restos de coma flotante: el 303 trabaja a céntimos */
+const c = F.compensar303(0.1 + 0.2, 0.1 + 0.2);
+assert.equal(c.c78, 0.3); assert.equal(c.c87, 0); assert.equal(c.c69, 0);
 console.log('calculadoras.mjs: ok');

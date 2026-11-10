@@ -315,10 +315,9 @@ const App = {
 
   expJson() {
     T.ev('action', 'export');
-    const d = JSON.stringify(D.d, null, 2), b = new Blob([d], { type: 'application/json' }), u = URL.createObjectURL(b), a = document.createElement('a');
     const now = new Date();
-    const ts = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}`;
-    a.href = u; a.download = `trackr_backup_${ts}.json`; a.click(); URL.revokeObjectURL(u);
+    const ts = `${localDateStr(now)}_${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}`;
+    downloadFile(new Blob([JSON.stringify(D.d, null, 2)], { type: 'application/json' }), `trackr_backup_${ts}.json`);
     try { localStorage.setItem('trackr_last_export', String(Date.now())); } catch (e) { /* noop */ }
     this.cm();
     if (this.cv === 'info') this.rInfo();

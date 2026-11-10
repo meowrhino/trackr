@@ -98,7 +98,7 @@ let DIAS_SEM = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
  * ══════════════════════════════════════════════ */
 
 /** Redondea a 2 decimales (céntimos) */
-function roundMoney(v) { return Math.round(v * 100) / 100; }
+function roundMoney(v) { return Math.round(v * 100) / 100 + 0; } /* + 0: un resto negativo minúsculo da -0, que se pintaba «-0,00 €» */
 
 /**
  * Importe de un gasto que cuenta como deducible en IRPF (130, renta y libros).
@@ -197,6 +197,16 @@ function fmtDate(s) {
 
 /** Formatea cantidad monetaria: 1234.5 → "1.234,50 €" (locale dinámico) */
 function fmtMoney(n) { return fmtNum(n) + ' €'; }
+
+/** Descarga un Blob como archivo. El enlace temporal se libera un segundo después: liberarlo
+ *  justo tras el click() a veces cortaba la descarga. */
+function downloadFile(blob, name) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
 
 /** Fecha y hora cortas en el idioma de la app ("10 nov 2026, 18:35"); '—' si no hay. */
 function fmtDateTime(ts) {

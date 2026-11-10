@@ -345,7 +345,7 @@ const Acc = (() => {
             S.version = g.data.version;
             // D.d actual, no el `data` del inicio: otra pestana pudo guardar mientras volaba el PUT
             const merged = mergeData(dataObj || (typeof D !== 'undefined' ? D.d : data), cloud);
-            if (typeof H !== 'undefined' && H.snapshot) H.snapshot(); // red de seguridad antes del merge
+            if (typeof H !== 'undefined' && H.snapshot) H.snapshot({ safety: true }); // red de seguridad antes del merge
             _applyRemote(merged);
             return await push(merged, true);
           }
@@ -585,7 +585,7 @@ const Acc = (() => {
         return { ok: true, applied: 0 };
       }
 
-      if (typeof H !== 'undefined' && H.snapshot) H.snapshot(); // red de seguridad antes de tocar datos ajenos a la sesion
+      if (typeof H !== 'undefined' && H.snapshot) H.snapshot({ safety: true }); // red de seguridad antes de tocar datos ajenos a la sesion
       const shareKey = CA._.b64uDec(g.shareKey);
       // Descifrado en paralelo (independiente por fila); aplicar, en cambio, es secuencial
       // y en orden de seq — el orden de las ops es parte del contrato.

@@ -261,11 +261,7 @@ const LR = {
     if (!exp.length && !rec.length) return { ok: false, error: 'sin_datos' };
     const blob = this._xlsx(exp, rec);
     const nombre = (em.nombre || 'TRACKR').replace(/[^\wÁÉÍÓÚÑÜáéíóúñü .-]/g, '').trim();
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `${y}${nif}T${nombre}.xlsx`;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    downloadFile(blob, `${y}${nif}T${nombre}.xlsx`);
     return { ok: true, avisos, filas: { exp: exp.length, rec: rec.length } };
   },
 };

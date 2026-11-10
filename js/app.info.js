@@ -185,7 +185,7 @@ Object.assign(App, {
       actHtml = `<div class="info-section"><div class="info-section-title">${t('info.recentActivity')}</div><div class="hl">`;
       recent.forEach(a => {
         const dateLabel = a.fecha === today ? t('info.today')
-          : a.fecha === localDateStr(new Date(now - 86400000)) ? t('info.yesterday')
+          : a.fecha === localDateStr(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1)) ? t('info.yesterday') /* el día de calendario anterior, aunque cambie la hora */
           : fmtDate(a.fecha);
         if (a.fecha !== lastDate) {
           if (lastDate) actHtml += `<div class="info-act-sep"></div>`;
@@ -211,7 +211,8 @@ Object.assign(App, {
       if (!fe) return;
       const parts = fe.split('-');
       const dDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-      const diffDays = Math.ceil((dDate - todayDate) / 86400000);
+      /* round, no ceil: entre dos medianoches locales hay 23 o 25 h la semana del cambio de hora */
+      const diffDays = Math.round((dDate - todayDate) / 86400000);
       if (diffDays < -30) return; /* ignore very old deadlines */
       deadlines.push({
         pn: p.nombre, pid: p.id, fecha: fe, diffDays,

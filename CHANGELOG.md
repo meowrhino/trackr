@@ -5,6 +5,18 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-11-10 (cierre) — Últimos arreglos de la auditoría
+
+### 🐛 Arreglado
+- **Días que quedan (Inicio)**: la semana del cambio de hora decía «2 días» siendo mañana, u «hoy» con un deadline vencido ayer (`Math.ceil` sobre medianoches de 23/25 h → `Math.round`); «Ayer» es el día de calendario anterior. _frontend_
+- **303 a céntimos**: el resultado, la compensación y el saldo a compensar se redondean; los restos de coma flotante ya no dejan una casilla 110 «con saldo» de 0,00 €. `roundMoney` ya no devuelve −0 (se pintaba «-0,00 €»). _frontend_
+- **Copias de seguridad**: las que pone el sistema (fusión entre dispositivos, ops de la gestoría, entrar con la cuenta) se sustituyen si la anterior es de hace menos de 10 min, y al sobrar se va primero la más vieja de ellas: la del día y las manuales ya no se pierden. Test `test/historial.mjs`. _frontend_
+
+### 🧹 Limpieza
+- Un solo `downloadFile()` en `utils.js` para las cuatro descargas (JSON, copia, libros, código de recuperación). _frontend_
+
+---
+
 ## 2026-11-10 (noche) — Factura emitida bloqueada, anular sin VeriFactu, textos a lang.js
 
 ### ✨ Nuevo
