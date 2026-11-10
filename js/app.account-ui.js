@@ -182,6 +182,23 @@
       });
     },
 
+    /**
+     * Tras guardar: cuenta recordada pero sin sesión -> lo guardado se queda solo aquí
+     * hasta entrar. Avisa en cada guardado (sin apilar toasts) salvo que se silencie en
+     * esta pestaña (sessionStorage: al cerrarla vuelve a avisar).
+     */
+    _accNoSessionNudge() {
+      if (typeof Acc === 'undefined' || Acc.state === 'in' || D._readOnly || this._exampleName()) return;
+      try { if (sessionStorage.getItem('trackr_nosess_mute')) return; } catch (e) { /* */ }
+      const rm = Acc.remembered();
+      if (!rm || !rm.dirty) return; // sin cuenta en este navegador, o nada por subir
+      if (this._nudgeEl && this._nudgeEl.isConnected && !this._nudgeEl.dataset.gone) return; // ya hay uno visible
+      this._nudgeEl = Toast.show(t('nudge'), 'warn', 8000, [
+        { label: t('nudgeLogin'), fn: () => this._accWelcomeBack(true) },
+        { label: t('nudgeMute'), fn: () => { try { sessionStorage.setItem('trackr_nosess_mute', '1'); } catch (e) { /* */ } } },
+      ]);
+    },
+
     _accWbSkip() {
       try { sessionStorage.setItem('trackr_wb_skip', '1'); } catch (e) { /* */ }
       this._accInModal = false;

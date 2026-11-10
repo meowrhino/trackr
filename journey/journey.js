@@ -182,7 +182,7 @@
         + '</button>'
         + '</div>';
     }
-    return '<div class="jrn-col" style="--stage-color:' + hex + '" data-stage-drop="' + esc(stage.id) + '">'
+    return '<div class="jrn-col' + (cards.length ? '' : ' empty') + '" style="--stage-color:' + hex + '" data-stage-drop="' + esc(stage.id) + '">'
       + '<div class="jrn-col-hd">'
       +   '<span class="jrn-dot"></span>'
       +   '<span class="jrn-col-name" title="' + esc(stage.nombre) + '">' + esc(stage.nombre) + '</span>'

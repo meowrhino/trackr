@@ -5,6 +5,15 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-11-10 — Proyectos por reciente y aviso sin sesión
+
+### ✨ Nuevo
+- **Proyectos ordenados por reciente.** En la lista y en el tablero, cada estado va de la última hora apuntada (hasta hoy) a la más antigua; los proyectos sin horas, al final. Antes la lista iba por total de horas y el tablero por orden de creación. _frontend_
+- **El tablero cabe en pantalla.** Las columnas se reparten el ancho (entre 190 y 360 px) en lugar de medir 264 px fijos, y las vacías ocupan la mitad; solo hay scroll lateral si no caben. En móvil, igual que antes. _frontend_
+- **Aviso al guardar sin sesión.** Si este navegador recuerda una cuenta pero no has entrado, cada guardado con cambios por subir muestra un aviso («Guardado solo en este navegador: se subirá cuando entres») con «Entrar» y «No avisar más en esta sesión» (vale hasta cerrar la pestaña). Nunca apila más de uno. Los toasts aceptan botones. _frontend_
+
+---
+
 ## 2026-10-20 — Tablero por estado y tickets con varios tipos de IVA
 
 ### ✨ Nuevo

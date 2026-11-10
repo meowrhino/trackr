@@ -85,6 +85,9 @@ Object.assign(App, {
     const num = parseInt(document.getElementById('facNum').value) || null;
     const p = D.p(pid);
     if (!p) return;
+    /* Una factura de prueba a 0 € o sin emisor numera el proyecto y lo bloquea: avisar antes. */
+    if (!(p.facturacion.totalFactura > 0)) { Toast.warn(t('msg.facZero')); return; }
+    if (!D.d.settings.emisor?.nombre || !D.d.settings.emisor?.nif) { Toast.warn(t('msg.facNoEmisor')); return; }
     const numEf = num || p.facturacion.facturaNum || D.d.settings.nextFacturaNum || 1;
     const otro = D.facturaNumTaken(numEf, pid);
     if (otro) { Toast.error(t('fac.numTaken', numEf, otro.nombre)); return; }

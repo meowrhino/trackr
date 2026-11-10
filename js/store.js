@@ -376,6 +376,7 @@ const D = {
       try { localStorage.setItem('trackr_saved_at', String(this.lastSaved)); } catch (e) { /* cuota: el timestamp es prescindible */ }
       /* El refresco del indicador es UI no crítica: si falla, el guardado YA fue OK. */
       try { if (typeof App !== 'undefined' && App._renderSaved) App._renderSaved(); } catch (e) { /* noop */ }
+      try { if (typeof App !== 'undefined' && App._accNoSessionNudge) App._accNoSessionNudge(); } catch (e) { /* noop */ }
     } catch (e) {
       if (typeof Toast !== 'undefined') Toast.error('Error al guardar: ' + (e.name === 'QuotaExceededError' ? 'almacenamiento lleno' : e.message));
       console.error('D.save() failed:', e);

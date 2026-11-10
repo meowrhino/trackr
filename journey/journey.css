@@ -37,7 +37,9 @@
 .jrn-board::-webkit-scrollbar-thumb{background:var(--jb2);border-radius:4px}
 
 /* ── Columna (estadio) ── */
-.jrn-col{flex:0 0 264px;width:264px;background:var(--jbg2);border:1px solid var(--jb1);border-top:3px solid var(--stage-color,var(--jb2));border-radius:var(--jr);display:flex;flex-direction:column;max-height:calc(100vh - 220px);scroll-snap-align:start;transition:background var(--jtr),box-shadow var(--jtr)}
+/* Las columnas se reparten el ancho (sin scroll lateral mientras quepan); las vacías, la mitad */
+.jrn-col{flex:1 1 0;min-width:190px;max-width:360px;background:var(--jbg2);border:1px solid var(--jb1);border-top:3px solid var(--stage-color,var(--jb2));border-radius:var(--jr);display:flex;flex-direction:column;max-height:calc(100vh - 220px);scroll-snap-align:start;transition:background var(--jtr),box-shadow var(--jtr)}
+.jrn-col.empty{flex-grow:.5;min-width:170px}
 .jrn-col.drag-over{background:var(--jbg3);box-shadow:inset 0 0 0 2px var(--stage-color,var(--jac))}
 .jrn-col-hd{display:flex;align-items:center;gap:.45rem;padding:.7rem .75rem .5rem}
 .jrn-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;background:var(--stage-color,var(--jb2))}
@@ -134,7 +136,7 @@
 
 /* ── Mobile ── */
 @media(max-width:768px){
-  .jrn-col,.jrn-col-ghost{flex-basis:80vw;width:80vw;max-width:300px}
+  .jrn-col,.jrn-col-ghost{flex:0 0 80vw;width:80vw;max-width:300px}
   .jrn-col{max-height:none}
   .jrn-col-body{overflow:visible}
   .jrn-col-actions{opacity:1}

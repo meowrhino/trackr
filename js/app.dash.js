@@ -66,14 +66,8 @@ Object.assign(App, {
       groups[key].push(p);
     });
 
-    /* Ordenar cada grupo por horas desc */
-    Object.keys(groups).forEach(st => {
-      groups[st].sort((a, b) => {
-        const ha = B.totalHoras(a);
-        const hb = B.totalHoras(b);
-        return hb - ha;
-      });
-    });
+    /* Ordenar cada grupo: lo trabajado más recientemente arriba */
+    Object.keys(groups).forEach(st => groups[st].sort((a, b) => this._byRecent(a, b)));
 
     const c = document.getElementById('dPr');
     if (!filtered.length) {
@@ -203,6 +197,14 @@ Object.assign(App, {
   },
 
   sf(f) { this.pf = f; this.rDash(); },
+
+  /** Orden de Proyectos (lista y tablero): última fecha con horas hasta hoy, la más reciente
+   *  arriba (las horas planificadas a futuro no cuentan); sin horas, al final; empate, por horas. */
+  _byRecent(a, b) {
+    const today = todayStr();
+    const last = p => (p.horas || []).reduce((m, h) => (h.fecha && h.fecha <= today && h.fecha > m ? h.fecha : m), '');
+    return last(b).localeCompare(last(a)) || B.totalHoras(b) - B.totalHoras(a);
+  },
 
   /** Modo de Proyectos: 'list' (tarjetas por estado) o 'board' (tablero journey). Se recuerda por navegador. */
   dashMode() {

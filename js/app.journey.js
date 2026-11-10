@@ -68,7 +68,7 @@ Object.assign(App, {
   /** Construye los datos del widget: una columna por estado + una tarjeta por proyecto mostrado. */
   _jData() {
     const stages = EST_ORDER.map(k => ({ id: k, nombre: EST[k] || k, color: this._J_EST_COLORS[k], collapsed: !!this._jCollapsed[k] }));
-    const cards = D.ps().filter(p => this._jShown(p)).map(p => ({
+    const cards = D.ps().filter(p => this._jShown(p)).sort((a, b) => this._byRecent(a, b)).map(p => ({
       id: p.id,
       nombre: p.nombre,
       nota: clienteName(p),

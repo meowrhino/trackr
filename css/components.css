@@ -144,6 +144,8 @@
 .toast-warn{border-left:3px solid var(--warn)}
 .toast-error{border-left:3px solid var(--bad)}
 .toast-info{border-left:3px solid var(--t2)}
+.toast-acts{display:flex;flex-wrap:wrap;gap:.4rem 1rem;margin-top:.45rem}
+.toast-acts button{background:none;border:0;padding:0;font:inherit;color:var(--t1);text-decoration:underline;cursor:pointer}
 
 /* ── Alertas del dashboard (antes en reports.css) ── */
 .als{margin-bottom:1.5rem}

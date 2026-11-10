@@ -21,7 +21,7 @@ Object.assign(App, {
     return `<div class="info-section"><div class="info-section-title" style="display:flex;justify-content:space-between;align-items:center">`
       + `<span>${t('onb.title')}</span><span class="pwa-x" onclick="App.onbHide()" title="${t('onb.hide')}" style="cursor:pointer">&times;</span></div><div class="hl">`
       + steps.map(s => `<div class="hr${s.ok ? '' : ' hr-click'}"${s.ok ? '' : ` onclick="${s.go}"`}>`
-        + `<span class="hr-t">${s.ok ? '✓' : '○'}</span><span class="hr-n"${s.ok ? ' style="opacity:.5;text-decoration:line-through"' : ''}>${t(s.key)}</span>`
+        + `<span class="hr-t">${s.ok ? '✓' : '○'}</span><span class="hr-n" style="white-space:normal${s.ok ? ';opacity:.5;text-decoration:line-through' : ''}">${t(s.key)}</span>`
         + (s.ok ? '' : `<span style="color:var(--t3)">&rarr;</span>`) + `</div>`).join('')
       + `</div></div>`;
   },
