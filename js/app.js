@@ -30,11 +30,10 @@ const App = {
    * ══════════════════════════════════════════════ */
 
   init() {
-    /* Analytics: usamos Cloudflare Web Analytics (sin cookies, sin código aquí).
-       T.init() queda dormido por si en el futuro queremos eventos custom via Worker. */
-    T.init(null);
-
     if (!D.init()) D.create();
+    /* Estadísticas de uso anónimas (qué pantallas y acciones se usan; nunca datos): activas
+       por defecto mientras trackr está en desarrollo; se apagan en Configuración. */
+    this.applyStats();
     if (D._broken) setTimeout(() => Toast.show(t('msg.dataBroken'), 'error', 0, [{ label: t('btn.close'), fn: () => {} }]), 500);
 
     /* Aplicar tema e idioma guardados */
@@ -362,7 +361,7 @@ const App = {
         if (!d.settings) d.settings = { defaultIva: 21, defaultIrpf: 15 };
         /* Importar SUSTITUYE todo: preguntar si hay datos y guardar antes una copia */
         const cur = (D.d.projects || []).length + (D.d.gastos || []).length + (D.d.clientes || []).length;
-        if (cur && !confirm(t('msg.importConfirm', D.d.projects.length, d.projects.length))) return;
+        if (cur && !confirm(t('msg.importConfirm', D.d.projects.length, d.projects.length) + '\n\n' + this._importDiff(D.d, d))) return;
         if (cur && typeof H !== 'undefined' && H.snapshot) H.snapshot();
         D.load(d); T.ev('action', 'import');
         this._applyPrefs();
@@ -371,6 +370,42 @@ const App = {
       } catch (err) { Toast.error(t('msg.importError') + err.message); }
     };
     r.readAsText(f); ev.target.value = '';
+  },
+
+  /** Resumen de lo que cambia al importar: por lista, cuántos se añaden / quitan / cambian
+   *  (con los nombres de los primeros) y la diferencia de horas. Texto plano para confirm(). */
+  _importDiff(a, b) {
+    const lines = [];
+    const lists = [['projects', t('imp.diff.projects')], ['clientes', t('imp.diff.clients')], ['gastos', t('imp.diff.expenses')]];
+    const names = (xs) => xs.slice(0, 3).map(x => x.nombre || x.id).join(', ') + (xs.length > 3 ? ` (+${xs.length - 3})` : '');
+    for (const [k, label] of lists) {
+      const A = new Map((a[k] || []).map(x => [x.id, x])), Bm = new Map((b[k] || []).map(x => [x.id, x]));
+      const add = [...Bm.values()].filter(x => !A.has(x.id));
+      const del = [...A.values()].filter(x => !Bm.has(x.id));
+      const chg = [...Bm.values()].filter(x => A.has(x.id) && JSON.stringify(A.get(x.id)) !== JSON.stringify(x));
+      if (!add.length && !del.length && !chg.length) continue;
+      const parts = [];
+      if (add.length) parts.push(t('imp.diff.add', add.length, names(add)));
+      if (del.length) parts.push(t('imp.diff.del', del.length, names(del)));
+      if (chg.length) parts.push(t('imp.diff.chg', chg.length));
+      lines.push(`${label}: ${parts.join(' · ')}`);
+    }
+    const hrs = (d) => (d.projects || []).reduce((s, p) => s + (p.horas || []).reduce((x, h) => x + (h.cantidad || 0), 0), 0);
+    const dh = Math.round((hrs(b) - hrs(a)) * 100) / 100;
+    if (dh) lines.push(t('imp.diff.hours', (dh > 0 ? '+' : '') + dh));
+    return lines.length ? lines.join('\n') : t('imp.diff.same');
+  },
+
+  /** Enciende o apaga el envío de estadísticas según settings.compartirUso (por defecto, sí). */
+  applyStats() {
+    const on = D.d?.settings?.compartirUso !== false && typeof Acc !== 'undefined' && Acc.apiBase;
+    T.init(on ? Acc.apiBase() + '/v1/usage' : null);
+  },
+  setStats(on) {
+    D.d.settings.compartirUso = !!on;
+    D.save();
+    this.applyStats();
+    Toast.ok(t(on ? 'stats.on' : 'stats.off'));
   },
 
   resetData() {

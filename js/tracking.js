@@ -11,10 +11,13 @@ const T={
   queue:[],
   sid:Math.random().toString(36).slice(2,10), // sesión anónima (no persiste)
 
-  /* Inicializa con la URL del Worker */
+  /* Activa (url) o apaga (null) el envío. Se puede llamar varias veces: los oyentes
+     se ponen una sola vez y, apagado, la cola se vacía sin enviar. */
   init(url){
-    if(!url)return;
-    this.endpoint=url;
+    this.endpoint=url||null;
+    if(!url){this.queue=[];return;}
+    if(this._wired)return;
+    this._wired=true;
     /* Enviar al cerrar/cambiar de pestaña */
     document.addEventListener('visibilitychange',()=>{
       if(document.visibilityState==='hidden')this.flush();

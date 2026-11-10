@@ -283,6 +283,7 @@ const Acc = (() => {
       if (Array.isArray(w.horas) && Array.isArray(o.horas)) r.horas = u(w.horas, o.horas);
       if (Array.isArray(w.entradas) && Array.isArray(o.entradas)) r.entradas = u(w.entradas, o.entradas);
       if (Array.isArray(w.facturacion?.cobros) && Array.isArray(o.facturacion?.cobros)) r.facturacion = { ...w.facturacion, cobros: u(w.facturacion.cobros, o.facturacion.cobros) };
+      if (Array.isArray(w.facturacion?.rectificativas) && Array.isArray(o.facturacion?.rectificativas)) r.facturacion = { ...(r.facturacion || w.facturacion), rectificativas: u(w.facturacion.rectificativas, o.facturacion.rectificativas) };
       return r;
     };
     const newer = (c, l) => ((tc.get(c.id) || 0) > (tl.get(l.id) || 0) ? nested(c, l) : nested(l, c));
@@ -301,6 +302,14 @@ const Acc = (() => {
     const lc = local.settings || {}, cc = cloud.settings || {};
     for (const numKey of ['nextFacturaNum', 'nextPresupuestoNum', 'nextNum', 'facturaCounter', 'numFactura']) {
       if (lc[numKey] != null || cc[numKey] != null) out.settings[numKey] = Math.max(Number(lc[numKey]) || 0, Number(cc[numKey]) || 0);
+    }
+    // El contador de facturas vuelve a 1 cada año: gana el año mas reciente, y dentro del
+    // mismo año el numero mayor (un max a secas dejaria el 14 de 2026 en enero de 2027).
+    if (lc.nextFacturaYear || cc.nextFacturaYear) {
+      const ly = lc.nextFacturaYear || '', cy = cc.nextFacturaYear || '';
+      const win = ly > cy ? lc : cy > ly ? cc : null;
+      if (win) { out.settings.nextFacturaYear = win.nextFacturaYear; out.settings.nextFacturaNum = Number(win.nextFacturaNum) || 1; }
+      else out.settings.nextFacturaYear = ly;
     }
     if (local.version != null) out.version = local.version;
     return out;
@@ -738,6 +747,7 @@ const Acc = (() => {
   async function adminSetActive(id, active) { const r = await api(`/v1/admin/users/${encodeURIComponent(id)}/active`, { method: 'POST', auth: true, body: { active } }); return r.status === 200; }
   async function adminSetPaid(id, paid) { const r = await api(`/v1/admin/users/${encodeURIComponent(id)}/paid`, { method: 'POST', auth: true, body: { paid } }); return r.status === 200; }
   async function adminDelete(id) { const r = await api(`/v1/admin/users/${encodeURIComponent(id)}`, { method: 'DELETE', auth: true }); return r.status === 204; }
+  async function adminUsage(days) { const r = await api('/v1/admin/usage?days=' + (days || 30), { auth: true }); return r.status === 200 ? r.data : null; }
   async function adminGetConfig() { const r = await api('/v1/admin/config', { auth: true }); return r.status === 200 ? r.data : null; }
   /* patch: { signupsOpen?, autoActivate? } (un boolean suelto = signupsOpen, por compat) */
   async function adminSetConfig(patch) {
@@ -751,7 +761,7 @@ const Acc = (() => {
     gestorEnsureKey, gestorResolve, grantCreate, grantRevoke, gestorClients, gestorOpenClient, pushShadow, _buildShareData: buildShareData,
     grantSetCanEdit, opsPush, pullOps, setOpsListener, reconcileGrant, pushVerifactu,
     adminListUsers, adminSetActive, adminSetPaid, adminDelete, adminGetConfig, adminSetConfig, _mergeData: mergeData, adoptMeta,
-    status, isUnlocked, detectLocked, setAutoSync, setSyncListener, notifyChange, setApiBase: (u) => { API_BASE = u; },
+    status, isUnlocked, detectLocked, setAutoSync, setSyncListener, notifyChange, setApiBase: (u) => { API_BASE = u; }, apiBase: () => API_BASE, adminUsage,
     get email() { return S.email; }, get version() { return S.version; }, get state() { return S.state; },
   };
 })();

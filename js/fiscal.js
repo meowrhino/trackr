@@ -64,6 +64,22 @@ const F = {
           ivaRep[tipo].cuota += f.importeIva || 0;
         }
       }
+      /* Rectificativas: cada una cuenta en el trimestre de SU fecha, con signo (±),
+         por la misma vía que la factura original (IVA por tipo o exterior). */
+      if (f.facturaFecha && D.facturaVigente(p.id)) (f.rectificativas || []).forEach(r => {
+        if (!r.fecha || !inPeriod(r.fecha, 'trim', y, m)) return;
+        ingresos += r.base || 0;
+        retenciones += r.importeIrpf || 0;
+        const zona = (p.clienteId && D.cl(p.clienteId)?.zonaFiscal) || 'es';
+        if (zona !== 'es' && !(f.importeIva > 0)) {
+          if (zona === 'ue') extUE += r.base || 0; else extNoUE += r.base || 0;
+        } else {
+          const tipo = f.iva || 0;
+          if (!ivaRep[tipo]) ivaRep[tipo] = { base: 0, cuota: 0 };
+          ivaRep[tipo].base += r.base || 0;
+          ivaRep[tipo].cuota += r.importeIva || 0;
+        }
+      });
       /* Facturas con importe pero sin fecha: no entran en ningún periodo */
       if (!f.facturaFecha && (f.baseImponible || 0) > 0 && f.modo !== 'gratis' && p.estado !== 'potencial') {
         sinFecha.push(p.nombre);
@@ -126,36 +142,57 @@ const F = {
    * negativos de 19 se arrastran vía 15 dentro del año.
    * No soportadas (= 0): 08-11 agrícolas, 16 vivienda pre-2013, 18 complementarias.
    */
+  /* ── Fórmulas puras (sin datos de la app): las usan la app y las calculadoras públicas
+         /130 y /303, para que una regla no pueda cambiar en un sitio y no en el otro. ── */
+
+  /** Casilla 13: minoración art. 110.3.c RIRPF según el rendimiento neto del año anterior */
+  minoracion130(rn) {
+    return rn == null || rn === '' || isNaN(rn) ? 0 : rn <= 9000 ? 100 : rn <= 10000 ? 75 : rn <= 11000 ? 50 : rn <= 12000 ? 25 : 0;
+  },
+  /**
+   * Casillas de UN 130 a partir de lo acumulado del año:
+   * c01 ingresos, gas gastos reales, eds (5 % de difícil justificación), c05 = Σ07 positivos
+   * anteriores, c06 retenciones, rn rendimiento neto del año anterior, neg = negativos del
+   * año pendientes de descontar (casilla 15).
+   * Cada casilla se redondea a céntimos antes de seguir, como en el modelo oficial:
+   * si no, 04 = 321,024 daba un 07 de 40,00 donde el presentado decía 39,99.
+   */
+  casillas130({ c01, gas, eds, c05 = 0, c06 = 0, rn = null, neg = 0 }) {
+    /* EDS: 5 % de difícil justificación sobre la diferencia positiva, tope 2.000 €/año */
+    const dj = eds ? roundMoney(Math.min(0.05 * Math.max(c01 - gas, 0), 2000)) : 0;
+    const c02 = roundMoney(gas + dj);
+    const c03 = roundMoney(c01 - c02);
+    const c04 = c03 > 0 ? roundMoney(c03 * 0.20) : 0;
+    c05 = roundMoney(c05); c06 = roundMoney(c06);
+    const c07 = roundMoney(c04 - c05 - c06);
+    const c12 = Math.max(c07, 0);
+    const c13 = this.minoracion130(rn);
+    const c14 = roundMoney(c12 - c13);
+    const c15 = c14 > 0 && neg > 0 ? roundMoney(Math.min(neg, c14)) : 0;
+    const c17 = roundMoney(c14 - c15);
+    return { c01, c02, dj, c03, c04, c05, c06, c07, c12, c13, c14, c15, c17, c19: c17 };
+  },
+  /** Compensación del 303: con saldo a compensar c110, cuánto se aplica (78), lo que queda (87)
+   *  y el resultado (69 = 71 en nuestro perfil). */
+  compensar303(c46, c110) {
+    const c78 = c46 > 0 ? Math.min(c110, c46) : 0;
+    return { c78, c87: c110 - c78, c69: c46 - c78 };
+  },
+
   calc130Year(y, uptoQ, qData) {
     const cfg = this.cfg();
-    /* Casilla 13: minoración art. 110.3.c RIRPF según rendimiento neto del año anterior */
-    const rn = cfg.rendAnterior;
-    const minor = rn == null ? 0 : rn <= 9000 ? 100 : rn <= 10000 ? 75 : rn <= 11000 ? 50 : rn <= 12000 ? 25 : 0;
     const out = [];
     let acumIng = 0, acumGas = 0, acumRet = 0, pendNeg = 0;
     for (let q = 0; q <= uptoQ; q++) {
       const d = (qData && qData[q]) || this.quarter(y, q);
       acumIng += d.ingresos; acumGas += d.gastos; acumRet += d.retenciones;
-      const c01 = acumIng;
-      /* EDS: 5% de difícil justificación sobre la diferencia positiva, tope 2.000 €/año */
-      const dj = cfg.eds ? roundMoney(Math.min(0.05 * Math.max(c01 - acumGas, 0), 2000)) : 0;
-      const c02 = roundMoney(acumGas + dj);
-      const c03 = roundMoney(c01 - c02);
-      /* Cada casilla se redondea a céntimos antes de seguir, como en el modelo oficial:
-         si no, 04 = 321,024 daba un 07 de 40,00 donde el presentado decía 39,99. */
-      const c04 = c03 > 0 ? roundMoney(c03 * 0.20) : 0;
-      const c05 = roundMoney(out.reduce((s, prev) => s + Math.max(prev.c07, 0), 0));
-      const c06 = roundMoney(acumRet);
-      const c07 = roundMoney(c04 - c05 - c06);
-      const c12 = Math.max(c07, 0);
-      const c13 = minor;
-      const c14 = c12 - c13;
-      let c15 = 0;
-      if (c14 > 0 && pendNeg > 0) { c15 = Math.min(pendNeg, c14); pendNeg -= c15; }
-      const c17 = c14 - c15;
-      const c19 = c17;
-      if (c19 < 0 && q < 3) pendNeg += -c19;
-      out.push({ q, c01, c02, dj, c03, c04, c05, c06, c07, c12, c13, c14, c15, c17, c19 });
+      const c = this.casillas130({
+        c01: acumIng, gas: acumGas, eds: cfg.eds, c06: acumRet, rn: cfg.rendAnterior, neg: pendNeg,
+        c05: out.reduce((s, prev) => s + Math.max(prev.c07, 0), 0)
+      });
+      pendNeg -= c.c15;
+      if (c.c19 < 0 && q < 3) pendNeg += -c.c19;
+      out.push({ q, ...c });
     }
     return out;
   },
@@ -185,11 +222,9 @@ const F = {
            importe (36-37 / 28-29), así que el 46 no cambia. Se muestran aparte. */
         const c46 = repCuota - sopCuota;
         const c110 = carryPrev + carryCur;
-        const c78 = c46 > 0 ? Math.min(c110, c46) : 0;    /* compensación aplicada */
+        const { c78, c87, c69 } = this.compensar303(c46, c110);  /* 78 aplicada, 87 pendiente, 69 resultado */
         const c78Prev = Math.min(c78, carryPrev);          /* …de la que viene de años anteriores */
         carryPrev -= c78Prev; carryCur -= c78 - c78Prev;
-        const c87 = c110 - c78;                            /* saldo viejo que sigue pendiente */
-        const c69 = c46 - c78;                             /* resultado (= c71 en nuestro perfil) */
         if (c46 < 0) carryCur += -c46;                     /* el negativo nuevo alimenta el 110 siguiente */
         let c98 = 0;
         if (qq === 3 && cfg.devolver[yy] && carryPrev + carryCur > 0) {   /* 4T: devolución de todo el saldo */

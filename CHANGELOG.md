@@ -5,6 +5,23 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-11-10 (tarde) — Rectificativas, numeración por año, «i» de ayuda y estadísticas de la beta
+
+### ✨ Nuevo
+- **Rectificar una factura emitida**: botón «Rectificar» en la ficha. Se pone la base correcta y se crea una rectificativa por diferencias (serie R por año: R1/26…), con su PDF («Factura rectificativa», referencia y motivo). Cuenta con signo en el 303/130/390 del trimestre de SU fecha y en el libro de expedidas (tipo R1); el pendiente de cobro y el €/h la tienen en cuenta. La factura original no se toca. No se envía a VeriFactu (avisa). Test en `test/facturas-estado.mjs`. _frontend_
+- **Numeración por año**: en enero la factura propone el 1 (1/27); el número repetido se mira dentro del año; al fusionar dispositivos gana el año más reciente. _frontend_
+- **«i» de ayuda** (clic, también en móvil): devengo en la fecha de la factura y en los títulos del 303/130; qué es una rectificativa; qué se comparte en las estadísticas. _frontend_
+- **Resumen al importar**: el aviso dice cuántos proyectos, clientes y gastos se añaden, desaparecen o cambian, y la diferencia de horas. _frontend_
+- **IVA de un gasto**: al cambiarlo, pregunta si es solo para lo nuevo o una corrección de las entradas anteriores (recalcula su IVA con la misma base). Una cuota con el tipo a 0 % toma el tipo de los importes (303 y libros coinciden). _frontend_
+- **Estadísticas de uso anónimas** (beta), activadas por defecto: qué pantallas y botones se usan, sumadas por día, sin usuarios ni contenido. Casilla en el registro («trackr aún está en desarrollo…») y en Configuración; resumen en `/admin` → Uso. Endpoint `POST /v1/usage` + `GET /v1/admin/usage` y tablas `usage_events`/`usage_sessions` (`scripts/migrate-usage.sql`, aplicada y desplegada en producción). _frontend + backend@39bdbef_
+
+### 🐛 Arreglado
+- **«i» de ayuda en 27 sitios**: IVA % e IRPF % del proyecto, modos de facturación, excepción IVA, cobro en una hora, neto, €/h, interno/recurrente, fecha del cobro, nº de factura, zona fiscal y NIF del cliente, desgravable, IRPF del proveedor, proveedor extranjero, tipo y fecha del gasto, deducciones, 303 y 130, VeriFactu, 5 % de difícil justificación, copias de seguridad, alcance y huella de la gestoría. _frontend_
+- **Calculadoras /130 y /303** usan las mismas fórmulas que la app (`F.casillas130`, `F.compensar303`); comprobado con 10.000 casos al azar (`test/calculadoras.mjs`) y con los datos de los tres ejemplos y uno real (resultados idénticos). _frontend_
+- **Guía**: decía que los impuestos se prorratean por la fecha del cobro (falso: van por la fecha de la factura); y el ejemplo «IVA 4 % — traducción literaria» pasa a «consulta a tu gestoría». _frontend_
+
+---
+
 ## 2026-11-10 — Auditoría: arreglos de dinero, datos y seguridad; columna Recurrente
 
 ### ✨ Nuevo

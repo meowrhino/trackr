@@ -61,7 +61,7 @@ const Fac = {
     doc.setFontSize(16);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(40);
-    doc.text(`${tf(isBud ? 'fac.budget' : 'fac.invoice', lang)} ${numYY}`, leftX, y);
+    doc.text(`${tf(isBud ? 'fac.budget' : data.kind === 'rectificativa' ? 'fac.rectInvoice' : 'fac.invoice', lang)} ${numYY}`, leftX, y);
     y += 8;
 
     /* ── 2-column header: Emisor (left) | Datos de factura (right) ── */
@@ -138,6 +138,16 @@ const Fac = {
       y += conceptoLines.length * 5 + 6;
     }
 
+    /* ── Rectificativa: qué factura corrige y por qué ── */
+    if (data.rectifica) {
+      section(tf('fac.rectifies', lang));
+      const ref = tf('fac.rectRef', lang, data.rectifica.num, fmtDate(data.rectifica.fecha))
+        + (data.rectifica.motivo ? ' ' + tf('fac.rectReason', lang, data.rectifica.motivo) : '');
+      const refLines = doc.splitTextToSize(ref, pageW - mg * 2);
+      doc.text(refLines, leftX, y);
+      y += refLines.length * 5 + 6;
+    }
+
     /* ── Líneas (una por proyecto): concepto a la izquierda, base a la derecha ── */
     if (data.lineas && data.lineas.length) {
       section(tf('fac.breakdown', lang));
@@ -165,7 +175,7 @@ const Fac = {
     const ivas = c.ivas || [{ rate: c.ivaRate, amount: c.iva }];
     irpfs.filter(r => r.rate > 0).forEach(r => rows.push({
       label: tf('fac.retention', lang, r.rate),
-      value: '- ' + fmt(Math.abs(r.amount)) + ' \u20AC'
+      value: (r.amount < 0 ? '+ ' : '- ') + fmt(Math.abs(r.amount)) + ' \u20AC' /* en una rectificativa a la baja la retención resta menos */
     }));
     /* IVA 0 también sale como fila (con la nota de exención debajo si la hay) */
     ivas.forEach(r => rows.push({
@@ -355,6 +365,26 @@ const Fac = {
     return { data, lang, cl };
   },
 
+  /** PDF de una rectificativa ya guardada en p.facturacion.rectificativas (por diferencias). */
+  downloadRect(pid, rid) {
+    const p = D.p(pid); if (!p) return;
+    const f = p.facturacion, r = (f.rectificativas || []).find(x => x.id === rid); if (!r) return;
+    const s = D.d.settings;
+    const cl = p.clienteId ? D.cl(p.clienteId) : null;
+    const lang = f.idiomaFactura || s.idioma || 'es';
+    const data = {
+      kind: 'rectificativa',
+      emisor: s.emisor,
+      cliente: this.clienteData(cl, clienteName(p)),
+      factura: { numero: r.num, fecha: r.fecha, vencimiento: null, asunto: f.asuntoFactura || defaultAsunto(p) },
+      rectifica: { num: `${f.facturaNum}/${yearShort(f.facturaFecha)}`, fecha: f.facturaFecha, motivo: r.motivo || '' },
+      calculos: { base: r.base, iva: r.importeIva, ivaRate: f.iva || 0, irpf: r.importeIrpf, irpfRate: f.irpf || 0, total: r.total, ivaExcepcion: f.ivaExcepcion || '' },
+      beneficiarioPago: s.emisor.beneficiarioPago || '',
+      instruccionesPago: r.total > 0 ? (s.emisor.instruccionesPago || '') : ''
+    };
+    this.genPDF(data, lang).save(`factura_${r.num}_${yearShort(r.fecha)}_${p.nombre.replace(/\s+/g, '_')}.pdf`);
+  },
+
   download(pid, opts = {}) {
     const p = D.p(pid);
     if (!p) return;
@@ -367,7 +397,7 @@ const Fac = {
     const facLang = f.idiomaFactura || D.d.settings.idioma || 'es';
 
     /* Numero de factura */
-    const num = opts.num || f.facturaNum || s.nextFacturaNum || 1;
+    const num = opts.num || f.facturaNum || D.nextFacturaNum(opts.fecha || f.facturaFecha);
     const numStr = String(num);
 
     /* Fecha y year short */
@@ -409,9 +439,11 @@ const Fac = {
     f.facturaFecha = data.factura.fecha;
     D.up(pid, { facturacion: f });
 
-    /* Incrementar contador */
-    if (!p.facturacion.facturaNum || num >= s.nextFacturaNum) {
-      s.nextFacturaNum = num + 1;
+    /* Contador del año de esta factura (en enero vuelve a 1: ver D.nextFacturaNum) */
+    const fy = String(data.factura.fecha || '').slice(0, 4);
+    if (s.nextFacturaYear !== fy || num >= (s.nextFacturaNum || 1)) {
+      if (s.nextFacturaYear && fy < s.nextFacturaYear) { /* factura atrasada de otro año: el contador no retrocede */ }
+      else { s.nextFacturaNum = Math.max(num + 1, s.nextFacturaYear === fy ? (s.nextFacturaNum || 1) : 1); s.nextFacturaYear = fy; }
       D.save();
     }
 

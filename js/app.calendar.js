@@ -677,7 +677,7 @@ Object.assign(App, {
       + `</div>`
       + `<label>Tipo</label><div class="ts2"><div class="to on" data-type="trabajo" onclick="App.selT(this)"><span class="ic">💻</span><span class="la">${t('det.work')}</span></div><div class="to" data-type="reunion" onclick="App.selT(this)"><span class="ic">👥</span><span class="la">${t('det.meeting')}</span></div></div>`
       + `<div class="fr"><div class="fg"><label>${t('field.hours')}</label><input type="number" id="chA" min="0.25" step="0.25" value="${dur}"></div><div class="fg"><label>${t('field.date')}</label><input type="date" id="chD" value="${fecha || todayStr()}"></div></div>`
-      + `<div class="fr"><div class="fg"><label>${t('field.startTime')}</label><input type="time" id="chHI" value="${hora || ''}"></div><div class="fg"><label>${t('field.amount')}</label><input type="number" id="chMo" min="0" step="0.01" placeholder="0"></div></div>`
+      + `<div class="fr"><div class="fg"><label>${t('field.startTime')}</label><input type="time" id="chHI" value="${hora || ''}"></div><div class="fg"><label>${t('field.amount')}${itip('tip.horaMonto')}</label><input type="number" id="chMo" min="0" step="0.01" placeholder="0"></div></div>`
       + `<div class="fg"><label>${t('field.note')}</label><input type="text" id="chN" placeholder="${t('ph.whatDidYouDo')}"></div>`
       + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveCalH()">${t('btn.save')}</button></div>`);
     // Sin proyectos, "_new" ya viene seleccionado y onchange no dispara: mostrar el bloque del nombre.

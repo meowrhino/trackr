@@ -398,7 +398,38 @@ const D = {
   /** Proyecto por ID */
   p(id) { return this.d.projects.find(p => p.id === id); },
   /** Otro proyecto (distinto de pid) que ya usa ese nº de factura, o undefined. Una anulada sigue gastando su número. */
-  facturaNumTaken(num, pid) { return this.d.projects.find(p => p.id !== pid && p.facturacion?.facturaNum === num); },
+  /** Otro proyecto con el mismo número EN EL MISMO AÑO (se imprime N/AA: la serie vuelve a 1
+   *  cada enero). Sin fecha, compara solo el número. Una anulada sigue gastando su número. */
+  facturaNumTaken(num, pid, fecha) {
+    const y = fecha ? String(fecha).slice(0, 4) : null;
+    return this.d.projects.find(p => p.id !== pid && p.facturacion?.facturaNum != null && +p.facturacion.facturaNum === +num
+      && (!y || String(p.facturacion.facturaFecha || '').slice(0, 4) === y));
+  },
+  /** Siguiente número de rectificativa (serie R, por año): 'R1', 'R2'… */
+  nextRectNum(fecha) {
+    const y = String(fecha || todayStr()).slice(0, 4);
+    let max = 0;
+    this.d.projects.forEach(p => (p.facturacion?.rectificativas || []).forEach(r => {
+      if (String(r.fecha || '').slice(0, 4) === y) max = Math.max(max, parseInt(String(r.num).replace(/\D/g, ''), 10) || 0);
+    }));
+    return 'R' + (max + 1);
+  },
+  /** Número que toca para una factura con esta fecha: el siguiente de su año. El contador de
+   *  Configuración (nextFacturaNum) vale para el año en que se usó por última vez
+   *  (nextFacturaYear; en datos viejos, el año de la última factura); en un año nuevo, 1. */
+  nextFacturaNum(fecha) {
+    const y = String(fecha || todayStr()).slice(0, 4);
+    const s = this.d.settings || {};
+    let max = 0, lastY = null;
+    this.d.projects.forEach(p => {
+      const f = p.facturacion; if (!f?.facturaNum || !f.facturaFecha) return;
+      const fy = f.facturaFecha.slice(0, 4);
+      if (!lastY || fy > lastY) lastY = fy;
+      if (fy === y) max = Math.max(max, +f.facturaNum || 0);
+    });
+    const cfgY = s.nextFacturaYear || lastY || y;
+    return Math.max(max + 1, cfgY === y ? (+s.nextFacturaNum || 1) : 1);
+  },
   /** ¿Tiene factura emitida y no anulada? (anulada = su registro de alta lleva el evento 'anulada') */
   facturaVigente(pid) {
     const p = this.p(pid);

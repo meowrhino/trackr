@@ -59,4 +59,31 @@ D.d.gastos[0].tipoIva = 21;
 assert.equal(gastoLineasIvaTipo(), 10);
 function gastoLineasIvaTipo() { return vm.runInContext('gastoLineasIva(D.d.gastos[0], D.d.gastos[0].entradas[0])[0].tipoIva', ctx); }
 
+/* 5. Cuota con tipo 0: el tipo sale de los importes (303 y libros coinciden) */
+assert.equal(vm.runInContext("gastoLineasIva({ tipoIva: 0 }, { base: 100, iva: 10 })[0].tipoIva", ctx), 10);
+assert.equal(vm.runInContext("gastoLineasIva({ tipoIva: 0 }, { base: 100, iva: 0 })[0].tipoIva", ctx), 0, 'sin cuota sigue a 0');
+
+/* 6. Numeración por año: en enero vuelve a 1; el número repetido se mira dentro del año */
+D.d.settings.nextFacturaNum = 14; delete D.d.settings.nextFacturaYear;
+assert.equal(D.nextFacturaNum('2026-11-10'), 14, 'en el año en curso, el contador');
+assert.equal(D.nextFacturaNum('2027-01-05'), 1, 'año nuevo: 1');
+assert.ok(D.facturaNumTaken(1, 'otro', '2026-05-01'), '1/26 ya existe');
+assert.equal(D.facturaNumTaken(1, 'otro', '2027-01-05'), undefined, '1/27 está libre');
+assert.equal(D.facturaNumTaken('1', 'otro', '2026-05-01')?.id, 'vig', 'número guardado como texto también cuenta');
+
+/* 7. Rectificativa a la baja: cuenta en el trimestre de su fecha, con signo; pendiente y pagado la tienen en cuenta */
+const vig = D.p('vig');
+const rd = B.rectDiff(vig.facturacion, 800);              // de 1000 a 800
+assert.equal(rd.base, -200); assert.equal(rd.importeIva, -42); assert.equal(rd.importeIrpf, -30); assert.equal(rd.total, -212);
+vig.facturacion.rectificativas = [{ id: 'r1', num: D.nextRectNum('2026-04-10'), fecha: '2026-04-10', ...rd }];
+assert.equal(vig.facturacion.rectificativas[0].num, 'R1');
+assert.equal(F.quarter(2026, 0).ingresos, 1000, 'el 1T no cambia');
+assert.equal(F.quarter(2026, 1).ingresos, -200, 'la rectificativa va al 2T');
+B.calc(vig);
+assert.equal(vig.facturacion.totalConRect, 848);          // 1000 + 210 − 150 − 212
+vig.facturacion.cobros = [{ id: 'k', cantidad: 848 }]; B.calc(vig);
+assert.equal(vig.facturacion.pagado, true);
+assert.equal(B.rectDiff(vig.facturacion, 800).base, 0, 'otra a la misma base: nada');
+assert.equal(D.nextRectNum('2026-05-01'), 'R2');
+
 console.log('facturas-estado.mjs: ok');

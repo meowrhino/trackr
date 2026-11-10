@@ -34,7 +34,7 @@ Object.assign(App, {
       + `<div class="cfg-section"><div class="cfg-section-title">${t('cfg.fiscalTitle')}</div><div class="cfg-grid">`
       + `<div class="fg"><label>${t('cfg.rendAnterior')}</label><input type="number" id="cfgFRend" value="${fis.rendAnterior ?? ''}" min="0" step="100" placeholder="—"><div style="font-size:.72rem;color:var(--t3);margin-top:.35rem">${t('cfg.rendAnteriorHelp')}</div></div>`
       + `<div class="fg"><label>${t('cfg.saldoIva')}</label><input type="number" id="cfgFSaldo" value="${fis.saldoIvaInicial || ''}" min="0" step="0.01" placeholder="0"><div style="font-size:.72rem;color:var(--t3);margin-top:.35rem">${t('cfg.saldoIvaHelp')}</div></div>`
-      + `<div class="cfg-full fg"><label style="font-size:.82rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0;color:var(--t2)"><input type="checkbox" id="cfgFEds" style="margin:0;width:14px;height:14px;accent-color:var(--ac)" ${fis.eds !== false ? 'checked' : ''}>${t('cfg.eds')}</label></div>`
+      + `<div class="cfg-full fg"><label style="font-size:.82rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0;color:var(--t2)"><input type="checkbox" id="cfgFEds" style="margin:0;width:14px;height:14px;accent-color:var(--ac)" ${fis.eds !== false ? 'checked' : ''}>${t('cfg.eds')}${itip('tip.eds')}</label></div>`
       + `<div class="fg"><label>${t('cfg.actTipo')}</label><select id="cfgFActT">${[['A', t('cfg.actTipoA')], ['B', t('cfg.actTipoB')]].map(([k, v]) => `<option value="${k}" ${(fis.actTipo || 'A') === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
       + `<div class="fg"><label>${t('cfg.actCodigo')}</label><select id="cfgFActC">${[['05', t('cfg.act05')], ['04', t('cfg.act04')], ['03', t('cfg.act03')], ['01', t('cfg.act01')]].map(([k, v]) => `<option value="${k}" ${(fis.actCodigo || '05') === k ? 'selected' : ''}>${k} — ${v}</option>`).join('')}</select></div>`
       + `<div class="cfg-full fg"><label>${t('cfg.actIAE')}</label><input type="text" id="cfgFActE" value="${esc(fis.actIAE || '')}" placeholder="763"><div style="font-size:.72rem;color:var(--t3);margin-top:.35rem">${t('cfg.actHelp')}</div></div>`
@@ -59,6 +59,7 @@ Object.assign(App, {
             + `<div style="width:100%;height:3px;border-radius:1px;background:${th.vars.ac || th.vars.ok};margin-top:3px"></div>`
             + `</div><span class="theme-name">${t('theme.' + id)}</span></button>`;
         }).join('')}</div></div>`
+      + this._cfgStatsSection()
       + this._cfgVerifactuSection()
       + (this._cfgGestoresSection ? this._cfgGestoresSection() : '')
       + this._cfgAuditSection()
@@ -173,7 +174,7 @@ Object.assign(App, {
     } else {
       listHtml = `<div style="color:var(--t3);font-size:.82rem;margin-top:.5rem">${tx('none')}</div>`;
     }
-    return `<div class="cfg-section" style="margin-top:2.5rem"><div class="cfg-section-title">${tx('title')}</div>`
+    return `<div class="cfg-section" style="margin-top:2.5rem"><div class="cfg-section-title">${tx('title')}${itip('tip.backups')}</div>`
       + `<div style="color:var(--t3);font-size:.82rem;margin-bottom:.75rem">${tx('desc')}</div>`
       + `<button class="bt bt-add" onclick="App.histSnapshot()">${tx('saveNow')}</button>`
       + listHtml
@@ -226,6 +227,14 @@ Object.assign(App, {
   },
 
   /** Sección Verifactu: identidad SIF + lista de facturas firmadas + verificar cadena */
+  /** Estadísticas de uso anónimas: activadas por defecto mientras trackr está en desarrollo. */
+  _cfgStatsSection() {
+    const on = D.d.settings.compartirUso !== false;
+    return `<div class="cfg-section"><div class="cfg-section-title">${t('stats.title')}${itip('tip.stats')}</div>`
+      + `<label style="display:flex;align-items:flex-start;gap:.5rem;cursor:pointer;text-transform:none;letter-spacing:0;font-size:.85rem;color:var(--t2)">`
+      + `<input type="checkbox" ${on ? 'checked' : ''} onchange="App.setStats(this.checked)" style="width:auto;margin-top:.2rem">${t('stats.label')}</label></div>`;
+  },
+
   _cfgVerifactuSection() {
     /* Si verifactu.js no se ha cargado (p.ej. deploy parcial), omitir la sección
        en vez de romper toda la vista de Configuración. */
@@ -242,7 +251,7 @@ Object.assign(App, {
       + `</div>`
       + `<div class="cfg-grid">`
       + `<div class="fg"><label>${t('cfg.vfEnv')}</label><select id="cfgVfEnv"><option value="prod" ${v.env !== 'test' ? 'selected' : ''}>${t('cfg.vfEnvProd')}</option><option value="test" ${v.env === 'test' ? 'selected' : ''}>${t('cfg.vfEnvTest')}</option></select></div>`
-      + `<div class="fg"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="cfgVfEnabled" ${v.habilitado === true ? 'checked' : ''}> ${t('cfg.vfEnabled')}</label></div>`
+      + `<div class="fg"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="cfgVfEnabled" ${v.habilitado === true ? 'checked' : ''}> ${t('cfg.vfEnabled')}${itip('tip.verifactu')}</label></div>`
       + `</div>`
       + `<p class="small" style="color:var(--t3);margin-top:.5rem">${t('cfg.vfLastHash')}: <code class="mono" style="font-size:.72rem">${esc(lastH)}</code> · ${t('cfg.vfTotalSigned', facts.length)} · ${t('cfg.vfEmisor')}: ${esc(emisor || t('cfg.vfNoEmisor'))}</p>`
       + this._vfRemisionLine(facts, v)
@@ -557,8 +566,8 @@ Object.assign(App, {
     this.om(`<div class="mt">${isE ? t('cfg.editClient') : t('cfg.newClient')}</div>`
       + `<div class="fr"><div class="fg"><label>${t('field.nickname')}</label><input type="text" id="clN" value="${esc(c?.nombre || '')}" placeholder="${t('ph.clientNameOrCompany')}"></div><div class="fg"><label>${t('field.fullName')}</label><input type="text" id="clNC" value="${esc(c?.nombreCompleto || '')}" placeholder="${t('ph.fullName')}"></div></div>`
       + `<div class="fr"><div class="fg"><label>${t('cfg.address1')}</label><input type="text" id="clD1" value="${esc(c?.direccion1 || '')}" placeholder="${t('ph.street')}"></div><div class="fg"><label>${t('cfg.address2')}</label><input type="text" id="clD2" value="${esc(c?.direccion2 || '')}" placeholder="${t('ph.clientCity')}"></div></div>`
-      + `<div class="fr"><div class="fg"><label>${t('cfg.nif')}</label><input type="text" id="clNif" value="${esc(c?.nif || '')}" placeholder="${t('ph.nif')}"></div><div class="fg"><label>${t('field.color')}</label>${this.colorSelect(clColor)}</div></div>`
-      + `<div class="fr"><div class="fg"><label>${t('field.zonaFiscal')}</label><select id="clZona">${Object.entries(ZONA_FISCAL).map(([k, v]) => `<option value="${k}" ${(c?.zonaFiscal || 'es') === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
+      + `<div class="fr"><div class="fg"><label>${t('cfg.nif')}${itip('tip.nifCl')}</label><input type="text" id="clNif" value="${esc(c?.nif || '')}" placeholder="${t('ph.nif')}"></div><div class="fg"><label>${t('field.color')}</label>${this.colorSelect(clColor)}</div></div>`
+      + `<div class="fr"><div class="fg"><label>${t('field.zonaFiscal')}${itip('tip.zonaCl')}</label><select id="clZona">${Object.entries(ZONA_FISCAL).map(([k, v]) => `<option value="${k}" ${(c?.zonaFiscal || 'es') === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
       + `<div class="fg" style="align-self:end"><p class="small" style="color:var(--t3);margin:0">${t('cfg.zonaClientHelp')}</p></div></div>`
       + `<div class="fg"><label>${t('field.notes')}</label><textarea id="clNo" placeholder="${t('ph.notes')}">${esc(c?.notas || '')}</textarea></div>`
       + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveCl('${cid || ''}')">${isE ? t('btn.save') : t('btn.create')}</button></div>`);
@@ -712,8 +721,9 @@ Object.assign(App, {
           created++;
         }
 
-        /* Update nextFacturaNum if needed */
-        if (num >= (D.d.settings.nextFacturaNum || 1)) {
+        /* Contador: solo si la factura es del año del contador (una antigua no lo toca) */
+        const fy = String(data.factura.fecha || '').slice(0, 4), cy = D.d.settings.nextFacturaYear;
+        if ((!cy || cy === fy) && num >= (D.d.settings.nextFacturaNum || 1)) {
           D.d.settings.nextFacturaNum = num + 1;
         }
 

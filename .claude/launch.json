@@ -4,25 +4,48 @@
     {
       "name": "trackr-dev",
       "runtimeExecutable": "/bin/bash",
-      "runtimeArgs": ["-c", "export PATH=/Users/manu/.nvm/versions/node/v22.15.0/bin:$PATH && npx live-server --port=5501 --no-browser"],
+      "runtimeArgs": [
+        "-c",
+        "export PATH=/Users/manu/.nvm/versions/node/v22.15.0/bin:$PATH && npx live-server --port=5501 --no-browser"
+      ],
       "port": 5501
     },
     {
       "name": "trackr-dev-b",
       "runtimeExecutable": "/bin/bash",
-      "runtimeArgs": ["-c", "export PATH=/Users/manu/.nvm/versions/node/v22.15.0/bin:$PATH && npx live-server --port=5502 --no-browser"],
+      "runtimeArgs": [
+        "-c",
+        "export PATH=/Users/manu/.nvm/versions/node/v22.15.0/bin:$PATH && npx live-server --port=5502 --no-browser"
+      ],
       "port": 5502
     },
     {
       "name": "trackr-api-dev",
       "runtimeExecutable": "/bin/bash",
-      "runtimeArgs": ["-c", "cd /Users/meowrhino/Documents/GitHub/trackr-api && npx wrangler dev --port 8787 --var ENVIRONMENT:dev --var SIGNUPS_OPEN:true --var ADMIN_EMAIL:admin@test.dev --var ENUM_SECRET:testsecret"],
+      "runtimeArgs": [
+        "-c",
+        "cd /Users/meowrhino/Documents/GitHub/trackr-api && npx wrangler dev --port 8787 --var ENVIRONMENT:dev --var SIGNUPS_OPEN:true --var ADMIN_EMAIL:admin@test.dev --var ENUM_SECRET:testsecret"
+      ],
       "port": 8787
+    },
+    {
+      "name": "trackr-api-dev-b",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": [
+        "-c",
+        "cd /Users/meowrhino/Documents/GitHub/trackr-api && npx wrangler dev --port 8788 --var ENVIRONMENT:dev --var SIGNUPS_OPEN:true --var ADMIN_EMAIL:admin@test.dev --var ENUM_SECRET:testsecret"
+      ],
+      "port": 8788
     },
     {
       "name": "blurberri",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["live-server", "/Users/manu/Documents/GitHub/blurberri", "--port=8080", "--no-browser"],
+      "runtimeArgs": [
+        "live-server",
+        "/Users/manu/Documents/GitHub/blurberri",
+        "--port=8080",
+        "--no-browser"
+      ],
       "port": 8080
     }
   ]

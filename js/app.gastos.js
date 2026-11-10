@@ -463,17 +463,17 @@ Object.assign(App, {
       `<div class="info-section">`
       + `<div class="din-gastos-header">`
       +   `<span class="info-section-title" style="margin-bottom:0">${t('din.taxSummary')} — ${qLabel}</span>`
-      +   `<button class="bt bt-s" onclick="App.dedModal()">+ ${t('renta.addDeduction')}</button>`
+      +   `<button class="bt bt-s" onclick="App.dedModal()">+ ${t('renta.addDeduction')}</button>${itip('tip.deduc')}`
       + `</div>`
       + warnHtml
       + `<div class="din-trim-grid">`
       +   (isYear ? this._html390(this._lastTrimData.r390) : `<div class="din-trim-card">`
-      +     `<div class="din-trim-title">${t('din.model303')}</div>`
+      +     `<div class="din-trim-title">${t('din.model303')}${itip('tip.m303')}</div>`
       +     html303
       +     `<div class="din-trim-actions"><button class="bt bt-s" onclick="App.copyTrim303()" title="${t('din.copyBoxes')}">&#128203; ${t('din.copyBoxes')}</button></div>`
       +   `</div>`)
       +   `<div class="din-trim-card">`
-      +     `<div class="din-trim-title">${t('din.model130')}</div>`
+      +     `<div class="din-trim-title">${t('din.model130')}${itip('tip.m130')}</div>`
       +     html130
       +     `<div class="din-trim-actions"><button class="bt bt-s" onclick="App.copyTrim130()" title="${t('din.copyBoxes')}">&#128203; ${t('din.copyBoxes')}</button></div>`
       +   `</div>`
@@ -677,7 +677,7 @@ Object.assign(App, {
     let html = `<div class="info-section">`
       + `<div class="din-gastos-header">`
       +   `<span class="info-section-title" style="margin-bottom:0">${t('renta.title')} — ${y}</span>`
-      +   `<button class="bt bt-s" onclick="App.dedModal()">+ ${t('renta.addDeduction')}</button>`
+      +   `<button class="bt bt-s" onclick="App.dedModal()">+ ${t('renta.addDeduction')}</button>${itip('tip.deduc')}`
       + `</div>`
       + `<div class="din-trim-card" style="margin-top:.75rem">`
       +   `<div style="font-size:.7rem;color:var(--t3);margin-bottom:.35rem">${t('renta.devengoNote')}</div>`

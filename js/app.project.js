@@ -160,7 +160,7 @@ Object.assign(App, {
       + `<div class="fr"><div class="fg"><label>${t('field.status')}</label><select id="mpSt">${Object.entries(EST).map(([k, v]) => `<option value="${k}" ${k === df.estado ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
       + `<div class="fg" style="display:flex;gap:1.25rem;padding-top:1.5rem">`
       + `<label style="${ckStyle}"><input type="checkbox" id="mpInt" ${df.interno ? 'checked' : ''} style="width:auto;accent-color:var(--t2)"> ${t('field.internal')}</label>`
-      + `<label style="${ckStyle}"><input type="checkbox" id="mpRec" ${df.recurrente ? 'checked' : ''} style="width:auto;accent-color:var(--t2)"> ${t('field.recurring')}</label>`
+      + `<label style="${ckStyle}"><input type="checkbox" id="mpRec" ${df.recurrente ? 'checked' : ''} style="width:auto;accent-color:var(--t2)"> ${t('field.recurring')}${itip('tip.flags')}</label>`
       + `</div></div>`;
   },
 
@@ -174,7 +174,7 @@ Object.assign(App, {
 
   _pmBilling(df, st) {
     const m = df.modo;
-    return `<div class="dst" style="margin-top:1.25rem">${t('billing.title')}</div>`
+    return `<div class="dst" style="margin-top:1.25rem">${t('billing.title')}${itip('tip.modes')}</div>`
       + `<div class="bms">`
       +   `<button class="bm ${m === 'desde_base' ? 'on' : ''}" onclick="App.sBM('desde_base')">${t('billing.fromBase')}</button>`
       +   `<button class="bm ${m === 'desde_total' ? 'on' : ''}" onclick="App.sBM('desde_total')">${t('billing.fromTotal')}</button>`
@@ -188,10 +188,10 @@ Object.assign(App, {
       +     `<div class="fg" id="bfTot" style="${m === 'desde_base' || m === 'por_hora' ? 'display:none' : ''}"><label>${t('billing.totalEur')}</label><input type="number" id="mpTo" value="${df.total}" step="0.01" placeholder="0.00" oninput="App.cPrev()"></div>`
       +   `</div>`
       +   `<div class="fr">`
-      +     `<div class="fg"><label>IVA %</label><input type="number" id="mpIva" value="${df.iva}" min="0" max="100" step="1" oninput="App.cPrev()"></div>`
-      +     `<div class="fg"><label>IRPF %</label><input type="number" id="mpIrpf" value="${df.irpf}" min="0" max="100" step="1" oninput="App.cPrev()"></div>`
+      +     `<div class="fg"><label>IVA %${itip('tip.ivaPct')}</label><input type="number" id="mpIva" value="${df.iva}" min="0" max="100" step="1" oninput="App.cPrev()"></div>`
+      +     `<div class="fg"><label>IRPF %${itip('tip.irpfPct')}</label><input type="number" id="mpIrpf" value="${df.irpf}" min="0" max="100" step="1" oninput="App.cPrev()"></div>`
       +   `</div>`
-      +   `<div class="fg" style="margin-top:.4rem"><label>${t('billing.ivaException')}</label><input type="text" id="mpIvaExc" value="${esc(df.ivaExc)}" placeholder="${t('ph.ivaException')}"></div>`
+      +   `<div class="fg" style="margin-top:.4rem"><label>${t('billing.ivaException')}${itip('tip.ivaExc')}</label><input type="text" id="mpIvaExc" value="${esc(df.ivaExc)}" placeholder="${t('ph.ivaException')}"></div>`
       +   `<div id="bPrev" class="bb" style="margin-top:.4rem"></div>`
       +   (df.cobros && df.cobros.length ? `<div style="margin-top:.75rem;font-size:.78rem;color:${df.pagado ? 'var(--ok)' : 'var(--warn)'}">${df.pagado ? t('billing.paid') : t('billing.progress', fmtMoney(df.cobros.reduce((s,c) => s + c.cantidad, 0)), fmtMoney(df.neto || 0))} (${df.cobros.length} ${t('billing.payments').toLowerCase()})</div>` : '')
       +   `<div class="fg" style="margin-top:.5rem"><label>${t('field.invoiceLang')}</label><select id="mpFacLang"><option value="" ${!df.idiomaFactura ? 'selected' : ''}>${_lang === 'es' ? 'Español' : 'Spanish'} (${t('cfg.defaults').toLowerCase()})</option><option value="es" ${df.idiomaFactura === 'es' ? 'selected' : ''}>Español</option><option value="en" ${df.idiomaFactura === 'en' ? 'selected' : ''}>English</option></select></div>`
@@ -299,6 +299,7 @@ Object.assign(App, {
         asuntoFactura: document.getElementById('mpAsunto')?.value?.trim() || '',
         importeIva: 0, importeIrpf: 0, totalFactura: 0, netoRecibido: 0,
         cobros: prev?.facturacion?.cobros || [],
+        rectificativas: prev?.facturacion?.rectificativas || [],
         pagado: false, fechaPago: null,
         gastos: 0,
         facturaNum: prev?.facturacion?.facturaNum || null,

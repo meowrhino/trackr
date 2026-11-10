@@ -98,6 +98,23 @@ const LR = {
         W: exterior ? '' : (f.iva || 0), X: exterior ? '' : this._r2(f.importeIva || 0),
         AE: f.importeIrpf > 0 ? (f.irpf || 0) : '', AF: f.importeIrpf > 0 ? this._r2(f.importeIrpf) : '',
       });
+      /* Rectificativas (R1: modificación de la base, art. 80 LIVA), con importes ± */
+      (f.rectificativas || []).forEach((r) => {
+        if (!enRango(r.fecha)) return;
+        avisos.push(`Rectificativa ${r.num}/${String(r.fecha).slice(2, 4)}: revisa en el fichero la referencia a la factura ${f.facturaNum}/${ys} que rectifica`);
+        exp.push({
+          A: y, B: this._trim(r.fecha), C: act.C, D: act.D, E: act.E,
+          F: 'R1', G: 'I01', H: this._r2(r.base),
+          I: this._fmtFecha(r.fecha),
+          L: `${r.num}/${String(r.fecha).slice(2, 4)}`,
+          N: n3.t, O: n3.pais, P: n3.id,
+          Q: (cl && (cl.nombreCompleto || cl.nombre) || '').slice(0, 40),
+          R: '01', S: exterior ? 'N2' : 'S1',
+          U: this._r2(r.total), V: this._r2(r.base),
+          W: exterior ? '' : (f.iva || 0), X: exterior ? '' : this._r2(r.importeIva || 0),
+          AE: r.importeIrpf ? (f.irpf || 0) : '', AF: r.importeIrpf ? this._r2(r.importeIrpf) : '',
+        });
+      });
     });
     exp.sort((a, b) => (a.I.slice(6) + a.I.slice(3, 5) + a.I.slice(0, 2)).localeCompare(b.I.slice(6) + b.I.slice(3, 5) + b.I.slice(0, 2)));
 

@@ -149,8 +149,8 @@
       this.om(`<div class="mt">${t('confirmTitle')}</div>`
         + `<p style="font-size:.86rem">${t('confirmDesc')}</p>`
         + `<div class="acc-card" style="margin:.6rem 0"><div class="acc-row"><span class="acc-email"><strong>${esc2(r.gestorEmail)}</strong></span></div>`
-        + `<div style="color:var(--t3);font-size:.74rem;margin-top:.3rem">${t('fingerprint')}: <code class="mono">${esc2(fpShort(r.fingerprint))}</code></div></div>`
-        + `<div class="fg" style="margin-top:.6rem"><label>${t('scope')}</label>`
+        + `<div style="color:var(--t3);font-size:.74rem;margin-top:.3rem">${t('fingerprint')}${itip('tip.fingerprint')}: <code class="mono">${esc2(fpShort(r.fingerprint))}</code></div></div>`
+        + `<div class="fg" style="margin-top:.6rem"><label>${t('scope')}${itip('tip.scope')}</label>`
         + `<label style="display:flex;align-items:flex-start;gap:.5rem;cursor:pointer;text-transform:none;letter-spacing:0;margin-top:.3rem"><input type="radio" name="gstScope" value="fiscal" checked style="width:auto;margin-top:.2rem"><span style="font-size:.82rem">${t('scopeFiscal')}</span></label>`
         + `<label style="display:flex;align-items:flex-start;gap:.5rem;cursor:pointer;text-transform:none;letter-spacing:0;margin-top:.35rem"><input type="radio" name="gstScope" value="todo" style="width:auto;margin-top:.2rem"><span style="font-size:.82rem">${t('scopeTodo')}</span></label>`
         + `</div>`

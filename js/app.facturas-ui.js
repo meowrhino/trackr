@@ -27,8 +27,8 @@ Object.assign(App, {
     const r = (this._facRestore && this._facRestore.pid === pid) ? this._facRestore : null;
     this._facRestore = null;
 
-    const num = r?.num || f.facturaNum || s.nextFacturaNum || 1;
     const date = r?.date || f.facturaFecha || todayStr();
+    const num = r?.num || f.facturaNum || D.nextFacturaNum(date);
     const asunto = r?.asunto != null ? r.asunto : defaultAsunto(p);
 
     const editBtn = `<button class="bt bt-s" style="padding:.15rem .45rem;font-size:.72rem;margin-left:.4rem" title="${t('btn.edit')}" onclick="App.editClFromFac('${pid}')">&#9998;</button>`;
@@ -55,8 +55,8 @@ Object.assign(App, {
       + `<div class="br tot"><span class="la">${t('billing.total')}</span><span class="va">${fmtMoney(f.totalFactura || 0)}</span></div></div>`;
 
     this.om(`<div class="mt">${t('fac.generate')}</div>`
-      + `<div class="fr"><div class="fg"><label>${t('field.invoiceNum')}</label><input type="text" id="facNum" value="${String(num)}" style="font-family:'DM Mono',monospace"></div>`
-      + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="facDate" value="${date}"></div></div>`
+      + `<div class="fr"><div class="fg"><label>${t('field.invoiceNum')}${itip('tip.facNum')}</label><input type="text" id="facNum" value="${String(num)}" style="font-family:'DM Mono',monospace"></div>`
+      + `<div class="fg"><label>${t('field.date')}${itip('tip.devengo')}</label><input type="date" id="facDate" value="${date}"></div></div>`
       + `<div class="fg"><label>${t('field.subject')}</label><input type="text" id="facAsunto" value="${esc(asunto)}"></div>`
       + summary
       + warnRow
@@ -77,6 +77,47 @@ Object.assign(App, {
     this.clModal(p.clienteId || null);
   },
 
+  /* ── Rectificar una factura emitida (por diferencias: la original no se toca) ── */
+  rectModal(pid) {
+    const p = D.p(pid); if (!p) return;
+    B.calc(p);
+    const f = p.facturacion;
+    const actual = roundMoney((f.baseImponible || 0) + (f.rectificativas || []).reduce((s, r) => s + (r.base || 0), 0));
+    this.om(`<div class="mt">${t('rect.title', `${esc(f.facturaNum)}/${yearShort(f.facturaFecha)}`)}</div>`
+      + `<p style="font-size:.82rem;color:var(--t2);line-height:1.5;margin-bottom:.8rem">${t('rect.help')}</p>`
+      + `<div class="fr"><div class="fg"><label>${t('rect.newBase', fmtMoney(actual))}</label><input type="number" id="rcBase" step="0.01" value="${actual}" oninput="App._rectPrev('${pid}')"></div>`
+      + `<div class="fg"><label>${t('field.date')}${itip('tip.devengo')}</label><input type="date" id="rcDate" value="${todayStr()}"></div></div>`
+      + `<div class="fg"><label>${t('rect.reason')}</label><input type="text" id="rcMot" placeholder="${t('rect.reasonPh')}"></div>`
+      + `<div id="rcPrev" class="bb" style="margin-top:.5rem"></div>`
+      + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveRect('${pid}')">${t('rect.save')}</button></div>`);
+    this._rectPrev(pid);
+  },
+  _rectPrev(pid) {
+    const p = D.p(pid), el = document.getElementById('rcPrev'); if (!p || !el) return;
+    const d = B.rectDiff(p.facturacion, parseFloat(document.getElementById('rcBase').value) || 0);
+    const sg = n => (n > 0 ? '+' : '') + fmtMoney(n);
+    el.innerHTML = `<div class="br"><span class="la">${t('billing.taxableBase')}</span><span class="va">${sg(d.base)}</span></div>`
+      + (p.facturacion.iva ? `<div class="br"><span class="la">${t('billing.plusIvaAmt', esc(p.facturacion.iva))}</span><span class="va">${sg(d.importeIva)}</span></div>` : '')
+      + (p.facturacion.irpf ? `<div class="br"><span class="la">${t('billing.minusIrpfAmt', esc(p.facturacion.irpf))}</span><span class="va">${sg(-d.importeIrpf)}</span></div>` : '')
+      + `<div class="br tot"><span class="la">${t('rect.diffTotal')}</span><span class="va">${sg(d.total)}</span></div>`;
+  },
+  saveRect(pid) {
+    const p = D.p(pid); if (!p) return;
+    const f = p.facturacion;
+    const fecha = document.getElementById('rcDate').value || todayStr();
+    if (fecha < f.facturaFecha) { Toast.warn(t('rect.dateBefore')); return; }
+    const d = B.rectDiff(f, parseFloat(document.getElementById('rcBase').value) || 0);
+    if (!d.base) { Toast.warn(t('rect.noChange')); return; }
+    const r = { id: uid(), num: D.nextRectNum(fecha), fecha, motivo: document.getElementById('rcMot').value.trim(), ...d };
+    const rectificativas = [...(f.rectificativas || []), r];
+    D.up(pid, { facturacion: { ...f, rectificativas } });
+    if (D.d.settings.verifactu?.habilitado) Toast.warn(t('rect.noVerifactu'));
+    this.cm();
+    Fac.downloadRect(pid, r.id);
+    Toast.ok(t('rect.done', `${r.num}/${yearShort(fecha)}`));
+    this.go(this.cv, this.cp);
+  },
+
   async genFactura(pid) {
     /* Normalizar la fecha aquí para que el PDF, el QR y el registro Verifactu usen
        EXACTAMENTE la misma (Fac.download también cae a todayStr() si va vacía). */
@@ -88,8 +129,8 @@ Object.assign(App, {
     /* Una factura de prueba a 0 € o sin emisor numera el proyecto y lo bloquea: avisar antes. */
     if (!(p.facturacion.totalFactura > 0)) { Toast.warn(t('msg.facZero')); return; }
     if (!D.d.settings.emisor?.nombre || !D.d.settings.emisor?.nif) { Toast.warn(t('msg.facNoEmisor')); return; }
-    const numEf = num || p.facturacion.facturaNum || D.d.settings.nextFacturaNum || 1;
-    const otro = D.facturaNumTaken(numEf, pid);
+    const numEf = num || p.facturacion.facturaNum || D.nextFacturaNum(fecha);
+    const otro = D.facturaNumTaken(numEf, pid, fecha);
     if (otro) { Toast.error(t('fac.numTaken', numEf, otro.nombre)); return; }
 
     /* Guardar asunto en el proyecto si difiere del default; borrar si vacío o igual al default */
@@ -109,7 +150,7 @@ Object.assign(App, {
 
     let verifactu = null;
     if (verifactuOn) {
-      const numStr = String(num || f.facturaNum || s.nextFacturaNum || 1);
+      const numStr = String(num || f.facturaNum || D.nextFacturaNum(fecha));
       /* NumSerieFactura = numero tal cual se imprime en el PDF: NNNN/YY (yearShort, como el PDF) */
       const numSerie = `${numStr}/${yearShort(fecha)}`;
       const cl = p.clienteId ? D.cl(p.clienteId) : null;
@@ -309,7 +350,7 @@ Object.assign(App, {
     this.om(
       `<div class="mt">${title}</div>`
       + `<div class="fr"><div class="fg"><label>${t('billing.paymentAmount')}</label><input type="number" id="mcA" min="0.01" step="0.01" value="${defAmount}"></div>`
-      + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="mcD" value="${defDate}"></div></div>`
+      + `<div class="fg"><label>${t('field.date')}${itip('tip.cobroFecha')}</label><input type="date" id="mcD" value="${defDate}"></div></div>`
       + `<div class="fg"><label>${t('billing.method')}</label><select id="mcM">${COBRO_METODOS.map(m => `<option value="${m}" ${(existing?.metodo || 'transferencia') === m ? 'selected' : ''}>${t('billing.m.' + m)}</option>`).join('')}</select></div>`
       + (isEdit ? '' : `<div style="font-size:.78rem;color:var(--t3);margin-bottom:.75rem">${t('billing.remaining', fmtMoney(pend))}</div>`)
       + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveCobro('${pid}'${isEdit ? `,'${cid}'` : ''})">${t('btn.save')}</button></div>`

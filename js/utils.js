@@ -115,8 +115,19 @@ function gastoImporteFiscal(zona, base, iva) {
  *  sin desglose, la entrada entera va al tipo del gasto. */
 function gastoLineasIva(g, e) {
   if (Array.isArray(e.desglose) && e.desglose.length) return e.desglose;
-  /* El tipo de la entrada manda: cambiar el IVA del gasto no reescribe trimestres pasados. */
-  return [{ tipoIva: e.tipoIva ?? g.tipoIva ?? 0, base: e.base || 0, iva: e.iva || 0 }];
+  /* El tipo de la entrada manda: cambiar el IVA del gasto no reescribe trimestres pasados.
+     Con cuota pero tipo 0 (dato mal apuntado), el tipo sale de los importes: así el 303
+     y los libros registro lo ponen en el mismo sitio. */
+  const base = e.base || 0, iva = e.iva || 0;
+  let tipo = e.tipoIva ?? g.tipoIva ?? 0;
+  if (!(tipo > 0) && iva > 0 && base > 0) tipo = ivaTipoDe(base, iva);
+  return [{ tipoIva: tipo, base, iva }];
+}
+
+/** Tipo de IVA español más cercano a cuota/base (4, 10 o 21). 10 € sobre 100 € → 10. */
+function ivaTipoDe(base, iva) {
+  const r = iva / base * 100;
+  return [4, 10, 21].reduce((a, b) => (Math.abs(b - r) < Math.abs(a - r) ? b : a));
 }
 
 /** Coste real de una entrada de gasto: base + IVA. La retención de IRPF no
@@ -148,6 +159,7 @@ function badIds(d) {
     chk(p); ref(p?.clienteId);
     arr(p?.horas).forEach(chk);
     arr(p?.facturacion?.cobros).forEach(chk);
+    arr(p?.facturacion?.rectificativas).forEach(chk);
   }
   for (const k of ['clientes', 'deducibles']) arr(d?.[k]).forEach(chk);
   for (const f of arr(d?.facturas)) { chk(f); ref(f?.proyectoId); }
@@ -289,4 +301,38 @@ function localDateStr(d = new Date()) {
 /** Devuelve la fecha de hoy como string YYYY-MM-DD */
 function todayStr() {
   return localDateStr();
+}
+
+/* ══════════════════════════════════════════════
+ *  «i» de ayuda: itip('clave') → botón que abre una explicación corta (t(clave), HTML
+ *  estático de lang.js). Clic/tap, no hover: funciona igual en móvil. Un solo globo a la vez;
+ *  se cierra con otro clic o Escape.
+ * ══════════════════════════════════════════════ */
+function itip(key) {
+  return `<button type="button" class="itip" data-tip="${esc(key)}" aria-label="${esc(typeof t === 'function' ? t('tip.more') : 'info')}" aria-expanded="false">i</button>`;
+}
+if (typeof document !== 'undefined') {
+  const closeTip = () => {
+    const pop = document.getElementById('tipPop'); if (pop) pop.remove();
+    document.querySelectorAll('.itip[aria-expanded="true"]').forEach(b => b.setAttribute('aria-expanded', 'false'));
+  };
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest && e.target.closest('.itip');
+    if (!b) { if (!(e.target.closest && e.target.closest('#tipPop'))) closeTip(); return; }
+    e.preventDefault(); e.stopPropagation();
+    const open = b.getAttribute('aria-expanded') === 'true';
+    closeTip();
+    if (open) return;
+    const pop = document.createElement('div');
+    pop.id = 'tipPop'; pop.className = 'tip-pop'; pop.setAttribute('role', 'tooltip');
+    pop.innerHTML = t(b.dataset.tip);
+    document.body.appendChild(pop);
+    const r = b.getBoundingClientRect(), w = pop.offsetWidth, h = pop.offsetHeight;
+    const left = Math.max(8, Math.min(r.left + r.width / 2 - w / 2, window.innerWidth - w - 8));
+    const top = r.bottom + 6 + h > window.innerHeight ? r.top - h - 6 : r.bottom + 6;
+    pop.style.left = left + window.scrollX + 'px'; pop.style.top = top + window.scrollY + 'px';
+    b.setAttribute('aria-expanded', 'true');
+  }, true);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeTip(); });
+  window.addEventListener('resize', closeTip);
 }

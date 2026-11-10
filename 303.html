@@ -145,6 +145,8 @@ footer a{color:var(--t3)}
 </div>
 <div class="toast" id="toast"></div>
 
+<script src="js/utils.js"></script>
+<script src="js/fiscal.js"></script>
 <script>
 /* Calculadora 303 — casillas oficiales. Sin dependencias, sin persistencia:
    el estado vive en el formulario y se serializa a la URL para compartir. */
@@ -187,9 +189,10 @@ function calc() {
   const c110 = num('prev');
   let c71 = c46;
   if (c110 > 0) {
-    const c78 = c46 > 0 ? Math.min(c110, c46) : 0;
-    const c87 = r2(c110 - c78);
-    c71 = r2(c46 - c78);
+    /* Misma compensación que la app (js/fiscal.js, F.compensar303) */
+    const comp = F.compensar303(c46, c110);
+    const c78 = comp.c78, c87 = r2(comp.c87);
+    c71 = r2(comp.c69);
     html += row('110', 'Saldo pendiente de periodos anteriores', fmt(c110));
     lineas.push(`110 Saldo pendiente anterior: ${fmt(c110)}`);
     if (c78 > 0) { html += row('78', 'Compensado en este periodo', '−' + fmt(c78)); lineas.push(`78  Compensado este periodo: ${fmt(c78)}`); }

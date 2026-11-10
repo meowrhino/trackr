@@ -81,6 +81,9 @@ footer a{color:var(--t3)}
       <span class="msg" id="quien"></span>
     </div>
     <div id="lista"></div>
+    <h3 style="font-size:.95rem;margin:1.6rem 0 .3rem">Uso (últimos 30 días)</h3>
+    <div class="msg" style="margin-bottom:.5rem">Estadísticas anónimas: sesiones por día y qué pantallas y botones se usan. Sin usuarios ni contenido.</div>
+    <div id="uso"><div class="msg">…</div></div>
   </div>
 
   <div class="msg" id="estado">Comprobando sesión…</div>
@@ -139,6 +142,7 @@ async function cargar() {
   }
   ver('panel');
   pintarConfig();
+  cargarUso();
   $('quien').textContent = `${Acc.status().email || ''} · ${users.length} cuenta${users.length === 1 ? '' : 's'}`;
   users.sort((a, b) => (a.active - b.active) || (b.createdAt - a.createdAt)); // pendientes arriba
   $('lista').innerHTML = users.map(u => `
@@ -175,6 +179,18 @@ async function entrar() {
   if (!r.ok) { $('loginErr').textContent = r.error === 'invalid_credentials' ? 'Credenciales no válidas.' : (r.error || 'Error'); return; }
   if (!Acc.status().isAdmin) { $('loginErr').textContent = 'Esta cuenta no es de administrador.'; return; }
   cargar();
+}
+
+/* Uso: sesiones por día (barras de texto) y las acciones más usadas */
+async function cargarUso() {
+  const u = await Acc.adminUsage(30);
+  if (!u) { $('uso').innerHTML = '<div class="msg">Sin datos (¿falta aplicar scripts/migrate-usage.sql?).</div>'; return; }
+  const tot = u.sessions.reduce((s, x) => s + x.sessions, 0);
+  const max = Math.max(1, ...u.sessions.map(x => x.sessions));
+  const dias = u.sessions.map(x => `<div style="display:flex;gap:.5rem;font-size:.78rem"><span style="width:6.5rem;color:var(--t3)">${esc(x.day)}</span><span style="background:var(--t2);height:.7rem;align-self:center;width:${Math.round(x.sessions / max * 60)}%"></span><span>${x.sessions}</span></div>`).join('');
+  const evs = u.events.slice(0, 40).map(e => `<div style="display:flex;justify-content:space-between;font-size:.78rem;border-bottom:1px solid var(--b1);padding:.15rem 0"><span>${esc(e.cat)} · ${esc(e.act)}${e.label ? ' · ' + esc(e.label) : ''}</span><span>${e.n}</span></div>`).join('');
+  $('uso').innerHTML = `<div class="msg" style="margin-bottom:.4rem">${tot} sesiones desde ${esc(u.since)}</div>` + (dias || '<div class="msg">Aún no hay sesiones.</div>')
+    + `<div style="margin-top:.8rem">${evs}</div>`;
 }
 
 (function init() {

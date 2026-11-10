@@ -44,6 +44,7 @@
         + `<div class="fg"><label>${t('password')}</label><input id="accPw" name="password" type="password" autocomplete="new-password" oninput="App.accPwMeter(this.value)"><div id="accMeter" class="acc-meter"><span></span><span></span><span></span><span></span></div></div>`
         + `<div class="fg"><label>${t('password2')}</label><input id="accPw2" name="password2" type="password" autocomplete="new-password"></div>`
         + `<label class="acc-legal"><input id="accLegal" type="checkbox" style="width:auto;margin-right:.5rem">${t('legal')}</label>`
+        + `<label class="acc-legal" style="margin-top:.4rem"><input id="accStats" type="checkbox" checked style="width:auto;margin-right:.5rem">${window.t('stats.signup')}</label>`
         + `<button type="submit" class="bt bt-p" style="margin-top:.85rem">${t('create')}</button>`
         + `</form>`
         + `<div class="acc-links"><a onclick="App.accMode('login')">${t('backLogin')}</a></div>`;
@@ -275,6 +276,8 @@
       if (pw !== pw2) return Toast.error(t('pwMismatch'));
       if (!document.getElementById('accLegal')?.checked) return Toast.error(t('legalReq'));
       const role = document.querySelector('input[name="accRole"]:checked')?.value === 'gestor' ? 'gestor' : 'persona';
+      D.d.settings.compartirUso = document.getElementById('accStats')?.checked !== false;
+      this.applyStats();
       try {
         // Cuenta gestor: empieza VACIA (no arrastra los datos locales de este navegador).
         const r = await Acc.signup(email, pw, role === 'gestor' ? CA.emptyData() : D.d, role);

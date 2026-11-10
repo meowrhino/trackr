@@ -77,6 +77,18 @@ Object.assign(App, {
     return `<div class="ds"><div style="display:flex;justify-content:space-between;align-items:center"><div class="dst" style="border:none;margin:0;padding:0">${t('det.hours')}</div><button class="bt bt-add" onclick="App.hModal('${p.id}')">${t('btn.addHour')}</button></div>${list}</div>`;
   },
 
+  /** Rectificativas de la factura: número, fecha, diferencia (±) y PDF; y el total que queda. */
+  _detRects(p, f) {
+    const rs = f.rectificativas || [];
+    if (!rs.length) return '';
+    return `<div class="hl" style="margin-top:.4rem">${rs.map(r =>
+      `<div class="hr"><span class="hr-d">${esc(r.num)}/${yearShort(r.fecha)} · ${fmtDate(r.fecha)}</span>`
+      + `<span class="hr-a m" style="color:${r.total < 0 ? 'var(--bad)' : 'var(--ok)'}">${r.total > 0 ? '+' : ''}${fmtMoney(r.total)}</span>`
+      + `<span class="hr-n">${esc(r.motivo || '')}</span>`
+      + `<span class="hr-e" onclick="Fac.downloadRect('${p.id}','${r.id}')" title="PDF">&#8595;</span></div>`).join('')}</div>`
+      + `<div style="font-size:.78rem;color:var(--t2);margin-top:.3rem">${t('rect.totalAfter', fmtMoney(f.totalConRect))}</div>`;
+  },
+
   _detBilling(p, f, eph) {
     const breakdown = f.modo === 'gratis'
       ? `<div style="color:var(--t3);font-size:.85rem">${t('billing.freeProject')}</div>`
@@ -85,8 +97,8 @@ Object.assign(App, {
         + (f.iva ? `<div class="br"><span class="la">${t('billing.plusIvaAmt', f.iva)}</span><span class="va">${fmtMoney(f.importeIva || 0)}</span></div>` : '')
         + (f.irpf ? `<div class="br"><span class="la">${t('billing.minusIrpfAmt', esc(f.irpf))}</span><span class="va">${fmtMoney(f.importeIrpf || 0)}</span></div>` : '')
         + `<div class="br tot"><span class="la">${t('billing.invoiceTotal')}</span><span class="va">${fmtMoney(f.totalFactura || 0)}</span></div>`
-        + `<div class="br"><span class="la">${t('billing.netToReceive')}</span><span class="va" style="color:var(--ok)">${fmtMoney(f.netoRecibido || 0)}</span></div>`
-        + (eph !== null ? `<div class="br"><span class="la">${t('billing.profitability')}</span><span class="va" style="color:${B.ephColor(eph)}">${eph.toFixed(2)} &euro;/h</span></div>` : '')
+        + `<div class="br"><span class="la">${t('billing.netToReceive')}${itip('tip.neto')}</span><span class="va" style="color:var(--ok)">${fmtMoney(f.netoRecibido || 0)}</span></div>`
+        + (eph !== null ? `<div class="br"><span class="la">${t('billing.profitability')}${itip('tip.eph')}</span><span class="va" style="color:${B.ephColor(eph)}">${eph.toFixed(2)} &euro;/h</span></div>` : '')
         + `</div>`;
 
     /* ── Cobros parciales ── */
@@ -123,7 +135,10 @@ Object.assign(App, {
     }
 
     return `<div class="ds"><div class="dst">${t('billing.title')}</div>${breakdown}`
-      + (f.facturaFecha ? `<div style="margin-top:.3rem;font-size:.78rem;color:var(--t3)">${t('billing.invoiceNo', esc(f.facturaNum), fmtDate(f.facturaFecha))}</div>` : '')
+      + (f.facturaFecha ? `<div style="margin-top:.3rem;font-size:.78rem;color:var(--t3);display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">${t('billing.invoiceNo', esc(f.facturaNum), fmtDate(f.facturaFecha))}`
+          + (f.facturaNum && D.facturaVigente(p.id) ? `<button class="bt bt-s" style="padding:.1rem .45rem;font-size:.72rem" onclick="App.rectModal('${p.id}')">${t('rect.btn')}</button>${itip('tip.rect')}` : '')
+          + `</div>` : '')
+      + this._detRects(p, f)
       + cobrosHtml
       + `</div>`;
   },
@@ -146,7 +161,7 @@ Object.assign(App, {
       + `<div class="fr"><div class="fg"><label>${t('field.hours')}</label><input type="number" id="ehA" min="0.25" step="0.25" value="${h.cantidad}"></div>`
       +   `<div class="fg"><label>${t('field.date')}</label><input type="date" id="ehD" value="${h.fecha || ''}" ${noDate ? 'disabled' : ''}>`
       +   `<label style="margin-top:.35rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="ehNd" ${noDate ? 'checked' : ''} onchange="document.getElementById('ehD').disabled=this.checked;if(this.checked)document.getElementById('ehD').value=''" style="width:auto;accent-color:var(--t2)"> ${t('field.noDate')}</label></div></div>`
-      + `<div class="fr"><div class="fg"><label>${t('field.startTime')}</label><input type="time" id="ehHI" value="${h.horaInicio || ''}"></div><div class="fg"><label>${t('field.amount')}</label><input type="number" id="ehMo" min="0" step="0.01" value="${h.monto || ''}"></div></div>`
+      + `<div class="fr"><div class="fg"><label>${t('field.startTime')}</label><input type="time" id="ehHI" value="${h.horaInicio || ''}"></div><div class="fg"><label>${t('field.amount')}${itip('tip.horaMonto')}</label><input type="number" id="ehMo" min="0" step="0.01" value="${h.monto || ''}"></div></div>`
       + `<div class="fg"><label>${t('field.note')}</label><input type="text" id="ehN" value="${esc(h.nota || '')}"></div>`
       + `<div class="ma" style="justify-content:space-between"><button class="bt bt-d" onclick="App.deleteEH('${pid}','${hid}')">${t('btn.delete')}</button><div style="display:flex;gap:.5rem"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveEH('${pid}','${hid}')">${t('btn.save')}</button></div></div>`
     );
@@ -232,7 +247,7 @@ Object.assign(App, {
       + `<div class="ts2"><div class="to on" data-type="trabajo" onclick="App.selT(this)"><span class="ic">💻</span><span class="la">${t('det.work')}</span></div><div class="to" data-type="reunion" onclick="App.selT(this)"><span class="ic">👥</span><span class="la">${t('det.meeting')}</span></div></div>`
       + `<div class="fr"><div class="fg"><label>${t('field.hours')}</label><input type="number" id="mhA" min="0.25" step="0.25" value="1"></div>`
       + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="mhD" value="${todayStr()}"><label style="margin-top:.35rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="mhNd" onchange="document.getElementById('mhD').disabled=this.checked;if(this.checked)document.getElementById('mhD').value=''" style="width:auto;accent-color:var(--t2)"> ${t('field.noDate')}</label></div></div>`
-      + `<div class="fr"><div class="fg"><label>${t('field.startTime')}</label><input type="time" id="mhHI" value=""></div><div class="fg"><label>${t('field.amount')}</label><input type="number" id="mhMo" min="0" step="0.01" placeholder="0"></div></div>`
+      + `<div class="fr"><div class="fg"><label>${t('field.startTime')}</label><input type="time" id="mhHI" value=""></div><div class="fg"><label>${t('field.amount')}${itip('tip.horaMonto')}</label><input type="number" id="mhMo" min="0" step="0.01" placeholder="0"></div></div>`
       + `<div class="fg"><label>${t('field.note')}</label><input type="text" id="mhN" placeholder="${t('ph.whatDidYouDo')}"></div>`
       + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveHM('${pid}')">${t('btn.save')}</button></div>`);
   },

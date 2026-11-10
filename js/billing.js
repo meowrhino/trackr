@@ -46,10 +46,16 @@ const B={
       f.total=f.totalFactura;
     }
 
+    /* ── Rectificativas: diferencias (±) sobre la factura original, que no se toca ── */
+    const rs = f.rectificativas || [];
+    f.totalRect = roundMoney(rs.reduce((s, r) => s + (r.total || 0), 0));
+    f.totalConRect = roundMoney((f.totalFactura || 0) + f.totalRect);
+    f.netoConRect = roundMoney((f.netoRecibido || 0) + rs.reduce((s, r) => s + (r.base || 0) - (r.importeIrpf || 0), 0));
+
     /* ── Sincronizar pagado/fechaPago desde cobros ── */
     const cobros = f.cobros || [];
     const tc = this.totalCobrado(p); /* redondeado: 100,10+200,20+300,30 suma 600,5999… */
-    f.pagado = f.totalFactura > 0 && tc >= roundMoney(f.totalFactura);
+    f.pagado = f.totalConRect > 0 && tc >= f.totalConRect;
     if (cobros.length) {
       const sorted = [...cobros].sort((a, b) => (a.fecha || '').localeCompare(b.fecha || ''));
       f.fechaPago = sorted[sorted.length - 1].fecha || null;
@@ -58,6 +64,15 @@ const B={
     }
 
     return f;
+  },
+
+  /** Rectificativa por diferencias: de la base correcta a los importes (±) que corrigen
+   *  la factura original y las rectificativas anteriores, con sus mismos tipos. */
+  rectDiff(f, baseCorrecta) {
+    const yaBase = (f.baseImponible || 0) + (f.rectificativas || []).reduce((s, r) => s + (r.base || 0), 0);
+    const base = roundMoney(baseCorrecta - yaBase);
+    const tax = this.calcTax(base, f.iva || 0, f.irpf || 0);
+    return { base, importeIva: tax.importeIva, importeIrpf: tax.importeIrpf, total: tax.totalFactura };
   },
 
   /** Calcula importes fiscales a partir de base, IVA% e IRPF% */
@@ -124,14 +139,16 @@ const B={
     return { label: `T${c.q + 1} ${c.y}`, end: c.end, days, y: c.y, q: c.q, start, open: hoy >= start, domEnd: iso(dom), domDays: days - 5 };
   },
   pendiente(p) {
-    return Math.max(roundMoney((p.facturacion.totalFactura || 0) - this.totalCobrado(p)), 0);
+    const f = p.facturacion;
+    return Math.max(roundMoney((f.totalConRect ?? f.totalFactura ?? 0) - this.totalCobrado(p)), 0);
   },
 
   /* Calcula €/hora (rentabilidad) */
   eph(p){
     const h=this.totalHoras(p);
     if(!h) return null;
-    return roundMoney((p.facturacion.netoRecibido||0)/h);
+    const f=p.facturacion;
+    return roundMoney((f.netoConRect ?? f.netoRecibido ?? 0)/h);
   },
 
   /* Color del €/h segun rentabilidad (umbrales 30 / 15) */
@@ -169,9 +186,10 @@ const B={
           bruto += c.cantidad || 0;
           touch(c.fecha);
           projTotals[key].total += c.cantidad || 0;
-          const tf = f.totalFactura || 0;
+          const tf = f.totalConRect ?? f.totalFactura ?? 0;
           const ratio = tf > 0 ? (c.cantidad / tf) : 0;
-          ivaTotal += (f.importeIva || 0) * ratio;
+          const ivaRect = (f.rectificativas || []).reduce((s, r) => s + (r.importeIva || 0), 0);
+          ivaTotal += ((f.importeIva || 0) + ivaRect) * ratio;
         }
       });
     });

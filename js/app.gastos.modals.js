@@ -133,6 +133,11 @@ Object.assign(App, {
       iva = roundMoney(desglose.reduce((s, l) => s + l.iva, 0));
       total = roundMoney(base + iva - irpf);
     }
+    /* Cuota de IVA con el tipo en 0 %: casi siempre un despiste. El tipo sale de los importes. */
+    if (!desglose && !(tipoIva > 0) && iva > 0 && base > 0) {
+      tipoIva = ivaTipoDe(base, iva);
+      Toast.info(t('gas.ivaInferred', tipoIva));
+    }
     return { base, iva, irpf, total, tipoIva, tipoIrpf, desglose };
   },
 
@@ -154,7 +159,7 @@ Object.assign(App, {
       + `<div class="fg"><label>${t('field.irpfAmount')}</label><input type="number" id="gER" min="0" step="0.01" value="${e0?.irpf ?? ''}" placeholder="0,00" onchange="App._gDesgCalc('g')"></div></div>`
       + this._gDesgHtml('g', lines)
       + `<div class="fr"><div class="fg"><label>${t('field.totalAmount')}</label><input type="number" id="gEA" min="0.01" step="0.01" value="${e0?.total ?? e0?.cantidad ?? ''}" placeholder="0,00" ${ro} onchange="App._gCalc('total')"></div>`
-      + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="gED" value="${e0?.fecha || todayStr()}"></div></div>`
+      + `<div class="fg"><label>${t('field.date')}${itip('tip.fechaGasto')}</label><input type="date" id="gED" value="${e0?.fecha || todayStr()}"></div></div>`
       + `<div class="fr"><div class="fg"><label>${t('field.numFactura')}</label><input type="text" id="gENF" value="${esc(e0?.numFactura || '')}" placeholder="${t('ph.optional')}"></div></div></div>`;
     const recurringFields = `<div id="gRecFields"${isPuntual ? ' style="display:none"' : ''}>`
       + `<div class="fr"><div class="fg"><label>${t('gas.baseAmount')}</label><input type="number" id="gIB" min="0" step="0.01" value="${g?.importeBase ?? ''}" placeholder="0,00"></div>`
@@ -163,11 +168,11 @@ Object.assign(App, {
     this.om(`<div class="mt">${isE ? t('gas.editExpense') : t('gas.newExpense')}</div>`
       + `<div class="fg"><label>${t('field.name')}</label><input type="text" id="gN" value="${esc(g?.nombre || '')}" placeholder="${t('ph.expenseName')}"></div>`
       + `<div class="fr fr-3"><div class="fg"><label>${t('field.category')}</label><select id="gCat">${Object.entries(GASTO_CAT).map(([k, v]) => `<option value="${k}" ${g?.categoria === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
-      + `<div class="fg"><label>${t('field.ivaRate')}</label><select id="gIva" onchange="App._gIvaChange()">${Object.entries(TIPOS_IVA).map(([k, v]) => `<option value="${k}" ${!lines.length && (g?.tipoIva ?? 21) == k ? 'selected' : ''}>${v}</option>`).join('')}<option value="mixto" ${lines.length ? 'selected' : ''}>${t('iva.mixto')}</option></select></div>`
-      + `<div class="fg"><label>${t('field.irpfRate')}</label><input type="number" id="gIrpf" min="0" max="100" step="1" value="${g?.tipoIrpf || ''}" placeholder="0" onchange="App._gCalcAuto()"></div></div>`
+      + `<div class="fg"><label>${t('field.ivaRate')}${itip('tip.ivaGasto')}</label><select id="gIva" onchange="App._gIvaChange()">${Object.entries(TIPOS_IVA).map(([k, v]) => `<option value="${k}" ${!lines.length && (g?.tipoIva ?? 21) == k ? 'selected' : ''}>${v}</option>`).join('')}<option value="mixto" ${lines.length ? 'selected' : ''}>${t('iva.mixto')}</option></select></div>`
+      + `<div class="fg"><label>${t('field.irpfRate')}${itip('tip.irpfProv')}</label><input type="number" id="gIrpf" min="0" max="100" step="1" value="${g?.tipoIrpf || ''}" placeholder="0" onchange="App._gCalcAuto()"></div></div>`
       + `<div class="fr"><div class="fg"><label>${t('field.recurrence')}</label><select id="gRec" onchange="App._toggleGasRec(this.value)">${Object.entries(RECURRENCIA).map(([k, v]) => `<option value="${k}" ${g?.recurrente === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
-      + `<div class="fg" style="display:flex;align-items:end"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;padding:.45rem 0"><input type="checkbox" id="gDes" ${g?.desgravable ? 'checked' : ''}> ${t('gas.deductibleBadge')}</label></div></div>`
-      + `<div class="fr"><div class="fg"><label>${t('gas.zonaProveedor')}</label><select id="gZona" onchange="document.getElementById('gZonaHelp').style.display = this.value === 'es' ? 'none' : ''">${Object.entries(ZONA_FISCAL).map(([k, v]) => `<option value="${k}" ${(g?.zonaFiscal || 'es') === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
+      + `<div class="fg" style="display:flex;align-items:end"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;padding:.45rem 0"><input type="checkbox" id="gDes" ${g?.desgravable ? 'checked' : ''}> ${t('gas.deductibleBadge')}${itip('tip.desgravable')}</label></div></div>`
+      + `<div class="fr"><div class="fg"><label>${t('gas.zonaProveedor')}${itip('tip.zonaProv')}</label><select id="gZona" onchange="document.getElementById('gZonaHelp').style.display = this.value === 'es' ? 'none' : ''">${Object.entries(ZONA_FISCAL).map(([k, v]) => `<option value="${k}" ${(g?.zonaFiscal || 'es') === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
       + `<div class="fg"><label>${t('field.nifProveedor')}</label><input type="text" id="gNif" value="${esc(g?.nifProveedor || '')}" placeholder="${t('ph.optional')}"></div></div>`
       + `<p class="small" id="gZonaHelp" style="color:var(--t3);margin:-.4rem 0 .6rem${(g?.zonaFiscal || 'es') === 'es' ? ';display:none' : ''}">${t('gas.zonaHelp')}</p>`
       + recurringFields
@@ -217,6 +222,17 @@ Object.assign(App, {
         data.entradas = entradas;
       }
       if (document.getElementById('gReact')?.checked) data.finHasta = null;
+      /* Cambia el IVA de un gasto con entradas anteriores a otro tipo: ¿es el precio nuevo
+         (solo lo que venga) o una corrección (también lo anterior)? Se pregunta, no se adivina. */
+      const viejas = data.entradas ? [] : (g?.entradas || []).filter(e => !(e.desglose && e.desglose.length) && (e.tipoIva ?? g.tipoIva) !== data.tipoIva);
+      if (g && g.tipoIva !== data.tipoIva && viejas.length) {
+        this._gPend = { gid, data };
+        this.om(`<div class="mt">${t('gas.ivaChangeTitle', g.tipoIva ?? 0, data.tipoIva)}</div>`
+          + `<p style="font-size:.85rem;color:var(--t2);line-height:1.5">${t('gas.ivaChangeBody', viejas.length)}</p>`
+          + `<div class="ma"><button class="bt" onclick="App._gFinish(false)">${t('gas.ivaOnlyNew')}</button>`
+          + `<button class="bt bt-p" onclick="App._gFinish(true)">${t('gas.ivaFixPast', viejas.length)}</button></div>`);
+        return;
+      }
       D.upG(gid, data);
     } else {
       data.id = uid(); data.entradas = [];
@@ -227,6 +243,27 @@ Object.assign(App, {
       }
       D.addG(data);
     }
+    this.cm(); this.rGas();
+  },
+
+  /** Termina saveG tras la pregunta del IVA. fixPast: las entradas anteriores pasan al tipo
+   *  nuevo (misma base; se recalcula la cuota y el total). Si no, conservan el suyo. */
+  _gFinish(fixPast) {
+    const p = this._gPend; this._gPend = null;
+    if (!p) return;
+    const g = D.g(p.gid); if (!g) return;
+    if (fixPast) {
+      const r = p.data.tipoIva;
+      p.data.entradas = (g.entradas || []).map(e => {
+        if (e.desglose && e.desglose.length) return e;
+        const iva = roundMoney((e.base || 0) * r / 100);
+        return { ...e, tipoIva: r, iva, total: roundMoney((e.base || 0) + iva - (e.irpf || 0)) };
+      });
+    } else {
+      /* Las anteriores se quedan con su tipo explícito (las más viejas no lo guardaban) */
+      p.data.entradas = (g.entradas || []).map(e => (e.tipoIva == null ? { ...e, tipoIva: g.tipoIva ?? 0 } : e));
+    }
+    D.upG(p.gid, p.data);
     this.cm(); this.rGas();
   },
 
@@ -259,7 +296,7 @@ Object.assign(App, {
       + `<input type="hidden" id="geIva" value="${tipoIva}"><input type="hidden" id="geIrpf" value="${tipoIrpf}">`
       + this._gDesgHtml('ge', lines)
       + `<div class="fr"><div class="fg"><label>${t('field.totalAmount')}</label><input type="number" id="geEA" min="0.01" step="0.01" value="${valTotal}" placeholder="0,00" ${ro} onchange="App._gCalc('total','ge')"></div>`
-      + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="geD" value="${e?.fecha || todayStr()}"></div></div>`
+      + `<div class="fg"><label>${t('field.date')}${itip('tip.fechaGasto')}</label><input type="date" id="geD" value="${e?.fecha || todayStr()}"></div></div>`
       + `<div class="fr"><div class="fg"><label>${t('field.note')}</label><input type="text" id="geN" value="${esc(e?.nota || '')}" placeholder="${t('ph.detail')}"></div>`
       + `<div class="fg"><label>${t('field.numFactura')}</label><input type="text" id="geNF" value="${esc(e?.numFactura || '')}" placeholder="${t('ph.optional')}"></div></div>`
       + (isRecurrente && !isE ? `<div class="fg"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="geUlt"> ${t('gas.lastMonth')}</label></div>` : '')
