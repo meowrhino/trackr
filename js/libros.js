@@ -78,7 +78,7 @@ const LR = {
     D.ps().forEach((p) => {
       if (typeof B !== 'undefined') B.calc(p);
       const f = p.facturacion || {};
-      if (!enRango(f.facturaFecha) || !(f.baseImponible > 0)) return;
+      if (!enRango(f.facturaFecha) || !(f.baseImponible > 0) || !D.facturaVigente(p.id)) return; // anulada: fuera del libro
       const cl = p.clienteId ? D.cl(p.clienteId) : null;
       const zona = (cl && cl.zonaFiscal) || 'es';
       const n3 = this._nif3(zona, cl && cl.nif);

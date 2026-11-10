@@ -26,7 +26,7 @@ Object.assign(App, {
       + `<div class="cfg-section"><div class="cfg-section-title">${t('cfg.defaults')}</div><div class="cfg-grid">`
       + `<div class="fg"><label>${t('cfg.ivaPercent')}</label><input type="number" id="cfgIva" value="${s.defaultIva}" min="0" max="100" step="1"></div>`
       + `<div class="fg"><label>${t('cfg.irpfPercent')}</label><input type="number" id="cfgIrpf" value="${s.defaultIrpf}" min="0" max="100" step="1"></div>`
-      + `<div class="fg"><label>${t('cfg.dueDays')}</label><input type="number" id="cfgDiasVenc" value="${s.diasVencimiento || 30}" min="0" max="365" step="1"></div>`
+      + `<div class="fg"><label>${t('cfg.dueDays')}</label><input type="number" id="cfgDiasVenc" value="${s.diasVencimiento ?? 30}" min="0" max="365" step="1"></div>`
       + `<div class="cfg-full fg"><label>${t('cfg.beneficiary')}</label><input type="text" id="cfgBenef" placeholder="${t('ph.beneficiary')}" value="${esc(em.beneficiarioPago || '')}"></div>`
       + `<div class="cfg-full fg"><label>${t('cfg.bankAccount')}</label><input type="text" id="cfgPago" placeholder="${t('ph.bankAccount')}" value="${esc(em.instruccionesPago || '')}"></div>`
       + `<div class="cfg-full fg"><label>${t('cfg.defaultSubject')}</label><input type="text" id="cfgConcepto" value="${esc(s.conceptoDefault || '')}" placeholder="${t('ph.defaultSubject')}"><label style="font-size:.82rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;margin-top:.45rem;text-transform:none;letter-spacing:0;color:var(--t2);white-space:nowrap"><input type="checkbox" id="cfgConceptoCl" style="margin:0;width:14px;height:14px;accent-color:var(--ac)" ${s.conceptoAppendCliente ? 'checked' : ''}>${t('cfg.appendClientName')}</label></div>`
@@ -95,11 +95,8 @@ Object.assign(App, {
         persona: 'persona', gestor: 'gestoria'
       }
     })[lang] || {};
-    const tx = k => TX[k] || k;
-    const fmtTs = ts => {
-      try { return new Date(ts).toLocaleString(currentLocale(), { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
-      catch { return String(ts); }
-    };
+    const tx = k => TX[k] || esc(k);
+    const fmtTs = fmtDateTime;
     const actorTxt = a => {
       if (!a || a === 'local') return tx('local');
       const role = a.role ? ` · ${tx(a.role)}` : '';
@@ -131,7 +128,7 @@ Object.assign(App, {
         const accion = `${tx(e.accion)} ${tx(e.entidad)}${nombre ? ` <strong>${esc(nombre)}</strong>` : ''}`;
         /* Deshacer solo donde hay inverso guardado: hoy, los cambios que vinieron de la
            gestoría (los propios ya tienen las copias de seguridad y el propio hacer). */
-        const undoBtn = e.undo ? `<button class="cl-btn" onclick="App.auditUndo(${idx},${e.ts})" title="${tx('undo')}">&#8630;</button>` : '';
+        const undoBtn = e.undo ? `<button class="cl-btn" onclick="App.auditUndo(${idx},${Number(e.ts) || 0})" title="${tx('undo')}">&#8630;</button>` : '';
         return `<div class="cl-item"${e.undone ? ' style="opacity:.55"' : ''}>`
           + `<span class="cl-name" style="font-size:.82rem">${esc(actorTxt(e.actor))} ${accion}${e.undone ? ` <em style="color:var(--t3);font-style:normal">· ${tx('undone')}</em>` : ''}</span>`
           + `<span class="cl-nif" style="font-size:.72rem;color:var(--t3)">${fmtTs(e.ts)}</span>`
@@ -158,12 +155,8 @@ Object.assign(App, {
       en: { title: 'Backups', desc: 'TRACKR keeps up to 10 local copies of your data (one a day, plus the ones you make). They are your safety net: download or restore them anytime. None of this leaves your browser.', saveNow: 'Save a copy now', none: 'No copies yet. One will be created automatically as you use the app.', current: 'CURRENT', auto: 'auto', load: 'Load', download: 'Download' },
       ca: { title: 'Còpies de seguretat', desc: 'TRACKR desa fins a 10 còpies locals de les teves dades (una al dia, més les que creïs tu). Són la teva xarxa de seguretat: descarrega-les o restaura-les quan vulguis. Res d\'això surt del teu navegador.', saveNow: 'Desar còpia ara', none: 'Encara no hi ha còpies. Se\'n crearà una automàticament en fer servir l\'app.', current: 'ACTUAL', auto: 'auto', load: 'Carregar', download: 'Descarregar' }
     })[typeof _lang !== 'undefined' ? _lang : 'es'] || {};
-    const tx = k => TX[k] || k;
-    const fmtTs = iso => {
-      if (!iso) return '—';
-      try { return new Date(iso).toLocaleString(currentLocale(), { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
-      catch { return iso.slice(0, 16).replace('T', ' '); }
-    };
+    const tx = k => TX[k] || esc(k);
+    const fmtTs = fmtDateTime;
     const saves = (typeof H !== 'undefined') ? H.list() : [];
     let listHtml;
     if (saves.length) {
@@ -386,7 +379,7 @@ Object.assign(App, {
     s.emisor.instruccionesPago = document.getElementById('cfgPago').value.trim();
     s.conceptoDefault = document.getElementById('cfgConcepto').value.trim();
     s.conceptoAppendCliente = document.getElementById('cfgConceptoCl').checked;
-    s.diasVencimiento = parseInt(document.getElementById('cfgDiasVenc').value) || 30;
+    s.diasVencimiento = ((v) => (Number.isFinite(v) && v >= 0 ? v : 30))(parseInt(document.getElementById('cfgDiasVenc').value));
 
     const oldIva = s.defaultIva;
     const oldIrpf = s.defaultIrpf;
@@ -479,7 +472,7 @@ Object.assign(App, {
           const col = { enviado: 'var(--warn)', aceptado: 'var(--ok)', rechazado: 'var(--bad)' }[b.estado] || 'var(--t3)';
           const conceptos = b.lineas.map(l => l.concepto).join(', ');
           return `<div class="cl-item">`
-            + `<span class="cl-nif" style="font-family:'DM Mono',monospace;font-size:.78rem;color:var(--t1)">${b.num}/${yearShort(b.fecha)}</span>`
+            + `<span class="cl-nif" style="font-family:'DM Mono',monospace;font-size:.78rem;color:var(--t1)">${esc(b.num)}/${yearShort(b.fecha)}</span>`
             + `<span class="cl-nif" style="font-size:.72rem">${fmtDate(b.fecha)}</span>`
             + `<span class="cl-name">${first ? `<a href="#" onclick="event.preventDefault();App.go('det','${first.id}')" style="color:inherit;text-decoration:none">` : ''}${esc(cl?.nombre || '')} <span style="color:var(--t3)">· ${esc(conceptos)}</span>${first ? '</a>' : ''}</span>`
             + `<span class="cl-nif" style="font-size:.78rem;color:var(--t1)">${fmtMoney(b.total || 0)}</span>`

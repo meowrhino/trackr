@@ -23,6 +23,9 @@ Object.assign(App, {
       `<button class="fb ${this.pf === f.k ? 'on' : ''}" onclick="App.sf('${f.k}')">${f.l}</button>`
     ).join('')
       + `<span style="flex:1"></span>`
+      + `<select class="fb" style="width:auto;flex:0 0 auto;padding-right:1.6rem" aria-label="${t('dash.sortBy')}" title="${t('dash.sortBy')}" onchange="App.ss(this.value)">`
+      +   ['recent', 'hours', 'name'].map(k => `<option value="${k}"${this.sortMode() === k ? ' selected' : ''}>${t('dash.sort.' + k)}</option>`).join('')
+      + `</select>`
       + `<button class="fb ${board ? '' : 'on'}" onclick="App.sm('list')">${t('dash.list')}</button>`
       + `<button class="fb ${board ? 'on' : ''}" onclick="App.sm('board')">${t('dash.board')}</button>`;
 
@@ -30,7 +33,7 @@ Object.assign(App, {
     const als = [];
     ps.forEach(p => {
       const f = p.facturacion;
-      if ((p.estado === 'completado' || p.estado === 'abandonado') && f.facturaFecha && !f.pagado) {
+      if ((p.estado === 'completado' || p.estado === 'abandonado') && f.facturaFecha && !f.pagado && D.facturaVigente(p.id)) {
         const dv = B.diasVencida(f, D.d.settings.diasVencimiento, todayStr());
         als.push({ t: t('info.pendingPaymentAlert', p.nombre) + (dv > 0 ? ' · ' + t('fac.overdueDays', dv) : ''), id: p.id });
       }
@@ -57,17 +60,18 @@ Object.assign(App, {
     const groups = {};
     filtered.forEach(p => {
       let key = p.estado;
-      /* En "Todos": activos se subdividen en externos / internos / recurrentes */
-      if (key === 'activo' && (!this.pf || this.pf === 'todos')) {
+      /* Los activos recurrentes (trabajo largo, sin fin cercano) van siempre aparte: en
+         Activos quedan solo los proyectos en curso. En "Todos", los internos también. */
+      if (key === 'activo') {
         if (p.recurrente) key = '_recurrente';
-        else if (p.interno) key = '_interno';
+        else if (p.interno && (!this.pf || this.pf === 'todos')) key = '_interno';
       }
       if (!groups[key]) groups[key] = [];
       groups[key].push(p);
     });
 
-    /* Ordenar cada grupo: lo trabajado más recientemente arriba */
-    Object.keys(groups).forEach(st => groups[st].sort((a, b) => this._byRecent(a, b)));
+    /* Ordenar cada grupo según el selector (por defecto, lo trabajado más recientemente arriba) */
+    Object.keys(groups).forEach(st => groups[st].sort((a, b) => this._projSort(a, b)));
 
     const c = document.getElementById('dPr');
     if (!filtered.length) {
@@ -76,11 +80,9 @@ Object.assign(App, {
     }
 
     const labels = { potencial: t('est.potenciales'), activo: t('est.activos'), _interno: t('dash.flagInternal'), _recurrente: t('dash.flagRecurring'), pausado: t('est.pausados'), completado: t('est.completados'), abandonado: t('est.abandonados') };
-    const collapsible = { completado: true, abandonado: true };
+    const collapsible = { _recurrente: true, completado: true, abandonado: true };
     /* Orden de renderizado: activos externos, internos, recurrentes, luego el resto */
-    const renderOrder = (!this.pf || this.pf === 'todos')
-      ? ['activo', '_interno', '_recurrente', 'potencial', 'pausado', 'completado', 'abandonado']
-      : EST_ORDER;
+    const renderOrder = ['activo', '_interno', '_recurrente', 'potencial', 'pausado', 'completado', 'abandonado'];
     let html = '';
     renderOrder.forEach(st => {
       const g = groups[st] || [];
@@ -146,12 +148,15 @@ Object.assign(App, {
       /* Limpiar aquí y no en dragend: rDash() sustituye la tarjeta arrastrada y su
          dragend ya no llega al contenedor (se quedaban visibles los estados vacíos). */
       c.classList.remove('dnd'); clear(); pid = null;
-      /* Internos / Recurrentes son activos con marca: soltar ahí = activo */
-      const st = g.dataset.st[0] === '_' ? 'activo' : g.dataset.st;
+      /* Internos / Recurrentes son activos con marca: soltar ahí = activo (y en Recurrentes,
+         marcarlo; en Activos, desmarcarlo, o volvería a caer en Recurrentes) */
+      const raw = g.dataset.st;
+      const st = raw[0] === '_' ? 'activo' : raw;
       const p = D.p(id);
-      if (p && p.estado !== st) {
-        D.up(id, { estado: st });
-        Toast.ok(`${p.nombre} → ${EST[st] || st}`);
+      const rec = raw === '_recurrente' ? true : raw === 'activo' ? false : p?.recurrente;
+      if (p && (p.estado !== st || !!p.recurrente !== !!rec)) {
+        D.up(id, { estado: st, recurrente: !!rec });
+        Toast.ok(`${p.nombre} → ${raw === '_recurrente' ? t('dash.flagRecurring') : (EST[st] || st)}`);
       }
       this.rDash();
     });
@@ -197,6 +202,23 @@ Object.assign(App, {
   },
 
   sf(f) { this.pf = f; this.rDash(); },
+
+  /** Orden elegido en Proyectos (lista y tablero): 'recent' | 'hours' | 'name'. Se recuerda por navegador. */
+  sortMode() {
+    if (!this._sortM) { try { this._sortM = localStorage.getItem('trackr_dash_sort') || 'recent'; } catch (e) { this._sortM = 'recent'; } }
+    return this._sortM;
+  },
+  ss(m) {
+    this._sortM = m;
+    try { localStorage.setItem('trackr_dash_sort', m); } catch (e) { /* sin storage: solo esta sesión */ }
+    this.rDash();
+  },
+  _projSort(a, b) {
+    const m = this.sortMode();
+    if (m === 'hours') return B.totalHoras(b) - B.totalHoras(a) || this._byRecent(a, b);
+    if (m === 'name') return (a.nombre || '').localeCompare(b.nombre || '', undefined, { sensitivity: 'base', numeric: true });
+    return this._byRecent(a, b);
+  },
 
   /** Orden de Proyectos (lista y tablero): última fecha con horas hasta hoy, la más reciente
    *  arriba (las horas planificadas a futuro no cuentan); sin horas, al final; empate, por horas. */

@@ -47,7 +47,8 @@ const F = {
       p.horas.forEach(h => {
         if (h.fecha && inPeriod(h.fecha, 'trim', y, m) && h.monto) ingresos += h.monto;
       });
-      if (f.facturaFecha && inPeriod(f.facturaFecha, 'trim', y, m) && f.baseImponible) {
+      /* Una factura anulada no cuenta: ni ingreso, ni IVA, ni retención. */
+      if (f.facturaFecha && inPeriod(f.facturaFecha, 'trim', y, m) && f.baseImponible && D.facturaVigente(p.id)) {
         ingresos += f.baseImponible || 0;
         retenciones += f.importeIrpf || 0;
         const zona = (p.clienteId && D.cl(p.clienteId)?.zonaFiscal) || 'es';

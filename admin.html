@@ -7,9 +7,7 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" type="image/png" href="navicon.png">
 <meta name="theme-color" content="#111111">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/fonts.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--bg:#111;--bg2:#191919;--bg3:#222;--b1:#262626;--b2:#333;--t1:#ccc;--t2:#888;--t3:#555;--ok:#5a9;--warn:#c93;--bad:#c55;--ac:#5a9;--r:3px}
@@ -132,6 +130,7 @@ async function toggleAuto() {
 
 async function cargar() {
   const users = await Acc.adminListUsers();
+  emailById = Object.fromEntries((users || []).map(u => [u.userId, u.email]));
   if (!users) {
     // sin sesión válida de admin → login (o cuenta sin permisos)
     ver('login');
@@ -158,14 +157,17 @@ async function cargar() {
       <div class="acts">
         <button class="bt bt-s${u.active ? '' : ' bt-p'}" title="${u.active ? 'Desactivar' : 'Activar'}" onclick="setActivo('${u.userId}',${u.active ? 0 : 1})">${u.active ? 'Desactivar' : 'Activar'}</button>
         <button class="bt bt-s" title="${u.paid ? 'Quitar pago' : 'Marcar pagado'}" onclick="setPago('${u.userId}',${u.paid ? 0 : 1})">€</button>
-        <button class="bt bt-s bt-danger" title="Borrar (soft, reversible 30 días)" onclick="borrar('${u.userId}','${esc(u.email)}')">×</button>
+        <button class="bt bt-s bt-danger" title="Borrar (soft, reversible 30 días)" onclick="borrar('${u.userId}')">×</button>
       </div>
     </div>`).join('') || '<div class="msg">No hay usuarios.</div>';
 }
 
 async function setActivo(id, on) { if (await Acc.adminSetActive(id, !!on)) { toast(on ? 'Activado — que cierre sesión y vuelva a entrar' : 'Desactivado'); cargar(); } else toast('Error'); }
 async function setPago(id, on) { if (await Acc.adminSetPaid(id, !!on)) { toast('OK'); cargar(); } else toast('Error'); }
-async function borrar(id, email) { if (!confirm(`¿Borrar la cuenta ${email}? (soft-delete, reversible 30 días)`)) return; if (await Acc.adminDelete(id)) { toast('Borrada'); cargar(); } else toast('Error'); }
+/* El email no viaja en el onclick: el navegador decodifica &#39; antes de ejecutar y un email
+   con comillas rompia la cadena. Solo va el id (del servidor) y el email se busca aqui. */
+let emailById = {};
+async function borrar(id) { const email = emailById[id] || id; if (!confirm(`¿Borrar la cuenta ${email}? (soft-delete, reversible 30 días)`)) return; if (await Acc.adminDelete(id)) { toast('Borrada'); cargar(); } else toast('Error'); }
 
 async function entrar() {
   $('loginErr').textContent = '';

@@ -26,7 +26,6 @@ const THEMES = {
 
   /* ── Lavanda: noche púrpura suave + violeta y oro (inspo: light rain) ── */
   lavanda: {
-    label: 'Lavanda',
     vars: {
       bg: '#141018', bg2: '#1a1520', bg3: '#221c2a', bg4: '#2a2434',
       b1: '#261e30', b2: '#362e42', b3: '#463e52',
@@ -38,7 +37,6 @@ const THEMES = {
 
   /* ── Monokai: paleta editor clásica, acento naranja cálido ── */
   monokai: {
-    label: 'Monokai',
     vars: {
       bg: '#272822', bg2: '#2e2f28', bg3: '#383930', bg4: '#424338',
       b1: '#3e3f38', b2: '#4e4f48', b3: '#5e5f58',
@@ -50,7 +48,6 @@ const THEMES = {
 
   /* ── Medianoche: espacio profundo + estrellas eléctricas (inspo: storm) ── */
   medianoche: {
-    label: 'Medianoche',
     vars: {
       bg: '#080c1c', bg2: '#0e142a', bg3: '#161e3a', bg4: '#1e284a',
       b1: '#1a2644', b2: '#283a64', b3: '#384c78',
@@ -62,7 +59,6 @@ const THEMES = {
 
   /* ── Cerezo: noche de hanami + sakura y farolillos dorados ── */
   cerezo: {
-    label: 'Cerezo',
     vars: {
       bg: '#1a0c10', bg2: '#241418', bg3: '#301c24', bg4: '#3c242e',
       b1: '#341c26', b2: '#4c3038', b3: '#5c404c',
@@ -74,7 +70,6 @@ const THEMES = {
 
   /* ── Nord: aurora boreal sobre polar night (canon Nord + más vida) ── */
   nord: {
-    label: 'Nord',
     vars: {
       bg: '#2e3440', bg2: '#3b4252', bg3: '#434c5e', bg4: '#4c566a',
       b1: '#434c5e', b2: '#4c566a', b3: '#5c6880',
@@ -86,7 +81,6 @@ const THEMES = {
 
   /* ── Sepia: mapa del tesoro + oro y cobre (inspo: vintage treasure) ── */
   sepia: {
-    label: 'Sepia',
     vars: {
       bg: '#1c1610', bg2: '#261e14', bg3: '#322820', bg4: '#3c3228',
       b1: '#3c3020', b2: '#544838', b3: '#645a48',
@@ -98,7 +92,6 @@ const THEMES = {
 
   /* ── Tinta: brutal b/w + neón rojo/verde (inspo: noir + neon signs) ── */
   tinta: {
-    label: 'Tinta',
     vars: {
       bg: '#000000', bg2: '#080808', bg3: '#141414', bg4: '#1c1c1c',
       b1: '#1e1e1e', b2: '#303030', b3: '#484848',
@@ -110,7 +103,6 @@ const THEMES = {
 
   /* ── Oscuro: carbón frío + destellos dorados (inspo: becasDigMeow dark) ── */
   oscuro: {
-    label: 'Oscuro',
     vars: {
       bg: '#101216', bg2: '#181c22', bg3: '#20242c', bg4: '#282e36',
       b1: '#262c34', b2: '#363e48', b3: '#48505c',
@@ -126,7 +118,6 @@ const THEMES = {
 
   /*
   hacker: {
-    label: 'Hacker',
     vars: {
       bg: '#040804', bg2: '#0a100a', bg3: '#101810', bg4: '#162016',
       b1: '#122012', b2: '#1c2e1c', b3: '#283c28',
@@ -136,7 +127,6 @@ const THEMES = {
     }
   },
   bosque: {
-    label: 'Bosque',
     vars: {
       bg: '#0c1410', bg2: '#121c14', bg3: '#1a261c', bg4: '#223026',
       b1: '#1e2c20', b2: '#2c3e30', b3: '#3c5240',
@@ -146,7 +136,6 @@ const THEMES = {
     }
   },
   claro: {
-    label: 'Claro',
     vars: {
       bg: '#eee8dc', bg2: '#f6f0e4', bg3: '#e4dccf', bg4: '#d8cfc0',
       b1: '#ccc2b0', b2: '#b8ae9c', b3: '#9e9484',
@@ -156,7 +145,6 @@ const THEMES = {
     }
   },
   pizarra: {
-    label: 'Pizarra',
     vars: {
       bg: '#40484c', bg2: '#4c5458', bg3: '#384044', bg4: '#30383c',
       b1: '#38424a', b2: '#586068', b3: '#6c7880',
@@ -166,7 +154,6 @@ const THEMES = {
     }
   },
   ocaso: {
-    label: 'Ocaso',
     vars: {
       bg: '#4c3424', bg2: '#5c4030', bg3: '#422c1c', bg4: '#382414',
       b1: '#483424', b2: '#685444', b3: '#806858',
@@ -176,7 +163,6 @@ const THEMES = {
     }
   },
   arena: {
-    label: 'Arena',
     vars: {
       bg: '#ece0c8', bg2: '#f4ecd8', bg3: '#e0d4bc', bg4: '#d4c8b0',
       b1: '#c8bca4', b2: '#b0a48c', b3: '#988c74',
@@ -186,7 +172,6 @@ const THEMES = {
     }
   },
   nube: {
-    label: 'Nube',
     vars: {
       bg: '#dce4f0', bg2: '#e6ecf8', bg3: '#d0d8e8', bg4: '#c4cce0',
       b1: '#b4c0d8', b2: '#9cacc4', b3: '#849cb8',
@@ -196,7 +181,6 @@ const THEMES = {
     }
   },
   melocoton: {
-    label: 'Melocotón',
     vars: {
       bg: '#f0dcd0', bg2: '#f8e8de', bg3: '#e8cec4', bg4: '#dcc0b6',
       b1: '#d0b4a8', b2: '#bca498', b3: '#a48c84',
@@ -206,7 +190,6 @@ const THEMES = {
     }
   },
   menta: {
-    label: 'Menta',
     vars: {
       bg: '#d4ece2', bg2: '#e0f4ec', bg3: '#c8e0d4', bg4: '#bcd8cc',
       b1: '#accabb', b2: '#94b8a8', b3: '#7ca494',
@@ -216,7 +199,6 @@ const THEMES = {
     }
   },
   sol: {
-    label: 'Sol',
     vars: {
       bg: '#ece0c4', bg2: '#f6ecd6', bg3: '#e0d4b8', bg4: '#d6ccac',
       b1: '#c8bca0', b2: '#b0a484', b3: '#98906c',

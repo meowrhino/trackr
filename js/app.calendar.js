@@ -582,13 +582,13 @@ Object.assign(App, {
     let body = '';
     if (withTime.length) {
       body += `<div class="hl">${withTime.map(e =>
-        `<div class="hr" style="border-left-color:${e.pc}"><span class="hr-d m" style="min-width:45px">${e.horaInicio}</span><span class="hr-t">${e.tipo === 'trabajo' ? '💻' : '👥'}</span><span class="hr-a m">${e.cantidad}h</span><span style="color:var(--t1);font-size:.82rem;flex:1">${esc(e.pn)}</span><span class="hr-n">${esc(e.nota || '')}</span><span class="hr-e" onclick="App.cm();App.eHour('${e.pid}','${e.id}')" title="${t('btn.edit')}">&#9998;</span><span class="hr-e" onclick="App.cm();App.go('det','${e.pid}')" title="Ver proyecto">&rarr;</span></div>`
+        `<div class="hr" style="border-left-color:${e.pc}"><span class="hr-d m" style="min-width:45px">${esc(e.horaInicio)}</span><span class="hr-t">${e.tipo === 'trabajo' ? '💻' : '👥'}</span><span class="hr-a m">${esc(e.cantidad)}h</span><span style="color:var(--t1);font-size:.82rem;flex:1">${esc(e.pn)}</span><span class="hr-n">${esc(e.nota || '')}</span><span class="hr-e" onclick="App.cm();App.eHour('${e.pid}','${e.id}')" title="${t('btn.edit')}">&#9998;</span><span class="hr-e" onclick="App.cm();App.go('det','${e.pid}')" title="Ver proyecto">&rarr;</span></div>`
       ).join('')}</div>`;
     }
     if (noTime.length) {
       body += `<div style="margin-top:.75rem;font-size:.72rem;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.4rem">${t('cal.noTime')}</div>`
         + `<div class="hl">${noTime.map(e =>
-          `<div class="hr" style="border-left-color:${e.pc}"><span class="hr-t">${e.tipo === 'trabajo' ? '💻' : '👥'}</span><span class="hr-a m">${e.cantidad}h</span><span style="color:var(--t1);font-size:.82rem;flex:1">${esc(e.pn)}</span><span class="hr-n">${esc(e.nota || '')}</span><span class="hr-e" onclick="App.cm();App.eHour('${e.pid}','${e.id}')" title="${t('btn.edit')}">&#9998;</span><span class="hr-e" onclick="App.cm();App.go('det','${e.pid}')" title="Ver proyecto">&rarr;</span></div>`
+          `<div class="hr" style="border-left-color:${e.pc}"><span class="hr-t">${e.tipo === 'trabajo' ? '💻' : '👥'}</span><span class="hr-a m">${esc(e.cantidad)}h</span><span style="color:var(--t1);font-size:.82rem;flex:1">${esc(e.pn)}</span><span class="hr-n">${esc(e.nota || '')}</span><span class="hr-e" onclick="App.cm();App.eHour('${e.pid}','${e.id}')" title="${t('btn.edit')}">&#9998;</span><span class="hr-e" onclick="App.cm();App.go('det','${e.pid}')" title="Ver proyecto">&rarr;</span></div>`
         ).join('')}</div>`;
     }
     if (!es.length) body += `<div class="es"><div class="tx">${t('cal.noHoursDay')}</div></div>`;

@@ -47,7 +47,7 @@
 .jrn-col-count{font-family:var(--jmono);font-size:.7rem;color:var(--jt3);background:var(--jbg3);border-radius:10px;padding:.05rem .45rem;flex-shrink:0}
 
 /* Acciones de columna (aparecen al hover) */
-.jrn-col-actions{display:flex;gap:.1rem;opacity:0;transition:opacity var(--jtr)}
+.jrn-col-actions{display:flex;gap:.1rem;opacity:.45;transition:opacity var(--jtr)} /* visible: plegar no debe ser un secreto */
 .jrn-col:hover .jrn-col-actions,.jrn-col:focus-within .jrn-col-actions{opacity:1}
 .jrn-ica{background:none;border:none;color:var(--jt3);cursor:pointer;font-size:.85rem;line-height:1;padding:.2rem .3rem;border-radius:var(--jr);transition:color var(--jtr),background var(--jtr)}
 .jrn-ica:hover{color:var(--jt1);background:var(--jbg4)}

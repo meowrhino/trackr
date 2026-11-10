@@ -115,7 +115,8 @@ function gastoImporteFiscal(zona, base, iva) {
  *  sin desglose, la entrada entera va al tipo del gasto. */
 function gastoLineasIva(g, e) {
   if (Array.isArray(e.desglose) && e.desglose.length) return e.desglose;
-  return [{ tipoIva: g.tipoIva || 0, base: e.base || 0, iva: e.iva || 0 }];
+  /* El tipo de la entrada manda: cambiar el IVA del gasto no reescribe trimestres pasados. */
+  return [{ tipoIva: e.tipoIva ?? g.tipoIva ?? 0, base: e.base || 0, iva: e.iva || 0 }];
 }
 
 /** Coste real de una entrada de gasto: base + IVA. La retención de IRPF no
@@ -176,18 +177,20 @@ function fmtDate(s) {
   if (!s) return '—';
   if (_fmtDateCache[s]) return _fmtDateCache[s];
   const p = s.split('-');
-  const r = p.length === 3 ? `${p[2]}-${p[1]}-${p[0]}` : s;
+  /* Escapada: una "fecha" que llega de un JSON importado, de un cliente o de un gestor acaba en innerHTML */
+  const r = esc(p.length === 3 ? `${p[2]}-${p[1]}-${p[0]}` : s);
   _fmtDateCache[s] = r;
   return r;
 }
 
 /** Formatea cantidad monetaria: 1234.5 → "1.234,50 €" (locale dinámico) */
-function fmtMoney(n) {
-  if (n == null || isNaN(n)) return '0,00 €';
-  return n.toLocaleString(typeof currentLocale === 'function' ? currentLocale() : 'es-ES', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }) + ' €';
+function fmtMoney(n) { return fmtNum(n) + ' €'; }
+
+/** Fecha y hora cortas en el idioma de la app ("10 nov 2026, 18:35"); '—' si no hay. */
+function fmtDateTime(ts) {
+  if (ts == null || ts === '') return '—';
+  try { return new Date(ts).toLocaleString(typeof currentLocale === 'function' ? currentLocale() : 'es-ES', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+  catch { return String(ts); }
 }
 
 /** Formatea número decimal: 1234.5 → "1.234,50" (locale dinámico) */

@@ -35,6 +35,7 @@ const App = {
     T.init(null);
 
     if (!D.init()) D.create();
+    if (D._broken) setTimeout(() => Toast.show(t('msg.dataBroken'), 'error', 0, [{ label: t('btn.close'), fn: () => {} }]), 500);
 
     /* Aplicar tema e idioma guardados */
     this._applyPrefs();
@@ -77,6 +78,7 @@ const App = {
        memoria entera y la última en guardar pisa a la otra sin avisar. Con un modal
        abierto no se repinta (se perdería lo tecleado); su guardado ya cae sobre lo nuevo. */
     window.addEventListener('storage', e => {
+      if (e.key === 'trackr_acct' && typeof Acc !== 'undefined' && Acc.adoptMeta) { Acc.adoptMeta(); return; }
       if (e.key !== 'trackr_data' || !e.newValue || D._readOnly) return;
       try { D.d = JSON.parse(e.newValue); D.ensure(); } catch { return; }
       D.lastSaved = parseInt(localStorage.getItem('trackr_saved_at'), 10) || Date.now();
@@ -358,6 +360,10 @@ const App = {
         if (d.gastos && !Array.isArray(d.gastos)) { Toast.error(t('msg.invalidJsonGastos')); return; }
         if (badIds(d).length) { Toast.error(t('msg.invalidJsonIds')); return; }
         if (!d.settings) d.settings = { defaultIva: 21, defaultIrpf: 15 };
+        /* Importar SUSTITUYE todo: preguntar si hay datos y guardar antes una copia */
+        const cur = (D.d.projects || []).length + (D.d.gastos || []).length + (D.d.clientes || []).length;
+        if (cur && !confirm(t('msg.importConfirm', D.d.projects.length, d.projects.length))) return;
+        if (cur && typeof H !== 'undefined' && H.snapshot) H.snapshot();
         D.load(d); T.ev('action', 'import');
         this._applyPrefs();
         Toast.ok(t('msg.importSuccess'));
@@ -369,9 +375,13 @@ const App = {
 
   resetData() {
     if (!confirm(t('msg.resetConfirm'))) return;
-    localStorage.removeItem('trackr_data');
-    localStorage.removeItem('trackr_example');
-    location.reload();
+    /* Primero una copia descargada (la red de seguridad ya no se queda aquí); luego fuera
+       todo lo de este navegador: datos, copias de seguridad y la cuenta recordada. La nube no se toca. */
+    if ((D.d.projects || []).length || (D.d.gastos || []).length) this.exp();
+    ['trackr_data', 'trackr_example', 'trackr_history', 'trackr_saved_at', 'trackr_last_export', 'trackr_data_broken', 'trackr_acct']
+      .forEach(k => { try { localStorage.removeItem(k); } catch (e) { /* */ } });
+    try { sessionStorage.removeItem('trackr_token'); } catch (e) { /* */ }
+    setTimeout(() => location.reload(), 300); /* deja arrancar la descarga */
   },
 
   logoutModal() {

@@ -127,6 +127,29 @@ for (const [choice, ids] of [['cloud', ['c1']], ['local', ['l1']], ['merge', ['c
   console.log('ok - merge: reloj por registro y borrados');
 }
 
+// mergeData: horas, entradas y cobros apuntados en los dos dispositivos se conservan todos
+{
+  const { Acc } = setup({ meta: null, cloudVersion: 1, local: empty, lastSaved: 1 });
+  const local = {
+    projects: [{ id: 'p1', nombre: 'local', horas: [{ id: 'h1', cantidad: 1 }, { id: 'h3', cantidad: 3 }], facturacion: { cobros: [{ id: 'c2', cantidad: 20 }] } }],
+    gastos: [{ id: 'g1', entradas: [{ id: 'e1', total: 5 }] }],
+    audit: [{ ts: 30, accion: 'editar', entidad: 'proyecto', entidadId: 'p1' }, { ts: 5, accion: 'editar', entidad: 'gasto', entidadId: 'g1' }]
+  };
+  const cloud = {
+    projects: [{ id: 'p1', nombre: 'nube', horas: [{ id: 'h1', cantidad: 9 }, { id: 'h2', cantidad: 2 }], facturacion: { cobros: [{ id: 'c1', cantidad: 10 }] } }],
+    gastos: [{ id: 'g1', entradas: [{ id: 'e2', total: 7 }] }],
+    audit: [{ ts: 20, accion: 'editar', entidad: 'proyecto', entidadId: 'p1' }, { ts: 9, accion: 'editar', entidad: 'gasto', entidadId: 'g1' }]
+  };
+  const m = Acc._mergeData(local, cloud);
+  const p = m.projects[0];
+  assert.equal(p.nombre, 'local');                                            // gana el tocado mas tarde
+  assert.equal(p.horas.map((h) => h.id).sort().join(), 'h1,h2,h3');      // horas de los dos lados
+  assert.equal(p.horas.find((h) => h.id === 'h1').cantidad, 1);               // en colision, la del ganador
+  assert.equal(p.facturacion.cobros.map((c) => c.id).sort().join(), 'c1,c2');
+  assert.equal(m.gastos[0].entradas.map((e) => e.id).sort().join(), 'e1,e2');
+  console.log('ok - merge: une horas, entradas y cobros');
+}
+
 // alcance fiscal de la gestoría: las notas del cliente no viajan
 {
   const { Acc, D } = setup({ meta: null, cloudVersion: 1, local: empty, lastSaved: 1 });

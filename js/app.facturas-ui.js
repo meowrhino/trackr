@@ -51,7 +51,7 @@ Object.assign(App, {
       + clRow
       + `<div class="br"><span class="la">${t('billing.base')}</span><span class="va">${fmtMoney(f.baseImponible || 0)}</span></div>`
       + (f.iva ? `<div class="br"><span class="la">${t('billing.plusIva', f.iva)}</span><span class="va">${fmtMoney(f.importeIva || 0)}</span></div>` : '')
-      + (f.irpf ? `<div class="br"><span class="la">${t('billing.minusIrpf', f.irpf)}</span><span class="va">${fmtMoney(f.importeIrpf || 0)}</span></div>` : '')
+      + (f.irpf ? `<div class="br"><span class="la">${t('billing.minusIrpf', esc(f.irpf))}</span><span class="va">${fmtMoney(f.importeIrpf || 0)}</span></div>` : '')
       + `<div class="br tot"><span class="la">${t('billing.total')}</span><span class="va">${fmtMoney(f.totalFactura || 0)}</span></div></div>`;
 
     this.om(`<div class="mt">${t('fac.generate')}</div>`
@@ -245,7 +245,7 @@ Object.assign(App, {
       + `<input type="text" class="bud-c" value="${esc(l.concepto)}" style="flex:1">`
       + `<input type="number" class="bud-b" step="0.01" min="0" value="${l.base}" style="width:7rem;font-family:'DM Mono',monospace">`
       + `</div>`).join('');
-    this.om(`<div class="mt">${t('bud.edit')} · ${b.num}/${yearShort(b.fecha)}</div>`
+    this.om(`<div class="mt">${t('bud.edit')} · ${esc(b.num)}/${yearShort(b.fecha)}</div>`
       + `<div class="fg"><label>${t('fac.client')}</label><div style="font-size:.9rem">${esc(D.cl(b.clienteId)?.nombre || '')}</div></div>`
       + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="budDate" value="${b.fecha}"></div>`
       + `<div class="fg"><label>${t('bud.projects')}</label><div class="cl-list">${lines}</div></div>`

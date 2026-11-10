@@ -5,6 +5,31 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-11-10 — Auditoría: arreglos de dinero, datos y seguridad; columna Recurrente
+
+### ✨ Nuevo
+- **Columna «Recurrente»** a la izquierda del tablero (plegada por defecto) y grupo aparte en la lista: los activos marcados como recurrentes ya no se mezclan con lo que está en curso. Arrastrar a Recurrente marca el proyecto; a Activo, lo desmarca. Las columnas plegadas se recuerdan por navegador y el botón de plegar se ve siempre. _frontend_
+- **Ordenar Proyectos**: Reciente (por defecto), Más horas o Nombre A–Z, en lista y tablero. _frontend_
+- **Aviso de modelos solo cuando toca**: del día 1 del mes siguiente al trimestre al último día; naranja los 5 últimos; con la fecha límite para domiciliar; el plazo que cae en fin de semana pasa al lunes (T4 2026 → 1 feb 2027); en enero dice «303, 130 y 390». Deadlines va antes. _frontend_
+- **Textos de sincronización** más claros: «Guardado aquí · sube en breve» → «Subiendo a la nube…» → «En la nube · vN». La subida espera 10 s (antes 30). _frontend_
+- **Fuentes propias** (Outfit y DM Mono en `fonts/`, `css/fonts.css`): fuera Google Fonts en todas las páginas. _frontend_
+
+### 🐛 Arreglado
+- **Factura anulada**: ya no cuenta en 303, 130, 390, libros registro ni avisos de cobro. _frontend_
+- **Factura por horas emitida**: la base se congela; las horas que se sigan apuntando solo cuentan para el €/h. _frontend_
+- **Cobros parciales** que suman el total exacto marcan la factura pagada (redondeo a céntimos). _frontend_
+- **IVA de un gasto**: cada entrada conserva su tipo; cambiar el del gasto ya no reescribe trimestres pasados. _frontend_
+- **Datos ilegibles al arrancar**: se apartan en `trackr_data_broken` con aviso, en vez de empezar de cero encima. Un import que falla a medias no se queda en memoria. _frontend_
+- **Sincronizar entre dispositivos**: al fusionar, las horas, entradas de gasto y cobros de los dos lados se conservan (antes ganaba un lado entero). Pestañas abiertas a la vez comparten la versión (sin choques en cada subida). Tiempo límite de 30 s por petición (antes podía quedarse «Sincronizando…» hasta recargar). Doble conflicto en «Sincronizar ahora» reintenta en vez de bajar la nube encima. _frontend_
+- **Gestoría en modo visor**: una subida ya programada no puede meter los datos del cliente en la cuenta del gestor. _frontend_
+- **Seguridad**: fechas, horas, números y claves de idioma desconocidas se escapan antes de ir a la página; las operaciones del gestor se validan (ids, tipos) y se deshacen si traen algo raro; el panel de admin no mete el email en el onclick. Tests `test/gestor-ops.mjs`, `test/facturas-estado.mjs`. _frontend_
+- **Importar** pide confirmación y guarda una copia antes; **Borrar datos de este navegador** descarga antes una copia y borra también las copias locales y la cuenta recordada. **0 días de pago** se respeta (antes pasaba a 30). _frontend_
+
+### 🧹 Limpieza
+- Fuera 14 textos sin uso (×3 idiomas), los nombres de tema que nadie leía, y formateadores repetidos (`fmtMoney`, fecha-hora, fecha local). _frontend_
+
+---
+
 ## 2026-11-10 — Proyectos por reciente y aviso sin sesión
 
 ### ✨ Nuevo

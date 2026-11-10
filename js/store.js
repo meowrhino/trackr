@@ -24,7 +24,12 @@ const D = {
         this.d = JSON.parse(raw);
         this.ensure();
         return true;
-      } catch { /* JSON corrupto, se ignora */ }
+      } catch (e) {
+        /* No se pueden cargar: se apartan intactos antes de que create() los pise.
+           Quedan en trackr_data_broken para recuperarlos a mano (o con ayuda). */
+        console.error('D.init: datos ilegibles, apartados en trackr_data_broken', e);
+        try { localStorage.setItem('trackr_data_broken', raw); this._broken = true; } catch (e2) { /* sin sitio: al menos el log */ }
+      }
     }
     return false;
   },
@@ -555,8 +560,10 @@ const D = {
 
   /** Carga datos importados (reemplaza todo, normaliza y persiste) */
   load(j) {
+    /* Si la normalización falla, no se queda a medias en memoria (lo guardaría el siguiente cambio) */
+    const prev = this.d;
     this.d = j;
-    this.ensure();
+    try { this.ensure(); } catch (e) { this.d = prev; throw e; }
     this.save();
   },
 

@@ -335,7 +335,13 @@
     async accSyncNow() {
       const r = await Acc.push();
       if (r.ok) Toast.ok(`${t('synced')} · v${r.version}`);
-      else if (r.error === 'version_conflict') { if (typeof H !== 'undefined') H.snapshot(); await this._accPull(); Toast.warn(`${t('synced')} (${t('version')} ${r.currentVersion})`); }
+      else if (r.error === 'version_conflict') {
+        /* Doble choque: lo local ya está fusionado y la versión al día; reintentar la subida
+           (antes se bajaba la nube encima y lo fusionado quedaba solo en una copia). */
+        const r2 = await Acc.push();
+        if (r2.ok) Toast.ok(`${t('synced')} · v${r2.version}`);
+        else { if (typeof H !== 'undefined') H.snapshot(); await this._accPull(); Toast.warn(`${t('synced')} (${t('version')} ${r.currentVersion})`); }
+      }
       else Toast.error(t('syncErr') + (r.error ? ` (${r.error})` : ''));
       this.rCfg();
     },

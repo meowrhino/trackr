@@ -26,6 +26,11 @@ const Acc = (() => {
     } catch (e) { /* ignore */ }
   }
   function loadMeta() { try { return JSON.parse(localStorage.getItem(MKEY) || 'null'); } catch (e) { return null; } }
+  // Otra pestana subio: adoptar su version para que esta no choque (409) en cada subida.
+  function adoptMeta() {
+    const m = loadMeta();
+    if (m && m.email && m.email === S.email && (m.version || 0) > (S.version || 0)) { S.version = m.version; S.syncedAt = m.syncedAt || S.syncedAt; }
+  }
   function setToken(t) { try { sessionStorage.setItem(TKEY, t); } catch (e) { /* */ } S.token = t; }
   function getToken() { try { return sessionStorage.getItem(TKEY); } catch (e) { return null; } }
   function wipe() {
@@ -84,7 +89,10 @@ const Acc = (() => {
     // la rechaza por encima de 64 KB: solo se pide si cabe.
     keepalive = keepalive && (!payload || payload.length < 60000);
     let res;
-    try { res = await fetch(API_BASE + path, { method, headers, body: payload, keepalive }); }
+    // Tiempo limite: sin el, una peticion colgada (red movil a medias) dejaba _pushing a true
+    // y el indicador en "Subiendo…" hasta recargar.
+    const signal = typeof AbortSignal !== 'undefined' && AbortSignal.timeout ? AbortSignal.timeout(30000) : undefined;
+    try { res = await fetch(API_BASE + path, { method, headers, body: payload, keepalive, signal }); }
     catch (e) { return { status: 0, data: null, netErr: true }; }
     let data = null; try { data = await res.json(); } catch (e) { /* 204 etc */ }
     return { status: res.status, data };
@@ -264,7 +272,20 @@ const Acc = (() => {
     [...(local.audit || []), ...(cloud.audit || [])].forEach((e) => {
       if (e && e.accion === 'borrar' && e.entidadId) borradoTs.set(e.entidadId, Math.max(borradoTs.get(e.entidadId) || 0, e.ts || 0));
     });
-    const newer = (c, l) => ((tc.get(c.id) || 0) > (tl.get(l.id) || 0) ? c : l);
+    // Gana el registro tocado mas tarde, pero sus listas internas (horas, entradas de gasto,
+    // cobros) se unen por id con las del otro lado: dos dispositivos que apuntan horas en el
+    // mismo proyecto antes de sincronizar conservan las dos.
+    // shortcut: una hora/entrada/cobro borrada en un lado vuelve si el otro aun la tenia
+    // (mejor que perder una). Si molesta, anotar borrados de sub-registros en la auditoria.
+    const nested = (w, o) => {
+      const u = (a, b) => unionBy(b, a, (x) => x.id); // a = ganador: gana en colision
+      const r = { ...w };
+      if (Array.isArray(w.horas) && Array.isArray(o.horas)) r.horas = u(w.horas, o.horas);
+      if (Array.isArray(w.entradas) && Array.isArray(o.entradas)) r.entradas = u(w.entradas, o.entradas);
+      if (Array.isArray(w.facturacion?.cobros) && Array.isArray(o.facturacion?.cobros)) r.facturacion = { ...w.facturacion, cobros: u(w.facturacion.cobros, o.facturacion.cobros) };
+      return r;
+    };
+    const newer = (c, l) => ((tc.get(c.id) || 0) > (tl.get(l.id) || 0) ? nested(c, l) : nested(l, c));
     const vivo = (x) => !(borradoTs.has(x.id) && borradoTs.get(x.id) > touched(x.id));
     for (const key of ['projects', 'clientes', 'gastos', 'deducibles', 'facturas', 'presupuestos']) {
       if (local[key] || cloud[key]) out[key] = unionBy(cloud[key], local[key], (x) => x.id, newer).filter(vivo);
@@ -289,6 +310,8 @@ const Acc = (() => {
   // Guard _pushing: evita pushes solapados (auto-sync + manual); si llega otro mientras, marca _dirty y relanza al acabar.
   async function push(dataObj, _retry) {
     if (!isUnlocked() || !S.active) return { ok: false, error: 'not_ready' };
+    // Modo visor: D.d son los datos de OTRO (un cliente de la gestoria). Nunca se suben aqui.
+    if (typeof D !== 'undefined' && D._readOnly) return { ok: false, error: 'readonly' };
     if (!_retry) {
       if (_pushing) { _dirty = true; return { ok: false, error: 'busy' }; }
       _pushing = true;
@@ -310,7 +333,8 @@ const Acc = (() => {
           try { cloud = await CA.decryptDownload(S.dek, g.data.blob, S.email, g.data.version); } catch (e) { /* */ }
           if (cloud) {
             S.version = g.data.version;
-            const merged = mergeData(data, cloud);
+            // D.d actual, no el `data` del inicio: otra pestana pudo guardar mientras volaba el PUT
+            const merged = mergeData(dataObj || (typeof D !== 'undefined' ? D.d : data), cloud);
             if (typeof H !== 'undefined' && H.snapshot) H.snapshot(); // red de seguridad antes del merge
             _applyRemote(merged);
             return await push(merged, true);
@@ -366,7 +390,9 @@ const Acc = (() => {
 
   /* ── auto-sync (debounce) + guards de concurrencia/reentrada ── */
   let _timer = null, _enabled = false, _pushing = false, _dirty = false, _applyingRemote = false;
-  function setAutoSync(on) { _enabled = !!on; }
+  // Al apagarlo (modo visor de la gestoria) se cancela tambien la subida ya programada:
+  // si no, el temporizador subiria los datos del cliente a la cuenta del gestor.
+  function setAutoSync(on) { _enabled = !!on; if (!on && _timer) { clearTimeout(_timer); _timer = null; } }
 
   /* ── Notificacion de estado de sync a la UI (indicador en la barra) ── */
   let _onSync = null;
@@ -393,10 +419,10 @@ const Acc = (() => {
     try { if (typeof D !== 'undefined' && D.load) D.load(data); } finally { _applyingRemote = false; }
   }
   /* Cuanto esperar tras el ultimo cambio antes de subir. Cada cambio queda guardado AL
-     MOMENTO en el navegador; esto solo agrupa subidas (antes 2,5 s = una version por cada
+     MOMENTO en el navegador; esto solo agrupa subidas (10 s; 30 s parecia colgado; antes 2,5 s = una version por cada
      entrada del calendario). Al ocultar la pestana se sube ya; lo que no llegue a subir
      lo recoge resume() en el siguiente inicio de sesion. */
-  const SYNC_DEBOUNCE_MS = 30000, RETRY_MS = 60000;
+  const SYNC_DEBOUNCE_MS = 10000, RETRY_MS = 60000;
   function scheduleSync(ms) {
     if (!_enabled || !isUnlocked() || !S.active) return;
     if (_timer) clearTimeout(_timer);
@@ -724,7 +750,7 @@ const Acc = (() => {
     signup, login, unlock, logout, changePassword, recover, pull, push: syncPush, resume, resolve, remembered, cloudMeta, versions, restoreVersion,
     gestorEnsureKey, gestorResolve, grantCreate, grantRevoke, gestorClients, gestorOpenClient, pushShadow, _buildShareData: buildShareData,
     grantSetCanEdit, opsPush, pullOps, setOpsListener, reconcileGrant, pushVerifactu,
-    adminListUsers, adminSetActive, adminSetPaid, adminDelete, adminGetConfig, adminSetConfig, _mergeData: mergeData,
+    adminListUsers, adminSetActive, adminSetPaid, adminDelete, adminGetConfig, adminSetConfig, _mergeData: mergeData, adoptMeta,
     status, isUnlocked, detectLocked, setAutoSync, setSyncListener, notifyChange, setApiBase: (u) => { API_BASE = u; },
     get email() { return S.email; }, get version() { return S.version; }, get state() { return S.state; },
   };

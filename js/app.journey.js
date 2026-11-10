@@ -20,8 +20,18 @@
 Object.assign(App, {
 
   /** Color W3C de cada columna de estado (el widget solo entiende nombres de la paleta). */
-  _J_EST_COLORS: { potencial: 'Goldenrod', activo: 'MediumSeaGreen', pausado: 'SandyBrown', completado: 'SteelBlue', abandonado: 'DimGray' },
-  _jCollapsed: {},
+  _J_EST_COLORS: { recurrente: 'MediumPurple', potencial: 'Goldenrod', activo: 'MediumSeaGreen', pausado: 'SandyBrown', completado: 'SteelBlue', abandonado: 'DimGray' },
+
+  /** Columnas plegadas, recordadas por navegador. Recurrente empieza plegada (trabajo largo,
+   *  no hace falta verlo a diario); el resto, abiertas. */
+  _jColl() {
+    if (!this._jCollapsedM) {
+      let saved = null;
+      try { saved = JSON.parse(localStorage.getItem('trackr_journey_collapsed') || 'null'); } catch (e) { /* */ }
+      this._jCollapsedM = saved && typeof saved === 'object' ? saved : { recurrente: true };
+    }
+    return this._jCollapsedM;
+  },
 
   rJourney() {
     const el = document.getElementById('jrnC');
@@ -67,14 +77,17 @@ Object.assign(App, {
 
   /** Construye los datos del widget: una columna por estado + una tarjeta por proyecto mostrado. */
   _jData() {
-    const stages = EST_ORDER.map(k => ({ id: k, nombre: EST[k] || k, color: this._J_EST_COLORS[k], collapsed: !!this._jCollapsed[k] }));
-    const cards = D.ps().filter(p => this._jShown(p)).sort((a, b) => this._byRecent(a, b)).map(p => ({
+    /* «Recurrente» (a la izquierda del todo) = activos con la marca recurrente: trabajo que
+       dura meses y no debe mezclarse con lo que está en curso ahora. */
+    const coll = this._jColl();
+    const stages = ['recurrente', ...EST_ORDER].map(k => ({ id: k, nombre: k === 'recurrente' ? t('est.recurrentes') : (EST[k] || k), color: this._J_EST_COLORS[k], collapsed: !!coll[k] }));
+    const cards = D.ps().filter(p => this._jShown(p)).sort((a, b) => this._projSort(a, b)).map(p => ({
       id: p.id,
       nombre: p.nombre,
       nota: clienteName(p),
       meta: this._jCardMeta(p),
       color: p.color || 'CornflowerBlue',
-      stageId: EST[p.estado] ? p.estado : 'activo',
+      stageId: p.estado === 'activo' && p.recurrente ? 'recurrente' : (EST[p.estado] ? p.estado : 'activo'),
       muted: p.estado === 'pausado' || p.estado === 'abandonado',
       strike: p.estado === 'abandonado'
     }));
@@ -95,8 +108,11 @@ Object.assign(App, {
   /** Soltar una tarjeta en otra columna = cambiar el estado del proyecto. */
   _jOnMove(id, estado) {
     const p = D.p(id);
-    if (!p || !EST[estado]) return;
+    if (!p) return;
+    if (estado === 'recurrente') { p.estado = 'activo'; p.recurrente = true; return; }
+    if (!EST[estado]) return;
     p.estado = estado;   /* el _save del movimiento lo persiste */
+    if (estado === 'activo') p.recurrente = false; /* si no, volvería a caer en Recurrente */
     /* Al pasar a potencial sin presupuesto: ofrecer generarlo (nada automático). */
     if (estado === 'potencial' && !p.presupuesto && p.clienteId) {
       this.om(`<div class="mt">${t('journey.noBudgetTitle')}</div>`
@@ -109,7 +125,9 @@ Object.assign(App, {
   /** Persiste lo que cambia el widget: el estado ya lo puso _jOnMove; aquí solo
    *  se guarda el plegado de columnas (en memoria) y se re-sincronizan las tarjetas. */
   _jSync(d) {
-    (d.stages || []).forEach(s => { this._jCollapsed[s.id] = !!s.collapsed; });
+    const coll = this._jColl();
+    (d.stages || []).forEach(s => { coll[s.id] = !!s.collapsed; });
+    try { localStorage.setItem('trackr_journey_collapsed', JSON.stringify(coll)); } catch (e) { /* sin storage: solo esta sesión */ }
     D.save();
     if (this._jb) this._jb.setData(this._jData());
   },

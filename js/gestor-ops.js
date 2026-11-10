@@ -76,9 +76,15 @@ const GOps = (() => {
     const out = {};
     let stripped = false;
     for (const k of Object.keys(payload)) {
-      if (spec.deny.includes(k)) { stripped = true; continue; }  // p.ej. horas: el calendario es de la persona
+      // id: lo fija entidadId, nunca el payload (si no, Object.assign lo pisaria con lo que sea)
+      if (k === 'id' || spec.deny.includes(k)) { stripped = true; continue; }  // p.ej. horas: el calendario es de la persona
       out[k] = payload[k];
     }
+    // Tipos de las listas y objetos anidados: uno mal formado hace fallar D.ensure() al cargar
+    const isObj = (v) => v && typeof v === 'object' && !Array.isArray(v);
+    if ('entradas' in out && !Array.isArray(out.entradas)) return { ok: false, why: 'entradas debe ser una lista' };
+    if ('facturacion' in out && !isObj(out.facturacion)) return { ok: false, why: 'facturacion debe ser un objeto' };
+    if (isObj(out.facturacion) && 'cobros' in out.facturacion && !Array.isArray(out.facturacion.cobros)) return { ok: false, why: 'cobros debe ser una lista' };
     // Si tras recortar no queda nada, la op no tenía más que campos prohibidos: rechazarla
     // en vez de aplicar un cambio vacío que dejaría una entrada fantasma en el historial.
     if (!Object.keys(out).length) return { ok: false, why: 'nada editable tras recortar los campos prohibidos' };
@@ -185,6 +191,22 @@ const GOps = (() => {
    * @returns {{ok:true, undo:object|null}|{ok:false, why:string}}
    */
   function apply(op, trusted) {
+    if (!trusted && op && op.entidadId != null && !/^[A-Za-z0-9_-]{1,64}$/.test(String(op.entidadId))) return { ok: false, why: 'entidadId no valido' };
+    const res = applyRaw(op, trusted);
+    // Frontera: tras aplicar, el registro no puede llevar ids raros (acaban en onclick="...").
+    // Si los lleva, se deshace con su inverso y la op se rechaza.
+    const spec = op && WRITABLE[op.entidad];
+    if (res.ok && !trusted && spec && spec.list && typeof badIds === 'function') {
+      const rec = (D.d[spec.list] || []).find((x) => x && x.id === op.entidadId);
+      if (rec && badIds({ [spec.list]: [rec] }).length) {
+        if (res.undo) applyRaw(Object.assign({ v: 1 }, res.undo), true);
+        return { ok: false, why: 'ids no validos en el payload' };
+      }
+    }
+    return res;
+  }
+
+  function applyRaw(op, trusted) {
     if (!op || typeof op !== 'object' || op.v !== 1) return { ok: false, why: 'formato de op desconocido' };
     const c = trusted ? { ok: true, payload: op.payload } : sanitize(op.accion, op.entidad, op.payload);
     if (!c.ok) return { ok: false, why: c.why };

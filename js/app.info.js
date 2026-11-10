@@ -33,11 +33,15 @@ Object.assign(App, {
   /* ── Próximo plazo de 303/130: lo que trae de vuelta cada trimestre ── */
   _taxHtml(today) {
     const d = B.nextTaxDeadline(today);
+    /* Solo mientras se puede presentar (del día 1 del mes siguiente al trimestre al último
+       día): en noviembre no tiene sentido contar los días que faltan para enero. */
+    if (!d.open) return '';
     const when = d.days === 0 ? t('info.taxToday') : d.days === 1 ? t('info.taxTomorrow', fmtDate(d.end)) : t('info.taxDays', d.days, fmtDate(d.end));
-    const open = d.days <= 20; /* ventana de presentación abierta */
-    return `<div class="als"><div class="al" style="border-left-color:${open ? 'var(--warn)' : 'var(--b2)'}" onclick="App.goTax(${d.y},${d.q})">`
-      + `<span style="color:${open ? 'var(--warn)' : 'var(--t3)'}">${open ? '!' : '◔'}</span>`
-      + `<span style="flex:1">${t('info.taxNext', d.label, when)}</span><span style="color:var(--t3)">&rarr;</span></div></div>`;
+    const dom = d.domDays > 0 ? t('info.taxDom', fmtDate(d.domEnd)) : d.domDays === 0 ? t('info.taxDomToday') : '';
+    const urgent = d.days <= 5;
+    return `<div class="als"><div class="al" style="border-left-color:${urgent ? 'var(--warn)' : 'var(--b2)'}" onclick="App.goTax(${d.y},${d.q})">`
+      + `<span style="color:${urgent ? 'var(--warn)' : 'var(--t3)'}">${urgent ? '!' : '◔'}</span>`
+      + `<span style="flex:1">${t(d.q === 3 ? 'info.taxNextT4' : 'info.taxNext', d.label, when)}${dom}</span><span style="color:var(--t3)">&rarr;</span></div></div>`;
   },
   goTax(y, q) {
     this.dinPeriod = 'trim'; this.dinY = y; this.dinM = q * 3;
@@ -90,7 +94,7 @@ Object.assign(App, {
       const f = p.facturacion;
       (f.cobros || []).forEach(c => { if (c.fecha && c.fecha.startsWith(thisMonth)) cobradoMes += c.cantidad || 0; });
       p.horas.forEach(h => { if (h.monto && h.fecha && h.fecha.startsWith(thisMonth)) cobradoMes += h.monto; });
-      if ((p.estado === 'completado' || p.estado === 'abandonado') && f.facturaFecha && !f.pagado) {
+      if ((p.estado === 'completado' || p.estado === 'abandonado') && f.facturaFecha && !f.pagado && D.facturaVigente(p.id)) {
         pendienteCobro += B.pendiente(p);
         nPendiente++;
       }
@@ -235,7 +239,7 @@ Object.assign(App, {
       dlHtml += `</div></div>`;
     }
 
-    mainEl.innerHTML = this._taxHtml(today) + this._backupHtml() + this._onbHtml() + actHtml + dlHtml;
+    mainEl.innerHTML = dlHtml + this._taxHtml(today) + this._backupHtml() + this._onbHtml() + actHtml;
 
     /* ── Resumen financiero (reutilizamos el existente) ── */
     this._rInfoFinancial();

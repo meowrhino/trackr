@@ -23,9 +23,10 @@ const B={
 
     const iv=f.iva||0, ir=f.irpf||0;
 
+    /* Por horas: la base sale de las horas hasta emitir la factura. Emitida, se congela:
+       las horas que se sigan apuntando son solo para el €/h, no cambian un trimestre ya presentado. */
     if(f.modo==='por_hora'){
-      const th=this.totalHoras(p);
-      f.baseImponible=roundMoney(th*(f.precioHora||0));
+      if(!(f.facturaNum&&f.facturaFecha)) f.baseImponible=roundMoney(this.totalHoras(p)*(f.precioHora||0));
     } else if(f.modo==='desde_total'){
       const t=f.total||0, fac=1+iv/100-ir/100;
       f.baseImponible=fac?roundMoney(t/fac):0;
@@ -47,8 +48,8 @@ const B={
 
     /* ── Sincronizar pagado/fechaPago desde cobros ── */
     const cobros = f.cobros || [];
-    const tc = cobros.reduce((s, c) => s + (c.cantidad || 0), 0);
-    f.pagado = f.totalFactura > 0 && tc >= f.totalFactura;
+    const tc = this.totalCobrado(p); /* redondeado: 100,10+200,20+300,30 suma 600,5999… */
+    f.pagado = f.totalFactura > 0 && tc >= roundMoney(f.totalFactura);
     if (cobros.length) {
       const sorted = [...cobros].sort((a, b) => (a.fecha || '').localeCompare(b.fecha || ''));
       f.fechaPago = sorted[sorted.length - 1].fecha || null;
@@ -84,7 +85,7 @@ const B={
 
   /* Suma total cobrada */
   totalCobrado(p) {
-    return (p.facturacion.cobros || []).reduce((s, c) => s + (c.cantidad || 0), 0);
+    return roundMoney((p.facturacion.cobros || []).reduce((s, c) => s + (c.cantidad || 0), 0));
   },
 
   /* Cantidad pendiente de cobro */
@@ -92,10 +93,8 @@ const B={
   vencimiento(f, dias) {
     if (!f || !f.facturaFecha) return null;
     const d = new Date(f.facturaFecha + 'T00:00:00');
-    d.setDate(d.getDate() + (dias || 30));
-    /* En local, no toISOString(): en Madrid eso resta un día */
-    const pad = n => String(n).padStart(2, '0');
-    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+    d.setDate(d.getDate() + (Number.isFinite(dias) ? dias : 30)); /* 0 = al contado, no 30 */
+    return localDateStr(d); /* en local, no toISOString(): en Madrid eso resta un día */
   },
   /** Días desde el vencimiento (>0 vencida, ≤0 en plazo); null si no facturada o ya pagada. */
   diasVencida(f, dias, hoy) {
@@ -111,12 +110,21 @@ const B={
       { y: y - 1, q: 3, end: `${y}-01-30` }, { y, q: 0, end: `${y}-04-20` }, { y, q: 1, end: `${y}-07-20` },
       { y, q: 2, end: `${y}-10-20` }, { y, q: 3, end: `${y + 1}-01-30` }
     ];
+    /* Fin de semana → el plazo pasa al lunes (30 ene 2027 es sábado: acaba el 1 feb).
+       Festivos no: shortcut, revisar con el calendario oficial de la AEAT de cada año. */
+    const d0 = s => new Date(s + 'T00:00:00');
+    const iso = d => localDateStr(d);
+    cands.forEach(x => { const d = d0(x.end); while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1); x.end = iso(d); });
     const c = cands.find(x => x.end >= hoy);
-    const days = Math.round((new Date(c.end + 'T00:00:00') - new Date(hoy + 'T00:00:00')) / 864e5);
-    return { label: `T${c.q + 1} ${c.y}`, end: c.end, days, y: c.y, q: c.q };
+    const days = Math.round((d0(c.end) - d0(hoy)) / 864e5);
+    /* Se puede presentar desde el día 1 del mes siguiente al trimestre; domiciliando el
+       pago, hasta 5 días antes del último día. */
+    const start = c.q === 3 ? `${c.y + 1}-01-01` : `${c.y}-${String((c.q + 1) * 3 + 1).padStart(2, '0')}-01`;
+    const dom = d0(c.end); dom.setDate(dom.getDate() - 5);
+    return { label: `T${c.q + 1} ${c.y}`, end: c.end, days, y: c.y, q: c.q, start, open: hoy >= start, domEnd: iso(dom), domDays: days - 5 };
   },
   pendiente(p) {
-    return Math.max((p.facturacion.totalFactura || 0) - this.totalCobrado(p), 0);
+    return Math.max(roundMoney((p.facturacion.totalFactura || 0) - this.totalCobrado(p)), 0);
   },
 
   /* Calcula €/hora (rentabilidad) */

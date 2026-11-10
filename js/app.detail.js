@@ -58,7 +58,7 @@ Object.assign(App, {
       + `<div><div class="dfl">${t('field.estEnd')}</div><div class="dfv">${fmtDate(p.fechas.finEstimada)}</div></div>`
       + `<div><div class="dfl">${t('field.actualEnd')}</div><div class="dfv">${fmtDate(p.fechas.finReal)}</div></div>`
       + `<div><div class="dfl">${t('field.hours')}</div><div class="dfv">${th.toFixed(1)}h <span style="color:var(--t3);font-size:.72rem">💻${wh.toFixed(1)} 👥${mh.toFixed(1)}</span></div></div>`
-      + (p.presupuesto ? `<div><div class="dfl">${t('bud.btn')}</div><div class="dfv">${p.presupuesto.num}/${yearShort(p.presupuesto.fecha)} · ${fmtDate(p.presupuesto.fecha)}</div></div>` : '')
+      + (p.presupuesto ? `<div><div class="dfl">${t('bud.btn')}</div><div class="dfv">${esc(p.presupuesto.num)}/${yearShort(p.presupuesto.fecha)} · ${fmtDate(p.presupuesto.fecha)}</div></div>` : '')
       + `</div>${p.notas ? `<div style="margin-top:.75rem"><div class="dfl">${t('field.notes')}</div><div style="color:var(--t3);font-size:.85rem">${esc(p.notas)}</div></div>` : ''}</div>`;
   },
 
@@ -68,7 +68,7 @@ Object.assign(App, {
       : `<div class="hl">${p.horas.map(h =>
           `<div class="hr hr-click" style="border-left-color:${hex}" onclick="App.eHour('${p.id}','${h.id}')">
             <span class="hr-t">${h.tipo === 'trabajo' ? '💻' : '👥'}</span>
-            <span class="hr-d">${fmtDate(h.fecha)}${h.horaInicio ? ' ' + h.horaInicio : ''}</span>
+            <span class="hr-d">${fmtDate(h.fecha)}${h.horaInicio ? ' ' + esc(h.horaInicio) : ''}</span>
             <span class="hr-a m">${h.cantidad}h</span>${h.monto ? `<span class="hr-a m" style="color:var(--ok)">${fmtMoney(h.monto)}</span>` : ''}
             <span class="hr-n">${esc(h.nota || '')}</span>
             <span class="hr-x" onclick="event.stopPropagation();App.xHour('${p.id}','${h.id}')" title="${t('btn.delete')}">&times;</span>
@@ -83,7 +83,7 @@ Object.assign(App, {
       : `<div class="bb">`
         + `<div class="br"><span class="la">${t('billing.taxableBase')}</span><span class="va">${fmtMoney(f.baseImponible || 0)}</span></div>`
         + (f.iva ? `<div class="br"><span class="la">${t('billing.plusIvaAmt', f.iva)}</span><span class="va">${fmtMoney(f.importeIva || 0)}</span></div>` : '')
-        + (f.irpf ? `<div class="br"><span class="la">${t('billing.minusIrpfAmt', f.irpf)}</span><span class="va">${fmtMoney(f.importeIrpf || 0)}</span></div>` : '')
+        + (f.irpf ? `<div class="br"><span class="la">${t('billing.minusIrpfAmt', esc(f.irpf))}</span><span class="va">${fmtMoney(f.importeIrpf || 0)}</span></div>` : '')
         + `<div class="br tot"><span class="la">${t('billing.invoiceTotal')}</span><span class="va">${fmtMoney(f.totalFactura || 0)}</span></div>`
         + `<div class="br"><span class="la">${t('billing.netToReceive')}</span><span class="va" style="color:var(--ok)">${fmtMoney(f.netoRecibido || 0)}</span></div>`
         + (eph !== null ? `<div class="br"><span class="la">${t('billing.profitability')}</span><span class="va" style="color:${B.ephColor(eph)}">${eph.toFixed(2)} &euro;/h</span></div>` : '')
@@ -123,7 +123,7 @@ Object.assign(App, {
     }
 
     return `<div class="ds"><div class="dst">${t('billing.title')}</div>${breakdown}`
-      + (f.facturaFecha ? `<div style="margin-top:.3rem;font-size:.78rem;color:var(--t3)">${t('billing.invoiceNo', String(f.facturaNum), fmtDate(f.facturaFecha))}</div>` : '')
+      + (f.facturaFecha ? `<div style="margin-top:.3rem;font-size:.78rem;color:var(--t3)">${t('billing.invoiceNo', esc(f.facturaNum), fmtDate(f.facturaFecha))}</div>` : '')
       + cobrosHtml
       + `</div>`;
   },

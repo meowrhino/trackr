@@ -99,11 +99,14 @@ assert.equal(B.diasVencida({}, 30, '2026-11-05'), null, 'sin factura: sin vencim
 }
 
 /* Próximo plazo fiscal */
-assert.deepEqual(JSON.parse(JSON.stringify(B.nextTaxDeadline('2026-10-19'))), { label: 'T3 2026', end: '2026-10-20', days: 1, y: 2026, q: 2 });
+assert.deepEqual(JSON.parse(JSON.stringify(B.nextTaxDeadline('2026-10-19'))), { label: 'T3 2026', end: '2026-10-20', days: 1, y: 2026, q: 2, start: '2026-10-01', open: true, domEnd: '2026-10-15', domDays: -4 });
 assert.equal(B.nextTaxDeadline('2026-10-21').label, 'T4 2026');
-assert.equal(B.nextTaxDeadline('2026-10-21').end, '2027-01-30');
-assert.equal(B.nextTaxDeadline('2027-01-30').days, 0, 'último día cuenta como plazo abierto');
-assert.equal(B.nextTaxDeadline('2027-02-01').label, 'T1 2027');
+assert.equal(B.nextTaxDeadline('2026-10-21').end, '2027-02-01', '30 ene 2027 es sábado: pasa al lunes');
+assert.equal(B.nextTaxDeadline('2026-11-10').open, false, 'en noviembre el T4 aún no se puede presentar');
+assert.equal(B.nextTaxDeadline('2027-01-05').open, true);
+assert.equal(B.nextTaxDeadline('2027-01-05').domEnd, '2027-01-27');
+assert.equal(B.nextTaxDeadline('2027-02-01').days, 0, 'último día cuenta como plazo abierto');
+assert.equal(B.nextTaxDeadline('2027-02-02').label, 'T1 2027');
 
 function roundMoney(v) { return Math.round(v * 100) / 100; }
 console.log('presupuestos.mjs: ok');
