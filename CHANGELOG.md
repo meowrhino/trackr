@@ -5,6 +5,33 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-11-10 (noche) — Factura emitida bloqueada, anular sin VeriFactu, textos a lang.js
+
+### ✨ Nuevo
+- **Factura emitida: importes bloqueados** en la ficha de edición, con aviso que manda a «Rectificar» (las horas se siguen apuntando). Al guardar, los importes de una factura vigente no cambian. _frontend_
+- **Anular sin VeriFactu**: el botón de Facturas funciona siempre; sin registro VeriFactu la anulación queda marcada en el proyecto (`facturacion.anulada`), sale de impuestos y su número sigue gastado. _frontend_
+- **Rectificativas en la lista de Facturas**, debajo de su factura, con su PDF. _frontend_
+- **Columnas plegadas del tablero** más legibles (más anchas, nombre más grande). _frontend_
+- **Ejemplos**: cada uno tiene una rectificativa coherente con su historia (Marina −500 €, Ana +500 €, Dani −600 €). _frontend_
+- **TODO/33**: preguntas para la gestoría (% de difícil justificación por año, IVA 0 % exenta, traducción literaria, cobros sin factura) e ideas (varias facturas por proyecto). _docs_
+
+### 🐛 Arreglado (revisión íntegra del día)
+- **«Borrar datos de este navegador» no descargaba la copia** (abría el modal de exportar y borraba a los 300 ms): ahora descarga el JSON antes, y deja `trackr_data_broken` en paz. _frontend_
+- **Editar un proyecto con la factura anulada le quitaba la anulación**; y la factura de un proyecto anulado ya no se puede volver a generar con el mismo número. _frontend_
+- **Libros registro**: una rectificativa de un año distinto al de su factura sale en el libro de su año. _frontend_
+- **Editar una entrada de gasto antigua** conserva su tipo de IVA (antes tomaba el actual del gasto). _frontend_
+- **Ops del gestor**: `rectificativas`, `cobros` y `entradas` tienen que ser listas de objetos (una mal formada dejaba la app sin pintar). _frontend_
+- **Fusión entre dispositivos**: una hora, entrada de gasto o cobro borrado deja una lápida en la auditoría y ya no vuelve del otro dispositivo. Test en `test/sync-resume.mjs`. _frontend_
+- **Contador de facturas**: importar o volver a descargar una factura de un año anterior ya no lo mueve (`D.bumpFacturaNum`, una sola regla). _frontend_
+- **Tablero**: mover una tarjeta pasa por `D.up` (queda en la auditoría y la fusión lo respeta). _frontend_
+- **`/v1/usage`**: solo categorías `nav`/`action`, acciones y etiquetas cortas en minúscula, cuerpo ≤ 16 KB, y el cron borra lo de más de 180 días. _backend@6565402 (desplegado)_
+
+### 🧹 Limpieza
+- Los textos que vivían dentro de `app.gestor.js`, `pwa.js`, `gestor-ops.js` y las secciones de historial y copias de `app.config.js` pasan a `lang.js` (prefijos `gst.`, `pwa.`, `gops.`, `audit.`, `hist.`): 102 claves por idioma, ya cubiertas por la comprobación de idiomas. Gastos recurrentes: la etiqueta «Importe base» pasa a «Total de cada factura» (es lo que guarda). _frontend_
+- El modo editable del widget del tablero **se queda**: es lo que lo hace reutilizable en otras webs.
+
+---
+
 ## 2026-11-10 (tarde) — Rectificativas, numeración por año, «i» de ayuda y estadísticas de la beta
 
 ### ✨ Nuevo

@@ -440,12 +440,7 @@ const Fac = {
     D.up(pid, { facturacion: f });
 
     /* Contador del año de esta factura (en enero vuelve a 1: ver D.nextFacturaNum) */
-    const fy = String(data.factura.fecha || '').slice(0, 4);
-    if (s.nextFacturaYear !== fy || num >= (s.nextFacturaNum || 1)) {
-      if (s.nextFacturaYear && fy < s.nextFacturaYear) { /* factura atrasada de otro año: el contador no retrocede */ }
-      else { s.nextFacturaNum = Math.max(num + 1, s.nextFacturaYear === fy ? (s.nextFacturaNum || 1) : 1); s.nextFacturaYear = fy; }
-      D.save();
-    }
+    if (D.bumpFacturaNum(num, data.factura.fecha)) D.save();
 
     return { num: numStr, fecha: data.factura.fecha };
   }

@@ -109,10 +109,10 @@ Object.assign(App, {
   _jOnMove(id, estado) {
     const p = D.p(id);
     if (!p) return;
-    if (estado === 'recurrente') { p.estado = 'activo'; p.recurrente = true; return; }
+    /* Con D.up: deja rastro en la auditoría (y la fusión entre dispositivos lo respeta) */
+    if (estado === 'recurrente') { D.up(id, { estado: 'activo', recurrente: true }); return; }
     if (!EST[estado]) return;
-    p.estado = estado;   /* el _save del movimiento lo persiste */
-    if (estado === 'activo') p.recurrente = false; /* si no, volvería a caer en Recurrente */
+    D.up(id, estado === 'activo' ? { estado, recurrente: false } : { estado }); /* a Activo: deja de ser recurrente */
     /* Al pasar a potencial sin presupuesto: ofrecer generarlo (nada automático). */
     if (estado === 'potencial' && !p.presupuesto && p.clienteId) {
       this.om(`<div class="mt">${t('journey.noBudgetTitle')}</div>`

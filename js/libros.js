@@ -78,11 +78,13 @@ const LR = {
     D.ps().forEach((p) => {
       if (typeof B !== 'undefined') B.calc(p);
       const f = p.facturacion || {};
-      if (!enRango(f.facturaFecha) || !(f.baseImponible > 0) || !D.facturaVigente(p.id)) return; // anulada: fuera del libro
+      if (!f.facturaFecha || !D.facturaVigente(p.id)) return; // anulada: fuera del libro
       const cl = p.clienteId ? D.cl(p.clienteId) : null;
       const zona = (cl && cl.zonaFiscal) || 'es';
       const n3 = this._nif3(zona, cl && cl.nif);
       const exterior = zona !== 'es' && !(f.importeIva > 0);   /* mismo criterio que _fiscalQ */
+      /* La original solo si cae en el rango; sus rectificativas, cada una por su fecha (pueden ser de otro año) */
+      if (enRango(f.facturaFecha) && f.baseImponible > 0) {
       if (!cl || !cl.nif) avisos.push(`Factura ${f.facturaNum || '?'} (${p.nombre}): cliente sin NIF → F2`);
       if (zona === 'noue' && cl && cl.nif) avisos.push(`${cl.nombre}: fuera de UE — revisa el "Código País" en el fichero (la AEAT lo pide y TRACKR no lo conoce)`);
       exp.push({
@@ -98,10 +100,11 @@ const LR = {
         W: exterior ? '' : (f.iva || 0), X: exterior ? '' : this._r2(f.importeIva || 0),
         AE: f.importeIrpf > 0 ? (f.irpf || 0) : '', AF: f.importeIrpf > 0 ? this._r2(f.importeIrpf) : '',
       });
+      }
       /* Rectificativas (R1: modificación de la base, art. 80 LIVA), con importes ± */
       (f.rectificativas || []).forEach((r) => {
         if (!enRango(r.fecha)) return;
-        avisos.push(`Rectificativa ${r.num}/${String(r.fecha).slice(2, 4)}: revisa en el fichero la referencia a la factura ${f.facturaNum}/${ys} que rectifica`);
+        avisos.push(`Rectificativa ${r.num}/${String(r.fecha).slice(2, 4)}: revisa en el fichero la referencia a la factura ${f.facturaNum}/${String(f.facturaFecha).slice(2, 4)} que rectifica`);
         exp.push({
           A: y, B: this._trim(r.fecha), C: act.C, D: act.D, E: act.E,
           F: 'R1', G: 'I01', H: this._r2(r.base),

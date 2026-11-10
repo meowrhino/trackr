@@ -337,6 +337,12 @@ const D = {
    * @param {string|null} entidadId  id del objeto tocado (null para settings)
    * @param {object} [payload]  objeto creado / cambios parciales; solo viaja en la op
    */
+  /** Lápida de un sub-registro borrado (hora, entrada de gasto, cobro): solo para que la fusión
+   *  entre dispositivos no lo recupere. Nunca sale como op hacia otra cuenta. */
+  _tomb(entidad, id) {
+    if (!this._readOnly && this.d && id) this._auditAs(this._actor(), 'borrar', entidad, id);
+  },
+
   _audit(accion, entidad, entidadId, payload) {
     if (!this.d) return;
     if (this._readOnly) {
@@ -405,6 +411,15 @@ const D = {
     return this.d.projects.find(p => p.id !== pid && p.facturacion?.facturaNum != null && +p.facturacion.facturaNum === +num
       && (!y || String(p.facturacion.facturaFecha || '').slice(0, 4) === y));
   },
+  /** Tras emitir (o importar) la factura `num` con esa fecha, avanza el contador si toca.
+   *  Solo cuentan el año del contador (o el actual en datos viejos sin año) y los posteriores:
+   *  volver a descargar o importar una factura de un año anterior no lo mueve. */
+  bumpFacturaNum(num, fecha) {
+    const s = this.d.settings, fy = String(fecha || todayStr()).slice(0, 4);
+    const cy = s.nextFacturaYear || todayStr().slice(0, 4);
+    if (fy > cy || (fy === cy && +num >= (+s.nextFacturaNum || 1))) { s.nextFacturaNum = +num + 1; s.nextFacturaYear = fy; return true; }
+    return false;
+  },
   /** Siguiente número de rectificativa (serie R, por año): 'R1', 'R2'… */
   nextRectNum(fecha) {
     const y = String(fecha || todayStr()).slice(0, 4);
@@ -434,6 +449,7 @@ const D = {
   facturaVigente(pid) {
     const p = this.p(pid);
     if (!p?.facturacion?.facturaNum) return false;
+    if (p.facturacion.anulada) return false; /* anulada sin VeriFactu (marca en el proyecto) */
     const reg = (this.d.facturas || []).filter(r => r.proyectoId === pid && r.tipoRegistro === 'alta').pop();
     return !(reg && (reg.eventos || []).some(e => e.tipo === 'anulada'));
   },

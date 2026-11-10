@@ -128,11 +128,11 @@
 .jrn-root.compact .jrn-col-body{gap:.4rem}
 
 /* ── Columna plegada ── */
-.jrn-col.collapsed{flex:0 0 44px;width:44px;min-width:44px}
+.jrn-col.collapsed{flex:0 0 52px;width:52px;min-width:52px}
 .jrn-col-collapsed{display:flex;flex-direction:column;align-items:center;gap:.55rem;width:100%;min-height:130px;padding:.7rem .15rem;background:none;border:none;cursor:pointer;font-family:var(--jfont);transition:background var(--jtr)}
 .jrn-col-collapsed:hover{background:var(--jbg3)}
 .jrn-col-collapsed .jrn-col-count{margin-top:.1rem}
-.jrn-col-vname{writing-mode:vertical-rl;font-size:.78rem;font-weight:500;color:var(--jt1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-height:220px}
+.jrn-col-vname{writing-mode:vertical-rl;font-size:.95rem;font-weight:600;letter-spacing:.06em;line-height:1;color:var(--jt1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-height:240px;padding-top:.15rem} /* plegada: el nombre es lo único que se ve, que se lea */
 
 /* ── Mobile ── */
 @media(max-width:768px){

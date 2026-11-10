@@ -19,6 +19,7 @@ Object.assign(App, {
 
   facModal(pid) {
     const p = D.p(pid); if (!p) return;
+    if (p.facturacion?.anulada) { Toast.warn(t('fac.isVoided')); return; }
     B.calc(p);
     const f = p.facturacion, s = D.d.settings;
     const cl = p.clienteId ? D.cl(p.clienteId) : null;
@@ -126,6 +127,8 @@ Object.assign(App, {
     const num = parseInt(document.getElementById('facNum').value) || null;
     const p = D.p(pid);
     if (!p) return;
+    /* Anulada: su número no se reutiliza y una factura nueva desde aquí quedaría fuera de impuestos */
+    if (p.facturacion.anulada) { Toast.warn(t('fac.isVoided')); return; }
     /* Una factura de prueba a 0 € o sin emisor numera el proyecto y lo bloquea: avisar antes. */
     if (!(p.facturacion.totalFactura > 0)) { Toast.warn(t('msg.facZero')); return; }
     if (!D.d.settings.emisor?.nombre || !D.d.settings.emisor?.nif) { Toast.warn(t('msg.facNoEmisor')); return; }
@@ -391,6 +394,7 @@ Object.assign(App, {
     if (!c) return;
     if (!confirm(t('billing.deletePayment', fmtMoney(c.cantidad)))) return;
     p.facturacion.cobros = p.facturacion.cobros.filter(x => x.id !== cid);
+    D._tomb('cobro', cid); /* lápida para la fusión entre dispositivos */
     B.calc(p);
     D.up(pid, { facturacion: p.facturacion });
     if (this.cv === 'det') this.rDet(pid); else this.rDash();

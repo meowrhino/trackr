@@ -86,4 +86,31 @@ assert.equal(vig.facturacion.pagado, true);
 assert.equal(B.rectDiff(vig.facturacion, 800).base, 0, 'otra a la misma base: nada');
 assert.equal(D.nextRectNum('2026-05-01'), 'R2');
 
+/* 8. Anular sin VeriFactu (marca en el proyecto): sale de impuestos y el número sigue gastado */
+D.p('vig').facturacion.anulada = { fecha: '2026-05-01' };
+assert.equal(D.facturaVigente('vig'), false);
+assert.equal(F.quarter(2026, 0).ingresos, 0, 'anulada: fuera del 1T');
+assert.ok(D.facturaNumTaken(1, 'otro', '2026-05-01'), 'su número no se reutiliza');
+assert.match(readFileSync(new URL('../js/app.project.js', import.meta.url), 'utf8'), /anulada: prev\?\.facturacion\?\.anulada/, 'editar el proyecto conserva la anulación');
+
+/* 9. Rectificativa de un año distinto al de su factura: sale en el libro de su año */
+const dic = { id: 'dic', nombre: 'dic', clienteId: 'c1', estado: 'completado', horas: [],
+  facturacion: { modo: 'desde_base', baseImponible: 1000, iva: 21, irpf: 15, facturaFecha: '2026-12-10', facturaNum: 9, cobros: [] } };
+D.d.projects.push(dic); B.calc(dic);
+dic.facturacion.rectificativas = [{ id: 'r9', num: 'R1', fecha: '2027-01-15', ...B.rectDiff(dic.facturacion, 800) }];
+assert.equal(F.quarter(2027, 0).ingresos, -200);
+if (LR && LR.buildRows) {
+  const rows = LR.buildRows(2027, 0);
+  assert.equal(rows.exp.length, 1, 'la R1/27 sale en el libro de 2027');
+  assert.equal(rows.exp[0].L, 'R1/27');
+}
+
+/* 10. Contador: una factura antigua (importada o vuelta a descargar) no lo mueve */
+D.d.settings.nextFacturaNum = 14; delete D.d.settings.nextFacturaYear;
+const yNow = vm.runInContext('todayStr()', ctx).slice(0, 4);
+assert.equal(D.bumpFacturaNum(40, (+yNow - 1) + '-06-01'), false, 'factura del año pasado: no toca');
+assert.equal(D.d.settings.nextFacturaNum, 14);
+assert.equal(D.bumpFacturaNum(14, yNow + '-11-10'), true);
+assert.equal(D.d.settings.nextFacturaNum, 15); assert.equal(D.d.settings.nextFacturaYear, yNow);
+
 console.log('facturas-estado.mjs: ok');

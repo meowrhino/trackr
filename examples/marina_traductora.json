@@ -3438,11 +3438,23 @@
           {
             "id": "cb-p219-w7w7-x8x8-2",
             "fecha": "2029-12-20",
-            "cantidad": 4800,
+            "cantidad": 4300,
             "metodo": "transferencia"
           }
         ],
-        "_cobrosV3": true
+        "_cobrosV3": true,
+        "rectificativas": [
+          {
+            "id": "r219-rect-01",
+            "num": "R1",
+            "fecha": "2029-12-10",
+            "motivo": "Se retira un anexo del encargo",
+            "base": -500,
+            "importeIva": 0,
+            "importeIrpf": 0,
+            "total": -500
+          }
+        ]
       },
       "horas": [
         {

@@ -82,9 +82,13 @@ const GOps = (() => {
     }
     // Tipos de las listas y objetos anidados: uno mal formado hace fallar D.ensure() al cargar
     const isObj = (v) => v && typeof v === 'object' && !Array.isArray(v);
-    if ('entradas' in out && !Array.isArray(out.entradas)) return { ok: false, why: 'entradas debe ser una lista' };
+    // Listas de objetos: 'x' o [null] dentro de una de ellas reventaría B.calc / F.quarter al pintar
+    const listaDeObjetos = (v) => Array.isArray(v) && v.every(isObj);
+    if ('entradas' in out && !listaDeObjetos(out.entradas)) return { ok: false, why: 'entradas debe ser una lista de objetos' };
     if ('facturacion' in out && !isObj(out.facturacion)) return { ok: false, why: 'facturacion debe ser un objeto' };
-    if (isObj(out.facturacion) && 'cobros' in out.facturacion && !Array.isArray(out.facturacion.cobros)) return { ok: false, why: 'cobros debe ser una lista' };
+    for (const k of ['cobros', 'rectificativas']) {
+      if (isObj(out.facturacion) && k in out.facturacion && !listaDeObjetos(out.facturacion[k])) return { ok: false, why: `${k} debe ser una lista de objetos` };
+    }
     // Si tras recortar no queda nada, la op no tenía más que campos prohibidos: rechazarla
     // en vez de aplicar un cambio vacío que dejaría una entrada fantasma en el historial.
     if (!Object.keys(out).length) return { ok: false, why: 'nada editable tras recortar los campos prohibidos' };
@@ -276,13 +280,8 @@ const GOps = (() => {
     return { ok: true };
   }
 
-  /* i18n mínimo del módulo (es/en/ca), como app.gestor.js */
-  const TXT = {
-    es: { cantEdit: 'Eso no lo puede editar la gestoría', permRevoked: 'La persona ha retirado el permiso de edición', grantGone: 'El vínculo ya no existe' },
-    en: { cantEdit: 'Advisors cannot edit that', permRevoked: 'The client withdrew edit permission', grantGone: 'The link no longer exists' },
-    ca: { cantEdit: 'Això no ho pot editar la gestoria', permRevoked: 'La persona ha retirat el permís d\'edició', grantGone: 'El vincle ja no existeix' },
-  };
-  const _txt = (k) => (TXT[typeof _lang !== 'undefined' ? _lang : 'es'] || TXT.es)[k] || k;
+  /* Textos en lang.js (prefijo gops.); fuera del navegador (tests) devuelve la clave */
+  const _txt = (k) => (typeof t === 'function' ? t('gops.' + k) : k);
 
   return {
     WRITABLE, sanitize, apply, undo, undoFits,

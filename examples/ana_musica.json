@@ -2303,12 +2303,30 @@
             "fecha": "2029-07-07",
             "cantidad": 2850,
             "metodo": "transferencia"
+          },
+          {
+            "id": "cb316-02",
+            "fecha": "2029-06-30",
+            "metodo": "transferencia",
+            "cantidad": 475
           }
         ],
         "facturaNum": 17,
         "facturaFecha": "2029-06-08",
         "idiomaFactura": null,
-        "_cobrosV3": true
+        "_cobrosV3": true,
+        "rectificativas": [
+          {
+            "id": "r316-rect-01",
+            "num": "R1",
+            "fecha": "2029-06-20",
+            "motivo": "Segon passi afegit al cartell",
+            "base": 500,
+            "importeIva": 50,
+            "importeIrpf": 75,
+            "total": 475
+          }
+        ]
       },
       "horas": [
         {

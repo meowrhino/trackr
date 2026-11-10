@@ -412,8 +412,9 @@ const App = {
     if (!confirm(t('msg.resetConfirm'))) return;
     /* Primero una copia descargada (la red de seguridad ya no se queda aquí); luego fuera
        todo lo de este navegador: datos, copias de seguridad y la cuenta recordada. La nube no se toca. */
-    if ((D.d.projects || []).length || (D.d.gastos || []).length) this.exp();
-    ['trackr_data', 'trackr_example', 'trackr_history', 'trackr_saved_at', 'trackr_last_export', 'trackr_data_broken', 'trackr_acct']
+    if ((D.d.projects || []).length || (D.d.gastos || []).length) this.expJson(); /* descarga directa (exp() solo abre el modal) */
+    /* trackr_data_broken se queda: son datos ilegibles apartados para recuperarlos */
+    ['trackr_data', 'trackr_example', 'trackr_history', 'trackr_saved_at', 'trackr_last_export', 'trackr_acct']
       .forEach(k => { try { localStorage.removeItem(k); } catch (e) { /* */ } });
     try { sessionStorage.removeItem('trackr_token'); } catch (e) { /* */ }
     setTimeout(() => location.reload(), 300); /* deja arrancar la descarga */

@@ -150,6 +150,23 @@ for (const [choice, ids] of [['cloud', ['c1']], ['local', ['l1']], ['merge', ['c
   console.log('ok - merge: une horas, entradas y cobros');
 }
 
+// mergeData: una hora / cobro borrado en un lado (con su lápida en la auditoría) no vuelve del otro
+{
+  const { Acc } = setup({ meta: null, cloudVersion: 1, local: empty, lastSaved: 1 });
+  const local = {
+    projects: [{ id: 'p1', nombre: 'P', horas: [{ id: 'h1', cantidad: 1 }, { id: 'h2', cantidad: 2 }], facturacion: { cobros: [{ id: 'c1' }, { id: 'c2' }] } }],
+    audit: [{ ts: 5, accion: 'editar', entidad: 'proyecto', entidadId: 'p1' }]
+  };
+  const cloud = {
+    projects: [{ id: 'p1', nombre: 'P', horas: [{ id: 'h1', cantidad: 1 }], facturacion: { cobros: [{ id: 'c1' }] } }],
+    audit: [{ ts: 9, accion: 'editar', entidad: 'proyecto', entidadId: 'p1' }, { ts: 8, accion: 'borrar', entidad: 'hora', entidadId: 'h2' }, { ts: 8, accion: 'borrar', entidad: 'cobro', entidadId: 'c2' }]
+  };
+  const m = Acc._mergeData(local, cloud);
+  assert.equal(m.projects[0].horas.map((h) => h.id).join(), 'h1', 'la hora borrada no vuelve');
+  assert.equal(m.projects[0].facturacion.cobros.map((c) => c.id).join(), 'c1', 'el cobro borrado no vuelve');
+  console.log('ok - merge: lápidas de horas y cobros');
+}
+
 // alcance fiscal de la gestoría: las notas del cliente no viajan
 {
   const { Acc, D } = setup({ meta: null, cloudVersion: 1, local: empty, lastSaved: 1 });

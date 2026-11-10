@@ -3,43 +3,11 @@
  * La app YA es instalable (manifest + service worker); esto solo lo hace
  * descubrible: banner descartable + botón en Configuración + instrucciones
  * para iOS (Safari/iPhone no dispara `beforeinstallprompt`).
- * Global: PWA. Textos i18n inline (es/en/ca) — migrar a lang.js si se valida.
+ * Global: PWA. Textos en lang.js (prefijo pwa.).
  * ================================================ */
 (() => {
   const L = () => (typeof _lang !== 'undefined' ? _lang : 'es');
-  const TXT = {
-    es: {
-      banner: 'Instala TRACKR en tu dispositivo: se abre como una app y funciona sin conexión.',
-      install: 'Instalar', how: 'Cómo instalar', later: 'Ahora no',
-      cfgTitle: 'Instalar como app', cfgDesc: 'Añade TRACKR a tu pantalla de inicio para abrirla como una app, también sin conexión.',
-      installed: '✓ TRACKR ya está instalada en este dispositivo.',
-      iosTitle: 'Instalar en iPhone o iPad',
-      iosSteps: ['Pulsa el botón <strong>Compartir</strong> (el cuadrado con una flecha hacia arriba).', 'Desplázate y elige <strong>«Añadir a pantalla de inicio»</strong>.', 'Confirma con <strong>«Añadir»</strong>.'],
-      iosNote: 'En iPhone/iPad la instalación funciona mejor desde Safari.',
-      ok: 'Entendido', done: '¡Instalada! Ábrela desde tu pantalla de inicio.',
-    },
-    en: {
-      banner: 'Install TRACKR on your device: it opens like an app and works offline.',
-      install: 'Install', how: 'How to install', later: 'Not now',
-      cfgTitle: 'Install as an app', cfgDesc: 'Add TRACKR to your home screen to open it like an app, also offline.',
-      installed: '✓ TRACKR is already installed on this device.',
-      iosTitle: 'Install on iPhone or iPad',
-      iosSteps: ['Tap the <strong>Share</strong> button (the square with an up arrow).', 'Scroll and choose <strong>“Add to Home Screen”</strong>.', 'Confirm with <strong>“Add”</strong>.'],
-      iosNote: 'On iPhone/iPad, installing works best from Safari.',
-      ok: 'Got it', done: 'Installed! Open it from your home screen.',
-    },
-    ca: {
-      banner: 'Instal·la TRACKR al teu dispositiu: s\'obre com una app i funciona sense connexió.',
-      install: 'Instal·lar', how: 'Com instal·lar', later: 'Ara no',
-      cfgTitle: 'Instal·lar com a app', cfgDesc: 'Afegeix TRACKR a la teva pantalla d\'inici per obrir-la com una app, també sense connexió.',
-      installed: '✓ TRACKR ja està instal·lada en aquest dispositiu.',
-      iosTitle: 'Instal·lar a l\'iPhone o iPad',
-      iosSteps: ['Prem el botó <strong>Comparteix</strong> (el quadrat amb una fletxa cap amunt).', 'Desplaça\'t i tria <strong>«Afegeix a la pantalla d\'inici»</strong>.', 'Confirma amb <strong>«Afegeix»</strong>.'],
-      iosNote: 'A l\'iPhone/iPad la instal·lació funciona millor des de Safari.',
-      ok: 'Entesos', done: 'Instal·lada! Obre-la des de la teva pantalla d\'inici.',
-    },
-  };
-  const t = (k) => (TXT[L()] || TXT.es)[k] || k;
+  const t = (k) => window.t('pwa.' + k); /* textos en lang.js, prefijo pwa. */
   const DKEY = 'trackr_pwa_dismissed';
 
   let deferred = null; // el evento beforeinstallprompt diferido (Chrome/Edge/Brave en Android/desktop)

@@ -3253,13 +3253,25 @@
           {
             "id": "cb424-02",
             "fecha": "2029-09-18",
-            "cantidad": 3180,
+            "cantidad": 2544,
             "metodo": "transferencia"
           }
         ],
         "facturaNum": 27,
         "facturaFecha": "2029-08-21",
-        "idiomaFactura": "en"
+        "idiomaFactura": "en",
+        "rectificativas": [
+          {
+            "id": "r424-rect-01",
+            "num": "R1",
+            "fecha": "2029-09-05",
+            "motivo": "One session cancelled by the client",
+            "base": -600,
+            "importeIva": -126,
+            "importeIrpf": -90,
+            "total": -636
+          }
+        ]
       },
       "horas": [
         {

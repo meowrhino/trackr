@@ -70,33 +70,8 @@ Object.assign(App, {
    *  Textos i18n inline (es/en/ca), como _cfgHistorySection. */
   _cfgAuditSection() {
     const lang = (typeof _lang !== 'undefined' ? _lang : 'es');
-    const TX = ({
-      es: {
-        title: 'Historial de cambios', desc: 'Quién ha cambiado qué y cuándo. Se guardan los últimos 500 cambios junto a tus datos, cifrados como el resto.',
-        none: 'Todavía no hay cambios registrados.', local: 'este dispositivo', showing: 'Mostrando los últimos {0} de {1} cambios.',
-        undo: 'Deshacer', undone: 'deshecho',
-        crear: 'creó', editar: 'editó', borrar: 'borró',
-        proyecto: 'proyecto', cliente: 'cliente', gasto: 'gasto', deducible: 'deducible', factura: 'factura', settings: 'la configuración',
-        persona: 'persona', gestor: 'gestoría'
-      },
-      en: {
-        title: 'Change history', desc: 'Who changed what, and when. The last 500 changes are stored alongside your data, encrypted like everything else.',
-        none: 'No changes recorded yet.', local: 'this device', showing: 'Showing the last {0} of {1} changes.',
-        undo: 'Undo', undone: 'undone',
-        crear: 'created', editar: 'edited', borrar: 'deleted',
-        proyecto: 'project', cliente: 'client', gasto: 'expense', deducible: 'deductible', factura: 'invoice', settings: 'the settings',
-        persona: 'person', gestor: 'advisor'
-      },
-      ca: {
-        title: 'Historial de canvis', desc: 'Qui ha canviat què i quan. Es desen els últims 500 canvis al costat de les teves dades, xifrats com la resta.',
-        none: 'Encara no hi ha canvis registrats.', local: 'aquest dispositiu', showing: 'Mostrant els últims {0} de {1} canvis.',
-        undo: 'Desfer', undone: 'desfet',
-        crear: 'va crear', editar: 'va editar', borrar: 'va esborrar',
-        proyecto: 'projecte', cliente: 'client', gasto: 'despesa', deducible: 'deduïble', factura: 'factura', settings: 'la configuració',
-        persona: 'persona', gestor: 'gestoria'
-      }
-    })[lang] || {};
-    const tx = k => TX[k] || esc(k);
+    /* Textos en lang.js (prefijo audit.); una clave desconocida (acción nueva) sale tal cual */
+    const tx = k => (LANGS.es['audit.' + k] ? t('audit.' + k) : esc(k));
     const fmtTs = fmtDateTime;
     const actorTxt = a => {
       if (!a || a === 'local') return tx('local');
@@ -151,12 +126,8 @@ Object.assign(App, {
   /** Sección Historial: copias locales (saves) — crear / restaurar / descargar.
    *  Textos i18n inline (es/en/ca) — migrar a lang.js cuando se valide la UX. */
   _cfgHistorySection() {
-    const TX = ({
-      es: { title: 'Copias de seguridad', desc: 'TRACKR guarda hasta 10 copias locales de tus datos (una al día, más las que crees tú). Son tu red de seguridad: descárgalas o restáuralas cuando quieras. Nada de esto sale de tu navegador.', saveNow: 'Guardar copia ahora', none: 'Aún no hay copias. Se creará una automáticamente al usar la app.', current: 'ACTUAL', auto: 'auto', load: 'Cargar', download: 'Descargar' },
-      en: { title: 'Backups', desc: 'TRACKR keeps up to 10 local copies of your data (one a day, plus the ones you make). They are your safety net: download or restore them anytime. None of this leaves your browser.', saveNow: 'Save a copy now', none: 'No copies yet. One will be created automatically as you use the app.', current: 'CURRENT', auto: 'auto', load: 'Load', download: 'Download' },
-      ca: { title: 'Còpies de seguretat', desc: 'TRACKR desa fins a 10 còpies locals de les teves dades (una al dia, més les que creïs tu). Són la teva xarxa de seguretat: descarrega-les o restaura-les quan vulguis. Res d\'això surt del teu navegador.', saveNow: 'Desar còpia ara', none: 'Encara no hi ha còpies. Se\'n crearà una automàticament en fer servir l\'app.', current: 'ACTUAL', auto: 'auto', load: 'Carregar', download: 'Descarregar' }
-    })[typeof _lang !== 'undefined' ? _lang : 'es'] || {};
-    const tx = k => TX[k] || esc(k);
+    /* Textos en lang.js (prefijo hist.); una clave desconocida (acción nueva) sale tal cual */
+    const tx = k => (LANGS.es['hist.' + k] ? t('hist.' + k) : esc(k));
     const fmtTs = fmtDateTime;
     const saves = (typeof H !== 'undefined') ? H.list() : [];
     let listHtml;
@@ -310,6 +281,18 @@ Object.assign(App, {
   },
 
   /** Anula una factura: registro de anulacion encadenado + evento en la original. */
+  /** Anular sin VeriFactu: la factura queda marcada en su proyecto (sale de 303/130/libros y
+   *  de los avisos de cobro) y su número sigue gastado. Para una factura que no debía existir;
+   *  si cambia el importe, lo correcto es rectificar. */
+  anularLocal(pid) {
+    const p = D.p(pid); if (!p?.facturacion?.facturaNum) return;
+    const f = p.facturacion, num = `${f.facturaNum}/${yearShort(f.facturaFecha || todayStr())}`;
+    if (!confirm(t('fac.voidConfirm', num))) return;
+    D.up(pid, { facturacion: { ...f, anulada: { fecha: todayStr() } } });
+    Toast.ok(t('cfg.vfAnulacionOk', num));
+    this.go(this.cv);
+  },
+
   async anularFactura(id) {
     const f = (D.fs() || []).find(x => x.id === id);
     if (!f || typeof V === 'undefined') return;
@@ -514,7 +497,7 @@ Object.assign(App, {
     document.getElementById('facC').innerHTML = ps.length
       ? `<div class="cl-list">${ps.map(p => {
           const f = p.facturacion, reg = this._facReg(p.id);
-          const anulada = !!reg && (reg.eventos || []).some(e => e.tipo === 'anulada');
+          const anulada = !!f.anulada || (!!reg && (reg.eventos || []).some(e => e.tipo === 'anulada'));
           const dv = B.diasVencida(f, D.d.settings.diasVencimiento, todayStr());
           const st = anulada ? ['void', 'var(--bad)'] : f.pagado ? ['paid', 'var(--ok)'] : dv > 0 ? ['overdue', 'var(--bad)'] : ['pending', 'var(--warn)'];
           const stLabel = t('fac.st.' + st[0])
@@ -527,8 +510,15 @@ Object.assign(App, {
             + `<span class="cl-nif" style="font-size:.68rem;color:${st[1]}">${stLabel}</span>`
             + `<div class="cl-actions"><button class="cl-btn" onclick="App.facPdf('${p.id}')" title="${t('btn.downloadPdf')}">&#9113;</button>`
             + (!f.pagado && !anulada ? `<button class="cl-btn" onclick="App.facRecordatorio('${p.id}')" title="${t('fac.reminder')}">&#9993;</button>` : '')
-            + (reg && !anulada ? `<button class="cl-btn cl-btn-del" onclick="App.anularFactura('${reg.id}')" title="${t('cfg.vfAnular')}">&times;</button>` : '')
-            + `</div></div>`;
+            + (!anulada ? `<button class="cl-btn cl-btn-del" onclick="${reg ? `App.anularFactura('${reg.id}')` : `App.anularLocal('${p.id}')`}" title="${t('cfg.vfAnular')}">&times;</button>` : '')
+            + `</div></div>`
+            /* Rectificativas de esta factura, debajo, con su PDF */
+            + (f.rectificativas || []).map(r => `<div class="cl-item" style="padding-left:1.2rem;opacity:.9">`
+              + `<span class="cl-nif" style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--t2)">↳ ${esc(r.num)}/${yearShort(r.fecha)}</span>`
+              + `<span class="cl-nif" style="font-size:.72rem">${fmtDate(r.fecha)}</span>`
+              + `<span class="cl-name" style="color:var(--t3);font-size:.78rem">${t('fac.rectInvoice')}${r.motivo ? ' · ' + esc(r.motivo) : ''}</span>`
+              + `<span class="cl-nif" style="font-size:.78rem;color:${r.total < 0 ? 'var(--bad)' : 'var(--t1)'}">${r.total > 0 ? '+' : ''}${fmtMoney(r.total)}</span>`
+              + `<div class="cl-actions"><button class="cl-btn" onclick="Fac.downloadRect('${p.id}','${r.id}')" title="${t('btn.downloadPdf')}">&#9113;</button></div></div>`).join('');
         }).join('')}</div>`
       : `<div style="color:var(--t3);font-size:.82rem">${t('fac.none')}</div>`;
   },
@@ -721,11 +711,8 @@ Object.assign(App, {
           created++;
         }
 
-        /* Contador: solo si la factura es del año del contador (una antigua no lo toca) */
-        const fy = String(data.factura.fecha || '').slice(0, 4), cy = D.d.settings.nextFacturaYear;
-        if ((!cy || cy === fy) && num >= (D.d.settings.nextFacturaNum || 1)) {
-          D.d.settings.nextFacturaNum = num + 1;
-        }
+        /* Contador: una factura antigua (de un año anterior) no lo toca */
+        D.bumpFacturaNum(num, data.factura.fecha);
 
         /* Update emisor if empty */
         if (data.emisor) {

@@ -274,7 +274,7 @@ Object.assign(App, {
     const e = isE ? (D.g(gid)?.entradas || []).find(x => x.id === eid) : null;
     const gasto = D.g(gid);
     const isRecurrente = gasto && gasto.recurrente && gasto.recurrente !== 'no';
-    const tipoIva = gasto?.tipoIva ?? 21;
+    const tipoIva = e?.tipoIva ?? gasto?.tipoIva ?? 21; /* una entrada vieja conserva su tipo */
     const tipoIrpf = gasto?.tipoIrpf || 0;
     /* Pre-rellenar con importeBase si es entrada nueva en gasto recurrente
        (importeBase = total de la factura, ya con la retención descontada) */
@@ -305,7 +305,8 @@ Object.assign(App, {
 
   saveGE(gid, eid) {
     const g = D.g(gid); if (!g) return;
-    const imp = this._gReadEntry('ge', g.tipoIva || 0, g.tipoIrpf || 0);
+    const old = eid ? (g.entradas || []).find(x => x.id === eid) : null;
+    const imp = this._gReadEntry('ge', old?.tipoIva ?? g.tipoIva ?? 0, old?.tipoIrpf ?? g.tipoIrpf ?? 0);
     if (imp.total <= 0) return;
     if (!g.entradas) g.entradas = [];
     const fecha = document.getElementById('geD').value || todayStr();
@@ -326,6 +327,7 @@ Object.assign(App, {
   delGE(gid, eid) {
     const g = D.g(gid); if (!g) return;
     g.entradas = (g.entradas || []).filter(e => e.id !== eid);
+    D._tomb('entrada', eid); /* lápida para la fusión entre dispositivos */
     D.upG(gid, { entradas: g.entradas }); this.rGas();
   },
 

@@ -36,6 +36,7 @@ Orden de implementación. Cada archivo tiene el detalle.
 | 30 | Dineros abre en trimestre vacío y parece no declarado | `30-trimestre-vacio.md` | ✅ hecho (20 oct 2026) — abre en el último mes con datos |
 | 31 | Al iniciar sesión, comparar en vez de pisar | `31-reconciliacion-login.md` | ✅ A (19 oct) + C vía auditoría como reloj (20 oct); B («combinar» = merge por id con reloj) cubierta por C |
 | 32 | Perfil fiscal: marcar qué modelos presentas (111/190, 347, 115…) y abrir opciones según eso | `32-perfil-fiscal.md` | 💡 idea (20 oct 2026) — ver con calma |
+| 33 | Preguntas para la gestoría (% difícil justificación por año, IVA 0 % exenta, traducción literaria, cobros sin factura) e ideas (varias facturas por proyecto) | `33-gestoria-e-ideas.md` | 📝 apuntado (10 nov 2026) |
 
 ---
 

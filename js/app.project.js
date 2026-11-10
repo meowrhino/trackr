@@ -121,7 +121,10 @@ Object.assign(App, {
       ivaExc: p?.facturacion?.ivaExcepcion || '', asuntoFactura: p?.facturacion?.asuntoFactura || '',
       pagado: p?.facturacion?.pagado || false, fechaPago: p?.facturacion?.fechaPago || '', notas: p?.notas || '',
       idiomaFactura: p?.facturacion?.idiomaFactura || null,
-      cobros: p?.facturacion?.cobros || [], neto: p?.facturacion?.netoRecibido || 0
+      cobros: p?.facturacion?.cobros || [], neto: p?.facturacion?.netoRecibido || 0,
+      /* Factura emitida y vigente: sus importes ya no se editan (se corrigen con «Rectificar») */
+      emitida: !!(p?.facturacion?.facturaNum && p?.facturacion?.facturaFecha && D.facturaVigente(p.id)),
+      numEmitida: p?.facturacion?.facturaNum ? `${p.facturacion.facturaNum}/${yearShort(p.facturacion.facturaFecha || todayStr())}` : ''
     };
     this.om(
       this._pmHeader(isE)
@@ -174,7 +177,10 @@ Object.assign(App, {
 
   _pmBilling(df, st) {
     const m = df.modo;
-    return `<div class="dst" style="margin-top:1.25rem">${t('billing.title')}${itip('tip.modes')}</div>`
+    /* Emitida: el bloque de importes va desactivado (fieldset) con un aviso que manda a Rectificar */
+    const lock = df.emitida ? `<div class="acc-warn" style="margin:.4rem 0 .6rem;font-size:.8rem">${t('billing.lockedIssued', esc(df.numEmitida))}</div>` : '';
+    return `<div class="dst" style="margin-top:1.25rem">${t('billing.title')}${itip('tip.modes')}</div>` + lock
+      + `<fieldset style="border:0;padding:0;margin:0;min-width:0"${df.emitida ? ' disabled' : ''}>`
       + `<div class="bms">`
       +   `<button class="bm ${m === 'desde_base' ? 'on' : ''}" onclick="App.sBM('desde_base')">${t('billing.fromBase')}</button>`
       +   `<button class="bm ${m === 'desde_total' ? 'on' : ''}" onclick="App.sBM('desde_total')">${t('billing.fromTotal')}</button>`
@@ -195,7 +201,7 @@ Object.assign(App, {
       +   `<div id="bPrev" class="bb" style="margin-top:.4rem"></div>`
       +   (df.cobros && df.cobros.length ? `<div style="margin-top:.75rem;font-size:.78rem;color:${df.pagado ? 'var(--ok)' : 'var(--warn)'}">${df.pagado ? t('billing.paid') : t('billing.progress', fmtMoney(df.cobros.reduce((s,c) => s + c.cantidad, 0)), fmtMoney(df.neto || 0))} (${df.cobros.length} ${t('billing.payments').toLowerCase()})</div>` : '')
       +   `<div class="fg" style="margin-top:.5rem"><label>${t('field.invoiceLang')}</label><select id="mpFacLang"><option value="" ${!df.idiomaFactura ? 'selected' : ''}>${_lang === 'es' ? 'Español' : 'Spanish'} (${t('cfg.defaults').toLowerCase()})</option><option value="es" ${df.idiomaFactura === 'es' ? 'selected' : ''}>Español</option><option value="en" ${df.idiomaFactura === 'en' ? 'selected' : ''}>English</option></select></div>`
-      + `</div>`;
+      + `</div></fieldset>`;
   },
 
   _pmFooter(eid, isE, df) {
@@ -300,6 +306,7 @@ Object.assign(App, {
         importeIva: 0, importeIrpf: 0, totalFactura: 0, netoRecibido: 0,
         cobros: prev?.facturacion?.cobros || [],
         rectificativas: prev?.facturacion?.rectificativas || [],
+        anulada: prev?.facturacion?.anulada || null,
         pagado: false, fechaPago: null,
         gastos: 0,
         facturaNum: prev?.facturacion?.facturaNum || null,
@@ -308,6 +315,10 @@ Object.assign(App, {
       },
       horas: prev?.horas || [], notas: document.getElementById('mpNo').value.trim()
     };
+    /* Factura emitida y vigente: los importes no cambian desde aquí (se corrigen con Rectificar) */
+    if (prev?.facturacion?.facturaNum && prev.facturacion.facturaFecha && D.facturaVigente(prev.id)) {
+      for (const k of ['modo', 'baseImponible', 'total', 'precioHora', 'iva', 'irpf', 'ivaExcepcion', 'idiomaFactura']) proj.facturacion[k] = prev.facturacion[k];
+    }
     B.calc(proj);
     if (eid) { D.up(eid, proj); T.ev('action', 'project_edit'); } else { D.add(proj); T.ev('action', 'project_create'); }
     this.cm();

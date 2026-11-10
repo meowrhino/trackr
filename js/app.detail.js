@@ -223,6 +223,7 @@ Object.assign(App, {
     if (!confirm(t('det.deleteHourConfirm'))) return;
     const p = D.p(pid); if (!p) return;
     p.horas = p.horas.filter(h => h.id !== hid);
+    D._tomb('hora', hid); /* lápida: al fusionar dispositivos, la hora no vuelve */
     D.up(pid, { horas: p.horas });
     this.cm();
     if (this.cv === 'cal') this.rCal(); else this.rDet(pid);
@@ -232,6 +233,7 @@ Object.assign(App, {
     const p = D.p(pid); if (!p) return;
     if (!confirm(t('det.deleteHourConfirm'))) return;
     p.horas = p.horas.filter(h => h.id !== hid);
+    D._tomb('hora', hid); /* lápida: al fusionar dispositivos, la hora no vuelve */
     D.up(pid, { horas: p.horas });
     this.rDet(pid);
   },

@@ -275,10 +275,11 @@ const Acc = (() => {
     // Gana el registro tocado mas tarde, pero sus listas internas (horas, entradas de gasto,
     // cobros) se unen por id con las del otro lado: dos dispositivos que apuntan horas en el
     // mismo proyecto antes de sincronizar conservan las dos.
-    // shortcut: una hora/entrada/cobro borrada en un lado vuelve si el otro aun la tenia
-    // (mejor que perder una). Si molesta, anotar borrados de sub-registros en la auditoria.
+    // Lo borrado dentro (una hora, un cobro…) deja un 'borrar' en la auditoria con su id: esas
+    // no se recuperan del otro lado. shortcut: el anillo guarda 500 eventos; un borrado mas
+    // viejo puede volver si el otro dispositivo llevaba mucho sin sincronizar.
     const nested = (w, o) => {
-      const u = (a, b) => unionBy(b, a, (x) => x.id); // a = ganador: gana en colision
+      const u = (a, b) => unionBy(b, a, (x) => x.id).filter((x) => !(x && borradoTs.has(x.id))); // a = ganador
       const r = { ...w };
       if (Array.isArray(w.horas) && Array.isArray(o.horas)) r.horas = u(w.horas, o.horas);
       if (Array.isArray(w.entradas) && Array.isArray(o.entradas)) r.entradas = u(w.entradas, o.entradas);

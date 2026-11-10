@@ -13,71 +13,13 @@
  * del cliente JAMÁS se suban a la cuenta del gestor. Banner fijo con "volver".
  * Si se cierra la pestaña en modo visor, al recargar se restaura solo.
  *
- * Textos i18n inline (es/en/ca), como app.account-ui.js.
+ * Textos en lang.js (prefijo gst.).
  * Globales usados: Acc, CA, D, H, Toast, App, esc.
  * ================================================ */
 (() => {
   const L = () => (typeof _lang !== 'undefined' ? _lang : 'es');
-  const TXT = {
-    es: {
-      miTitle: 'Mi gestoría', miDesc: 'Comparte tus datos con tu gestoría de forma cifrada. Solo tu gestoría puede leerlos (ni TRACKR ni el servidor). Puedes revocar el acceso cuando quieras.',
-      codePh: 'Código de tu gestoría (TRK-G-…)', link: 'Vincular', badCode: 'Código no válido', notFound: 'No se encontró esa gestoría', rateLimited: 'Demasiados intentos, espera unos minutos',
-      confirmTitle: 'Confirmar gestoría', confirmDesc: 'Vas a compartir tus datos con:', fingerprint: 'Huella de clave',
-      scope: 'Qué compartir', scopeFiscal: 'Solo lo fiscal (facturas, gastos, clientes y proyectos, sin horas ni notas)', scopeTodo: 'Todo (incluye horas y notas)',
-      confirmBtn: 'Compartir', cancel: 'Cancelar', linked: 'Vinculado con', revoke: 'Revocar acceso', revokeConfirm: '¿Revocar el acceso de tu gestoría? Dejará de ver tus datos inmediatamente.', revoked: 'Acceso revocado', lastShared: 'última copia',
-      gestTitle: 'Cartera de gestoría', gestDesc: 'Comparte tu código con tus clientes de TRACKR: ellos lo introducen en su Configuración para darte acceso cifrado a sus datos.',
-      yourCode: 'Tu código', copy: 'Copiar', copied: 'Copiado', clients: 'Clientes vinculados', noClients: 'Ningún cliente vinculado todavía.', refresh: 'Refrescar', open: 'Ver datos', noBlob: 'sin datos aún', updated: 'actualizado',
-      viewing: 'Viendo los datos de', viewingRO: '(solo lectura: los cambios NO se guardan ni se suben)', back: '← Volver a mis datos', backOk: 'De vuelta a tus datos', openErr: 'No se pudieron descifrar los datos', badIds: 'Los datos del cliente tienen identificadores no válidos',
-      keyPublished: 'Clave de gestoría publicada', keyErr: 'No se pudo publicar la clave de gestoría',
-      /* Etapa B */
-      canEdit: 'Dejar que edite mis datos', canEditHelp: 'Podrá corregir gastos, clientes, proyectos (incluida su facturación), deducibles y tus casillas fiscales. No puede tocar tus horas, ni borrar proyectos, ni tocar tus facturas firmadas. Cada cambio queda firmado con su nombre en el historial y lo puedes deshacer.',
-      editOn: 'Puede editar', editOff: 'Solo lectura', allowEdit: 'Permitir edición', denyEdit: 'Quitar edición', permSaved: 'Permiso actualizado',
-      edit: 'Editar', editing: 'EDITANDO', stopEdit: 'Dejar de editar', editNotAllowed: 'Esta persona no te ha dado permiso de edición',
-      pendingOps: (n) => `${n} cambio${n === 1 ? '' : 's'} sin enviar`, allSent: 'Cambios enviados', sendErr: 'No se pudieron enviar los cambios',
-      leaveWarn: 'Tienes cambios sin enviar. Si sales ahora se pierden.',
-      opsApplied: (n, who) => `${who} ha hecho ${n} cambio${n === 1 ? '' : 's'} en tus datos`,
-      undo: 'Deshacer', undone: 'deshecho', undoOk: 'Cambio deshecho', undoErr: 'No se pudo deshacer',
-    },
-    en: {
-      miTitle: 'My advisor', miDesc: 'Share your data with your advisor, encrypted end-to-end. Only your advisor can read it (not TRACKR, not the server). You can revoke access anytime.',
-      codePh: 'Your advisor\'s code (TRK-G-…)', link: 'Link', badCode: 'Invalid code', notFound: 'Advisor not found', rateLimited: 'Too many attempts, wait a few minutes',
-      confirmTitle: 'Confirm advisor', confirmDesc: 'You are about to share your data with:', fingerprint: 'Key fingerprint',
-      scope: 'What to share', scopeFiscal: 'Fiscal only (invoices, expenses, clients and projects, without hours or notes)', scopeTodo: 'Everything (includes hours and notes)',
-      confirmBtn: 'Share', cancel: 'Cancel', linked: 'Linked with', revoke: 'Revoke access', revokeConfirm: 'Revoke your advisor\'s access? They will stop seeing your data immediately.', revoked: 'Access revoked', lastShared: 'last copy',
-      gestTitle: 'Advisor portfolio', gestDesc: 'Share your code with your TRACKR clients: they enter it in their Settings to give you encrypted access to their data.',
-      yourCode: 'Your code', copy: 'Copy', copied: 'Copied', clients: 'Linked clients', noClients: 'No linked clients yet.', refresh: 'Refresh', open: 'View data', noBlob: 'no data yet', updated: 'updated',
-      viewing: 'Viewing data of', viewingRO: '(read-only: changes are NOT saved or uploaded)', back: '← Back to my data', backOk: 'Back to your data', openErr: 'Could not decrypt the data', badIds: 'The client data has invalid identifiers',
-      keyPublished: 'Advisor key published', keyErr: 'Could not publish advisor key',
-      /* Etapa B */
-      canEdit: 'Let them edit my data', canEditHelp: 'They will be able to fix expenses, clients, projects (including their billing), deductibles and your tax fields. They cannot touch your hours, delete projects, or touch your signed invoices. Every change is signed with their name in the history and you can undo it.',
-      editOn: 'Can edit', editOff: 'Read-only', allowEdit: 'Allow editing', denyEdit: 'Remove editing', permSaved: 'Permission updated',
-      edit: 'Edit', editing: 'EDITING', stopEdit: 'Stop editing', editNotAllowed: 'This person has not given you edit permission',
-      pendingOps: (n) => `${n} change${n === 1 ? '' : 's'} not sent`, allSent: 'Changes sent', sendErr: 'Could not send the changes',
-      leaveWarn: 'You have unsent changes. Leaving now loses them.',
-      opsApplied: (n, who) => `${who} made ${n} change${n === 1 ? '' : 's'} to your data`,
-      undo: 'Undo', undone: 'undone', undoOk: 'Change undone', undoErr: 'Could not undo',
-    },
-    ca: {
-      miTitle: 'La meva gestoria', miDesc: 'Comparteix les teves dades amb la teva gestoria de forma xifrada. Només la teva gestoria pot llegir-les (ni TRACKR ni el servidor). Pots revocar l\'accés quan vulguis.',
-      codePh: 'Codi de la teva gestoria (TRK-G-…)', link: 'Vincular', badCode: 'Codi no vàlid', notFound: 'No s\'ha trobat aquesta gestoria', rateLimited: 'Massa intents, espera uns minuts',
-      confirmTitle: 'Confirmar gestoria', confirmDesc: 'Compartiràs les teves dades amb:', fingerprint: 'Empremta de clau',
-      scope: 'Què compartir', scopeFiscal: 'Només el fiscal (factures, despeses, clients i projectes, sense hores ni notes)', scopeTodo: 'Tot (inclou hores i notes)',
-      confirmBtn: 'Compartir', cancel: 'Cancel·lar', linked: 'Vinculat amb', revoke: 'Revocar accés', revokeConfirm: 'Revocar l\'accés de la teva gestoria? Deixarà de veure les teves dades immediatament.', revoked: 'Accés revocat', lastShared: 'última còpia',
-      gestTitle: 'Cartera de gestoria', gestDesc: 'Comparteix el teu codi amb els teus clients de TRACKR: ells l\'introdueixen a la seva Configuració per donar-te accés xifrat a les seves dades.',
-      yourCode: 'El teu codi', copy: 'Copiar', copied: 'Copiat', clients: 'Clients vinculats', noClients: 'Cap client vinculat encara.', refresh: 'Refrescar', open: 'Veure dades', noBlob: 'sense dades encara', updated: 'actualitzat',
-      viewing: 'Veient les dades de', viewingRO: '(només lectura: els canvis NO es desen ni es pugen)', back: '← Tornar a les meves dades', backOk: 'De tornada a les teves dades', openErr: 'No s\'han pogut desxifrar les dades', badIds: 'Les dades del client tenen identificadors no vàlids',
-      keyPublished: 'Clau de gestoria publicada', keyErr: 'No s\'ha pogut publicar la clau de gestoria',
-      /* Etapa B */
-      canEdit: 'Deixar que editi les meves dades', canEditHelp: 'Podrà corregir despeses, clients, projectes (inclosa la seva facturació), deduïbles i les teves caselles fiscals. No pot tocar les teves hores, ni esborrar projectes, ni tocar les teves factures signades. Cada canvi queda signat amb el seu nom a l\'historial i el pots desfer.',
-      editOn: 'Pot editar', editOff: 'Només lectura', allowEdit: 'Permetre edició', denyEdit: 'Treure edició', permSaved: 'Permís actualitzat',
-      edit: 'Editar', editing: 'EDITANT', stopEdit: 'Deixar d\'editar', editNotAllowed: 'Aquesta persona no t\'ha donat permís d\'edició',
-      pendingOps: (n) => `${n} canvi${n === 1 ? '' : 's'} sense enviar`, allSent: 'Canvis enviats', sendErr: 'No s\'han pogut enviar els canvis',
-      leaveWarn: 'Tens canvis sense enviar. Si surts ara es perden.',
-      opsApplied: (n, who) => `${who} ha fet ${n} canvi${n === 1 ? '' : 's'} a les teves dades`,
-      undo: 'Desfer', undone: 'desfet', undoOk: 'Canvi desfet', undoErr: 'No s\'ha pogut desfer',
-    },
-  };
-  const t = (k) => (TXT[L()] || TXT.es)[k] || k;
+  /* Textos en lang.js con el prefijo gst. */
+  const t = (k, ...a) => window.t('gst.' + k, ...a);
   const esc2 = (s) => (typeof esc === 'function' ? esc(s) : String(s));
   const fpShort = (fp) => (fp || '').slice(0, 12);
   const VIEW_KEY = 'trackr_gestor_view';   // marca {clientEmail, grantId} — solo para el banner al recargar
@@ -339,7 +281,7 @@
       b.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:' + (editing ? 'var(--ok,#4a4)' : 'var(--warn,#c90)') + ';color:#111;'
         + 'padding:.5rem .9rem;font-size:.82rem;display:flex;align-items:center;gap:.75rem;flex-wrap:wrap';
       let state;
-      if (editing) state = `<span><strong>${t('editing')}</strong>${pend ? ' · ' + t('pendingOps')(pend) : ''}</span>`;
+      if (editing) state = `<span><strong>${t('editing')}</strong>${pend ? ' · ' + t(pend === 1 ? 'pendingOps.one' : 'pendingOps.other', pend) : ''}</span>`;
       else state = `<span>${t('viewingRO')}</span>`;
       const editBtn = !v.canEdit ? ''
         : editing
@@ -353,7 +295,7 @@
 
     /** Aviso de la persona: su gestoría le ha cambiado cosas. Refresca la vista actual. */
     _gstOnOpsApplied(info) {
-      Toast.ok(t('opsApplied')(info.applied, info.gestorEmail));
+      Toast.ok(t(info.applied === 1 ? 'opsApplied.one' : 'opsApplied.other', info.applied, info.gestorEmail));
       try { this.go(this.cv); } catch (e) { /* la vista se refrescará sola al navegar */ }
     },
   });
