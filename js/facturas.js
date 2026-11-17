@@ -61,8 +61,12 @@ const Fac = {
     doc.setFontSize(16);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(40);
-    doc.text(`${tf(isBud ? 'fac.budget' : data.kind === 'rectificativa' ? 'fac.rectInvoice' : 'fac.invoice', lang)} ${numYY}`, leftX, y);
+    const docTitle = `${tf(isBud ? 'fac.budget' : data.kind === 'rectificativa' ? 'fac.rectInvoice' : 'fac.invoice', lang)} ${numYY}`;
+    doc.text(docTitle, leftX, y);
     y += 8;
+    /* Título interno del PDF: la pestaña del navegador y Vista Previa lo enseñan en vez del nombre del archivo */
+    doc.setProperties({ title: docTitle + (data.cliente.nombre ? ' · ' + data.cliente.nombre : ''), author: data.emisor.nombre || '', subject: data.factura.asunto || '', creator: 'trackr' });
+    doc.viewerPreferences({ DisplayDocTitle: true });
 
     /* ── 2-column header: Emisor (left) | Datos de factura (right) ── */
     doc.setFontSize(11);
