@@ -53,11 +53,35 @@ assert.equal(b2.lineas[0].base, 100, 'por_hora: 2,5 h × 40');
 D.ensure();
 assert.equal(D.buds().length, 2);
 
+/* Migración con IRPF distinto por proyecto: cada línea con el suyo (mary garlic: 800 sin IRPF + 480 al 7 %) */
+{
+  const d2 = JSON.parse(JSON.stringify(data));
+  d2.projects = [
+    { id: 'm1', nombre: 'Ecommerce', clienteId: 'c1', estado: 'potencial', fechas: {}, horas: [], facturacion: { modo: 'desde_base', baseImponible: 800, iva: 21, irpf: 0 }, presupuesto: { num: 11, fecha: '2026-10-19' } },
+    { id: 'm2', nombre: 'Web', clienteId: 'c1', estado: 'potencial', fechas: {}, horas: [], facturacion: { modo: 'desde_base', baseImponible: 480, iva: 21, irpf: 7 }, presupuesto: { num: 11, fecha: '2026-10-19' } }
+  ];
+  D.load(d2);
+  assert.equal(D.buds()[0].total, 1515.2, '1280 + 268,80 IVA − 33,60 IRPF');
+
+  /* Serie P por año: el antiguo 11 no cuenta; P1, P2… y en enero vuelve a P1 */
+  assert.equal(D.nextBudNum('2026-11-17'), 'P1');
+  D.addBud({ id: 'b1', num: 'P1', fecha: '2026-11-17', clienteId: 'c1', lineas: [], estado: 'enviado' });
+  D.addBud({ id: 'b2', num: 'P2', fecha: '2026-12-01', clienteId: 'c1', lineas: [], estado: 'enviado' });
+  assert.equal(D.nextBudNum('2026-12-20'), 'P3');
+  assert.equal(D.nextBudNum('2027-01-02'), 'P1');
+  assert.ok(D.budNumTaken('P2', '2026-05-01'), 'P2 ya existe en 2026');
+  assert.ok(!D.budNumTaken('P2', '2027-05-01'), 'en 2027 está libre');
+  assert.ok(!D.budNumTaken('P2', '2026-05-01', 'b2'), 'el propio no cuenta');
+  D.load(JSON.parse(JSON.stringify(data)));
+}
+
 /* Vencimiento */
 const f = { facturaFecha: '2026-10-01', pagado: false };
 assert.equal(B.vencimiento(f, 30), '2026-10-31');
 assert.equal(B.vencimiento(f, undefined), '2026-10-31', '30 días por defecto');
 assert.equal(B.diasVencida(f, 30, '2026-11-05'), 5);
+assert.equal(B.vencimiento({ ...f, diasPago: 15 }, 30), '2026-10-16', 'los días de la factura mandan sobre Configuración');
+assert.equal(B.vencimiento({ ...f, diasPago: 0 }, 30), '2026-10-01', '0 días en la factura = al contado');
 assert.equal(B.diasVencida(f, 30, '2026-10-20'), -11);
 assert.equal(B.diasVencida({ ...f, pagado: true }, 30, '2026-11-05'), null, 'pagada: sin vencimiento');
 assert.equal(B.diasVencida({}, 30, '2026-11-05'), null, 'sin factura: sin vencimiento');

@@ -896,7 +896,7 @@
       "notas": "Novela italiana contemporánea, IT→ES. ~280 páginas. IVA reducido 4% por ser traducción literaria. Pausada por revisión editorial, retomada en abril.",
       "journeyStage": "jst-revision",
       "presupuesto": {
-        "num": 2,
+        "num": "P2",
         "fecha": "2025-11-11"
       }
     },
@@ -1406,7 +1406,7 @@
       "notas": "Empresa cerró operaciones inesperadamente. 8h trabajadas sin cobrar.",
       "journeyStage": "jst-presupuesto",
       "presupuesto": {
-        "num": 1,
+        "num": "P1",
         "fecha": "2025-08-26"
       }
     },
@@ -1519,7 +1519,7 @@
       "notas": "Catálogo premium de vinos del Priorat para exportación. 35 fichas + textos web + tasting notes.",
       "journeyStage": "jst-revision",
       "presupuesto": {
-        "num": 3,
+        "num": "P1",
         "fecha": "2026-09-11"
       }
     },
@@ -2181,7 +2181,7 @@
       "notas": "Segunda novela IT→ES para Mediterráneo. 350 páginas, más compleja. La primera novela recibió excelentes reseñas.",
       "journeyStage": "jst-revision",
       "presupuesto": {
-        "num": 4,
+        "num": "P1",
         "fecha": "2027-02-09"
       }
     },
@@ -2482,7 +2482,7 @@
       "notas": "App de salud digital noruega. Localización continua NO→ES, y desde 2028 también NO→CA. Segundo cliente internacional más estable.",
       "journeyStage": "jst-presupuesto",
       "presupuesto": {
-        "num": 5,
+        "num": "P2",
         "fecha": "2027-03-12"
       }
     },
@@ -3394,7 +3394,7 @@
       "notas": "Libro de no-ficción: gastronomía italiana. IT→ES. 250 páginas + recetas + glosario. IVA 4% literario.",
       "journeyStage": "jst-entregado",
       "presupuesto": {
-        "num": 6,
+        "num": "P1",
         "fecha": "2028-07-12"
       }
     },
@@ -3557,7 +3557,7 @@
       "notas": "Subcontrata para traducción institucional EU. Documentos de política digital + regulación IA + sostenibilidad. EN→ES y EN→FR. Exento IVA intracomunitario.",
       "journeyStage": "jst-cobrado",
       "presupuesto": {
-        "num": 7,
+        "num": "P1",
         "fecha": "2029-06-11"
       }
     },
@@ -3785,7 +3785,7 @@
       "notas": "Segundo proyecto EU-Translate. Regulación IA ampliada. 10.000€. EN→ES y EN→FR. Mayor que el primero.",
       "journeyStage": "jst-contacto",
       "presupuesto": {
-        "num": 8,
+        "num": "P2",
         "fecha": "2029-12-26"
       }
     },
@@ -3889,7 +3889,7 @@
       "notas": "Cuarta traducción literaria para Mediterráneo. Novela negra IT→ES, 320 págs. 7000€. Marina se ha convertido en su traductora de referencia.",
       "journeyStage": "jst-presupuesto",
       "presupuesto": {
-        "num": 9,
+        "num": "P1",
         "fecha": "2030-01-12"
       }
     }
@@ -5956,7 +5956,6 @@
     },
     "nextFacturaNum": 26,
     "tema": "monokai",
-    "nextPresupuestoNum": 10,
     "diasVencimiento": 30
   },
   "journey": {
@@ -5997,7 +5996,7 @@
   "presupuestos": [
     {
       "id": "bud-marina-1",
-      "num": 1,
+      "num": "P1",
       "fecha": "2025-08-26",
       "clienteId": null,
       "lineas": [
@@ -6009,11 +6008,12 @@
       ],
       "descripcion": "Traducción técnica IT→ES, 180 páginas. Entrega en 6 semanas. 50 % a la aceptación y 50 % a la entrega. Glosario del cliente incluido.",
       "total": 2332,
-      "estado": "rechazado"
+      "estado": "rechazado",
+      "validez": 30
     },
     {
       "id": "bud-marina-2",
-      "num": 2,
+      "num": "P2",
       "fecha": "2025-11-11",
       "clienteId": "c201-xa11-yb22",
       "lineas": [
@@ -6025,11 +6025,12 @@
       ],
       "descripcion": "Traducción literaria IT→ES, 320 páginas. Entrega en 5 meses, con una ronda de revisión de la editorial incluida. Pago a 60 días.",
       "total": 4005,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     },
     {
       "id": "bud-marina-3",
-      "num": 3,
+      "num": "P1",
       "fecha": "2026-09-11",
       "clienteId": "c205-xi99-yj00",
       "lineas": [
@@ -6041,11 +6042,12 @@
       ],
       "descripcion": "Catálogo ES→EN: 60 fichas de vino y textos de marca. Entrega en 4 semanas. Revisión nativa incluida.",
       "total": 2120,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     },
     {
       "id": "bud-marina-4",
-      "num": 4,
+      "num": "P1",
       "fecha": "2027-02-09",
       "clienteId": "c201-xa11-yb22",
       "lineas": [
@@ -6057,11 +6059,12 @@
       ],
       "descripcion": "Traducción literaria IT→ES, 350 páginas. Entrega en 7 meses. Pago en dos plazos.",
       "total": 5340,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     },
     {
       "id": "bud-marina-5",
-      "num": 5,
+      "num": "P2",
       "fecha": "2027-03-12",
       "clienteId": "c206-xk11-yl22",
       "lineas": [
@@ -6073,11 +6076,12 @@
       ],
       "descripcion": "Localización de app NO→ES, unas 25.000 palabras. Entregas por lotes quincenales. Sin IVA (cliente fuera de la UE); transferencia internacional.",
       "total": 4347,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     },
     {
       "id": "bud-marina-6",
-      "num": 6,
+      "num": "P1",
       "fecha": "2028-07-12",
       "clienteId": "c201-xa11-yb22",
       "lineas": [
@@ -6089,11 +6093,12 @@
       ],
       "descripcion": "No ficción IT→ES, 280 páginas. Entrega en 6 meses. Pago a 60 días.",
       "total": 4895,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     },
     {
       "id": "bud-marina-7",
-      "num": 7,
+      "num": "P1",
       "fecha": "2029-06-11",
       "clienteId": "c207-xm33-yn44",
       "lineas": [
@@ -6105,11 +6110,12 @@
       ],
       "descripcion": "Tarifa por palabra cerrada. Volumen estimado: 80.000 palabras en 5 meses. Factura mensual por lo entregado.",
       "total": 8000,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     },
     {
       "id": "bud-marina-8",
-      "num": 8,
+      "num": "P2",
       "fecha": "2029-12-26",
       "clienteId": "c207-xm33-yn44",
       "lineas": [
@@ -6121,11 +6127,12 @@
       ],
       "descripcion": "Mismas condiciones que el proyecto institucional. 100.000 palabras estimadas.",
       "total": 10000,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     },
     {
       "id": "bud-marina-9",
-      "num": 9,
+      "num": "P1",
       "fecha": "2030-01-12",
       "clienteId": "c201-xa11-yb22",
       "lineas": [
@@ -6137,7 +6144,8 @@
       ],
       "descripcion": "Novela negra IT→ES, 400 páginas. Entrega en 8 meses. Pago en dos plazos.",
       "total": 6230,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     }
   ]
 }

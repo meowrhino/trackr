@@ -1560,7 +1560,7 @@
       "notas": "Ongoing quarterly training contract. CaixaBank's biggest frontend investment. Rate increased to 100€/h from 2028.",
       "journeyStage": "jst-proposal",
       "presupuesto": {
-        "num": 1,
+        "num": "P1",
         "fecha": "2026-12-21"
       }
     },
@@ -1687,7 +1687,7 @@
       "notas": "6-month DevOps bootcamp for Vueling engineering team. 12 engineers, hands-on labs cada sesión.",
       "journeyStage": "jst-materials",
       "presupuesto": {
-        "num": 2,
+        "num": "P1",
         "fecha": "2027-04-11"
       }
     },
@@ -2211,7 +2211,7 @@
       "notas": "Strategic consulting: help Vueling migrate booking frontend to React. 6-month engagement.",
       "journeyStage": "jst-running",
       "presupuesto": {
-        "num": 3,
+        "num": "P1",
         "fecha": "2028-01-12"
       }
     },
@@ -2522,7 +2522,7 @@
       "notas": "Annual contract — 3 bootcamps (spring, summer, fall). 1800€ each. IVA exempt.",
       "journeyStage": "jst-materials",
       "presupuesto": {
-        "num": 4,
+        "num": "P2",
         "fecha": "2028-01-12"
       }
     },
@@ -3342,7 +3342,7 @@
       "notas": "Second Vueling engagement — post-migration coaching. Focus on team upskilling.",
       "journeyStage": "jst-materials",
       "presupuesto": {
-        "num": 6,
+        "num": "P2",
         "fecha": "2029-02-09"
       }
     },
@@ -3531,7 +3531,7 @@
       "notas": "Barcelona Activa 2029 — 3 bootcamps. Added AI basics to curriculum this year.",
       "journeyStage": "jst-running",
       "presupuesto": {
-        "num": 5,
+        "num": "P1",
         "fecha": "2029-01-12"
       }
     },
@@ -3668,7 +3668,7 @@
       "notas": "Biggest project to date. Seat/Cupra digital transformation — training 25 engineers on modern frontend. 6-month engagement.",
       "journeyStage": "jst-proposal",
       "presupuesto": {
-        "num": 7,
+        "num": "P3",
         "fecha": "2029-12-26"
       }
     },
@@ -3749,7 +3749,7 @@
       "notas": "ReactConf EU 2030 — KEYNOTE speaker! Major career milestone. Travel: flights + 2 nights ~520€.",
       "journeyStage": "jst-closed",
       "presupuesto": {
-        "num": 8,
+        "num": "P1",
         "fecha": "2030-03-31"
       }
     },
@@ -6729,7 +6729,6 @@
     "nif": "41876543J",
     "direccion1": "Carrer de Bailèn 55, 4t 2a",
     "direccion2": "08010 Barcelona",
-    "nextPresupuestoNum": 9,
     "diasVencimiento": 60
   },
   "journey": {
@@ -6770,7 +6769,7 @@
   "presupuestos": [
     {
       "id": "bud-dani-1",
-      "num": 1,
+      "num": "P1",
       "fecha": "2026-12-21",
       "clienteId": "c405-jj99-kk00",
       "lineas": [
@@ -6782,11 +6781,12 @@
       ],
       "descripcion": "Quarterly training programme: 4 workshops per quarter, up to 15 people each. Invoiced per quarter; order reference required.",
       "total": 28572.3,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     },
     {
       "id": "bud-dani-2",
-      "num": 2,
+      "num": "P1",
       "fecha": "2027-04-11",
       "clienteId": "c406-ll11-mm22",
       "lineas": [
@@ -6798,11 +6798,12 @@
       ],
       "descripcion": "DevOps training: 5 full days on site, materials included. 30% upfront, rest after the last session.",
       "total": 6360,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     },
     {
       "id": "bud-dani-3",
-      "num": 3,
+      "num": "P1",
       "fecha": "2028-01-12",
       "clienteId": "c406-ll11-mm22",
       "lineas": [
@@ -6814,11 +6815,12 @@
       ],
       "descripcion": "Frontend consulting: 10 days spread over 6 months. Invoiced monthly for the days delivered.",
       "total": 8480,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     },
     {
       "id": "bud-dani-4",
-      "num": 4,
+      "num": "P2",
       "fecha": "2028-01-12",
       "clienteId": "c403-ee55-ff66",
       "lineas": [
@@ -6830,11 +6832,12 @@
       ],
       "descripcion": "Annual bootcamp contract: two bootcamps (spring and autumn), 8 weeks each. Invoiced per bootcamp through the supplier portal.",
       "total": 4590,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     },
     {
       "id": "bud-dani-5",
-      "num": 5,
+      "num": "P1",
       "fecha": "2029-01-12",
       "clienteId": "c403-ee55-ff66",
       "lineas": [
@@ -6846,11 +6849,12 @@
       ],
       "descripcion": "Annual bootcamp contract 2029, same terms as 2028.",
       "total": 4590,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     },
     {
       "id": "bud-dani-6",
-      "num": 6,
+      "num": "P2",
       "fecha": "2029-02-09",
       "clienteId": "c406-ll11-mm22",
       "lineas": [
@@ -6862,11 +6866,12 @@
       ],
       "descripcion": "Frontend coaching 2029: 12 half-day sessions. Invoiced monthly.",
       "total": 6360,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     },
     {
       "id": "bud-dani-7",
-      "num": 7,
+      "num": "P3",
       "fecha": "2029-12-26",
       "clienteId": "c408-qq55-rr66",
       "lineas": [
@@ -6878,11 +6883,12 @@
       ],
       "descripcion": "Digital transformation programme: discovery, 6 workshops and a 3-month follow-up. 30% upfront, rest on delivery. Approved by procurement.",
       "total": 12720,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     },
     {
       "id": "bud-dani-8",
-      "num": 8,
+      "num": "P1",
       "fecha": "2030-03-31",
       "clienteId": null,
       "lineas": [
@@ -6894,7 +6900,8 @@
       ],
       "descripcion": "ReactConf EU keynote: talk fee, travel and two hotel nights.",
       "total": 2000,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     }
   ]
 }

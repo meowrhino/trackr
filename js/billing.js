@@ -104,11 +104,13 @@ const B={
   },
 
   /* Cantidad pendiente de cobro */
-  /** Fecha de vencimiento: fecha de factura + días de pago. null si no hay factura. */
+  /** Fecha de vencimiento: fecha de factura + días de pago. null si no hay factura.
+   *  Los días guardados en la factura (f.diasPago) mandan sobre los de Configuración. */
   vencimiento(f, dias) {
     if (!f || !f.facturaFecha) return null;
+    const n = Number.isFinite(f.diasPago) ? f.diasPago : Number.isFinite(dias) ? dias : 30; /* 0 = al contado, no 30 */
     const d = new Date(f.facturaFecha + 'T00:00:00');
-    d.setDate(d.getDate() + (Number.isFinite(dias) ? dias : 30)); /* 0 = al contado, no 30 */
+    d.setDate(d.getDate() + n);
     return localDateStr(d); /* en local, no toISOString(): en Madrid eso resta un día */
   },
   /** Días desde el vencimiento (>0 vencida, ≤0 en plazo); null si no facturada o ya pagada. */

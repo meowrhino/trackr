@@ -91,7 +91,6 @@ const D = {
     });
     Object.keys(porNum).forEach(num => {
       const ps = porNum[num];
-      const f0 = ps[0].facturacion || {};
       const lineas = ps.map(p => {
         const f = p.facturacion || {};
         /* por_hora: la base sale de las horas (B.calc aún no ha pasado por aquí) */
@@ -101,8 +100,9 @@ const D = {
       const aceptado = ps.some(p => (p.facturacion || {}).facturaNum || p.estado === 'activo' || p.estado === 'completado');
       const rechazado = !aceptado && ps.some(p => p.estado === 'abandonado');
       d.presupuestos.push({
-        id: uid(), num: Number(num), fecha: ps[0].presupuesto.fecha, clienteId: ps[0].clienteId, lineas, descripcion: '',
-        total: roundMoney(lineas.reduce((s, l) => s + l.base, 0) * (1 + (f0.iva == null ? 21 : f0.iva) / 100 - (f0.irpf == null ? 15 : f0.irpf) / 100)),
+        id: uid(), num: /^\d+$/.test(num) ? Number(num) : num, fecha: ps[0].presupuesto.fecha, clienteId: ps[0].clienteId, lineas, descripcion: '',
+        /* Cada línea con el IVA y el IRPF de su proyecto (no los del primero) */
+        total: roundMoney(ps.reduce((s, p, i) => { const f = p.facturacion || {}; return s + lineas[i].base * (1 + (f.iva == null ? 21 : f.iva) / 100 - (f.irpf == null ? 15 : f.irpf) / 100); }, 0)),
         estado: aceptado ? 'aceptado' : rechazado ? 'rechazado' : 'enviado'
       });
     });
@@ -123,7 +123,6 @@ const D = {
     if (s.defaultIrpf == null) s.defaultIrpf = 15;
     if (!s.targets) s.targets = { horasMes: null, ingresosMes: null, horasSemana: null };
     if (s.nextFacturaNum == null) s.nextFacturaNum = 1;
-    if (s.nextPresupuestoNum == null) s.nextPresupuestoNum = 1;
     if (s.conceptoDefault == null) s.conceptoDefault = '';
     if (s.conceptoAppendCliente == null) s.conceptoAppendCliente = false;
     if (!s.tema) s.tema = 'oscuro';
@@ -598,6 +597,21 @@ const D = {
   /* ── Presupuestos (sin auditoría: no los ve la gestoría) ── */
   buds() { return this.d.presupuestos; },
   bud(id) { return this.d.presupuestos.find(b => b.id === id); },
+  /** Siguiente número de presupuesto (serie P, por año): 'P1', 'P2'… Los antiguos sin P
+   *  (usaban el contador de facturas) no cuentan. */
+  nextBudNum(fecha) {
+    const y = String(fecha || todayStr()).slice(0, 4);
+    let max = 0;
+    this.d.presupuestos.forEach(b => {
+      if (/^P\d+$/.test(b.num) && String(b.fecha || '').slice(0, 4) === y) max = Math.max(max, +String(b.num).slice(1));
+    });
+    return 'P' + (max + 1);
+  },
+  /** Otro presupuesto con el mismo número en el mismo año (se imprime N/AA) */
+  budNumTaken(num, fecha, id) {
+    const y = String(fecha || '').slice(0, 4);
+    return this.d.presupuestos.find(b => b.id !== id && String(b.num) === String(num) && String(b.fecha || '').slice(0, 4) === y);
+  },
   addBud(b) { this.d.presupuestos.push(b); this.save(); return b; },
   upBud(id, u) { const b = this.bud(id); if (b) { Object.assign(b, u); this.save(); } return b; },
 

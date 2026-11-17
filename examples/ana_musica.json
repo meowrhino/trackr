@@ -235,7 +235,7 @@
       "notas": "EP de 3 tracks: pop electrònic. Cobro parcial: 50% al començar, 50% al entregar master. Gran èxit!",
       "journeyStage": "jst-mescla",
       "presupuesto": {
-        "num": 1,
+        "num": "P1",
         "fecha": "2025-12-26"
       }
     },
@@ -419,7 +419,7 @@
       "notas": "Actuació festival estiu. IVA 10%. Pagament a 30 dies post-event.",
       "journeyStage": "jst-publicat",
       "presupuesto": {
-        "num": 2,
+        "num": "P1",
         "fecha": "2026-01-12"
       }
     },
@@ -1245,7 +1245,7 @@
       "notas": "Àlbum complet 10 tracks. Cantautor electrònic. Recomanat per Samantha Vega. Gran producció.",
       "journeyStage": "jst-publicat",
       "presupuesto": {
-        "num": 3,
+        "num": "P2",
         "fecha": "2026-05-12"
       }
     },
@@ -1621,7 +1621,7 @@
       "notas": "Segon any al Cruïlla. Escenari més gran, slot de 90 min. 2500€.",
       "journeyStage": "jst-entrega",
       "presupuesto": {
-        "num": 4,
+        "num": "P1",
         "fecha": "2027-02-09"
       }
     },
@@ -1866,7 +1866,7 @@
       "notas": "Primer àlbum per Llum Records. Artista: Noa Serra. Pop indie, 8 tracks.",
       "journeyStage": "jst-mescla",
       "presupuesto": {
-        "num": 5,
+        "num": "P2",
         "fecha": "2027-03-12"
       }
     },
@@ -1964,7 +1964,7 @@
       "notas": "Tercer Cruïlla. Doble funció: actuació + sound design escenari electrònic. 3000€.",
       "journeyStage": "jst-entrega",
       "presupuesto": {
-        "num": 7,
+        "num": "P2",
         "fecha": "2028-02-10"
       }
     },
@@ -2092,7 +2092,7 @@
       "notas": "Primer encàrrec Netflix — via contacte Llum Records. Soundtrack curt documental sobre música urbana BCN. 8000€!",
       "journeyStage": "jst-publicat",
       "presupuesto": {
-        "num": 8,
+        "num": "P3",
         "fecha": "2028-09-11"
       }
     },
@@ -2204,7 +2204,7 @@
       "notas": "Lot de singles per artistes Llum 2028. 3 singles + 1 remix.",
       "journeyStage": "jst-mescla",
       "presupuesto": {
-        "num": 6,
+        "num": "P1",
         "fecha": "2028-01-12"
       }
     },
@@ -2373,7 +2373,7 @@
       "notas": "Primera actuació al Primavera Sound. Escenari electrònic. 3000€. Gran fita!",
       "journeyStage": "jst-publicat",
       "presupuesto": {
-        "num": 9,
+        "num": "P1",
         "fecha": "2029-02-09"
       }
     },
@@ -2523,7 +2523,7 @@
       "notas": "Segon Netflix — sèrie documental 4 episodis sobre cultura mediterrània. 12.000€. Gran projecte!",
       "journeyStage": "jst-mescla",
       "presupuesto": {
-        "num": 11,
+        "num": "P3",
         "fecha": "2029-06-11"
       }
     },
@@ -2621,7 +2621,7 @@
       "notas": "Quart any al Cruïlla. Headliner escenari electrònic! 3500€.",
       "journeyStage": "jst-entrega",
       "presupuesto": {
-        "num": 10,
+        "num": "P2",
         "fecha": "2029-03-12"
       }
     },
@@ -2742,7 +2742,7 @@
       "notas": "Gran àlbum per l'artista estrella de Llum Records. 12 tracks. 6000€. La producció més gran fins ara.",
       "journeyStage": "jst-proposta",
       "presupuesto": {
-        "num": 12,
+        "num": "P4",
         "fecha": "2029-12-26"
       }
     },
@@ -2808,7 +2808,7 @@
       "notas": "Segon Primavera Sound. Escenari més gran. 4000€. Puja de caché!",
       "journeyStage": "jst-preprod",
       "presupuesto": {
-        "num": 13,
+        "num": "P1",
         "fecha": "2030-02-09"
       }
     },
@@ -2905,7 +2905,7 @@
       "notas": "Tercer Netflix — llargmetratge documental. 15.000€. Consolidació com a compositora audiovisual.",
       "journeyStage": "jst-gravacio",
       "presupuesto": {
-        "num": 14,
+        "num": "P2",
         "fecha": "2030-02-09"
       }
     }
@@ -4848,7 +4848,6 @@
     "nif": "43987654K",
     "direccion1": "Carrer de Verdi 78, 2n 1a",
     "direccion2": "08012 Barcelona",
-    "nextPresupuestoNum": 15,
     "diasVencimiento": 45
   },
   "journey": {
@@ -4894,7 +4893,7 @@
   "presupuestos": [
     {
       "id": "bud-ana-1",
-      "num": 1,
+      "num": "P1",
       "fecha": "2025-12-26",
       "clienteId": "c301-aa11-bb22",
       "lineas": [
@@ -4906,11 +4905,12 @@
       ],
       "descripcion": "Producció de l'EP (5 temes): preproducció, gravació a l'estudi, mescla i màster. 50 % a l'inici i 50 % a l'entrega del màster.",
       "total": 3710,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     },
     {
       "id": "bud-ana-2",
-      "num": 2,
+      "num": "P1",
       "fecha": "2026-01-12",
       "clienteId": "c304-gg77-hh88",
       "lineas": [
@@ -4922,11 +4922,12 @@
       ],
       "descripcion": "Concert al Festival Cruïlla: caixet, desplaçament i backline. Pagament a 30 dies de la factura.",
       "total": 1900,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     },
     {
       "id": "bud-ana-3",
-      "num": 3,
+      "num": "P2",
       "fecha": "2026-05-12",
       "clienteId": "c305-ii99-jj00",
       "lineas": [
@@ -4938,11 +4939,12 @@
       ],
       "descripcion": "Producció de l'àlbum (10 temes), 4 mesos. Tres pagaments: inici, final de gravació i entrega.",
       "total": 5300,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     },
     {
       "id": "bud-ana-4",
-      "num": 4,
+      "num": "P1",
       "fecha": "2027-02-09",
       "clienteId": "c304-gg77-hh88",
       "lineas": [
@@ -4954,11 +4956,12 @@
       ],
       "descripcion": "Concert al Festival Cruïlla 2027: caixet i desplaçament.",
       "total": 2375,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     },
     {
       "id": "bud-ana-5",
-      "num": 5,
+      "num": "P2",
       "fecha": "2027-03-12",
       "clienteId": "c306-kk11-ll22",
       "lineas": [
@@ -4970,11 +4973,12 @@
       ],
       "descripcion": "Producció per a Discogràfica Llum: àlbum de Noa Serra, 10 temes. Pagament a 45 dies.",
       "total": 4240,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     },
     {
       "id": "bud-ana-6",
-      "num": 6,
+      "num": "P1",
       "fecha": "2028-01-12",
       "clienteId": "c306-kk11-ll22",
       "lineas": [
@@ -4986,11 +4990,12 @@
       ],
       "descripcion": "Producció de tres singles per a Discogràfica Llum. Pagament a 45 dies.",
       "total": 3710,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     },
     {
       "id": "bud-ana-7",
-      "num": 7,
+      "num": "P2",
       "fecha": "2028-02-10",
       "clienteId": "c304-gg77-hh88",
       "lineas": [
@@ -5002,11 +5007,12 @@
       ],
       "descripcion": "Concert al Festival Cruïlla 2028: caixet i desplaçament.",
       "total": 2850,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     },
     {
       "id": "bud-ana-8",
-      "num": 8,
+      "num": "P3",
       "fecha": "2028-09-11",
       "clienteId": "c307-mm33-nn44",
       "lineas": [
@@ -5018,11 +5024,12 @@
       ],
       "descripcion": "Banda sonora del curt documental: composició, gravació i mescla. Cessió de drets inclosa. Pagament a 45 dies.",
       "total": 8480,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     },
     {
       "id": "bud-ana-9",
-      "num": 9,
+      "num": "P1",
       "fecha": "2029-02-09",
       "clienteId": "c308-oo55-pp66",
       "lineas": [
@@ -5034,11 +5041,12 @@
       ],
       "descripcion": "Concert al Primavera Sound 2029: caixet, desplaçament i backline.",
       "total": 2850,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     },
     {
       "id": "bud-ana-10",
-      "num": 10,
+      "num": "P2",
       "fecha": "2029-03-12",
       "clienteId": "c304-gg77-hh88",
       "lineas": [
@@ -5050,11 +5058,12 @@
       ],
       "descripcion": "Concert al Festival Cruïlla 2029: caixet i desplaçament.",
       "total": 3325,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     },
     {
       "id": "bud-ana-11",
-      "num": 11,
+      "num": "P3",
       "fecha": "2029-06-11",
       "clienteId": "c307-mm33-nn44",
       "lineas": [
@@ -5066,11 +5075,12 @@
       ],
       "descripcion": "Banda sonora de la sèrie documental (6 episodis). Cessió de drets inclosa. Pagament per episodi entregat.",
       "total": 12720,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     },
     {
       "id": "bud-ana-12",
-      "num": 12,
+      "num": "P4",
       "fecha": "2029-12-26",
       "clienteId": "c306-kk11-ll22",
       "lineas": [
@@ -5082,11 +5092,12 @@
       ],
       "descripcion": "Producció de l'àlbum estrella 2030 per a Discogràfica Llum. Tres pagaments.",
       "total": 6360,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     },
     {
       "id": "bud-ana-13",
-      "num": 13,
+      "num": "P1",
       "fecha": "2030-02-09",
       "clienteId": "c308-oo55-pp66",
       "lineas": [
@@ -5098,11 +5109,12 @@
       ],
       "descripcion": "Concert al Primavera Sound 2030: caixet, desplaçament i backline.",
       "total": 3800,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     },
     {
       "id": "bud-ana-14",
-      "num": 14,
+      "num": "P2",
       "fecha": "2030-02-09",
       "clienteId": "c307-mm33-nn44",
       "lineas": [
@@ -5114,7 +5126,8 @@
       ],
       "descripcion": "Banda sonora del llargmetratge: composició, gravació amb orquestra i mescla. Pagament en tres plegues.",
       "total": 15900,
-      "estado": "aceptado"
+      "estado": "aceptado",
+      "validez": 30
     }
   ]
 }

@@ -191,9 +191,9 @@ Object.assign(App, {
         ${f.modo !== 'gratis'
           ? `<span><span class="m">${fmtMoney(f.totalFactura || 0)}</span></span>`
           : `<span style="color:var(--t3)">${t('dash.free')}</span>`}
-        ${eph !== null && f.modo !== 'gratis'
-          ? `<span style="color:${B.ephColor(eph)}">${eph.toFixed(2)} &euro;/h</span>`
-          : ''}
+        ${f.modo === 'gratis' ? ''
+          : eph !== null ? `<span style="color:${B.ephColor(eph)}">${eph.toFixed(2)} &euro;/h</span>`
+          : `<span style="color:var(--t3)" title="${t('billing.noHoursYet')}">??? &euro;/h</span>`}
       </div>
       ${!f.pagado && f.facturaFecha && f.modo !== 'gratis'
         ? `<div class="pc-qp"><button class="bt bt-add pc-qp-btn" onclick="event.stopPropagation();App.quickPay('${p.id}')">${t('dash.markPaid')}</button></div>`

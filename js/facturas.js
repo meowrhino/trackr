@@ -86,11 +86,9 @@ const Fac = {
     doc.text(fmtDate(data.factura.fecha), rightX, y);
     y += 5;
 
-    /* Row 3: Emisor direccion2 | Vencimiento (solo factura) */
-    const venc = !isBud && data.factura.vencimiento;
-    if (data.emisor.direccion2) doc.text(data.emisor.direccion2, leftX, y);
-    if (venc) doc.text(tf('fac.dueLabel', lang) + fmtDate(venc), rightX, y);
-    if (data.emisor.direccion2 || venc) y += 5;
+    /* Row 3: Emisor direccion2 (el plazo de pago y la validez van abajo, con la forma de pago) */
+    const venc = isBud ? data.factura.validoHasta : data.factura.vencimiento;
+    if (data.emisor.direccion2) { doc.text(data.emisor.direccion2, leftX, y); y += 5; }
 
     /* Row 4: Emisor NIF */
     if (data.emisor.nif) {
@@ -233,8 +231,18 @@ const Fac = {
       totalsY += lineH;
     });
 
+    /* ── Presupuesto: sin cuenta para pagar (eso va en la factura) y dicho claro ── */
+    if (isBud) {
+      totalsY += 4;
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(60);
+      const budLines = (venc ? [tf('fac.validUntil', lang) + fmtDate(venc)] : []).concat(tf('fac.budNotInvoice', lang));
+      doc.text(doc.splitTextToSize(budLines.join('\n'), PDF_TOTALS_W), labelX, totalsY);
+    }
+
     /* ── Payment / bank account ── */
-    if (data.instruccionesPago || data.beneficiarioPago) {
+    if (!isBud && (data.instruccionesPago || data.beneficiarioPago || venc)) {
       totalsY += 4;
       doc.setFontSize(9);
       doc.setFont('helvetica', 'bold');
@@ -244,6 +252,7 @@ const Fac = {
       doc.setFontSize(8);
       doc.setFont('helvetica', 'normal');
       let payLines = [];
+      if (venc) payLines.push(tf('fac.dueLabel', lang) + fmtDate(venc));
       if (data.beneficiarioPago) payLines.push(tf('fac.beneficiary', lang) + ' ' + data.beneficiarioPago);
       if (data.instruccionesPago) payLines.push(tf('fac.bankTransferText', lang), data.instruccionesPago);
       const lines = doc.splitTextToSize(payLines.join('\n'), PDF_TOTALS_W);
@@ -310,21 +319,19 @@ const Fac = {
    * @param {Object} opts  { num, fecha, descripcion }
    */
   presupuesto(cid, lineas, opts) {
-    const s = D.d.settings;
     const { data, lang, cl } = this._budData(cid, lineas, opts);
     this._budSave(this.genPDF(data, lang), opts, cl);
 
     lineas.forEach(l => D.up(l.pid, { presupuesto: { num: opts.num, fecha: opts.fecha } }));
-    if (opts.num >= (s.nextPresupuestoNum || 1)) { s.nextPresupuestoNum = opts.num + 1; D.save(); }
     /* Registro propio: para listarlo, marcarlo aceptado/rechazado y volver a bajar el PDF */
-    D.addBud({ id: uid(), num: opts.num, fecha: opts.fecha, clienteId: cid, lineas, descripcion: opts.descripcion || '', total: data.calculos.total, estado: 'enviado' });
+    D.addBud({ id: uid(), num: opts.num, fecha: opts.fecha, clienteId: cid, lineas, descripcion: opts.descripcion || '', validez: opts.validez, total: data.calculos.total, estado: 'enviado' });
     return { total: data.calculos.total };
   },
 
   /** Vuelve a bajar el PDF de un presupuesto guardado (mismo número y fecha; no toca contador ni proyectos) */
   presupuestoPdf(id) {
     const b = D.bud(id); if (!b) return;
-    const opts = { num: b.num, fecha: b.fecha, descripcion: b.descripcion };
+    const opts = { num: b.num, fecha: b.fecha, descripcion: b.descripcion, validez: b.validez };
     const { data, lang, cl } = this._budData(b.clienteId, b.lineas, opts);
     this._budSave(this.genPDF(data, lang), opts, cl);
   },
@@ -356,7 +363,9 @@ const Fac = {
       kind: 'presupuesto',
       emisor: s.emisor,
       cliente: this.clienteData(cl, ''),
-      factura: { numero: String(opts.num), fecha: opts.fecha, asunto: opts.descripcion || '' },
+      /* Validez: los guardados antes de existir el campo no la imprimen */
+      factura: { numero: String(opts.num), fecha: opts.fecha, asunto: opts.descripcion || '',
+        validoHasta: Number.isFinite(opts.validez) ? B.vencimiento({ facturaFecha: opts.fecha }, opts.validez) : null },
       lineas,
       calculos: { base: roundMoney(base), ivas, irpfs, total },
       beneficiarioPago: s.emisor.beneficiarioPago || '',
@@ -404,6 +413,11 @@ const Fac = {
     const fecha = opts.fecha || todayStr();
     const ys = yearShort(fecha);
 
+    /* Días para pagar: se fijan al emitir y se guardan en la factura (volver a bajarla no los cambia).
+       Las emitidas antes de existir el campo se quedan con los de Configuración. */
+    const pick = (...v) => v.find(Number.isFinite);
+    const diasPago = f.facturaNum ? pick(f.diasPago, s.diasVencimiento, 30) : pick(opts.diasPago, f.diasPago, s.diasVencimiento, 30);
+
     /* Construir datos */
     const data = {
       emisor: s.emisor,
@@ -411,7 +425,7 @@ const Fac = {
       factura: {
         numero: numStr,
         fecha: fecha,
-        vencimiento: B.vencimiento({ facturaFecha: fecha }, s.diasVencimiento),
+        vencimiento: B.vencimiento({ facturaFecha: fecha }, diasPago),
         asunto: opts.asunto || defaultAsunto(p)
       },
       calculos: {
@@ -437,6 +451,7 @@ const Fac = {
     /* Actualizar proyecto: marcar facturado */
     f.facturaNum = num;
     f.facturaFecha = data.factura.fecha;
+    f.diasPago = diasPago;
     D.up(pid, { facturacion: f });
 
     /* Contador del año de esta factura (en enero vuelve a 1: ver D.nextFacturaNum) */

@@ -5,6 +5,23 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-11-17 — Presupuestos (serie P, validez, sin cuenta) y días para pagar por factura
+
+### ✨ Nuevo
+- **Serie P por año** (P1/26, P2/26…; vuelve a P1 cada enero, como las rectificativas R). Antes un presupuesto podía salir «11/26» igual que una factura. Los antiguos con número suelto se quedan como están. Número repetido en el mismo año: aviso y no se crea. _frontend_
+- **Validez** al crear y editar (30 días por defecto): el PDF dice «Válido hasta». _frontend_
+- **El PDF del presupuesto no lleva la cuenta bancaria** y dice «Este documento es un presupuesto, no una factura». _frontend_
+- **Editar un presupuesto**: se pueden añadir y quitar proyectos del cliente. _frontend_
+- **Días para pagar en cada factura**: campo nuevo al generarla, con los de Configuración por defecto. Se guardan en la factura (`facturacion.diasPago`): el aviso de vencida, la lista y el recordatorio usan los suyos, y volver a bajarla no los cambia. _frontend_
+- **PDF: el plazo va abajo, con la forma de pago** («Pagar antes del 17/12/2026» en vez de «Vencimiento» junto a los datos de la factura); en el presupuesto, «Válido hasta» también va abajo. _frontend_
+- **Ejemplos** con la serie P y validez de 30 días. _frontend_
+- **Tarjeta de proyecto sin horas**: «??? €/h» en vez de nada. _frontend_
+
+### 🐛 Arreglado
+- **Total de la lista** en presupuestos pasados de las marcas antiguas: cada línea con el IVA y el IRPF de su proyecto, no los del primero (mary garlic marcaba 1548,80 € en vez de 1515,20 €). _frontend_
+
+---
+
 ## 2026-11-10 (cierre) — Últimos arreglos de la auditoría
 
 ### 🐛 Arreglado

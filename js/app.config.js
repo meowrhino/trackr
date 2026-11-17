@@ -456,7 +456,8 @@ Object.assign(App, {
 
   /* ── Presupuestos guardados (debajo de las facturas) ── */
   rBud() {
-    const bs = [...D.buds()].sort((a, b) => (b.fecha || '').localeCompare(a.fecha || '') || b.num - a.num);
+    const n = x => parseInt(String(x).replace(/\D/g, ''), 10) || 0; /* 'P3' y los antiguos 11 */
+    const bs = [...D.buds()].sort((a, b) => (b.fecha || '').localeCompare(a.fecha || '') || n(b.num) - n(a.num));
     document.getElementById('budC').innerHTML = bs.length
       ? `<div class="cl-list">${bs.map(b => {
           const cl = D.cl(b.clienteId);
