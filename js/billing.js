@@ -104,6 +104,15 @@ const B={
   },
 
   /* Cantidad pendiente de cobro */
+  /** Fechas de la tarjeta de proyecto: { ini, fin } en YYYY-MM-DD o null. Lo que falte se saca
+   *  de las horas apuntadas y de la factura. fin solo en completados y abandonados. */
+  fechasProyecto(p) {
+    const hs = (p.horas || []).map(h => h.fecha).filter(Boolean).sort();
+    const fe = p.fechas || {};
+    const ini = fe.inicio || hs[0] || null;
+    if (p.estado !== 'completado' && p.estado !== 'abandonado') return { ini, fin: null };
+    return { ini, fin: fe.finReal || (p.facturacion || {}).facturaFecha || hs[hs.length - 1] || null };
+  },
   /** Fecha de vencimiento: fecha de factura + días de pago. null si no hay factura.
    *  Los días guardados en la factura (f.diasPago) mandan sobre los de Configuración. */
   vencimiento(f, dias) {

@@ -194,11 +194,23 @@ Object.assign(App, {
         ${f.modo === 'gratis' ? ''
           : eph !== null ? `<span style="color:${B.ephColor(eph)}">${eph.toFixed(2)} &euro;/h</span>`
           : `<span style="color:var(--t3)" title="${t('billing.noHoursYet')}">??? &euro;/h</span>`}
+        ${this.cardDates(p)}
       </div>
       ${!f.pagado && f.facturaFecha && f.modo !== 'gratis'
         ? `<div class="pc-qp"><button class="bt bt-add pc-qp-btn" onclick="event.stopPropagation();App.quickPay('${p.id}')">${t('dash.markPaid')}</button></div>`
         : ''}
     </div>`;
+  },
+
+  /** «sep 26 → oct 26» en cerrados, «desde sep 26» en el resto; nada en potenciales. */
+  cardDates(p) {
+    if (p.estado === 'potencial') return '';
+    const { ini, fin } = B.fechasProyecto(p);
+    const m = d => d ? `${MESES[+d.slice(5, 7) - 1].slice(0, 3).toLowerCase()} ${d.slice(2, 4)}` : t('dash.noDate');
+    const a = m(ini), z = m(fin);
+    const txt = p.estado === 'completado' || p.estado === 'abandonado' ? (a === z ? a : `${a} → ${z}`) /* mismo mes: una vez */
+      : ini ? t('dash.since', a) : '';
+    return txt ? `<span class="pc-dt">${txt}</span>` : '';
   },
 
   sf(f) { this.pf = f; this.rDash(); },

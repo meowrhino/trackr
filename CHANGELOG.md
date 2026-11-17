@@ -16,6 +16,7 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 - **PDF: el plazo va abajo, con la forma de pago** («Pagar antes del 17/12/2026» en vez de «Vencimiento» junto a los datos de la factura); en el presupuesto, «Válido hasta» también va abajo. _frontend_
 - **Ejemplos** con la serie P y validez de 30 días. _frontend_
 - **Tarjeta de proyecto sin horas**: «??? €/h» en vez de nada. _frontend_
+- **Fechas en la tarjeta de proyecto**, abajo a la derecha y pequeñas: «sep 26 → oct 26» en completados y abandonados, «desde sep 26» en activos y recurrentes, nada en potenciales. Si falta el inicio, la primera hora apuntada; si falta el cierre, la fecha de la factura o la última hora. _frontend_
 - **Título dentro del PDF** (factura, rectificativa y presupuesto): «Factura 14/26 · cliente», con autor y asunto. La pestaña del navegador y Vista Previa lo enseñan en vez del nombre del archivo. _frontend_
 
 ### 🐛 Arreglado

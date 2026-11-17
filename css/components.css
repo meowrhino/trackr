@@ -47,8 +47,9 @@
 .pc-h{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.5rem}
 .pc-n{font-weight:500;font-size:.95rem}
 .pc-c{font-size:.78rem;color:var(--t3);margin-top:.1rem}
-.pc-s{display:flex;gap:1.25rem;margin-top:.5rem;font-size:.78rem;color:var(--t3)}
+.pc-s{display:flex;flex-wrap:wrap;gap:.35rem 1.25rem;margin-top:.5rem;font-size:.78rem;color:var(--t3)}
 .pc-s span{display:flex;align-items:center;gap:.25rem}
+.pc-s .pc-dt{margin-left:auto;font-size:.7rem;white-space:nowrap}
 
 /* ── Badges de estado ── */
 .bd{font-family:'DM Mono',monospace;font-size:.68rem;padding:.15rem .5rem;border:1px solid var(--b1);border-radius:var(--r);text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;color:var(--t3)}

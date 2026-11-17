@@ -327,6 +327,7 @@ const LANGS = {
     'dash.flagInvoiced': 'facturado',
     'dash.flagPartial': 'parcial',
     'dash.free': 'gratis',
+    'dash.since': 'desde {0}', 'dash.noDate': 's/f',
     'dash.markPaid': 'Marcar pagado',
 
     /* ── Detalle ── */
@@ -1366,6 +1367,7 @@ const LANGS = {
     'dash.flagInvoiced': 'invoiced',
     'dash.flagPartial': 'partial',
     'dash.free': 'free',
+    'dash.since': 'since {0}', 'dash.noDate': 'n/d',
     'dash.markPaid': 'Mark paid',
 
     /* ── Detalle ── */
@@ -2397,6 +2399,7 @@ const LANGS = {
     'dash.flagInvoiced': 'facturat',
     'dash.flagPartial': 'parcial',
     'dash.free': 'gratuït',
+    'dash.since': 'des de {0}', 'dash.noDate': 's/d',
     'dash.markPaid': 'Marcar pagat',
 
     /* ── Detall ── */
