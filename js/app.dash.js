@@ -204,13 +204,17 @@ Object.assign(App, {
 
   /** «sep 26 → oct 26» en cerrados, «desde sep 26» en el resto; nada en potenciales. */
   cardDates(p) {
+    const txt = this.cardDatesText(p);
+    return txt ? `<span class="pc-dt">${txt}</span>` : '';
+  },
+  /** El texto solo; también lo usa el Tablero (app.journey.js). */
+  cardDatesText(p) {
     if (p.estado === 'potencial') return '';
     const { ini, fin } = B.fechasProyecto(p);
     const m = d => d ? `${MESES[+d.slice(5, 7) - 1].slice(0, 3).toLowerCase()} ${d.slice(2, 4)}` : t('dash.noDate');
     const a = m(ini), z = m(fin);
-    const txt = p.estado === 'completado' || p.estado === 'abandonado' ? (a === z ? a : `${a} → ${z}`) /* mismo mes: una vez */
+    return p.estado === 'completado' || p.estado === 'abandonado' ? (a === z ? a : `${a} → ${z}`) /* mismo mes: una vez */
       : ini ? t('dash.since', a) : '';
-    return txt ? `<span class="pc-dt">${txt}</span>` : '';
   },
 
   sf(f) { this.pf = f; this.rDash(); },

@@ -102,6 +102,8 @@ Object.assign(App, {
     const parts = [th.toFixed(1) + ' h'];
     if (f.modo && f.modo !== 'gratis' && f.totalFactura > 0) parts.push(fmtMoney(f.totalFactura));
     if (p.presupuesto) parts.push(t('bud.btn') + ' ' + p.presupuesto.num + '/' + yearShort(p.presupuesto.fecha));
+    const fechas = this.cardDatesText(p);
+    if (fechas) parts.push(fechas.replace(/ /g, ' ')); /* que no se parta en columnas estrechas */
     return parts.join('  ·  ');
   },
 
