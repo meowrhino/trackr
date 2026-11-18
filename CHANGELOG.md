@@ -5,6 +5,15 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-11-18 — «Desde total»: primero se quita el IVA, luego el IRPF
+
+### 🐛 Arreglado
+- **«Desde total» calculaba la base mal** (lo vio la gestoría). Dividía el total entre (1 + IVA − IRPF), tomándolo como lo que llega al banco; ahora el total es el **precio con IVA**: base = total ÷ (1 + IVA), y el IRPF sale de esa base. 1.210 € con 21 % y 15 % → base 1.000, IVA 210, IRPF 150, cobras 1.060 (antes: base 1.141,51). El campo pasa a llamarse «Total con IVA (€)», y la ayuda y la guía lo explican así (es/en/ca). _frontend_
+- **Las facturas ya emitidas no cambian**: se quedan con la base de entonces, que es la que se envió y se declaró. Las nuevas llevan `facturacion.totalConIva`; una sin emitir la recibe al recalcularse. Test en `test/desde-total.mjs`. _frontend_
+- **Ejemplos**: la factura de CaixaBank de Dani usa el cálculo nuevo; las otras dos se quedan como emitidas antes del arreglo. _frontend_
+
+---
+
 ## 2026-11-17 — Presupuestos (serie P, validez, sin cuenta) y días para pagar por factura
 
 ### ✨ Nuevo

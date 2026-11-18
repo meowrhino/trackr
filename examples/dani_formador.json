@@ -838,6 +838,7 @@
       },
       "facturacion": {
         "modo": "desde_total",
+        "totalConIva": true,
         "baseImponible": 0,
         "total": 5000,
         "precioHora": 0,

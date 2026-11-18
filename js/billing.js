@@ -28,8 +28,7 @@ const B={
     if(f.modo==='por_hora'){
       if(!(f.facturaNum&&f.facturaFecha)) f.baseImponible=roundMoney(this.totalHoras(p)*(f.precioHora||0));
     } else if(f.modo==='desde_total'){
-      const t=f.total||0, fac=1+iv/100-ir/100;
-      f.baseImponible=fac?roundMoney(t/fac):0;
+      f.baseImponible=this.baseDesdeTotal(f.total||0,iv,ir,this.conIva(f));
     }
 
     const tax=this.calcTax(f.baseImponible||0,iv,ir);
@@ -37,10 +36,15 @@ const B={
     f.importeIrpf=tax.importeIrpf;
     f.netoRecibido=tax.netoRecibido;
     if(f.modo==='desde_total'){
-      f.totalFactura=f.total||0;
-      /* La base sale redondeada de dividir el total: la cuota absorbe el céntimo
-         para que base + IVA − IRPF sea exactamente el total impreso (303 y libros). */
-      if(iv>0) f.importeIva=roundMoney(f.totalFactura-f.baseImponible+f.importeIrpf);
+      /* La base sale redondeada de dividir el total: la cuota absorbe el céntimo para que
+         el total tecleado cuadre exacto (base + IVA, o lo cobrado en las facturas viejas). */
+      if(f.totalConIva){
+        if(iv>0) f.importeIva=roundMoney((f.total||0)-f.baseImponible);
+        f.totalFactura=roundMoney(f.baseImponible+f.importeIva-f.importeIrpf);
+      } else {
+        f.totalFactura=f.total||0;
+        if(iv>0) f.importeIva=roundMoney(f.totalFactura-f.baseImponible+f.importeIrpf);
+      }
     } else {
       f.totalFactura=tax.totalFactura;
       f.total=f.totalFactura;
@@ -64,6 +68,21 @@ const B={
     }
 
     return f;
+  },
+
+  /** «Desde total»: el total es el precio con IVA → base = total ÷ (1 + IVA), y el IRPF
+   *  sale luego de esa base. Las facturas viejas (conIva false) dividían entre (1 + IVA − IRPF). */
+  baseDesdeTotal(t,iv,ir,conIva){
+    const fac=1+iv/100-(conIva?0:ir/100);
+    return fac?roundMoney(t/fac):0;
+  },
+
+  /** ¿El total de este «desde total» lleva IVA? Sí, salvo en las facturas emitidas antes del
+   *  arreglo (2026-11-18), que lo tomaban como lo cobrado: ya están enviadas y declaradas.
+   *  Una sin emitir queda marcada aquí, así que al emitirla ya no cambia. */
+  conIva(f){
+    if(!f.totalConIva&&!(f.facturaNum&&f.facturaFecha)) f.totalConIva=true;
+    return !!f.totalConIva;
   },
 
   /** Rectificativa por diferencias: de la base correcta a los importes (±) que corrigen

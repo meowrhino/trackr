@@ -233,7 +233,7 @@ Object.assign(App, {
     const ivR = parseFloat(document.getElementById('mpIva')?.value) || 0;
     const irR = parseFloat(document.getElementById('mpIrpf')?.value) || 0;
 
-    let base, importeIva, importeIrpf, totalF, neto;
+    let base, importeIva, importeIrpf, totalF, neto, conIva;
 
     const p = this._editPid ? D.p(this._editPid) : null;
 
@@ -245,16 +245,20 @@ Object.assign(App, {
       base = parseFloat(document.getElementById('mpBa')?.value) || 0;
     } else {
       const t2 = parseFloat(document.getElementById('mpTo')?.value) || 0;
-      const fac = 1 + ivR / 100 - irR / 100;
-      base = fac ? roundMoney(t2 / fac) : 0;
-      totalF = t2;
+      conIva = !p || B.conIva({ ...p.facturacion });
+      base = B.baseDesdeTotal(t2, ivR, irR, conIva);
     }
 
     const tax = B.calcTax(base, ivR, irR);
     importeIva = tax.importeIva;
     importeIrpf = tax.importeIrpf;
-    if (m !== 'desde_total') totalF = tax.totalFactura;
+    totalF = tax.totalFactura;
     neto = tax.netoRecibido;
+    if (m === 'desde_total') { /* mismo ajuste de céntimo que B.calc */
+      const t2 = parseFloat(document.getElementById('mpTo')?.value) || 0;
+      if (ivR > 0) importeIva = roundMoney(conIva ? t2 - base : t2 - base + importeIrpf);
+      totalF = conIva ? roundMoney(base + importeIva - importeIrpf) : t2;
+    }
 
     let phInfo = '';
     if (m === 'por_hora') {
@@ -309,6 +313,7 @@ Object.assign(App, {
         anulada: prev?.facturacion?.anulada || null,
         pagado: false, fechaPago: null,
         gastos: 0,
+        totalConIva: prev?.facturacion?.totalConIva,
         facturaNum: prev?.facturacion?.facturaNum || null,
         facturaFecha: prev?.facturacion?.facturaFecha || null,
         idiomaFactura: facLangVal || null
