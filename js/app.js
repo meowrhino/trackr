@@ -41,7 +41,7 @@ const App = {
 
     /* Cerrar modal con Escape / Enter para submit */
     document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') this.cm();
+      if (e.key === 'Escape') this.cmSoft();
       if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && document.getElementById('mO').classList.contains('on')) {
         e.preventDefault();
         document.getElementById('mC').querySelector('.bt-p')?.click();
@@ -53,8 +53,15 @@ const App = {
     let mdTarget = null;
     mo.addEventListener('mousedown', e => { mdTarget = e.target; });
     mo.addEventListener('mouseup', e => {
-      if (e.target === mo && mdTarget === mo) this.cm();
+      if (e.target === mo && mdTarget === mo) this.cmSoft();
       mdTarget = null;
+    });
+    /* Algo tecleado en el modal: cerrarlo sin querer (fuera, Escape, cerrar pestaña) lo perdería */
+    const mc = document.getElementById('mC');
+    mc.addEventListener('input', () => { this._mDirty = true; });
+    mc.addEventListener('change', () => { this._mDirty = true; });
+    window.addEventListener('beforeunload', e => {
+      if (this._mDirty && mo.classList.contains('on')) { e.preventDefault(); e.returnValue = ''; return ''; }
     });
 
     /* A11y: la barra lateral (divs con onclick) navegable por teclado. */
@@ -251,7 +258,7 @@ const App = {
    *  MODALES COMPARTIDOS
    * ══════════════════════════════════════════════ */
 
-  om(h) { const mc = document.getElementById('mC'); mc.innerHTML = h; this._linkLabels(mc); document.getElementById('mO').classList.add('on'); },
+  om(h) { this._mDirty = false; const mc = document.getElementById('mC'); mc.innerHTML = h; this._linkLabels(mc); document.getElementById('mO').classList.add('on'); },
 
   /** A11y: asocia cada <label> de un .fg con su control (for/id) si no lo está, para lectores de pantalla. */
   _fldSeq: 0,
@@ -266,6 +273,12 @@ const App = {
       }
     });
   },
+  /** Cierre "sin querer" (click fuera, Escape): si hay algo tecleado, pregunta antes de tirarlo. */
+  cmSoft() {
+    if (!document.getElementById('mO').classList.contains('on')) return;
+    if (this._mDirty && !this._accChoose && !confirm(t('msg.discardModal'))) return;
+    this.cm();
+  },
   cm() {
     /* Conflicto local/nube pendiente (app.account-ui.js): no se cierra sin elegir */
     if (this._accChoose) return;
@@ -274,6 +287,7 @@ const App = {
       const r = this._facReturn;
       this._facReturn = null;
       this.facModal(r.pid);
+      this._mDirty = r.dirty;
       return;
     }
     /* Si venimos del flujo pModal→clModal, volver a pModal preservando estado */
@@ -281,13 +295,15 @@ const App = {
       const r = this._projReturn;
       this._projReturn = null;
       this.pModal(r.eid || undefined);
+      this._mDirty = r.dirty;
       return;
     }
     document.getElementById('mO').classList.remove('on');
+    this._mDirty = false;
     this._editPid = null;
     this._accInModal = false;
   },
-  selT(el) { el.parentElement.querySelectorAll('.to').forEach(o => o.classList.remove('on')); el.classList.add('on'); },
+  selT(el) { this._mDirty = true; el.parentElement.querySelectorAll('.to').forEach(o => o.classList.remove('on')); el.classList.add('on'); },
 
 
 

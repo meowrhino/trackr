@@ -5,6 +5,13 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-11-19 — Avisa antes de cerrar una ventana con cosas escritas
+
+### ✨ Nuevo
+- **Clicar fuera de una ventana o pulsar Escape ya no tira lo escrito sin preguntar.** Si has tecleado o elegido algo (nuevo proyecto, horas, gasto, cliente…), pregunta «¿Cerrarla y perderlas?». Vacía, se cierra como siempre; Cancelar y Guardar no preguntan. Cerrar la pestaña con una ventana a medias también avisa. Al volver de editar el cliente desde el proyecto, el aviso sigue (es/en/ca). _frontend_
+
+---
+
 ## 2026-11-18 — «Desde total»: primero se quita el IVA, luego el IRPF
 
 ### 🐛 Arreglado

@@ -78,7 +78,7 @@ Object.assign(App, {
       asunto: document.getElementById('facAsunto')?.value,
       dias: document.getElementById('facDias')?.value
     };
-    this._facReturn = { pid };
+    this._facReturn = { pid, dirty: this._mDirty };
     this.clModal(p.clienteId || null);
   },
 

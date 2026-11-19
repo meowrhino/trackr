@@ -17,7 +17,7 @@ Object.assign(App, {
   },
   _csHover(el) { document.getElementById('mpColorDot').style.background = el.dataset.hex; document.getElementById('mpColorLbl').textContent = el.dataset.name; },
   _csReset() { const sel = document.getElementById('mpColor'); if (!sel) return; document.getElementById('mpColorDot').style.background = colorHex(sel.value); document.getElementById('mpColorLbl').textContent = sel.value; },
-  _csPick(el) { document.querySelectorAll('.cs-sw.on').forEach(s => s.classList.remove('on')); el.classList.add('on'); document.getElementById('mpColor').value = el.dataset.name; document.getElementById('mpColorDot').style.background = el.dataset.hex; document.getElementById('mpColorLbl').textContent = el.dataset.name; },
+  _csPick(el) { this._mDirty = true; document.querySelectorAll('.cs-sw.on').forEach(s => s.classList.remove('on')); el.classList.add('on'); document.getElementById('mpColor').value = el.dataset.name; document.getElementById('mpColorDot').style.background = el.dataset.hex; document.getElementById('mpColorLbl').textContent = el.dataset.name; },
 
   /** Cuando cambia el cliente en el modal de proyecto, aplica su color por defecto */
   _onClientChange(val) {
@@ -38,7 +38,7 @@ Object.assign(App, {
     const cid = document.getElementById('mpCl')?.value;
     if (!cid || cid === '_new') return;
     this._projRestore = { eid: this._editPid || null, state: this._capturePModalState() };
-    this._projReturn = { eid: this._editPid || null };
+    this._projReturn = { eid: this._editPid || null, dirty: this._mDirty };
     this.clModal(cid);
   },
 
