@@ -120,12 +120,18 @@ const B={
   /** Subproyectos en uso: solo cuentan en «desde base» (en otro modo se guardan, pero no pintan nada). */
   subs(p){ return p&&p.facturacion?.modo==='desde_base'&&Array.isArray(p.subproyectos)?p.subproyectos:[]; },
 
+  /** Texto de la línea de presupuesto de un subproyecto: «nombre: qué incluye», en una sola línea. */
+  subConcepto(x){
+    const d=(x.descripcion||'').split(/\n+/).map(s=>s.trim()).filter(Boolean).join('; '); /* «;» y no «,»: cada cosa puede llevar sus comas */
+    return d?`${x.nombre||''}: ${d}`:(x.nombre||'');
+  },
+
   /** Horas y €/h (neto ÷ horas) de cada subproyecto. La última fila, sin id, son las horas
    *  sin subproyecto o de uno ya borrado; solo sale si las hay. */
   subStats(p){
     const subs=this.subs(p), ir=p.facturacion.irpf||0;
     const de=id=>p.horas.filter(h=>h.subId===id).reduce((s,h)=>s+(h.cantidad||0),0);
-    const rows=subs.map(x=>{ const horas=de(x.id); return { id:x.id, nombre:x.nombre, base:x.base||0, horas, eph:horas?roundMoney((x.base||0)*(1-ir/100)/horas):null }; });
+    const rows=subs.map(x=>{ const horas=de(x.id); return { id:x.id, nombre:x.nombre, descripcion:x.descripcion||'', base:x.base||0, horas, eph:horas?roundMoney((x.base||0)*(1-ir/100)/horas):null }; });
     const sin=p.horas.filter(h=>!subs.some(x=>x.id===h.subId)).reduce((s,h)=>s+(h.cantidad||0),0);
     if(sin) rows.push({ id:null, nombre:'', base:0, horas:sin, eph:null });
     return rows;

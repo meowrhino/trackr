@@ -294,7 +294,7 @@ Object.assign(App, {
          proyecto sin subproyecto (un desglose hecho a mano), no se ofrecen: saldrían repetidas. */
       if (subs.length) {
         if (!mias.some(l => !l.subId)) subs.filter(x => !mias.some(l => l.subId === x.id))
-          .forEach(x => rows.push({ pid: p.id, sub: x.id, on: pre(p), concepto: x.nombre, base: x.base || '' }));
+          .forEach(x => rows.push({ pid: p.id, sub: x.id, on: pre(p), concepto: B.subConcepto(x), base: x.base || '' }));
       } else if (!mias.length) rows.push({
         pid: p.id, on: pre(p), concepto: p.nombre,
         base: p.facturacion?.modo === 'gratis' ? '' : (p.facturacion?.baseImponible || '')

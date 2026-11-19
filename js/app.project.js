@@ -217,10 +217,11 @@ Object.assign(App, {
 
   /* ── Subproyectos: filas nombre + importe; con filas, la base es su suma (cPrev) ── */
   _subRow(x) {
-    return `<div class="cl-item sub-row" data-id="${x.id}" style="gap:.5rem;cursor:default">`
+    return `<div class="cl-item sub-row" data-id="${x.id}" style="gap:.5rem;cursor:default;flex-wrap:wrap">`
       + `<input type="text" class="sub-n" value="${esc(x.nombre || '')}" placeholder="${t('field.name')}" style="flex:1">`
       + `<input type="number" class="sub-b" step="0.01" value="${x.base || ''}" placeholder="0.00" oninput="App.cPrev()" style="width:7rem;font-family:'DM Mono',monospace">`
-      + `<button type="button" class="hr-x" style="background:none;border:0" onclick="App._subDel(this)" title="${t('btn.delete')}">&times;</button></div>`;
+      + `<button type="button" class="hr-x" style="background:none;border:0" onclick="App._subDel(this)" title="${t('btn.delete')}">&times;</button>`
+      + `<textarea class="sub-d" rows="3" placeholder="${t('sub.descPh')}" style="flex-basis:100%;min-height:0;font-size:.8rem">${esc(x.descripcion || '')}</textarea></div>`;
   },
   _subAdd() {
     this._mDirty = true;
@@ -229,12 +230,13 @@ Object.assign(App, {
     this.cPrev();
   },
   _subDel(btn) { this._mDirty = true; btn.parentNode.remove(); this.cPrev(); },
-  /** Filas del modal → [{ id, nombre, base }]; las vacías del todo no cuentan */
+  /** Filas del modal → [{ id, nombre, base, descripcion? }]; las vacías del todo no cuentan */
   _subRead() {
-    return [...document.querySelectorAll('#mpSubs .sub-row')].map(el => ({
-      id: el.dataset.id, nombre: el.querySelector('.sub-n').value.trim(),
-      base: roundMoney(parseFloat(el.querySelector('.sub-b').value) || 0)
-    })).filter(x => x.nombre || x.base);
+    return [...document.querySelectorAll('#mpSubs .sub-row')].map(el => {
+      const descripcion = el.querySelector('.sub-d').value.trim();
+      return { id: el.dataset.id, nombre: el.querySelector('.sub-n').value.trim(),
+        base: roundMoney(parseFloat(el.querySelector('.sub-b').value) || 0), ...(descripcion && { descripcion }) };
+    }).filter(x => x.nombre || x.base || x.descripcion);
   },
 
   sBM(m) {

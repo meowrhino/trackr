@@ -11,6 +11,7 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 - **Subproyectos** en un proyecto «Desde base»: al editarlo, filas nombre + importe («+ subproyecto»). Si hay alguna, la base del proyecto es la suma y ya no se teclea; con la factura emitida no cambia. Se guardan en `p.subproyectos: [{ id, nombre, base }]`; un proyecto sin ellos sigue igual. _frontend_
 - **Presupuesto con una línea por subproyecto** (`{ pid, subId, concepto, base }`), con su nombre y su importe, editables como siempre. Los presupuestos ya guardados con varias líneas del mismo proyecto y sin `subId` se abren y se editan igual que antes. _frontend_
 - **Horas por subproyecto**: al apuntar o editar una hora (ficha y calendario) se elige el subproyecto, opcional (`subId` en la hora). La ficha enseña importe, horas y €/h de cada uno, y las horas «sin asignar». Borrar un subproyecto deja sus horas sin asignar. _frontend_
+- **Qué incluye cada subproyecto** (`descripcion`, opcional, una cosa por línea): se escribe bajo el nombre al editar el proyecto, sale en la ficha y pasa a la línea del presupuesto como «nombre: qué incluye». _frontend_
 - **En la ventana del presupuesto** los subproyectos salen bajo el nombre de su proyecto y metidos hacia dentro, para no confundirlos con los proyectos del cliente. _frontend_
 - Textos en es/en/ca; al fusionar dispositivos los subproyectos se unen por id, como las horas. Test en `test/subproyectos.mjs`. _frontend_
 

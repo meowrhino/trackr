@@ -68,7 +68,8 @@ Object.assign(App, {
     const rows = B.subStats(p);
     if (!B.subs(p).length) return '';
     return `<div class="ds"><div class="dst">${t('sub.title')}</div><div class="hl">${rows.map(r =>
-      `<div class="hr"><span style="flex:1;${r.id ? '' : 'color:var(--t3)'}">${r.id ? esc(r.nombre || '\u2014') : t('sub.none')}</span>`
+      `<div class="hr" style="align-items:flex-start"><span style="flex:1;min-width:0;${r.id ? '' : 'color:var(--t3)'}">${r.id ? esc(r.nombre || '\u2014') : t('sub.none')}`
+      + (r.descripcion ? `<div style="color:var(--t3);font-size:.76rem;white-space:pre-line;margin-top:.2rem;line-height:1.45">${esc(r.descripcion)}</div>` : '') + `</span>`
       + `<span class="hr-a m">${r.id ? fmtMoney(r.base) : ''}</span>`
       + `<span class="hr-a m" style="min-width:55px;text-align:right">${r.horas.toFixed(1)}h</span>`
       + `<span class="hr-a m" style="min-width:85px;text-align:right;color:${r.eph === null ? 'var(--t3)' : B.ephColor(r.eph)}">${r.eph === null ? (r.id ? '??? ' : '') : r.eph.toFixed(2) + ' '}${r.id ? '&euro;/h' : ''}</span>`

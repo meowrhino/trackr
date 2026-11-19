@@ -21,7 +21,7 @@ for (const f of ['utils.js', 'billing.js', 'store.js', 'facturas.js', 'app.factu
 const { D, B, Fac, App } = vm.runInContext('({ D, B, Fac, App })', ctx);
 
 const fac = (o = {}) => ({ modo: 'desde_base', baseImponible: 0, iva: 21, irpf: 15, ...o });
-const subs = () => [{ id: 's1', nombre: 'Diseño', base: 1000.1 }, { id: 's2', nombre: 'Tienda', base: 2000.2 }, { nombre: 'Formación', base: 640 }];
+const subs = () => [{ id: 's1', nombre: 'Diseño', base: 1000.1 }, { id: 's2', nombre: 'Tienda', base: 2000.2 }, { nombre: 'Formación', base: 640, descripcion: 'dos sesiones\n con el equipo\n' }];
 const viejas = [1, 2, 3, 4, 5].map(i => ({ pid: 'esc', concepto: 'Bloque ' + i, base: 928 }));
 const data = {
   version: 4,
@@ -73,6 +73,8 @@ assert.equal(st[0].horas, 12.5);
 assert.equal(st[0].eph, 68.01, '1000,10 × 0,85 ÷ 12,5');
 assert.equal(st[1].horas, 0);
 assert.equal(st[1].eph, null);
+assert.equal(st[2].descripcion, 'dos sesiones\n con el equipo\n');
+assert.equal(st[0].descripcion, '');
 assert.equal(st[3].id, null);
 assert.equal(st[3].horas, 5, 'sin subproyecto (4) + de uno borrado (1)');
 assert.equal(B.totalHoras(web), 17.5, 'el total del proyecto no cambia');
@@ -85,7 +87,8 @@ D.d.presupuestos = [];
 let rs = filas(App._budRows('c1', [], p => p.id === 'web'));
 assert.equal(rs.length, 5, 'web × 3 subproyectos + logo + escocesa');
 assert.equal(rs.filter(r => r.pid === 'web').map(r => `${r.sub}|${r.concepto}|${r.base}|${r.on}`).join(' '),
-  `s1|Diseño|1000.1|true s2|Tienda|2000.2|true ${web.subproyectos[2].id}|Formación|640|true`);
+  `s1|Diseño|1000.1|true s2|Tienda|2000.2|true ${web.subproyectos[2].id}|Formación: dos sesiones; con el equipo|640|true`, 'con explicación: «nombre: qué incluye» en una línea');
+assert.equal(B.subConcepto({ nombre: 'Web' }), 'Web');
 assert.equal(rs.find(r => r.pid === 'solo').sub, undefined);
 assert.equal(rs.find(r => r.pid === 'solo').base, '300');
 
