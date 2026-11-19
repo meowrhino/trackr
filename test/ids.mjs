@@ -11,7 +11,7 @@ const { badIds, uid } = vm.runInContext('({ badIds, uid })', ctx);
 
 const evil = "x'); alert(1); ('";
 const ok = () => ({
-  projects: [{ id: uid(), nombre: 'P', horas: [{ id: uid() }, {}], facturacion: { cobros: [{ id: uid() }] } }],
+  projects: [{ id: uid(), nombre: 'P', horas: [{ id: uid() }, {}], subproyectos: [{ id: uid() }], facturacion: { cobros: [{ id: uid() }] } }],
   clientes: [{ id: uid() }], gastos: [{ id: uid(), entradas: [{ id: uid() }] }], deducibles: [{ id: uid() }],
   facturas: [{ id: uid() }], presupuestos: [{ id: uid(), lineas: [{ id: uid() }, {}] }]
 });
@@ -25,6 +25,9 @@ assert.deepEqual([...badIds({ projects: [{ id: evil }] })], [evil]);
 for (const mut of [
   d => { d.projects[0].horas[0].id = evil; },
   d => { d.projects[0].facturacion.cobros[0].id = evil; },
+  d => { d.projects[0].subproyectos[0].id = evil; },
+  d => { d.projects[0].horas[0].subId = evil; },
+  d => { d.presupuestos[0].lineas[0].subId = evil; },
   d => { d.gastos[0].entradas[0].id = evil; },
   d => { d.presupuestos[0].lineas[0].id = evil; },
   d => { d.clientes[0].id = evil; },

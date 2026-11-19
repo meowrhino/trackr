@@ -59,6 +59,7 @@ Object.assign(App, {
       finR: g('mpFR')?.value || '',
       bm: g('mpBM')?.value || '',
       base: g('mpBa')?.value || '',
+      subs: this._subRead(),
       total: g('mpTo')?.value || '',
       precioHora: g('mpPH')?.value || '',
       iva: g('mpIva')?.value || '',
@@ -84,6 +85,7 @@ Object.assign(App, {
     set('mpFE', s.finEst);
     set('mpFR', s.finR);
     set('mpBa', s.base);
+    const subsEl = document.getElementById('mpSubs'); if (subsEl) subsEl.innerHTML = (s.subs || []).map(x => this._subRow(x)).join('');
     set('mpTo', s.total);
     set('mpPH', s.precioHora);
     set('mpIva', s.iva);
@@ -122,6 +124,7 @@ Object.assign(App, {
       pagado: p?.facturacion?.pagado || false, fechaPago: p?.facturacion?.fechaPago || '', notas: p?.notas || '',
       idiomaFactura: p?.facturacion?.idiomaFactura || null,
       cobros: p?.facturacion?.cobros || [], neto: p?.facturacion?.netoRecibido || 0,
+      subs: p?.subproyectos || [],
       /* Factura emitida y vigente: sus importes ya no se editan (se corrigen con «Rectificar») */
       emitida: !!(p?.facturacion?.facturaNum && p?.facturacion?.facturaFecha && D.facturaVigente(p.id)),
       numEmitida: p?.facturacion?.facturaNum ? `${p.facturacion.facturaNum}/${yearShort(p.facturacion.facturaFecha || todayStr())}` : ''
@@ -193,6 +196,9 @@ Object.assign(App, {
       +     `<div class="fg" id="bfBase" style="${m === 'desde_total' || m === 'por_hora' ? 'display:none' : ''}"><label>${t('billing.baseEur')}</label><input type="number" id="mpBa" value="${df.base}" step="0.01" placeholder="0.00" oninput="App.cPrev()"></div>`
       +     `<div class="fg" id="bfTot" style="${m === 'desde_base' || m === 'por_hora' ? 'display:none' : ''}"><label>${t('billing.totalEur')}</label><input type="number" id="mpTo" value="${df.total}" step="0.01" placeholder="0.00" oninput="App.cPrev()"></div>`
       +   `</div>`
+      +   `<div class="fg" id="bfSubs" style="${m === 'desde_base' ? '' : 'display:none'}"><label>${t('sub.title')}${itip('tip.subs')}</label>`
+      +     `<div id="mpSubs" class="cl-list">${df.subs.map(x => this._subRow(x)).join('')}</div>`
+      +     `<button type="button" class="bt bt-add" style="margin:.4rem 0 0" onclick="App._subAdd()">${t('sub.add')}</button></div>`
       +   `<div class="fr">`
       +     `<div class="fg"><label>IVA %${itip('tip.ivaPct')}</label><input type="number" id="mpIva" value="${df.iva}" min="0" max="100" step="1" oninput="App.cPrev()"></div>`
       +     `<div class="fg"><label>IRPF %${itip('tip.irpfPct')}</label><input type="number" id="mpIrpf" value="${df.irpf}" min="0" max="100" step="1" oninput="App.cPrev()"></div>`
@@ -209,6 +215,28 @@ Object.assign(App, {
       + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveP('${eid || ''}')">${isE ? t('btn.save') : t('btn.create')}</button></div>`;
   },
 
+  /* ── Subproyectos: filas nombre + importe; con filas, la base es su suma (cPrev) ── */
+  _subRow(x) {
+    return `<div class="cl-item sub-row" data-id="${x.id}" style="gap:.5rem;cursor:default">`
+      + `<input type="text" class="sub-n" value="${esc(x.nombre || '')}" placeholder="${t('field.name')}" style="flex:1">`
+      + `<input type="number" class="sub-b" step="0.01" value="${x.base || ''}" placeholder="0.00" oninput="App.cPrev()" style="width:7rem;font-family:'DM Mono',monospace">`
+      + `<button type="button" class="hr-x" style="background:none;border:0" onclick="App._subDel(this)" title="${t('btn.delete')}">&times;</button></div>`;
+  },
+  _subAdd() {
+    this._mDirty = true;
+    document.getElementById('mpSubs').insertAdjacentHTML('beforeend', this._subRow({ id: uid() }));
+    document.querySelector('#mpSubs .sub-row:last-child .sub-n').focus();
+    this.cPrev();
+  },
+  _subDel(btn) { this._mDirty = true; btn.parentNode.remove(); this.cPrev(); },
+  /** Filas del modal → [{ id, nombre, base }]; las vacías del todo no cuentan */
+  _subRead() {
+    return [...document.querySelectorAll('#mpSubs .sub-row')].map(el => ({
+      id: el.dataset.id, nombre: el.querySelector('.sub-n').value.trim(),
+      base: roundMoney(parseFloat(el.querySelector('.sub-b').value) || 0)
+    })).filter(x => x.nombre || x.base);
+  },
+
   sBM(m) {
     document.getElementById('mpBM').value = m;
     document.querySelectorAll('.bm').forEach(b => b.classList.remove('on'));
@@ -221,6 +249,7 @@ Object.assign(App, {
       bf.style.display = (m === 'desde_total' || m === 'por_hora') ? 'none' : '';
       tf.style.display = (m === 'desde_base' || m === 'por_hora') ? 'none' : '';
       ph.style.display = m === 'por_hora' ? '' : 'none';
+      document.getElementById('bfSubs').style.display = m === 'desde_base' ? '' : 'none';
     }
     this.cPrev();
   },
@@ -242,7 +271,11 @@ Object.assign(App, {
       const th = p ? B.totalHoras(p) : 0;
       base = roundMoney(th * ph);
     } else if (m === 'desde_base') {
-      base = parseFloat(document.getElementById('mpBa')?.value) || 0;
+      /* Con subproyectos la base no se teclea: es la suma */
+      const ba = document.getElementById('mpBa'), n = document.querySelectorAll('#mpSubs .sub-row').length;
+      if (n) ba.value = roundMoney(this._subRead().reduce((s, x) => s + x.base, 0));
+      ba.readOnly = !!n; ba.style.opacity = n ? '.6' : '';
+      base = parseFloat(ba.value) || 0;
     } else {
       const t2 = parseFloat(document.getElementById('mpTo')?.value) || 0;
       conIva = !p || B.conIva({ ...p.facturacion });
@@ -318,12 +351,15 @@ Object.assign(App, {
         facturaFecha: prev?.facturacion?.facturaFecha || null,
         idiomaFactura: facLangVal || null
       },
-      horas: prev?.horas || [], notas: document.getElementById('mpNo').value.trim()
+      horas: prev?.horas || [], subproyectos: this._subRead(), notas: document.getElementById('mpNo').value.trim()
     };
     /* Factura emitida y vigente: los importes no cambian desde aquí (se corrigen con Rectificar) */
     if (prev?.facturacion?.facturaNum && prev.facturacion.facturaFecha && D.facturaVigente(prev.id)) {
       for (const k of ['modo', 'baseImponible', 'total', 'precioHora', 'iva', 'irpf', 'ivaExcepcion', 'idiomaFactura']) proj.facturacion[k] = prev.facturacion[k];
+      proj.subproyectos = prev.subproyectos || [];
     }
+    /* Lápida de los subproyectos quitados: al fusionar dispositivos no vuelven. Sus horas quedan sin asignar. */
+    (prev?.subproyectos || []).forEach(x => { if (!proj.subproyectos.some(y => y.id === x.id)) D._tomb('subproyecto', x.id); });
     B.calc(proj);
     if (eid) { D.up(eid, proj); T.ev('action', 'project_edit'); } else { D.add(proj); T.ev('action', 'project_create'); }
     this.cm();

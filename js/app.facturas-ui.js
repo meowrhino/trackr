@@ -258,7 +258,8 @@ Object.assign(App, {
 
   /**
    * Modal de presupuesto. Se abre desde la lista de clientes (cid) o desde un proyecto
-   * (cid de su cliente + pid premarcado). Cada proyecto del cliente marcado = una línea.
+   * (cid de su cliente + pid premarcado). Cada proyecto del cliente marcado = una línea;
+   * si tiene subproyectos, una por subproyecto ({ pid, subId, concepto, base }).
    */
   budModal(cid, pid) {
     const cls = D.cls();
@@ -286,12 +287,20 @@ Object.assign(App, {
   /** Filas del modal: primero las líneas ya elegidas (en su orden), luego el resto de proyectos del cliente. */
   _budRows(cid, lineas, pre) {
     const ps = D.ps().filter(p => p.clienteId === cid && p.estado !== 'abandonado');
-    const rows = lineas.map(l => ({ pid: l.pid, on: true, concepto: l.concepto, base: l.base }))
-      .concat(ps.filter(p => !lineas.some(l => l.pid === p.id)).map(p => ({
+    const rows = lineas.map(l => ({ pid: l.pid, sub: l.subId, on: true, concepto: l.concepto, base: l.base }));
+    ps.forEach(p => {
+      const mias = lineas.filter(l => l.pid === p.id), subs = B.subs(p);
+      /* Con subproyectos: una línea por cada uno que falte. Si el presupuesto ya trae líneas del
+         proyecto sin subproyecto (un desglose hecho a mano), no se ofrecen: saldrían repetidas. */
+      if (subs.length) {
+        if (!mias.some(l => !l.subId)) subs.filter(x => !mias.some(l => l.subId === x.id))
+          .forEach(x => rows.push({ pid: p.id, sub: x.id, on: pre(p), concepto: x.nombre, base: x.base || '' }));
+      } else if (!mias.length) rows.push({
         pid: p.id, on: pre(p), concepto: p.nombre,
         base: p.facturacion?.modo === 'gratis' ? '' : (p.facturacion?.baseImponible || '')
-      })));
-    return rows.map(r => `<div class="cl-item bud-line" data-pid="${r.pid}" style="gap:.5rem">`
+      });
+    });
+    return rows.map(r => `<div class="cl-item bud-line" data-pid="${r.pid}"${r.sub ? ` data-sub="${esc(r.sub)}"` : ''} style="gap:.5rem">`
       + `<input type="checkbox" ${r.on ? 'checked' : ''} style="width:auto">`
       + `<input type="text" class="bud-c" value="${esc(r.concepto)}" style="flex:1">`
       + `<input type="number" class="bud-b" step="0.01" min="0" value="${r.base}" placeholder="0" style="width:7rem;font-family:'DM Mono',monospace">`
@@ -305,7 +314,8 @@ Object.assign(App, {
       .map(el => ({
         pid: el.dataset.pid,
         concepto: el.querySelector('.bud-c').value.trim(),
-        base: roundMoney(parseFloat(el.querySelector('.bud-b').value) || 0)
+        base: roundMoney(parseFloat(el.querySelector('.bud-b').value) || 0),
+        ...(el.dataset.sub && { subId: el.dataset.sub })
       }));
     const v = parseInt(document.getElementById('budVal').value, 10);
     return { lineas, validez: Number.isFinite(v) && v >= 0 ? v : undefined };

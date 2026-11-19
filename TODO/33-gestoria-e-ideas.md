@@ -26,6 +26,8 @@ fiscales que no conviene resolver a ojo y diseños que piden pensarlo con calma.
    más sus rectificativas. Para trabajos largos (MONICAS, PETRA) o pagos por fases haría
    falta `p.facturas = [...]`, cada una con su número, fecha, base y cobros. Toca el modelo
    de datos, 303/130/390, libros, PDF, cobros, sync y gestoría: pensarlo antes de empezar.
+   Desde el 19 nov 2026 hay subproyectos (`p.subproyectos`): cada factura podría llevar
+   `subIds: [...]` y su base sería la suma de esos, para facturar por bloques.
 2. **Rectificativas en VeriFactu** (registro R). Hoy la rectificativa avisa de que no se
    envía. Va con el resto de VeriFactu (TODO/15), aparcado.
 3. **VeriFactu: no duplicar registros** al volver a descargar una factura o con doble clic

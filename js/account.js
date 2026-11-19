@@ -282,6 +282,7 @@ const Acc = (() => {
       const u = (a, b) => unionBy(b, a, (x) => x.id).filter((x) => !(x && borradoTs.has(x.id))); // a = ganador
       const r = { ...w };
       if (Array.isArray(w.horas) && Array.isArray(o.horas)) r.horas = u(w.horas, o.horas);
+      if (Array.isArray(w.subproyectos) && Array.isArray(o.subproyectos)) r.subproyectos = u(w.subproyectos, o.subproyectos);
       if (Array.isArray(w.entradas) && Array.isArray(o.entradas)) r.entradas = u(w.entradas, o.entradas);
       if (Array.isArray(w.facturacion?.cobros) && Array.isArray(o.facturacion?.cobros)) r.facturacion = { ...w.facturacion, cobros: u(w.facturacion.cobros, o.facturacion.cobros) };
       if (Array.isArray(w.facturacion?.rectificativas) && Array.isArray(o.facturacion?.rectificativas)) r.facturacion = { ...(r.facturacion || w.facturacion), rectificativas: u(w.facturacion.rectificativas, o.facturacion.rectificativas) };

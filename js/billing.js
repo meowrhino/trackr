@@ -29,6 +29,9 @@ const B={
       if(!(f.facturaNum&&f.facturaFecha)) f.baseImponible=roundMoney(this.totalHoras(p)*(f.precioHora||0));
     } else if(f.modo==='desde_total'){
       f.baseImponible=this.baseDesdeTotal(f.total||0,iv,ir,this.conIva(f));
+    } else if(this.subs(p).length&&!(f.facturaNum&&f.facturaFecha)){
+      /* Subproyectos: la base es su suma. Emitida la factura se congela, como en por_hora. */
+      f.baseImponible=roundMoney(this.subs(p).reduce((s,x)=>s+(x.base||0),0));
     }
 
     const tax=this.calcTax(f.baseImponible||0,iv,ir);
@@ -112,6 +115,20 @@ const B={
     const base = roundMoney(div > 0 ? total / div : total);
     const { importeIva, importeIrpf } = this.calcTax(base, ivaRate || 0, irpfRate || 0);
     return { base, importeIva, importeIrpf };
+  },
+
+  /** Subproyectos en uso: solo cuentan en «desde base» (en otro modo se guardan, pero no pintan nada). */
+  subs(p){ return p&&p.facturacion?.modo==='desde_base'&&Array.isArray(p.subproyectos)?p.subproyectos:[]; },
+
+  /** Horas y €/h (neto ÷ horas) de cada subproyecto. La última fila, sin id, son las horas
+   *  sin subproyecto o de uno ya borrado; solo sale si las hay. */
+  subStats(p){
+    const subs=this.subs(p), ir=p.facturacion.irpf||0;
+    const de=id=>p.horas.filter(h=>h.subId===id).reduce((s,h)=>s+(h.cantidad||0),0);
+    const rows=subs.map(x=>{ const horas=de(x.id); return { id:x.id, nombre:x.nombre, base:x.base||0, horas, eph:horas?roundMoney((x.base||0)*(1-ir/100)/horas):null }; });
+    const sin=p.horas.filter(h=>!subs.some(x=>x.id===h.subId)).reduce((s,h)=>s+(h.cantidad||0),0);
+    if(sin) rows.push({ id:null, nombre:'', base:0, horas:sin, eph:null });
+    return rows;
   },
 
   /* Suma total de horas registradas en el proyecto */

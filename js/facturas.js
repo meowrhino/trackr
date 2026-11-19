@@ -150,7 +150,7 @@ const Fac = {
       y += refLines.length * 5 + 6;
     }
 
-    /* ── Líneas (una por proyecto): concepto a la izquierda, base a la derecha ── */
+    /* ── Líneas (una por proyecto o subproyecto): concepto a la izquierda, base a la derecha ── */
     if (data.lineas && data.lineas.length) {
       section(tf('fac.breakdown', lang));
       data.lineas.forEach(l => {
@@ -319,7 +319,7 @@ const Fac = {
    * Presupuesto de varios proyectos de un cliente. NO es factura: no consume numeración
    * de facturas, no firma VeriFactu y no sale en los libros. Contador propio.
    * @param {string} cid  cliente
-   * @param {Array} lineas  [{pid, concepto, base}]
+   * @param {Array} lineas  [{pid, subId?, concepto, base}] (varias del mismo pid: sus subproyectos)
    * @param {Object} opts  { num, fecha, descripcion }
    */
   presupuesto(cid, lineas, opts) {

@@ -25,6 +25,7 @@ Object.assign(App, {
     document.getElementById('detC').innerHTML =
       this._detHeader(p, hex, cn, f)
       + this._detInfo(p, th, wh, mh)
+      + this._detSubs(p)
       + this._detHours(p, hex)
       + this._detBilling(p, f, eph)
       + `<div style="display:flex;justify-content:flex-end;margin-top:1.5rem;padding-bottom:1rem"><button class="bt bt-s bt-d" onclick="App.xProj('${p.id}')">${t('btn.delete')}</button></div>`;
@@ -62,7 +63,30 @@ Object.assign(App, {
       + `</div>${p.notas ? `<div style="margin-top:.75rem"><div class="dfl">${t('field.notes')}</div><div style="color:var(--t3);font-size:.85rem">${esc(p.notas)}</div></div>` : ''}</div>`;
   },
 
+  /** Subproyectos: importe, horas y €/h de cada uno; al final, las horas sin asignar. */
+  _detSubs(p) {
+    const rows = B.subStats(p);
+    if (!B.subs(p).length) return '';
+    return `<div class="ds"><div class="dst">${t('sub.title')}</div><div class="hl">${rows.map(r =>
+      `<div class="hr"><span style="flex:1;${r.id ? '' : 'color:var(--t3)'}">${r.id ? esc(r.nombre || '\u2014') : t('sub.none')}</span>`
+      + `<span class="hr-a m">${r.id ? fmtMoney(r.base) : ''}</span>`
+      + `<span class="hr-a m" style="min-width:55px;text-align:right">${r.horas.toFixed(1)}h</span>`
+      + `<span class="hr-a m" style="min-width:85px;text-align:right;color:${r.eph === null ? 'var(--t3)' : B.ephColor(r.eph)}">${r.eph === null ? (r.id ? '??? ' : '') : r.eph.toFixed(2) + ' '}${r.id ? '&euro;/h' : ''}</span>`
+      + `</div>`).join('')}</div></div>`;
+  },
+
+  /** Selector de subproyecto de los modales de horas: rellena #hSubW según el proyecto (vacío si no tiene). */
+  _subSel(pid, cur) {
+    const el = document.getElementById('hSubW'); if (!el) return;
+    const subs = B.subs(D.p(pid));
+    el.innerHTML = subs.length
+      ? `<div class="fg"><label>${t('sub.one')}</label><select id="hSub"><option value="">${t('sub.none')}</option>`
+        + subs.map(x => `<option value="${x.id}" ${x.id === cur ? 'selected' : ''}>${esc(x.nombre || '\u2014')}</option>`).join('') + `</select></div>`
+      : '';
+  },
+
   _detHours(p, hex) {
+    const subN = Object.fromEntries(B.subs(p).map(x => [x.id, x.nombre]));
     const list = !p.horas.length
       ? `<div class="es"><div class="tx">${t('det.noHours')}</div></div>`
       : `<div class="hl">${p.horas.map(h =>
@@ -70,7 +94,7 @@ Object.assign(App, {
             <span class="hr-t">${h.tipo === 'trabajo' ? '💻' : '👥'}</span>
             <span class="hr-d">${fmtDate(h.fecha)}${h.horaInicio ? ' ' + esc(h.horaInicio) : ''}</span>
             <span class="hr-a m">${h.cantidad}h</span>${h.monto ? `<span class="hr-a m" style="color:var(--ok)">${fmtMoney(h.monto)}</span>` : ''}
-            <span class="hr-n">${esc(h.nota || '')}</span>
+            <span class="hr-n">${esc([subN[h.subId], h.nota].filter(Boolean).join(' \u00b7 '))}</span>
             <span class="hr-x" onclick="event.stopPropagation();App.xHour('${p.id}','${h.id}')" title="${t('btn.delete')}">&times;</span>
           </div>`).join('')}</div>`;
 
@@ -157,6 +181,7 @@ Object.assign(App, {
       +   `<div class="to ${h.tipo === 'reunion' ? 'on' : ''}" data-type="reunion" onclick="App.selT(this)"><span class="ic">👥</span><span class="la">${t('det.meeting')}</span></div>`
       + `</div>`
       + `<div class="fg"><label>${t('field.project')}</label><select id="ehProj" onchange="App._ehProjChange(this.value)">${projOpts}</select>${this._projToggle('ehProj', false)}</div>`
+      + `<div id="hSubW"></div>`
       + `<div class="fg"><label>${t('field.color')}</label>${this.colorSelect(p.color)}</div>`
       + `<div class="fr"><div class="fg"><label>${t('field.hours')}</label><input type="number" id="ehA" min="0.25" step="0.25" value="${h.cantidad}"></div>`
       +   `<div class="fg"><label>${t('field.date')}</label><input type="date" id="ehD" value="${h.fecha || ''}" ${noDate ? 'disabled' : ''}>`
@@ -165,12 +190,14 @@ Object.assign(App, {
       + `<div class="fg"><label>${t('field.note')}</label><input type="text" id="ehN" value="${esc(h.nota || '')}"></div>`
       + `<div class="ma" style="justify-content:space-between"><button class="bt bt-d" onclick="App.deleteEH('${pid}','${hid}')">${t('btn.delete')}</button><div style="display:flex;gap:.5rem"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveEH('${pid}','${hid}')">${t('btn.save')}</button></div></div>`
     );
+    this._subSel(pid, h.subId);
   },
 
   /** Al cambiar el proyecto en editar-hora, refleja su color en el picker (el picker
    *  edita el color del proyecto SELECCIONADO). */
   _ehProjChange(val) {
     const p = D.p(val); if (!p) return;
+    this._subSel(val);
     const sw = document.querySelector(`.cs-sw[data-name="${p.color}"]`);
     if (sw) { this._csPick(sw); return; }
     // Color que no está en la paleta: ajusta el input oculto y refresca el preview.
@@ -189,6 +216,9 @@ Object.assign(App, {
     h.horaInicio = document.getElementById('ehHI').value || null;
     h.nota = document.getElementById('ehN').value.trim();
     h.monto = parseFloat(document.getElementById('ehMo').value) || 0;
+    /* El selector es el del proyecto elegido: al mover la hora, el subproyecto es del nuevo */
+    const sub = document.getElementById('hSub')?.value;
+    if (sub) h.subId = sub; else delete h.subId;
 
     const newPid = document.getElementById('ehProj')?.value || pid;
 
@@ -247,11 +277,13 @@ Object.assign(App, {
   hModal(pid) {
     this.om(`<div class="mt">${t('det.addHours')}</div><label>Tipo</label>`
       + `<div class="ts2"><div class="to on" data-type="trabajo" onclick="App.selT(this)"><span class="ic">💻</span><span class="la">${t('det.work')}</span></div><div class="to" data-type="reunion" onclick="App.selT(this)"><span class="ic">👥</span><span class="la">${t('det.meeting')}</span></div></div>`
+      + `<div id="hSubW"></div>`
       + `<div class="fr"><div class="fg"><label>${t('field.hours')}</label><input type="number" id="mhA" min="0.25" step="0.25" value="1"></div>`
       + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="mhD" value="${todayStr()}"><label style="margin-top:.35rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="mhNd" onchange="document.getElementById('mhD').disabled=this.checked;if(this.checked)document.getElementById('mhD').value=''" style="width:auto;accent-color:var(--t2)"> ${t('field.noDate')}</label></div></div>`
       + `<div class="fr"><div class="fg"><label>${t('field.startTime')}</label><input type="time" id="mhHI" value=""></div><div class="fg"><label>${t('field.amount')}${itip('tip.horaMonto')}</label><input type="number" id="mhMo" min="0" step="0.01" placeholder="0"></div></div>`
       + `<div class="fg"><label>${t('field.note')}</label><input type="text" id="mhN" placeholder="${t('ph.whatDidYouDo')}"></div>`
       + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveHM('${pid}')">${t('btn.save')}</button></div>`);
+    this._subSel(pid);
   },
 
   saveHM(pid) {
@@ -264,7 +296,8 @@ Object.assign(App, {
     const monto = parseFloat(document.getElementById('mhMo').value) || 0;
     if (cant <= 0) return;
     const p = D.p(pid); if (!p) return;
-    p.horas.push({ id: uid(), fecha, tipo, cantidad: cant, nota, horaInicio, monto });
+    const subId = document.getElementById('hSub')?.value;
+    p.horas.push({ id: uid(), fecha, tipo, cantidad: cant, nota, horaInicio, monto, ...(subId && { subId }) });
     T.ev('action', 'hours_add', 'modal');
     sortHoras(p.horas); D.up(pid, { horas: p.horas }); this.cm(); this.rDet(pid);
   }

@@ -169,6 +169,8 @@ const D = {
     d.projects.forEach(p => {
       /* Garantizar campos estructurales */
       if (!p.horas) p.horas = [];
+      /* Subproyectos (opcional): solo se rellenan los ids que falten; sin lista no se toca nada */
+      if (Array.isArray(p.subproyectos)) p.subproyectos.forEach(s => { if (s && !s.id) s.id = uid(); });
       if (!p.facturacion) p.facturacion = { modo: 'gratis' };
       if (!p.fechas) p.fechas = { inicio: null, finEstimada: null, finReal: null };
 

@@ -157,14 +157,15 @@ function badIds(d) {
   const ref = v => chk(v == null ? null : { id: v });   /* referencias: también acaban en onclick */
   for (const p of arr(d?.projects)) {
     chk(p); ref(p?.clienteId);
-    arr(p?.horas).forEach(chk);
+    arr(p?.horas).forEach(h => { chk(h); ref(h?.subId); });
+    arr(p?.subproyectos).forEach(chk);
     arr(p?.facturacion?.cobros).forEach(chk);
     arr(p?.facturacion?.rectificativas).forEach(chk);
   }
   for (const k of ['clientes', 'deducibles']) arr(d?.[k]).forEach(chk);
   for (const f of arr(d?.facturas)) { chk(f); ref(f?.proyectoId); }
   for (const g of arr(d?.gastos)) { chk(g); arr(g?.entradas).forEach(chk); }
-  for (const b of arr(d?.presupuestos)) { chk(b); ref(b?.clienteId); arr(b?.lineas).forEach(chk); }
+  for (const b of arr(d?.presupuestos)) { chk(b); ref(b?.clienteId); arr(b?.lineas).forEach(l => { chk(l); ref(l?.subId); }); }
   return bad;
 }
 

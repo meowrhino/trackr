@@ -670,6 +670,7 @@ Object.assign(App, {
     const projOpts = this._projOptions();
     this.om(`<div class="mt">${t('cal.addHour')}</div>`
       + `<div class="fg"><label>${t('field.project')}</label><select id="chP" onchange="App._onCalProjChange(this.value)">${projOpts}<option value="_new">${t('btn.createNewProject')}</option></select>${this._projToggle('chP', true)}</div>`
+      + `<div id="hSubW"></div>`
       + `<div id="chPNew" style="display:none;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);padding:.75rem;margin-bottom:.85rem">`
       +   `<div class="fg"><label>${t('field.projectName')}</label><input type="text" id="chPN" placeholder="${t('ph.newProjectName')}"></div>`
       +   `<div class="fg"><label>${t('field.client')}</label><select id="chPCl" onchange="document.getElementById('chPClNew').style.display=this.value==='_new'?'block':'none'"><option value="">${t('field.noClient')}</option>${D.cls().map(c => `<option value="${c.id}">${esc(c.nombre)}</option>`).join('')}<option value="_new">${t('btn.newClientOpt')}</option></select></div>`
@@ -686,10 +687,12 @@ Object.assign(App, {
 
   _onCalProjChange(val) {
     document.getElementById('chPNew').style.display = val === '_new' ? 'block' : 'none';
+    this._subSel(val);
   },
 
   saveCalH() {
     let pid = document.getElementById('chP').value;
+    const subId = document.getElementById('hSub')?.value;
     const tipo = document.querySelector('#mC .to.on')?.dataset.type || 'trabajo';
     const cant = parseFloat(document.getElementById('chA').value) || 0;
     const fecha = document.getElementById('chD').value || null;
@@ -724,7 +727,7 @@ Object.assign(App, {
     }
     if (!pid) return;
     const p = D.p(pid); if (!p) return;
-    p.horas.push({ id: uid(), fecha, tipo, cantidad: cant, nota, horaInicio, monto });
+    p.horas.push({ id: uid(), fecha, tipo, cantidad: cant, nota, horaInicio, monto, ...(subId && { subId }) });
     T.ev('action', 'hours_add', 'calendar');
     sortHoras(p.horas); D.up(pid, { horas: p.horas }); this.cm(); this.rCal();
   }
