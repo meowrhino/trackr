@@ -5,6 +5,13 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-11-19 — Las notas del proyecto respetan los saltos de línea
+
+### 🐛 Arreglado
+- **Notas en la ficha del proyecto**: salían en un solo párrafo; ahora se ven con sus renglones, como se escribieron. _frontend_
+
+---
+
 ## 2026-11-19 — Importar: se ve qué cambia, sección por sección
 
 ### ✨ Nuevo

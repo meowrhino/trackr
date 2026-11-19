@@ -60,7 +60,7 @@ Object.assign(App, {
       + `<div><div class="dfl">${t('field.actualEnd')}</div><div class="dfv">${fmtDate(p.fechas.finReal)}</div></div>`
       + `<div><div class="dfl">${t('field.hours')}</div><div class="dfv">${th.toFixed(1)}h <span style="color:var(--t3);font-size:.72rem">💻${wh.toFixed(1)} 👥${mh.toFixed(1)}</span></div></div>`
       + (p.presupuesto ? `<div><div class="dfl">${t('bud.btn')}</div><div class="dfv">${esc(p.presupuesto.num)}/${yearShort(p.presupuesto.fecha)} · ${fmtDate(p.presupuesto.fecha)}</div></div>` : '')
-      + `</div>${p.notas ? `<div style="margin-top:.75rem"><div class="dfl">${t('field.notes')}</div><div style="color:var(--t3);font-size:.85rem">${esc(p.notas)}</div></div>` : ''}</div>`;
+      + `</div>${p.notas ? `<div style="margin-top:.75rem"><div class="dfl">${t('field.notes')}</div><div style="color:var(--t3);font-size:.85rem;white-space:pre-line">${esc(p.notas)}</div></div>` : ''}</div>`;
   },
 
   /** Subproyectos: importe, horas y €/h de cada uno; al final, las horas sin asignar. */
