@@ -293,6 +293,19 @@ Object.assign(App, {
     this.go(this.cv);
   },
 
+  _facNumStr(p) { const f = p.facturacion; return `${f.facturaNum}/${yearShort(f.facturaFecha || todayStr())}`; },
+
+  /** Borra del todo una factura no enviada (la última del año, sin VeriFactu): ver D.facturaBorrable. */
+  borrarFactura(pid) {
+    const p = D.p(pid); if (!p?.facturacion?.facturaNum) return;
+    const num = this._facNumStr(p), motivo = D.facturaBorrable(pid);
+    if (motivo) { Toast.warn(t(motivo, num)); return; }
+    if (!confirm(t('fac.deleteConfirm', num))) return;
+    D.borrarFactura(pid);
+    Toast.ok(t('fac.deleteOk', num));
+    this.go(this.cv, this.cv === 'det' ? pid : undefined);
+  },
+
   async anularFactura(id) {
     const f = (D.fs() || []).find(x => x.id === id);
     if (!f || typeof V === 'undefined') return;
@@ -514,6 +527,7 @@ Object.assign(App, {
             + `<div class="cl-actions"><button class="cl-btn" onclick="App.facPdf('${p.id}')" title="${t('btn.downloadPdf')}">&#9113;</button>`
             + (!f.pagado && !anulada ? `<button class="cl-btn" onclick="App.facRecordatorio('${p.id}')" title="${t('fac.reminder')}">&#9993;</button>` : '')
             + (!anulada ? `<button class="cl-btn cl-btn-del" onclick="${reg ? `App.anularFactura('${reg.id}')` : `App.anularLocal('${p.id}')`}" title="${t('cfg.vfAnular')}">&times;</button>` : '')
+            + (anulada && !D.facturaBorrable(p.id) ? `<button class="cl-btn cl-btn-del" onclick="App.borrarFactura('${p.id}')" title="${t('fac.delete')}">&#9003;</button>` : '')
             + `</div></div>`
             /* Rectificativas de esta factura, debajo, con su PDF */
             + (f.rectificativas || []).map(r => `<div class="cl-item" style="padding-left:1.2rem;opacity:.9">`

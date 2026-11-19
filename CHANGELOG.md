@@ -5,6 +5,16 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-11-19 — Borrar una factura no enviada; los cobros parciales ya no crecen
+
+### ✨ Nuevo
+- **«Borrar factura»** en la ficha del proyecto (y ⌫ en Facturas para las anuladas): la factura desaparece, el proyecto vuelve a estar sin facturar y su número queda libre. Solo la última del año (si no, quedaría un hueco en la numeración), sin firmar en VeriFactu, sin cobros ni rectificativas. Pulsar «Factura» sobre una anulada que cumple eso ofrece borrarla y volver a emitirla con el mismo número. Test en `test/facturas-borrar.mjs`. _frontend_
+
+### 🐛 Arreglado
+- **Un cobro parcial crecía un 24,7 % en cada recarga** tras editar el proyecto (500 → 623,53 → 777,58…): la migración de cobros de marzo volvía a correr. Ahora solo toca datos de antes de la versión 4. Los cobros parciales ya inflados no se corrigen solos: hay que revisarlos a mano. Test en `test/cobros-migracion.mjs`. _frontend_
+
+---
+
 ## 2026-11-19 — Las notas del proyecto respetan los saltos de línea
 
 ### 🐛 Arreglado

@@ -209,8 +209,10 @@ const D = {
             p.facturacion.cobros = [{ id: uid(), fecha: p.facturacion.fechaPago || todayStr(), cantidad: tf }];
           }
         }
-        /* Migración v3: cobros antiguos registrados como neto → escalar a totalFactura */
-        if (!p.facturacion._cobrosV3 && p.facturacion.cobros.length > 0) {
+        /* Migración v3: cobros antiguos registrados como neto → escalar a totalFactura.
+           Solo en datos de antes de la v4: la marca _cobrosV3 se pierde al editar el proyecto
+           y, sin este tope, cada recarga inflaba un cobro parcial un 24,7 % (500 → 623,53). */
+        if (!(d.version >= 4) && !p.facturacion._cobrosV3 && p.facturacion.cobros.length > 0) {
           const nr = p.facturacion.netoRecibido || 0;
           const tf = p.facturacion.totalFactura || 0;
           if (nr > 0 && tf > 0 && tf !== nr) {
@@ -453,6 +455,28 @@ const D = {
     if (p.facturacion.anulada) return false; /* anulada sin VeriFactu (marca en el proyecto) */
     const reg = (this.d.facturas || []).filter(r => r.proyectoId === pid && r.tipoRegistro === 'alta').pop();
     return !(reg && (reg.eventos || []).some(e => e.tipo === 'anulada'));
+  },
+  /** ¿Se puede borrar del todo la factura de pid (como si no se hubiera emitido)? '' si sí; si no,
+   *  la clave del motivo. Solo la última de su año: borrar una de en medio deja un hueco en la
+   *  numeración. Nunca una ya firmada en VeriFactu (está en la cadena) ni con cobros o rectificativas. */
+  facturaBorrable(pid) {
+    const f = this.p(pid)?.facturacion;
+    if (!f?.facturaNum || !f.facturaFecha) return 'fac.delNone';
+    if ((this.d.facturas || []).some(r => r.proyectoId === pid)) return 'fac.delVerifactu';
+    if ((f.rectificativas || []).length) return 'fac.delRects';
+    if ((f.cobros || []).length) return 'fac.delCobros';
+    const y = f.facturaFecha.slice(0, 4);
+    const later = this.d.projects.some(p => p.id !== pid && String(p.facturacion?.facturaFecha || '').slice(0, 4) === y && +p.facturacion.facturaNum > +f.facturaNum);
+    return later ? 'fac.delNotLast' : '';
+  },
+  /** Borra la factura de pid (ver facturaBorrable): el proyecto vuelve a estar sin facturar y,
+   *  si el contador ya había pasado de ella, su número queda libre para la siguiente. */
+  borrarFactura(pid) {
+    if (this.facturaBorrable(pid)) return false;
+    const f = this.p(pid).facturacion, s = this.d.settings, y = f.facturaFecha.slice(0, 4);
+    if ((s.nextFacturaYear || y) === y && +s.nextFacturaNum === +f.facturaNum + 1) s.nextFacturaNum = +f.facturaNum;
+    this.up(pid, { facturacion: { ...f, facturaNum: null, facturaFecha: null, anulada: null } });
+    return true;
   },
   /** ¿Algún proyecto de este cliente tiene factura emitida (vigente o anulada)? */
   clienteFacturado(cid) { return this.d.projects.some(p => p.clienteId === cid && p.facturacion?.facturaNum); },

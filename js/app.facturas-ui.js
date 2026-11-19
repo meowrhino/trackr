@@ -19,7 +19,12 @@ Object.assign(App, {
 
   facModal(pid) {
     const p = D.p(pid); if (!p) return;
-    if (p.facturacion?.anulada) { Toast.warn(t('fac.isVoided')); return; }
+    if (p.facturacion?.anulada) {
+      /* La última y sin enviar a VeriFactu: se puede borrar y volver a emitir con el mismo número */
+      if (D.facturaBorrable(pid)) { Toast.warn(t('fac.isVoided')); return; }
+      if (!confirm(t('fac.voidedDeleteConfirm', this._facNumStr(p)))) return;
+      D.borrarFactura(pid);
+    }
     B.calc(p);
     const f = p.facturacion, s = D.d.settings;
     const cl = p.clienteId ? D.cl(p.clienteId) : null;

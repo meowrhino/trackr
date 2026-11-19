@@ -162,6 +162,7 @@ Object.assign(App, {
     return `<div class="ds"><div class="dst">${t('billing.title')}</div>${breakdown}`
       + (f.facturaFecha ? `<div style="margin-top:.3rem;font-size:.78rem;color:var(--t3);display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">${t('billing.invoiceNo', esc(f.facturaNum), fmtDate(f.facturaFecha))}`
           + (f.facturaNum && D.facturaVigente(p.id) ? `<button class="bt bt-s" style="padding:.1rem .45rem;font-size:.72rem" onclick="App.rectModal('${p.id}')">${t('rect.btn')}</button>${itip('tip.rect')}` : '')
+          + (!D.facturaBorrable(p.id) ? `<button class="bt bt-s bt-d" style="padding:.1rem .45rem;font-size:.72rem" onclick="App.borrarFactura('${p.id}')">${t('fac.delete')}</button>` : '')
           + `</div>` : '')
       + this._detRects(p, f)
       + cobrosHtml
