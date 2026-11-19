@@ -616,6 +616,20 @@ const D = {
   },
   addBud(b) { this.d.presupuestos.push(b); this.save(); return b; },
   upBud(id, u) { const b = this.bud(id); if (b) { Object.assign(b, u); this.save(); } return b; },
+  /** Borra un presupuesto. Su número queda libre (no es una factura: la serie no tiene que ser correlativa). */
+  delBud(id) {
+    const b = this.bud(id); if (!b) return;
+    this.d.presupuestos = this.d.presupuestos.filter(x => x.id !== id);
+    /* La marca del proyecto no puede seguir apuntando al borrado (ensure() lo volvería a crear):
+       pasa al presupuesto más reciente que aún incluya el proyecto, o se quita. */
+    this.d.projects.forEach(p => {
+      if (!p.presupuesto || String(p.presupuesto.num) !== String(b.num)) return;
+      const o = this.d.presupuestos.filter(x => (x.lineas || []).some(l => l.pid === p.id)).sort((x, y) => (y.fecha || '').localeCompare(x.fecha || ''))[0];
+      p.presupuesto = o ? { num: o.num, fecha: o.fecha } : null;
+    });
+    this._tomb('presupuesto', id); /* lápida: al fusionar dispositivos no vuelve */
+    this.save();
+  },
 
   /* ══════════════════════════════════════════════
    *  IMPORT

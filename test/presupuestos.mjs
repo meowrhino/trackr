@@ -75,6 +75,29 @@ assert.equal(D.buds().length, 2);
   D.load(JSON.parse(JSON.stringify(data)));
 }
 
+/* Borrar un presupuesto: desaparece, su número queda libre, no vuelve al abrir la app
+   y la marca del proyecto pasa al presupuesto que aún lo incluye (o se quita) */
+{
+  D.load(JSON.parse(JSON.stringify(data)));
+  D.addBud({ id: 'bx', num: 'P1', fecha: '2026-11-19', clienteId: 'c1', lineas: [{ pid: 'p1', concepto: 'Web', base: 480 }], estado: 'enviado' });
+  D.addBud({ id: 'by', num: 'P2', fecha: '2026-11-20', clienteId: 'c1', lineas: [{ pid: 'p1', concepto: 'Web', base: 500 }, { pid: 'p4', concepto: 'Nada', base: 10 }], estado: 'enviado' });
+  D.up('p1', { presupuesto: { num: 'P2', fecha: '2026-11-20' } });
+  D.up('p4', { presupuesto: { num: 'P2', fecha: '2026-11-20' } });
+  assert.equal(D.nextBudNum('2026-11-21'), 'P3');
+  D.delBud('by');
+  assert.ok(!D.bud('by'));
+  assert.equal(D.nextBudNum('2026-11-21'), 'P2', 'el número borrado queda libre');
+  assert.equal(D.p('p1').presupuesto.num, 'P1', 'la marca pasa al más reciente que lo incluye');
+  assert.equal(D.p('p4').presupuesto, null, 'sin otro presupuesto: sin marca');
+  assert.equal(D.d.audit.filter(e => e.accion === 'borrar' && e.entidad === 'presupuesto' && e.entidadId === 'by').length, 1, 'lápida para la fusión');
+  const n = D.buds().length;
+  D.ensure();
+  assert.equal(D.buds().length, n, 'la migración de marcas no lo resucita');
+  D.delBud('no-existe');
+  assert.equal(D.buds().length, n);
+  D.load(JSON.parse(JSON.stringify(data)));
+}
+
 /* Vencimiento */
 const f = { facturaFecha: '2026-10-01', pagado: false };
 assert.equal(B.vencimiento(f, 30), '2026-10-31');

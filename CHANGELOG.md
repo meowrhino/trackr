@@ -5,6 +5,15 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-11-19 — Presupuestos: se pueden borrar, y se edita todo desde su ventana
+
+### ✨ Nuevo
+- **Borrar un presupuesto**: × en la lista y «Eliminar» en su ventana, con aviso antes. Su número queda libre para el siguiente. La marca del proyecto pasa al presupuesto que aún lo incluya, o se quita. _frontend_
+- **La ventana de editar lo cambia todo**: también el número (avisa si ya existe ese año) y el estado; aceptarlo desde ahí activa los proyectos potenciales, igual que el ✓. El cliente no se cambia. _frontend_
+- **En la lista, × ya no rechaza**: borra, como en gastos y clientes. Rechazar pasa a ser ⊘. _frontend_
+
+---
+
 ## 2026-11-19 — Subproyectos: un proyecto, varias partes con su importe
 
 ### ✨ Nuevo

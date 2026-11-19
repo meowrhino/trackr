@@ -324,17 +324,30 @@ Object.assign(App, {
     return { lineas, validez: Number.isFinite(v) && v >= 0 ? v : undefined };
   },
 
-  /** Editar un presupuesto guardado: fecha, validez, descripción y proyectos (marcar o desmarcar). El número no cambia. */
+  /** Editar un presupuesto guardado: número, fecha, validez, estado, descripción y líneas. También se borra desde aquí. El cliente no cambia. */
   budEditModal(id) {
     const b = D.bud(id); if (!b) return;
     this.om(`<div class="mt">${t('bud.edit')} · ${esc(b.num)}/${yearShort(b.fecha)}</div>`
       + `<div class="fg"><label>${t('fac.client')}</label><div style="font-size:.9rem">${esc(D.cl(b.clienteId)?.nombre || '')}</div></div>`
-      + `<div class="fr"><div class="fg"><label>${t('field.date')}</label><input type="date" id="budDate" value="${b.fecha}"></div>`
+      + `<div class="fr"><div class="fg"><label>${t('bud.num')}</label><input type="text" id="budNum" value="${esc(b.num)}" style="font-family:'DM Mono',monospace"></div>`
+      + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="budDate" value="${b.fecha}"></div>`
       + `<div class="fg"><label>${t('bud.validez')}</label><input type="number" id="budVal" min="0" step="1" value="${b.validez ?? ''}" style="font-family:'DM Mono',monospace"></div></div>`
+      + `<div class="fg"><label>${t('field.status')}</label><select id="budSt">${['enviado', 'aceptado', 'rechazado'].map(k => `<option value="${k}" ${k === b.estado ? 'selected' : ''}>${t('bud.st.' + k)}</option>`).join('')}</select></div>`
       + `<div class="fg"><label>${t('bud.projects')}</label><div class="cl-list">${this._budRows(b.clienteId, b.lineas, () => false)}</div></div>`
       + `<div class="fg"><label>${t('bud.desc')}</label><textarea id="budDesc" placeholder="${t('bud.descPh')}">${esc(b.descripcion || '')}</textarea></div>`
-      + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button>`
-      + `<button class="bt bt-p" onclick="App.budSaveEdit('${b.id}')">${t('btn.save')}</button></div>`);
+      + `<div class="ma" style="justify-content:space-between"><button class="bt bt-d" onclick="App.budDel('${b.id}')">${t('btn.delete')}</button>`
+      + `<div style="display:flex;gap:.5rem"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button>`
+      + `<button class="bt bt-p" onclick="App.budSaveEdit('${b.id}')">${t('btn.save')}</button></div></div>`);
+  },
+
+  /** Borrar un presupuesto (desde la lista o desde su ventana). Pregunta antes: no se puede deshacer. */
+  budDel(id) {
+    const b = D.bud(id); if (!b) return;
+    if (!confirm(t('bud.deleteConfirm', `${b.num}/${yearShort(b.fecha)}`))) return;
+    D.delBud(id);
+    this._mDirty = false; /* la ventana, si está abierta, se cierra sin preguntar por lo escrito */
+    this.cm();
+    this.rBud();
   },
 
   budSaveEdit(id) {
@@ -343,14 +356,21 @@ Object.assign(App, {
     if (!lineas.length) return Toast.error(t('bud.none'));
     const fecha = document.getElementById('budDate').value || b.fecha;
     const descripcion = document.getElementById('budDesc').value.trim();
-    const total = Fac._budData(b.clienteId, lineas, { num: b.num, fecha, descripcion, validez }).data.calculos.total;
-    /* Marca del proyecto: los quitados la pierden; los que siguen o entran llevan la fecha nueva */
-    b.lineas.forEach(l => { if (!lineas.some(x => x.pid === l.pid) && D.p(l.pid)?.presupuesto?.num === b.num) D.up(l.pid, { presupuesto: null }); });
-    lineas.forEach(l => { const p = D.p(l.pid); if (p && (!p.presupuesto || p.presupuesto.num === b.num)) D.up(l.pid, { presupuesto: { num: b.num, fecha } }); });
-    D.upBud(id, { lineas, fecha, descripcion, validez, total });
-    Toast.ok(t('bud.saved', b.num));
+    /* Número: si no se toca se queda como estaba (los antiguos son un número, no un texto) */
+    const tecleado = document.getElementById('budNum').value.trim(), antes = b.num;
+    const num = !tecleado || tecleado === String(antes) ? antes : tecleado;
+    if (D.budNumTaken(num, fecha, id)) return Toast.error(t('bud.numTaken', num + '/' + yearShort(fecha)));
+    const estado = document.getElementById('budSt').value;
+    const total = Fac._budData(b.clienteId, lineas, { num, fecha, descripcion, validez }).data.calculos.total;
+    /* Marca del proyecto: los quitados la pierden; los que siguen o entran llevan el número y la fecha nuevos */
+    b.lineas.forEach(l => { if (!lineas.some(x => x.pid === l.pid) && D.p(l.pid)?.presupuesto?.num === antes) D.up(l.pid, { presupuesto: null }); });
+    lineas.forEach(l => { const p = D.p(l.pid); if (p && (!p.presupuesto || p.presupuesto.num === antes)) D.up(l.pid, { presupuesto: { num, fecha } }); });
+    D.upBud(id, { num, lineas, fecha, descripcion, validez, total });
+    Toast.ok(t('bud.saved', num));
+    this._mDirty = false;
     this.cm();
-    this.rBud();
+    /* Aceptarlo desde aquí hace lo mismo que el ✓ de la lista (activa los proyectos potenciales) */
+    if (estado !== b.estado) this.budEstado(id, estado); else this.rBud();
   },
 
   budGen(cid) {

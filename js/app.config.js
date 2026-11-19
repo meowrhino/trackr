@@ -473,8 +473,10 @@ Object.assign(App, {
             + `<div class="cl-actions"><button class="cl-btn" onclick="App.budPdf('${b.id}')" title="${t('btn.downloadPdf')}">&#9113;</button>`
             + `<button class="cl-btn" onclick="App.budEditModal('${b.id}')" title="${t('bud.edit')}">&#9998;</button>`
             + (b.estado === 'enviado'
-              ? `<button class="cl-btn" style="color:var(--ok)" onclick="App.budEstado('${b.id}','aceptado')" title="${t('bud.accept')}">&#10003;</button><button class="cl-btn cl-btn-del" onclick="App.budEstado('${b.id}','rechazado')" title="${t('bud.reject')}">&times;</button>`
+              ? `<button class="cl-btn" style="color:var(--ok)" onclick="App.budEstado('${b.id}','aceptado')" title="${t('bud.accept')}">&#10003;</button><button class="cl-btn" onclick="App.budEstado('${b.id}','rechazado')" title="${t('bud.reject')}">&#8856;</button>`
               : `<button class="cl-btn" onclick="App.budEstado('${b.id}','enviado')" title="${t('bud.reopen')}">&#8634;</button>`)
+            /* × borra, como en el resto de listas; rechazar es ⊘ */
+            + `<button class="cl-btn cl-btn-del" onclick="App.budDel('${b.id}')" title="${t('btn.delete')}">&times;</button>`
             + `</div></div>`;
         }).join('')}</div>`
       : `<div style="color:var(--t3);font-size:.82rem">${t('bud.listNone')}</div>`;
