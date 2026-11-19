@@ -5,6 +5,13 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-11-19 — Importar: se ve qué cambia, sección por sección
+
+### ✨ Nuevo
+- **El aviso de importar ya no es el `confirm()` del navegador**: es una ventana con un desplegable por sección (proyectos, clientes, gastos, facturas y, aparte y al final, presupuestos). Dentro, qué entra (+), qué sale (−) y qué cambia y en qué (estado, horas con su diferencia, cobrada…). _frontend_
+
+---
+
 ## 2026-11-19 — Presupuestos: se pueden borrar, y se edita todo desde su ventana
 
 ### ✨ Nuevo

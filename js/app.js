@@ -374,41 +374,81 @@ const App = {
         if (d.gastos && !Array.isArray(d.gastos)) { Toast.error(t('msg.invalidJsonGastos')); return; }
         if (badIds(d).length) { Toast.error(t('msg.invalidJsonIds')); return; }
         if (!d.settings) d.settings = { defaultIva: 21, defaultIrpf: 15 };
-        /* Importar SUSTITUYE todo: preguntar si hay datos y guardar antes una copia */
+        /* Importar SUSTITUYE todo: si hay datos, enseñar qué cambia y pedir confirmación */
         const cur = (D.d.projects || []).length + (D.d.gastos || []).length + (D.d.clientes || []).length;
-        if (cur && !confirm(t('msg.importConfirm', D.d.projects.length, d.projects.length) + '\n\n' + this._importDiff(D.d, d))) return;
-        if (cur && typeof H !== 'undefined' && H.snapshot) H.snapshot();
-        D.load(d); T.ev('action', 'import');
-        this._applyPrefs();
-        Toast.ok(t('msg.importSuccess'));
-        this.go(this.cv);
+        if (!cur) return this._impGo(d, false);
+        this._impData = d;
+        this.om(`<div class="mt">${t('nav.import')}</div>`
+          + `<p class="small" style="color:var(--t2)">${t('msg.importConfirm', D.d.projects.length, d.projects.length)}</p>`
+          + this._importDiff(D.d, d)
+          + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App._impGo()">${t('nav.import')}</button></div>`);
       } catch (err) { Toast.error(t('msg.importError') + err.message); }
     };
     r.readAsText(f); ev.target.value = '';
   },
 
-  /** Resumen de lo que cambia al importar: por lista, cuántos se añaden / quitan / cambian
-   *  (con los nombres de los primeros) y la diferencia de horas. Texto plano para confirm(). */
+  /** Sustituye los datos por los importados (antes, copia en Copias de seguridad si había algo). */
+  _impGo(d = this._impData, snap = true) {
+    this._impData = null;
+    try {
+      if (snap && typeof H !== 'undefined' && H.snapshot) H.snapshot();
+      D.load(d); T.ev('action', 'import');
+      this._applyPrefs();
+      document.getElementById('mO').classList.remove('on');
+      Toast.ok(t('msg.importSuccess'));
+      this.go(this.cv);
+    } catch (err) { Toast.error(t('msg.importError') + err.message); }
+  },
+
+  /** Qué cambia al importar, como HTML: un desplegable por lista (proyectos, clientes, gastos,
+   *  facturas y, aparte, presupuestos) con lo que entra, lo que sale y lo que cambia y en qué. */
   _importDiff(a, b) {
-    const lines = [];
-    const lists = [['projects', t('imp.diff.projects')], ['clientes', t('imp.diff.clients')], ['gastos', t('imp.diff.expenses')]];
-    const names = (xs) => xs.slice(0, 3).map(x => x.nombre || x.id).join(', ') + (xs.length > 3 ? ` (+${xs.length - 3})` : '');
-    for (const [k, label] of lists) {
-      const A = new Map((a[k] || []).map(x => [x.id, x])), Bm = new Map((b[k] || []).map(x => [x.id, x]));
+    const hrs = (p) => Math.round((p.horas || []).reduce((x, h) => x + (h.cantidad || 0), 0) * 100) / 100;
+    const sgn = (n) => (n > 0 ? '+' : '') + n;
+    const cname = (d, id) => ((d.clientes || []).find(c => c.id === id) || {}).nombre || '';
+    /* Facturas = proyectos con número; presupuestos = su lista. Clave: número/año; _n solo se enseña */
+    const facs = (d) => (d.projects || []).filter(p => p.facturacion?.facturaNum).map(p => ({
+      id: `${p.facturacion.facturaNum}/${yearShort(p.facturacion.facturaFecha || todayStr())}`, _n: p.nombre,
+      fecha: p.facturacion.facturaFecha, total: p.facturacion.totalFactura, pagado: p.facturacion.pagado }));
+    const buds = (d) => (d.presupuestos || []).map(x => ({ id: `${x.num}/${yearShort(x.fecha)}`, _n: cname(d, x.clienteId), clienteId: x.clienteId,
+      fecha: x.fecha, total: x.total, estado: x.estado, lineas: x.lineas, descripcion: x.descripcion }));
+    const lists = [
+      [t('imp.diff.projects'), a.projects, b.projects],
+      [t('imp.diff.clients'), a.clientes, b.clientes],
+      [t('imp.diff.expenses'), a.gastos, b.gastos],
+      [t('imp.diff.invoices'), facs(a), facs(b), true],
+      /* Un save viejo sin la lista los recrea al cargar (store.js): no decir que desaparecen */
+      ...(Array.isArray(b.presupuestos) ? [[t('imp.diff.budgets'), buds(a), buds(b), true]] : [])
+    ];
+    const field = (k) => { const l = t('imp.f.' + k); return l === esc('imp.f.' + k) ? esc(k) : l; };
+    const label = (x, num) => num ? `${esc(x.id)}${x._n ? ' · ' + esc(x._n) : ''}` : esc(x.nombre || x.id);
+    const diffKeys = (o, x) => [...new Set([...Object.keys(o), ...Object.keys(x)])].filter(k => k[0] !== '_' && JSON.stringify(o[k]) !== JSON.stringify(x[k]));
+    let html = '';
+    for (const [title, xa, xb, num] of lists) {
+      const A = new Map((xa || []).map(x => [x.id, x])), Bm = new Map((xb || []).map(x => [x.id, x]));
       const add = [...Bm.values()].filter(x => !A.has(x.id));
       const del = [...A.values()].filter(x => !Bm.has(x.id));
-      const chg = [...Bm.values()].filter(x => A.has(x.id) && JSON.stringify(A.get(x.id)) !== JSON.stringify(x));
+      const chg = [...Bm.values()].filter(x => A.has(x.id) && diffKeys(A.get(x.id), x).length);
       if (!add.length && !del.length && !chg.length) continue;
       const parts = [];
-      if (add.length) parts.push(t('imp.diff.add', add.length, names(add)));
-      if (del.length) parts.push(t('imp.diff.del', del.length, names(del)));
+      if (add.length) parts.push(t('imp.diff.add', add.length));
+      if (del.length) parts.push(t('imp.diff.del', del.length));
       if (chg.length) parts.push(t('imp.diff.chg', chg.length));
-      lines.push(`${label}: ${parts.join(' · ')}`);
+      const li = [
+        ...add.map(x => `<li><span style="color:var(--ok)">+</span> ${label(x, num)}</li>`),
+        ...del.map(x => `<li><span style="color:var(--bad)">−</span> ${label(x, num)}</li>`),
+        ...chg.map(x => {
+          const o = A.get(x.id);
+          const what = diffKeys(o, x).map(k => k === 'horas' && hrs(x) !== hrs(o) ? `${field(k)} (${sgn(Math.round((hrs(x) - hrs(o)) * 100) / 100)} h)` : field(k));
+          return `<li>~ ${label(x, num)}: <span style="color:var(--t3)">${what.join(', ')}</span></li>`;
+        })
+      ];
+      html += `<details class="fg" style="margin-top:.5rem"><summary style="cursor:pointer"><strong>${title}</strong> · ${parts.join(' · ')}</summary>`
+        + `<ul class="small" style="margin:.4rem 0 0 .9rem;padding:0;list-style:none">${li.join('')}</ul></details>`;
     }
-    const hrs = (d) => (d.projects || []).reduce((s, p) => s + (p.horas || []).reduce((x, h) => x + (h.cantidad || 0), 0), 0);
-    const dh = Math.round((hrs(b) - hrs(a)) * 100) / 100;
-    if (dh) lines.push(t('imp.diff.hours', (dh > 0 ? '+' : '') + dh));
-    return lines.length ? lines.join('\n') : t('imp.diff.same');
+    const dh = Math.round(((b.projects || []).reduce((s, p) => s + hrs(p), 0) - (a.projects || []).reduce((s, p) => s + hrs(p), 0)) * 100) / 100;
+    if (dh) html += `<p class="small" style="margin-top:.5rem">${t('imp.diff.hours', sgn(dh))}</p>`;
+    return html || `<p class="small" style="margin-top:.5rem">${t('imp.diff.same')}</p>`;
   },
 
   /** Enciende o apaga el envío de estadísticas según settings.compartirUso (por defecto, sí). */
