@@ -300,7 +300,10 @@ Object.assign(App, {
         base: p.facturacion?.modo === 'gratis' ? '' : (p.facturacion?.baseImponible || '')
       });
     });
-    return rows.map(r => `<div class="cl-item bud-line" data-pid="${r.pid}"${r.sub ? ` data-sub="${esc(r.sub)}"` : ''} style="gap:.5rem">`
+    /* Los subproyectos van bajo el nombre de su proyecto y metidos hacia dentro: sin eso no se distinguen de un proyecto */
+    return rows.map((r, i) => (r.sub && !(rows[i - 1]?.sub && rows[i - 1].pid === r.pid)
+        ? `<div class="cl-item" style="cursor:default;color:var(--t2);font-size:.78rem;padding-bottom:.2rem">${esc(D.p(r.pid)?.nombre || '')}</div>` : '')
+      + `<div class="cl-item bud-line" data-pid="${r.pid}"${r.sub ? ` data-sub="${esc(r.sub)}"` : ''} style="gap:.5rem${r.sub ? ';padding-left:1.75rem' : ''}">`
       + `<input type="checkbox" ${r.on ? 'checked' : ''} style="width:auto">`
       + `<input type="text" class="bud-c" value="${esc(r.concepto)}" style="flex:1">`
       + `<input type="number" class="bud-b" step="0.01" min="0" value="${r.base}" placeholder="0" style="width:7rem;font-family:'DM Mono',monospace">`
