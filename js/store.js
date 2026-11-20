@@ -140,22 +140,10 @@ const D = {
       saldoIvaInicial: 0     /* IVA a compensar pendiente anterior al primer dato en TRACKR */
     };
 
-    /* Verifactu / SIF — solo opciones de usuario. SIF_ID y SOFTWARE_VERSION
-       viven en js/verifactu.js como constantes del fabricante, no aquí. */
-    if (!s.verifactu) s.verifactu = {
-      habilitado: false,           /* Apagado por defecto hasta que la remisión a AEAT (Fase 3)
-                                      esté viva: el QR promete cotejo en la sede y aún no remitimos. */
-      lastInvoiceHash: null,       /* Hash de la última factura firmada (cadena por emisor) */
-      env: 'prod'                  /* 'prod' o 'test' — endpoint AEAT en el QR */
-    };
-    /* Migración: settings antiguos traían habilitado:true de fábrica, pero ningún usuario pudo
-       elegirlo (la sección estaba oculta sin verifactu.js). Forzar off salvo elección explícita. */
-    if (!s.verifactu.userSet) s.verifactu.habilitado = false;
-    /* Limpieza: si quedan campos legacy del fabricante en el settings de un user, descartarlos */
-    if (s.verifactu) {
-      delete s.verifactu.sifId;
-      delete s.verifactu.softwareVersion;
-    }
+    /* VeriFactu está desconectado (aparcado/verifactu/): no se firma ni se envía nada. Quien lo
+       activó en su día conserva sus registros en d.facturas (solo lectura: una anulada sigue
+       anulada), pero la opción queda apagada para todo el mundo. */
+    if (s.verifactu) s.verifactu.habilitado = false;
 
     /* Migrar usuario legacy → emisor.nombre */
     if (s.usuario && !s.emisor.nombre) {
@@ -801,57 +789,11 @@ const D = {
   },
 
   /* ══════════════════════════════════════════════
-   *  FACTURAS (Verifactu — registro inmutable)
+   *  FACTURAS firmadas en su día con VeriFactu (solo lectura; ver aparcado/verifactu/)
    * ══════════════════════════════════════════════ */
 
-  /** Todas las facturas firmadas (registro Verifactu) */
+  /** Registros que dejó VeriFactu cuando estuvo activo (altas y anulaciones) */
   fs() { return this.d.facturas; },
-
-  /** Facturas de un emisor (filtradas por NIF) en orden de la cadena.
-   *  Ordena por `seq` (epoch ms monótono guardado al firmar), NO por el string
-   *  del timestamp con huso: en el cambio de hora de otoño dos registros a la misma
-   *  hora local llevan offsets +02:00 y +01:00 y el orden lexicográfico los invertía,
-   *  rompiendo la cadena en falso. El epoch ms es monótono y sin ambigüedad. */
-  fsBy(nif) {
-    const n = (nif || '').replace(/[\s-]/g, '').toUpperCase();
-    const key = f => (f.seq != null ? f.seq : Date.parse(f.timestamp) || 0);
-    return this.d.facturas
-      .filter(f => (f.emisorNif || '').toUpperCase() === n)
-      .sort((a, b) => key(a) - key(b));
-  },
-
-  /** Hash de la última factura del emisor (para encadenar la siguiente) */
-  lastHashFor(nif) {
-    const arr = this.fsBy(nif);
-    return arr.length ? arr[arr.length - 1].hash : null;
-  },
-
-  /**
-   * Persiste una factura firmada en el registro Verifactu.
-   * No permite modificar facturas ya firmadas (registro inmutable).
-   */
-  addFact(f) {
-    this.d.facturas.push(f);
-    /* Actualizar lastInvoiceHash en settings.verifactu */
-    if (!this.d.settings.verifactu) this.d.settings.verifactu = {};
-    this.d.settings.verifactu.lastInvoiceHash = f.hash;
-    this._audit('crear', 'factura', f.id);
-    this.save();
-  },
-
-  /**
-   * Añade un evento (anulación, rectificación) a una factura existente.
-   * No modifica los datos originales; solo añade al array eventos[].
-   */
-  addFactEvent(factId, evento) {
-    const i = this.d.facturas.findIndex(f => f.id === factId);
-    if (i !== -1) {
-      if (!this.d.facturas[i].eventos) this.d.facturas[i].eventos = [];
-      this.d.facturas[i].eventos.push(evento);
-      this._audit('editar', 'factura', factId);
-      this.save();
-    }
-  },
 
 
   /* ── Presupuestos (sin auditoría: no los ve la gestoría) ── */

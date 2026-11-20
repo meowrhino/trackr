@@ -22,19 +22,19 @@ de él salvo que tú lo pidas.
 - **Fiscalidad exacta, no aproximada**: 130 acumulativo con casillas 05/13/15, 303 con numeración
   oficial, ISP e informativas 59/120, renta desglosada por casilla. Referencia completa con
   fuentes en [TODO/20](TODO/20-modelos-fiscales-casillas.md).
-- **VeriFactu**: huella oficial encadenada + QR de cotejo ya implementados (apagado por defecto);
-  la remisión a AEAT está en camino — plan completo en [TODO/15](TODO/15-verifactu.md).
+- **VeriFactu**: desconectado. trackr no firma ni remite facturas a la AEAT; lo que había está
+  aparcado en [`aparcado/verifactu/`](aparcado/verifactu/LEEME.md), fuera de la app.
 
 ## Stack
 
-Vanilla JS sin build ni dependencias de runtime (los vendors — jsPDF, qrcode — van en `vendor/`).
-Módulos como globales (`D` store, `App` UI, `Acc` cuentas, `V` verifactu, `B` billing, `F` fiscal,
+Vanilla JS sin build ni dependencias de runtime (los vendors — jsPDF, lz-string, argon2 — van en `vendor/`).
+Módulos como globales (`D` store, `App` UI, `Acc` cuentas, `B` billing, `F` fiscal,
 `LR` libros registro…) cargados
 en orden desde `index.html`. El backend es un repo aparte:
 [trackr-api](https://github.com/meowrhino/trackr-api) (Cloudflare Worker + D1 + R2).
 
 ```
-js/          lógica (store, vistas, cuentas, gestor, verifactu, facturas…)
+js/          lógica (store, vistas, cuentas, gestor, facturas…)
 css/         estilos (variables.css primero, responsive.css último)
 journey/     widget kanban de customer journey (autocontenido)
 examples/    cuentas de ejemplo completas (las fechas futuras son intencionales)

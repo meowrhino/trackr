@@ -60,7 +60,6 @@ Object.assign(App, {
             + `</div><span class="theme-name">${t('theme.' + id)}</span></button>`;
         }).join('')}</div></div>`
       + this._cfgStatsSection()
-      + this._cfgVerifactuSection()
       + (this._cfgGestoresSection ? this._cfgGestoresSection() : '')
       + this._cfgAuditSection()
       + this._cfgHistorySection();
@@ -198,7 +197,6 @@ Object.assign(App, {
     } else Toast.error(t(r === 'nobackup' ? 'msg.noBackup' : 'msg.restoreFailed'));
   },
 
-  /** Sección Verifactu: identidad SIF + lista de facturas firmadas + verificar cadena */
   /** Estadísticas de uso anónimas: activadas por defecto mientras trackr está en desarrollo. */
   _cfgStatsSection() {
     const on = D.d.settings.compartirUso !== false;
@@ -207,82 +205,7 @@ Object.assign(App, {
       + `<input type="checkbox" ${on ? 'checked' : ''} onchange="App.setStats(this.checked)" style="width:auto;margin-top:.2rem">${t('stats.label')}</label></div>`;
   },
 
-  _cfgVerifactuSection() {
-    /* Si verifactu.js no se ha cargado (p.ej. deploy parcial), omitir la sección
-       en vez de romper toda la vista de Configuración. */
-    if (typeof V === 'undefined') return '';
-    const v = D.d.settings.verifactu || {};
-    const facts = D.fs() || [];
-    const emisor = D.d.settings.emisor?.nif || '';
-    const lastH = v.lastInvoiceHash ? v.lastInvoiceHash.slice(0, 24) + '…' : '—';
-    return `<div class="cfg-section" style="margin-top:2.5rem"><div class="cfg-section-title">${t('cfg.vfTitle')}</div>`
-      + `<p style="color:var(--t3);font-size:.82rem;margin-bottom:.75rem">${t('cfg.vfDesc')}</p>`
-      + `<div style="background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:.7rem 1rem;margin-bottom:.75rem;font-size:.82rem">`
-      +   `<div><strong>${t('cfg.vfSifId')}:</strong> <code class="mono">${esc(V.SIF_ID)}</code> &middot; <strong>${t('cfg.vfVersion')}:</strong> <code class="mono">${esc(V.SOFTWARE_VERSION)}</code></div>`
-      +   `<div style="color:var(--t3);font-size:.72rem;margin-top:.25rem">${t('cfg.vfFixedNote')}</div>`
-      + `</div>`
-      + `<div class="cfg-grid">`
-      + `<div class="fg"><label>${t('cfg.vfEnv')}</label><select id="cfgVfEnv"><option value="prod" ${v.env !== 'test' ? 'selected' : ''}>${t('cfg.vfEnvProd')}</option><option value="test" ${v.env === 'test' ? 'selected' : ''}>${t('cfg.vfEnvTest')}</option></select></div>`
-      + `<div class="fg"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="cfgVfEnabled" ${v.habilitado === true ? 'checked' : ''}> ${t('cfg.vfEnabled')}${itip('tip.verifactu')}</label></div>`
-      + `</div>`
-      + `<p class="small" style="color:var(--t3);margin-top:.5rem">${t('cfg.vfLastHash')}: <code class="mono" style="font-size:.72rem">${esc(lastH)}</code> · ${t('cfg.vfTotalSigned', facts.length)} · ${t('cfg.vfEmisor')}: ${esc(emisor || t('cfg.vfNoEmisor'))}</p>`
-      + this._vfRemisionLine(facts, v)
-      + `<div class="cfg-save" style="gap:.5rem;display:flex"><button class="bt bt-p" onclick="App.saveVerifactu()">${t('btn.save')}</button>`
-      + `<button class="bt" onclick="App.verifyChain()">&#128274; ${t('cfg.vfVerifyChain')}</button>`
-      + `<button class="bt" onclick="App.vfSelfTest()">${t('cfg.vfSelfTest')}</button></div>`
-      + `</div>`;
-  },
-
-  /* Estado de la remisión (Fase 3): cuántos registros esperan en la cola del servidor
-     y cuántos ni siquiera se han encolado. Solo con VeriFactu activado. */
-  _vfRemisionLine(facts, v) {
-    if (v.habilitado !== true || !facts.length) return '';
-    const enCola = facts.filter(f => f.remitida).length;
-    const pend = facts.length - enCola;
-    const hasSession = typeof Acc !== 'undefined' && Acc.status().state === 'in' && Acc.status().active;
-    let inner = `${t('cfg.vfRemisionState', enCola, pend)}`;
-    if (pend > 0) {
-      inner += hasSession
-        ? ` <button class="bt" style="font-size:.68rem;padding:.15rem .5rem" onclick="App.vfPushNow()">${t('cfg.vfPushNow')}</button>`
-        : ` · ${t('cfg.vfNeedsAccount')}`;
-    }
-    return `<p class="small" style="color:var(--t3);margin-top:.35rem">${t('cfg.vfRemision')}: ${inner}<br><span style="font-size:.7rem">${t('cfg.vfRemisionNote')}</span></p>`;
-  },
-
-  async vfPushNow() {
-    await Acc.pushVerifactu();
-    this.rCfg();
-    Toast.ok(t('cfg.vfPushed'));
-  },
-
-  saveVerifactu() {
-    const v = D.d.settings.verifactu || {};
-    /* sifId y softwareVersion son constantes en js/verifactu.js, no aquí */
-    v.env = document.getElementById('cfgVfEnv').value === 'test' ? 'test' : 'prod';
-    v.habilitado = document.getElementById('cfgVfEnabled').checked;
-    v.userSet = true; /* elección explícita: la migración de defaults ya no la pisa */
-    D.d.settings.verifactu = v;
-    D._audit('editar', 'settings', null);
-    D.save();
-    Toast.ok(t('cfg.saved'));
-  },
-
-  async verifyChain() {
-    const emisor = D.d.settings.emisor?.nif;
-    if (!emisor) { Toast.warn(t('cfg.vfNoEmisor')); return; }
-    const facts = D.fsBy(emisor);
-    if (!facts.length) { Toast.ok(t('cfg.vfNothingToVerify')); return; }
-    const res = await V.verifyChain(facts);
-    if (res.ok) {
-      Toast.ok(t('cfg.vfChainOk', res.total));
-    } else {
-      Toast.error(t('cfg.vfChainBroken', res.broken.length, res.total));
-      console.warn('Verifactu cadena rota:', res.broken);
-    }
-  },
-
-  /** Anula una factura: registro de anulacion encadenado + evento en la original. */
-  /** Anular sin VeriFactu: la factura queda marcada en su proyecto (sale de 303/130/libros y
+  /** Anular: la factura queda marcada en su proyecto (sale de 303/130/libros y
    *  de los avisos de cobro) y su número sigue gastado. Para una factura que no debía existir;
    *  si cambia el importe, lo correcto es rectificar. */
   anularLocal(pid) {
@@ -307,50 +230,6 @@ Object.assign(App, {
     D.borrarFactura(pid);
     Toast.ok(t('fac.deleteOk', num));
     this.go(this.cv, this.cv === 'det' ? pid : undefined);
-  },
-
-  async anularFactura(id) {
-    const f = (D.fs() || []).find(x => x.id === id);
-    if (!f || typeof V === 'undefined') return;
-    if (!confirm(t('cfg.vfAnularConfirm', f.numero))) return;
-    const hashPrev = D.lastHashFor(f.emisorNif);
-    const fechaHoraHuso = V.nowHuso();
-    try {
-      const hash = await V.huellaAnulacion({
-        emisorNif: f.emisorNif,
-        numSerie: f.numero,
-        fecha: f.fecha,
-        huellaPrev: hashPrev || '',
-        fechaHoraHuso
-      });
-      D.addFact({
-        id: uid(),
-        tipoRegistro: 'anulacion',
-        numero: f.numero,
-        fecha: f.fecha,
-        emisorNif: f.emisorNif,
-        refFactura: f.id,
-        hash,
-        hashPrev: hashPrev || null,
-        timestamp: fechaHoraHuso,
-        seq: Date.now(),
-        eventos: []
-      });
-      D.addFactEvent(f.id, { tipo: 'anulada', fecha: fechaHoraHuso });
-      Toast.ok(t('cfg.vfAnulacionOk', f.numero));
-      this.go(this.cv);
-    } catch (err) {
-      console.warn('Verifactu anulacion failed:', err);
-      Toast.error(t('cfg.vfChainBroken', 1, 1));
-    }
-  },
-
-  /** Valida el algoritmo de huella contra los vectores oficiales AEAT (doc v0.1.2 §6). */
-  async vfSelfTest() {
-    if (typeof V === 'undefined') return;
-    const r = await V.selfTest();
-    if (r.ok) Toast.ok(t('cfg.vfSelfTestOk', r.casos));
-    else { Toast.error(t('cfg.vfSelfTestBad')); console.warn('Verifactu self-test:', r); }
   },
 
   setLanguage(code) {
@@ -538,7 +417,7 @@ Object.assign(App, {
             + `<span class="cl-nif" style="font-size:.68rem;color:${st[1]}">${stLabel}</span>`
             + `<div class="cl-actions"><button class="cl-btn" onclick="App.facPdf('${p.id}')" title="${t('btn.downloadPdf')}">&#9113;</button>`
             + (!f.pagado && !anulada ? `<button class="cl-btn" onclick="App.facRecordatorio('${p.id}')" title="${t('fac.reminder')}">&#9993;</button>` : '')
-            + (!anulada ? `<button class="cl-btn cl-btn-del" onclick="${reg ? `App.anularFactura('${reg.id}')` : `App.anularLocal('${p.id}')`}" title="${t('cfg.vfAnular')}">&times;</button>` : '')
+            + (!anulada ? `<button class="cl-btn cl-btn-del" onclick="App.anularLocal('${p.id}')" title="${t('cfg.vfAnular')}">&times;</button>` : '')
             + (anulada && !D.facturaBorrable(p.id) ? `<button class="cl-btn cl-btn-del" onclick="App.borrarFactura('${p.id}')" title="${t('fac.delete')}">&#9003;</button>` : '')
             + `</div></div>`
             /* Rectificativas de esta factura, debajo, con su PDF */
@@ -569,14 +448,11 @@ Object.assign(App, {
     else Toast.error(texto);
   },
 
-  /** Vuelve a bajar el PDF de una factura ya emitida (mismo número, fecha y QR; no firma de nuevo) */
+  /** Vuelve a bajar el PDF de una factura ya emitida (mismo número y fecha) */
   facPdf(pid) {
     const p = D.p(pid); if (!p) return;
-    const f = p.facturacion, reg = this._facReg(pid);
-    const verifactu = reg && typeof V !== 'undefined'
-      ? { sifId: V.SIF_ID, softwareVersion: V.SOFTWARE_VERSION, qrPayload: reg.qrPayload, hash: reg.hash, publicUrl: V.PUBLIC_URL }
-      : null;
-    Fac.download(pid, { fecha: f.facturaFecha, num: f.facturaNum, asunto: defaultAsunto(p), verifactu });
+    const f = p.facturacion;
+    Fac.download(pid, { fecha: f.facturaFecha, num: f.facturaNum, asunto: defaultAsunto(p) });
   },
 
   clModal(cid) {

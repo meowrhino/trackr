@@ -1,11 +1,10 @@
 /* ================================================
- * TRACKR — App: Facturas, Verifactu y Cobros (UI)
+ * TRACKR — App: Facturas y Cobros (UI)
  *
  * Extiende el objeto global App (definido en app.js, cargado antes).
  * facModal/genFactura (PDF) + editClFromFac + cobros (cobroModal/saveCobro/delCobro).
- * Verifactu esta APARCADO: genFactura usa el guard "typeof V !== undefined";
- * en main el global V no existe -> sin QR ni warning (ver memoria del pivot).
- * Deps globales: Fac (facturas.js), V (verifactu.js, opcional), D, B, T, t, esc...
+ * VeriFactu está desconectado (aparcado/verifactu/): aquí no se firma ni se envía nada.
+ * Deps globales: Fac (facturas.js), D, B, T, t, esc...
  * cm() (cierre de modal con _facReturn) queda en el core app.js.
  * ================================================ */
 /** Cómo llegó el dinero de un cobro. Solo informativo: no cambia ningún cálculo fiscal. */
@@ -131,7 +130,6 @@ Object.assign(App, {
     const r = { id: uid(), num: D.nextRectNum(fecha), fecha, motivo: document.getElementById('rcMot').value.trim(), ...d };
     const rectificativas = [...(f.rectificativas || []), r];
     D.up(pid, { facturacion: { ...f, rectificativas } });
-    if (D.d.settings.verifactu?.habilitado) Toast.warn(t('rect.noVerifactu'));
     this.cm();
     Fac.downloadRect(pid, r.id);
     Toast.ok(t('rect.done', `${r.num}/${yearShort(fecha)}`));
@@ -139,8 +137,6 @@ Object.assign(App, {
   },
 
   async genFactura(pid) {
-    /* Normalizar la fecha aquí para que el PDF, el QR y el registro Verifactu usen
-       EXACTAMENTE la misma (Fac.download también cae a todayStr() si va vacía). */
     const fecha = document.getElementById('facDate').value || todayStr();
     const asunto = document.getElementById('facAsunto').value.trim();
     const numTxt = document.getElementById('facNum').value.trim();
@@ -177,85 +173,7 @@ Object.assign(App, {
       p.facturacion.asuntoFactura = asunto;
     }
 
-    const s = D.d.settings;
-    const f = p.facturacion;
-    const vCfg = s.verifactu || {};
-    // Guard: la rama Verifactu solo corre si verifactu.js (global V) esta cargado,
-    // asi un deploy parcial no rompe la generacion de facturas.
-    const verifactuOn = typeof V !== 'undefined' && vCfg.habilitado === true && s.emisor?.nif;
-
-    let verifactu = null;
-    if (verifactuOn) {
-      const numStr = String(num || f.facturaNum || D.nextFacturaNum(fecha));
-      /* NumSerieFactura = numero tal cual se imprime en el PDF: NNNN/YY (yearShort, como el PDF) */
-      const numSerie = `${numStr}/${yearShort(fecha)}`;
-      const cl = p.clienteId ? D.cl(p.clienteId) : null;
-      const emisorNif = s.emisor.nif.replace(/[\s-]/g, '').toUpperCase();
-      const hashPrev = D.lastHashFor(emisorNif);
-      const fechaHoraHuso = V.nowHuso();
-      /* F1 completa (destinatario con NIF) / F2 simplificada (sin identificar) */
-      const tipoFactura = cl?.nif ? 'F1' : 'F2';
-      const cuotaTotal = f.importeIva || 0;
-      /* ImporteTotal AEAT = base + cuota IVA, SIN restar la retencion de IRPF
-         (criterio SII/VeriFactu); el total a pagar (totalFactura) es otro campo. */
-      const importeTotal = (f.baseImponible || 0) + (f.importeIva || 0);
-      try {
-        const hash = await V.huellaAlta({
-          emisorNif,
-          numSerie,
-          fecha,
-          tipoFactura,
-          cuotaTotal,
-          importeTotal,
-          huellaPrev: hashPrev || '',
-          fechaHoraHuso
-        });
-        const qrPayload = V.buildQRPayload(emisorNif, numSerie, fecha, importeTotal, vCfg.env === 'test');
-        verifactu = {
-          sifId: V.SIF_ID,
-          softwareVersion: V.SOFTWARE_VERSION,
-          qrPayload,
-          hash,
-          publicUrl: V.PUBLIC_URL
-        };
-        /* Persistir el registro de alta en el registro inmutable. seq = epoch ms
-           monótono para ordenar la cadena sin ambigüedad de huso (ver D.fsBy).
-           sifId/softwareVersion no se guardan por registro: son constantes de V y
-           congelarlas mentiría sobre la versión con la que se firmó. */
-        D.addFact({
-          id: uid(),
-          tipoRegistro: 'alta',
-          numero: numSerie,
-          fecha,
-          emisorNif,
-          emisorNombre: s.emisor.nombre || '',
-          clienteNif: cl?.nif || '',
-          clienteNombre: cl?.nombreCompleto || cl?.nombre || '',
-          tipoFactura,
-          baseImponible: f.baseImponible || 0,
-          iva: f.iva || 0,
-          importeIva: f.importeIva || 0,
-          irpf: f.irpf || 0,
-          importeIrpf: f.importeIrpf || 0,
-          cuotaTotal,
-          importeTotal,
-          totalFactura: f.totalFactura || 0,
-          desglose: [{ impuesto: 'IVA', tipoImpositivo: f.iva || 0, base: f.baseImponible || 0, cuota: f.importeIva || 0 }],
-          proyectoId: pid,
-          hash,
-          hashPrev: hashPrev || null,
-          timestamp: fechaHoraHuso,
-          seq: Date.now(),
-          qrPayload,
-          eventos: []
-        });
-      } catch (err) {
-        console.warn('Verifactu signing failed:', err);
-        Toast.warn('Verifactu: no se pudo firmar (PDF sin QR)');
-      }
-    }
-
-    Fac.download(pid, { fecha, asunto: asunto || defaultAsunto(p), num, verifactu, diasPago: diasPago >= 0 ? diasPago : undefined });
+    Fac.download(pid, { fecha, asunto: asunto || defaultAsunto(p), num, diasPago: diasPago >= 0 ? diasPago : undefined });
     T.ev('action', 'invoice_generate');
     this.cm(); this.rDet(pid);
     this._firstInvoice();

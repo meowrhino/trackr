@@ -5,6 +5,19 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-11-20 — VeriFactu, desconectado y aparcado
+
+### 🧹 Quitado
+- **trackr ya no hace nada de VeriFactu**. Decía en la factura «verificable en la sede electrónica de la AEAT» y ponía el QR, pero no se remitía nada; y con la opción activada las facturas subían legibles al servidor (NIF, nombres, importes), en contra de «ni nosotros podemos leer tus datos». Mejor que no exista a que mienta. _frontend + backend_
+- Fuera: la sección de Configuración (con su nota interna «TODO/15» a la vista), la firma al emitir, el QR y la leyenda del PDF, el aviso de la rectificativa y el envío a la cola del servidor. La opción queda apagada para todo el mundo. _frontend_
+- En el servidor: las rutas `/v1/verifactu/*` ya no existen y la tabla con lo encolado se borra con `scripts/drop-verifactu.sql` (hay que lanzarlo a mano al desplegar). _backend_
+- Todo el código está en `aparcado/verifactu/` (en los dos repos), con un LEEME que cuenta qué era y por qué se quitó. No se carga ni se publica.
+
+### Lo que no cambia
+- Quien lo tuvo activado conserva sus registros: una factura anulada entonces sigue anulada, y una ya firmada no se puede borrar.
+
+---
+
 ## 2026-11-20 — Fiscal sencillo: el céntimo, clientes de fuera, gastos y presupuestos
 
 ### 🐛 Arreglado
