@@ -46,7 +46,7 @@ Object.assign(App, {
       (g.entradas || []).forEach(e => {
         if (!e.fecha) return;
         if (!gm[e.fecha]) gm[e.fecha] = [];
-        gm[e.fecha].push({ gn: g.nombre, gc, cant: e.cantidad || 0 });
+        gm[e.fecha].push({ gn: g.nombre, gc, cant: gastoCoste(e) });
       });
     });
 
@@ -77,7 +77,7 @@ Object.assign(App, {
       const gc = colorHex(gasto.color || 'Salmon');
       (gasto.entradas || []).forEach(e => {
         if (e.fecha && e.fecha.startsWith(mKey)) {
-          monthGastos.push({ gn: gasto.nombre, gc, cant: e.cantidad || 0, fecha: e.fecha, nota: e.nota || '' });
+          monthGastos.push({ gn: gasto.nombre, gc, cant: gastoCoste(e), fecha: e.fecha, nota: e.nota || '' });
         }
       });
     });
@@ -175,7 +175,7 @@ Object.assign(App, {
       const gc = colorHex(gasto.color || 'Salmon');
       (gasto.entradas || []).forEach(e => {
         if (e.fecha && dateSet.has(e.fecha)) {
-          weekGastos.push({ gn: gasto.nombre, gc, cant: e.cantidad || 0, fecha: e.fecha });
+          weekGastos.push({ gn: gasto.nombre, gc, cant: gastoCoste(e), fecha: e.fecha });
         }
       });
     });
@@ -597,7 +597,7 @@ Object.assign(App, {
     D.gs().forEach(gasto => {
       const gc = colorHex(gasto.color || 'Salmon');
       (gasto.entradas || []).forEach(e => {
-        if (e.fecha === ds) dayGastos.push({ gn: gasto.nombre, gc, cant: e.cantidad || 0, nota: e.nota || '' });
+        if (e.fecha === ds) dayGastos.push({ gn: gasto.nombre, gc, cant: gastoCoste(e), nota: e.nota || '' });
       });
     });
     if (dayGastos.length) {

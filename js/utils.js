@@ -38,6 +38,7 @@ let GASTO_CAT = {
   software:     'Software',
   marketing:    'Marketing',
   oficina:      'Oficina',
+  alquiler:     'Alquiler',
   cotizacion:   'Cotización',
   amortizacion: 'Amortización',
   suministros:  'Suministros',
@@ -98,7 +99,14 @@ let DIAS_SEM = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
  * ══════════════════════════════════════════════ */
 
 /** Redondea a 2 decimales (céntimos) */
-function roundMoney(v) { return Math.round(v * 100) / 100 + 0; } /* + 0: un resto negativo minúsculo da -0, que se pintaba «-0,00 €» */
+function roundMoney(v) {
+  /* 306,50 × 21 % = 64,365, pero en coma flotante es 64,36499999…: Math.round a secas daba 64,36.
+     El 1e-7 (de céntimo) tapa ese ruido, también el que arrastra una resta previa. Medio céntimo
+     sube siempre (también en negativo: −0,125 → −0,13, para que una rectificativa sea el espejo
+     de su factura). */
+  const c = Math.round(Math.abs(v) * 100 + 1e-7);
+  return Math.sign(v) * c / 100 + 0; /* + 0: −0 se pintaba «-0,00 €» */
+}
 
 /**
  * Importe de un gasto que cuenta como deducible en IRPF (130, renta y libros).

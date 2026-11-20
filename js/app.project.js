@@ -20,7 +20,8 @@ Object.assign(App, {
   _csPick(el) { this._mDirty = true; document.querySelectorAll('.cs-sw.on').forEach(s => s.classList.remove('on')); el.classList.add('on'); document.getElementById('mpColor').value = el.dataset.name; document.getElementById('mpColorDot').style.background = el.dataset.hex; document.getElementById('mpColorLbl').textContent = el.dataset.name; },
 
   /** Cuando cambia el cliente en el modal de proyecto, aplica su color por defecto */
-  _onClientChange(val) {
+  _onClientChange(val, user) {
+    if (user) this._zonaDefaults(val);
     document.getElementById('mpClNew').style.display = val === '_new' ? 'block' : 'none';
     const editBtn = document.getElementById('mpClEditBtn');
     if (editBtn) editBtn.style.display = (val && val !== '_new') ? '' : 'none';
@@ -31,6 +32,30 @@ Object.assign(App, {
         if (sw) this._csPick(sw);
       }
     }
+  },
+
+  /** Al elegir un cliente de fuera de España (zona fiscal UE / fuera de la UE): IVA 0, IRPF 0 y
+   *  la mención que tiene que llevar la factura, en el idioma de la factura. Al volver a uno de
+   *  España, lo que se puso solo vuelve a los valores por defecto. No toca una factura emitida. */
+  _zonaDefaults(cid) {
+    const g = id => document.getElementById(id);
+    const iva = g('mpIva'), irpf = g('mpIrpf'), exc = g('mpIvaExc');
+    if (!iva || !irpf || !exc || iva.closest('fieldset')?.disabled) return;
+    const zona = (D.cl(cid)?.zonaFiscal) || 'es', st = D.d.settings;
+    const lang = g('mpFacLang')?.value || st.idioma || 'es';
+    const menc = z => (LANGS[lang] || LANGS.es)['fac.mention.' + z] || LANGS.es['fac.mention.' + z];
+    const auto = [menc('ue'), menc('noue'), ...['es', 'en', 'ca'].flatMap(l => [LANGS[l]['fac.mention.ue'], LANGS[l]['fac.mention.noue']])];
+    if (zona !== 'es') {
+      iva.value = 0; irpf.value = 0;
+      if (!exc.value.trim() || auto.includes(exc.value.trim())) exc.value = menc(zona);
+      this._zonaAuto = true;
+    } else if (this._zonaAuto) {
+      iva.value = st.defaultIva; irpf.value = st.defaultIrpf;
+      if (auto.includes(exc.value.trim())) exc.value = '';
+      this._zonaAuto = false;
+    }
+    this._mDirty = true;
+    this.cPrev();
   },
 
   /** Abre clModal del cliente seleccionado en pModal, preserva estado y retorna */
@@ -109,6 +134,7 @@ Object.assign(App, {
 
   pModal(eid, estadoInicial) {
     this._editPid = eid || null;
+    this._zonaAuto = false;
     /* Estado para un proyecto NUEVO creado desde una columna del Tablero.
        Se resetea en cada apertura, así el alta normal (barra/dashboard) no lo hereda. */
     this._pendNewEstado = EST[estadoInicial] ? estadoInicial : null;
@@ -157,7 +183,7 @@ Object.assign(App, {
     const showEdit = df.clienteId && df.clienteId !== '_new';
     return `<div class="fg"><label>${t('field.name')}</label><input type="text" id="mpN" value="${esc(df.nombre)}" placeholder="${t('ph.projectName')}"></div>`
       + `<div class="fg"><label>${t('field.client')}</label><div style="display:flex;gap:.4rem;align-items:stretch">`
-      +   `<select id="mpCl" onchange="App._onClientChange(this.value)" style="flex:1"><option value="">${t('field.noClient')}</option>${clOpts}<option value="_new">${t('btn.createNew')}</option></select>`
+      +   `<select id="mpCl" onchange="App._onClientChange(this.value, true)" style="flex:1"><option value="">${t('field.noClient')}</option>${clOpts}<option value="_new">${t('btn.createNew')}</option></select>`
       +   `<button type="button" class="bt bt-s" id="mpClEditBtn" onclick="App.editClFromProj()" title="${t('btn.edit')}" style="${showEdit ? '' : 'display:none;'}padding:.15rem .55rem;font-size:.85rem">&#9998;</button>`
       + `</div></div>`
       + `<div id="mpClNew" style="display:none;margin-bottom:.85rem"><input type="text" id="mpClNewN" placeholder="${t('ph.newClient')}"></div>`
@@ -337,6 +363,7 @@ Object.assign(App, {
       recurrente: document.getElementById('mpRec')?.checked || false,
       fechas: { inicio: document.getElementById('mpI').value || null, finEstimada: document.getElementById('mpFE').value || null, finReal: document.getElementById('mpFR').value || null },
       facturacion: {
+        ...prev?.facturacion, /* lo que esta ventana no edita se queda: días para pagar, marcas internas… */
         modo, baseImponible: parseNum(document.getElementById('mpBa')?.value) || 0, total: parseNum(document.getElementById('mpTo')?.value) || 0,
         precioHora: parseNum(document.getElementById('mpPH')?.value) || 0,
         iva: parseNum(document.getElementById('mpIva')?.value) || 0, irpf: parseNum(document.getElementById('mpIrpf')?.value) || 0,

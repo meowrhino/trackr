@@ -434,6 +434,7 @@ const D = {
 
     d.gastos.forEach(g => {
       str(g, 'nombre', 'notas', 'nifProveedor'); if (g.nombre == null) g.nombre = '';
+      if (g.categoria === 'alquiler_oficina') g.categoria = 'alquiler'; /* clave vieja de los ejemplos */
       slug(g, 'categoria', 'otro');
       if (g.recurrente) oneOf(g, 'recurrente', Object.keys(RECURRENCIA), 'no');
       color(g, 'color', 'Salmon');
@@ -451,6 +452,7 @@ const D = {
     });
 
     d.deducibles.forEach(x => {
+      if (x.categoria === 'alquiler_oficina') x.categoria = 'alquiler';
       slug(x, 'categoria', 'otro');
       num(x, 'cantidad'); date(x, 'fecha');
       str(x, 'nombre', 'descripcion', 'nota');
@@ -869,6 +871,32 @@ const D = {
   budNumTaken(num, fecha, id) {
     const y = String(fecha || '').slice(0, 4);
     return this.d.presupuestos.find(b => b.id !== id && String(b.num) === String(num) && String(b.fecha || '').slice(0, 4) === y);
+  },
+  /** Presupuesto aceptado: sus importes pasan a los proyectos (antes la factura salía por el
+   *  importe viejo). Cada línea con subproyecto fija la base de ese subproyecto; las líneas sin
+   *  él, sumadas, la base del proyecto. No toca un proyecto con factura emitida ni uno por horas
+   *  (su base sale de las horas). Devuelve cuántos proyectos ha cambiado. */
+  aplicarPresupuesto(id) {
+    const b = this.bud(id); if (!b) return 0;
+    const porP = {};
+    (b.lineas || []).forEach(l => { if (l.pid) (porP[l.pid] = porP[l.pid] || []).push(l); });
+    let n = 0;
+    Object.entries(porP).forEach(([pid, ls]) => {
+      const p = this.p(pid); if (!p || this.facturaVigente(pid) || p.facturacion?.modo === 'por_hora') return;
+      const f = { ...p.facturacion }, antes = JSON.stringify([f.modo, f.baseImponible, p.subproyectos]);
+      let subs = p.subproyectos;
+      const conSub = ls.filter(l => l.subId && (subs || []).some(x => x.id === l.subId));
+      if (conSub.length) {
+        subs = subs.map(x => { const l = conSub.find(y => y.subId === x.id); return l ? { ...x, base: roundMoney(l.base || 0) } : x; });
+        f.modo = 'desde_base'; f.baseImponible = roundMoney(subs.reduce((s, x) => s + (x.base || 0), 0));
+      } else {
+        f.modo = 'desde_base'; f.baseImponible = roundMoney(ls.reduce((s, l) => s + (l.base || 0), 0));
+      }
+      if (JSON.stringify([f.modo, f.baseImponible, subs]) === antes) return;
+      this.up(pid, { facturacion: f, ...(subs && { subproyectos: subs }) });
+      n++;
+    });
+    return n;
   },
   addBud(b) { this.d.presupuestos.push(b); this.save(); return b; },
   upBud(id, u) { const b = this.bud(id); if (b) { Object.assign(b, u); this.save(); } return b; },

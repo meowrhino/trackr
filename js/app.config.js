@@ -511,7 +511,8 @@ Object.assign(App, {
     if (estado === 'aceptado') {
       let n = 0;
       b.lineas.forEach(l => { const p = D.p(l.pid); if (p && p.estado === 'potencial') { D.up(p.id, { estado: 'activo' }); n++; } });
-      Toast.ok(t('bud.accepted', b.num, n));
+      const m = D.aplicarPresupuesto(id); /* los importes aceptados pasan al proyecto */
+      Toast.ok(t('bud.accepted', b.num, n) + (m ? ' · ' + t('bud.amountsApplied', m) : ''));
     }
     this.rBud();
   },

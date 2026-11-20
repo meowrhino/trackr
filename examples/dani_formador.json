@@ -5342,7 +5342,7 @@
         }
       ],
       "color": "DarkGray",
-      "categoria": "autonomos",
+      "categoria": "cotizacion",
       "periodicidad": "mensual",
       "desgravable": true,
       "tipoIva": 0
@@ -5839,7 +5839,7 @@
         }
       ],
       "color": "Sienna",
-      "categoria": "alquiler_oficina",
+      "categoria": "alquiler",
       "periodicidad": "mensual",
       "desgravable": true
     },
@@ -6193,7 +6193,7 @@
         }
       ],
       "color": "DarkRed",
-      "categoria": "equipo",
+      "categoria": "herramientas",
       "periodicidad": null,
       "desgravable": true
     },
@@ -6212,7 +6212,7 @@
         }
       ],
       "color": "Silver",
-      "categoria": "equipo",
+      "categoria": "herramientas",
       "periodicidad": null,
       "desgravable": true
     },
@@ -6258,7 +6258,7 @@
         }
       ],
       "color": "RoyalBlue",
-      "categoria": "viaje",
+      "categoria": "transporte",
       "periodicidad": null,
       "desgravable": true
     },

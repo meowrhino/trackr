@@ -5,6 +5,25 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-11-20 — Fiscal sencillo: el céntimo, clientes de fuera, gastos y presupuestos
+
+### 🐛 Arreglado
+- **Redondeo del céntimo**: 306,50 € al 21 % daba 64,36 € y es 64,37 €. Fallaban 239 bases al 21 % y casi 2.300 al 10 % (entre 0 y 5.000 €), y los negativos redondeaban al revés. Ahora el medio céntimo sube siempre. Ojo: una factura ya emitida con uno de esos importes puede enseñar un céntimo distinto al de su PDF antiguo. _frontend_
+- **El calendario pintaba todos los gastos a 0,00 €** (y el «€/hora real» de Inicio no los restaba): leían un campo que las entradas ya no llevan. _frontend_
+- **«€/hora real» ya no cuenta el IVA**: usa el mismo neto que Dineros (lo cobrado sin su IVA, menos los gastos sin el IVA que se recupera). _frontend_
+- **Guardar el proyecto ya no borra los días para pagar**: una factura al contado pasaba a vencer a 30 días. _frontend_
+- **Aceptar un presupuesto pasa sus importes al proyecto** (y a sus subproyectos): antes la factura salía por el importe viejo. No toca proyectos por horas ni con factura emitida. _frontend_
+- **Gastos mensuales**: «+ Este mes» usa el día configurado, no el día en que lo pulsas; y una entrada añadida mirando un mes pasado lleva la fecha de ese mes. _frontend_
+- **Ejemplos**: las facturas a la UE ya no citan el «art. 25» (es de entregas de bienes) y la categoría `alquiler_oficina`, que no existía, es `alquiler`. _frontend_
+
+### ✨ Nuevo
+- **Cliente de la UE o de fuera**: al elegirlo en un proyecto, trackr propone IVA 0, IRPF 0 y la mención «Operación no sujeta a IVA (art. 69.Uno.1.º Ley 37/1992). Inversión del sujeto pasivo.», en el idioma de la factura. No pisa una mención escrita a mano. _frontend_
+- **«Desgravable» viene marcado** en un gasto nuevo. _frontend_
+- **Categoría de gasto «Alquiler»** (casilla 0192 de la renta, G12 en los libros). _frontend_
+- Test en `test/fiscal-sencillo.mjs`.
+
+---
+
 ## 2026-11-20 — No perder datos: coma decimal, fusión, copias, papelera e importar
 
 ### 🐛 Arreglado

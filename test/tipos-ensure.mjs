@@ -34,7 +34,7 @@ D.load({
       cobros: [{ id: 'k1', cantidad: '100,50', fecha: X, metodo: X }, 3] } },
     { id: 'p2', nombre: 'Emitida', estado: 'completado', horas: [], facturacion: { modo: 'desde_base', baseImponible: 1000, iva: 21, irpf: 15, facturaNum: '7', facturaFecha: '2026-05-15' } }],
   gastos: [{ id: 'g1', nombre: 'G', categoria: X, recurrente: X, color: X, tipoIva: X, diaRecurrente: 99, entradas: {} },
-    { id: 'g2', nombre: 'Viejo', categoria: 'alquiler_oficina', entradas: [{ id: 'e1', fecha: '2026-01-01', base: '10', iva: '2,10', total: 12.1 }] }],
+    { id: 'g2', nombre: 'Viejo', categoria: 'viaje', entradas: [{ id: 'e1', fecha: '2026-01-01', base: '10', iva: '2,10', total: 12.1 }] }],
   deducibles: [{ id: 'd1', categoria: X, cantidad: '50', fecha: X }],
   presupuestos: [{ id: 'b1', num: X, fecha: X, estado: X, total: X, lineas: 'x' }],
   facturas: {}, audit: 'x',
@@ -54,7 +54,7 @@ assert.equal(f.facturaNum, null); assert.equal(f.facturaFecha, null); assert.equ
 assert.equal(f.cobros.length, 1); assert.equal(f.cobros[0].cantidad, 100.5); assert.equal(f.cobros[0].metodo, undefined);
 assert.equal(d.projects[1].facturacion.facturaNum, 7, 'un número de factura como texto pasa a número');
 assert.equal(d.gastos[0].categoria, 'otro'); assert.equal(d.gastos[0].diaRecurrente, null); assert.equal(d.gastos[0].entradas.length, 0);
-assert.equal(d.gastos[1].categoria, 'alquiler_oficina', 'una categoría vieja pero limpia se conserva');
+assert.equal(d.gastos[1].categoria, 'viaje', 'una categoría vieja pero limpia se conserva');
 assert.equal(d.gastos[1].entradas[0].iva, 2.1);
 assert.equal(d.deducibles[0].cantidad, 50); assert.equal(d.deducibles[0].fecha, null);
 assert.equal(d.presupuestos[0].estado, 'enviado'); assert.equal(d.presupuestos[0].lineas.length, 0); assert.equal(d.presupuestos[0].total, 0);

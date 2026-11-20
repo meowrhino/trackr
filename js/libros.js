@@ -21,7 +21,7 @@ const LR = {
 
   /** Concepto de gasto por categoría de gasto TRACKR */
   GASTO_G: {
-    cotizacion: 'G45', suministros: 'GY4', gestoria: 'G19', seguros: 'G20',
+    cotizacion: 'G45', alquiler: 'G12', suministros: 'GY4', gestoria: 'G19', seguros: 'G20',
     amortizacion: 'GY8', oficina: 'G22', herramientas: 'G22', software: 'G22',
     marketing: 'G22', formacion: 'G22', transporte: 'G22', otro: 'G37',
   },

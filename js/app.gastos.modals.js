@@ -171,7 +171,7 @@ Object.assign(App, {
       + `<div class="fg"><label>${t('field.ivaRate')}${itip('tip.ivaGasto')}</label><select id="gIva" onchange="App._gIvaChange()">${Object.entries(TIPOS_IVA).map(([k, v]) => `<option value="${k}" ${!lines.length && (g?.tipoIva ?? 21) == k ? 'selected' : ''}>${v}</option>`).join('')}<option value="mixto" ${lines.length ? 'selected' : ''}>${t('iva.mixto')}</option></select></div>`
       + `<div class="fg"><label>${t('field.irpfRate')}${itip('tip.irpfProv')}</label><input type="text" inputmode="decimal" id="gIrpf" min="0" max="100" step="1" value="${g?.tipoIrpf || ''}" placeholder="0" onchange="App._gCalcAuto()"></div></div>`
       + `<div class="fr"><div class="fg"><label>${t('field.recurrence')}</label><select id="gRec" onchange="App._toggleGasRec(this.value)">${Object.entries(RECURRENCIA).map(([k, v]) => `<option value="${k}" ${g?.recurrente === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
-      + `<div class="fg" style="display:flex;align-items:end"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;padding:.45rem 0"><input type="checkbox" id="gDes" ${g?.desgravable ? 'checked' : ''}> ${t('gas.deductibleBadge')}${itip('tip.desgravable')}</label></div></div>`
+      + `<div class="fg" style="display:flex;align-items:end"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;padding:.45rem 0"><input type="checkbox" id="gDes" ${!g || g.desgravable ? 'checked' : ''}> ${t('gas.deductibleBadge')}${itip('tip.desgravable')}</label></div></div>`
       + `<div class="fr"><div class="fg"><label>${t('gas.zonaProveedor')}${itip('tip.zonaProv')}</label><select id="gZona" onchange="document.getElementById('gZonaHelp').style.display = this.value === 'es' ? 'none' : ''">${Object.entries(ZONA_FISCAL).map(([k, v]) => `<option value="${k}" ${(g?.zonaFiscal || 'es') === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
       + `<div class="fg"><label>${t('field.nifProveedor')}</label><input type="text" id="gNif" value="${esc(g?.nifProveedor || '')}" placeholder="${t('ph.optional')}"></div></div>`
       + `<p class="small" id="gZonaHelp" style="color:var(--t3);margin:-.4rem 0 .6rem${(g?.zonaFiscal || 'es') === 'es' ? ';display:none' : ''}">${t('gas.zonaHelp')}</p>`
@@ -269,6 +269,18 @@ Object.assign(App, {
 
   delG(gid) { const g = D.g(gid); if (!g) return; if (!confirm(t('gas.deleteConfirm', g.nombre))) return; D.delG(gid); this.rGas(); },
 
+  /** Fecha por defecto de una entrada nueva: en un mensual, el día configurado; si se está
+   *  mirando otro mes (Dineros, vista de mes), ese mes y no hoy. Antes, apuntar la cuota de
+   *  octubre desde noviembre la guardaba en noviembre. */
+  _gasFecha(g) {
+    const now = new Date(), mensual = g && g.recurrente === 'mensual';
+    const otroMes = this.cv === 'gas' && this.dinPeriod === 'mes' && (this.dinY !== now.getFullYear() || this.dinM !== now.getMonth());
+    if (!otroMes && !(mensual && g.diaRecurrente)) return todayStr();
+    const y = otroMes ? this.dinY : now.getFullYear(), m = otroMes ? this.dinM : now.getMonth();
+    const dia = Math.min((mensual && g.diaRecurrente) || 1, new Date(y, m + 1, 0).getDate()); /* día 31 en un mes de 30 → 30 */
+    return localDateStr(new Date(y, m, dia));
+  },
+
   geModal(gid, eid) {
     const isE = !!eid;
     const e = isE ? (D.g(gid)?.entradas || []).find(x => x.id === eid) : null;
@@ -296,7 +308,7 @@ Object.assign(App, {
       + `<input type="hidden" id="geIva" value="${tipoIva}"><input type="hidden" id="geIrpf" value="${tipoIrpf}">`
       + this._gDesgHtml('ge', lines)
       + `<div class="fr"><div class="fg"><label>${t('field.totalAmount')}</label><input type="text" inputmode="decimal" id="geEA" min="0.01" step="0.01" value="${valTotal}" placeholder="0,00" ${ro} onchange="App._gCalc('total','ge')"></div>`
-      + `<div class="fg"><label>${t('field.date')}${itip('tip.fechaGasto')}</label><input type="date" id="geD" value="${e?.fecha || todayStr()}"></div></div>`
+      + `<div class="fg"><label>${t('field.date')}${itip('tip.fechaGasto')}</label><input type="date" id="geD" value="${e?.fecha || this._gasFecha(gasto)}"></div></div>`
       + `<div class="fr"><div class="fg"><label>${t('field.note')}</label><input type="text" id="geN" value="${esc(e?.nota || '')}" placeholder="${t('ph.detail')}"></div>`
       + `<div class="fg"><label>${t('field.numFactura')}</label><input type="text" id="geNF" value="${esc(e?.numFactura || '')}" placeholder="${t('ph.optional')}"></div></div>`
       + (isRecurrente && !isE ? `<div class="fg"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="geUlt"> ${t('gas.lastMonth')}</label></div>` : '')
@@ -343,7 +355,7 @@ Object.assign(App, {
     const tipoIrpf = g.tipoIrpf || 0;
     const total = roundMoney(g.importeBase);
     const { base, importeIva: iva, importeIrpf: irpf } = B.desglosarTotal(total, tipoIva, tipoIrpf);
-    const fecha = todayStr();
+    const fecha = this._gasFecha(g); /* el día configurado, no el día en que se pulsa */
     if (!g.entradas) g.entradas = [];
     g.entradas.push({ id: uid(), fecha, base, iva, irpf, total, tipoIva, tipoIrpf, nota: '' });
     D.upG(gid, { entradas: g.entradas });

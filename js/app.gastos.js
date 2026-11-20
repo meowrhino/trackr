@@ -657,7 +657,7 @@ Object.assign(App, {
        repartidos, no un total). Mapeo por categoría; lo no mapeado → 0202 "otros
        servicios exteriores". Mismo criterio de importe que F.quarter: base para
        proveedores ES, base+iva para extranjeros (su impuesto no es deducible en 303). */
-    const GASTO_R = { cotizacion: '0186', suministros: '0194', gestoria: '0199', seguros: '0200', amortizacion: '0208' };
+    const GASTO_R = { cotizacion: '0186', alquiler: '0192', suministros: '0194', gestoria: '0199', seguros: '0200', amortizacion: '0208' };
     const DED_R = { autonomos: '0186', alquiler: '0192', suministros: '0194', asesoria: '0199', seguros: '0200', amortizacion: '0208' };
     const porCasilla = {};
     const addC = (cas, amt) => { if (amt > 0) porCasilla[cas] = (porCasilla[cas] || 0) + amt; };

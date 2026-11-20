@@ -47,7 +47,7 @@ assert.ok(!('subproyectos' in D.p('solo')) && !('subproyectos' in D.p('esc')), '
 /* ── La base es la suma (al céntimo), y de ahí salen IVA, IRPF y total ── */
 B.calc(web);
 assert.equal(web.facturacion.baseImponible, 3640.3, '1000,10 + 2000,20 + 640');
-assert.equal(web.facturacion.totalFactura, 3858.72, '3640,30 + 764,46 − 546,05 (cada cuota redondeada)');
+assert.equal(web.facturacion.totalFactura, 3858.71, '3640,30 + 764,46 − 546,05 (cada cuota redondeada; 546,045 sube a 546,05)');
 B.calc(D.p('solo'));
 assert.equal(D.p('solo').facturacion.baseImponible, 300, 'sin subproyectos manda la base tecleada');
 
@@ -97,7 +97,7 @@ const lineas = web.subproyectos.map(x => ({ pid: 'web', subId: x.id, concepto: x
 const pdf = Fac._budData('c1', lineas, { num: 'P2', fecha: '2026-11-19', validez: 30 }).data;
 assert.equal(pdf.lineas.length, 3);
 assert.equal(pdf.calculos.base, 3640.3);
-assert.equal(pdf.calculos.total, 3858.72);
+assert.equal(pdf.calculos.total, 3858.71);
 
 /* Al editarlo: las guardadas primero y marcadas; un subproyecto nuevo se ofrece sin marcar y no se repite ninguno */
 web.subproyectos.push({ id: 's4', nombre: 'Extra', base: 100 });

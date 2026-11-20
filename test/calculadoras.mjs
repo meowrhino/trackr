@@ -10,7 +10,9 @@ const ctx = { console, navigator: { language: 'es' }, window: {}, document: unde
 vm.createContext(ctx);
 for (const f of ['utils.js', 'fiscal.js']) vm.runInContext(readFileSync(new URL('../js/' + f, import.meta.url), 'utf8'), ctx);
 const F = vm.runInContext('F', ctx);
-const r2 = v => Math.round(v * 100) / 100;
+/* Redondeo al céntimo con el medio céntimo hacia arriba (57257,45 − 22946,55 al 5 % = 1715,545 → 1715,55).
+   Math.round(v * 100) / 100 a secas daba 1715,54 por el ruido de la coma flotante. */
+const r2 = v => Math.sign(v) * Math.round(Math.abs(v) * 100 + 1e-7) / 100 + 0;
 
 /* Copia literal de la calculadora 130 anterior (130.html, nov 2026) */
 function old130(c01, gasReal, eds, c05, c06, rn, neg) {
