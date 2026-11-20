@@ -152,7 +152,19 @@ function parseNum(v) {
   if (typeof v === 'number') return v;
   if (typeof v !== 'string') return NaN;
   let s = v.trim().replace(/\s/g, '');
-  if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
+  const c = s.lastIndexOf(','), p = s.lastIndexOf('.');
+  if (c >= 0 && p >= 0) {
+    /* Los dos: el último es el decimal («1.250,50» y «1,234.50») */
+    const [dec, mil] = c > p ? [',', '.'] : ['.', ','];
+    s = s.split(mil).join('').replace(dec, '.');
+  } else if (c >= 0) {
+    /* Solo coma: decimal («12,50»), salvo que sean miles: varias («1,234,567») o, con la app en
+       inglés, una con tres cifras detrás («1,500» = 1500; antes daba 1,5 sin avisar) */
+    const miles = /^-?\d{1,3}(,\d{3})+$/.test(s) && (s.split(',').length > 2 || (typeof _lang !== 'undefined' && _lang === 'en'));
+    s = miles ? s.replace(/,/g, '') : s.replace(',', '.');
+  } else if (s.split('.').length > 2) {
+    s = /^-?\d{1,3}(\.\d{3})+$/.test(s) ? s.replace(/\./g, '') : s; /* «1.234.567»; «1.2.3» no vale */
+  }
   return /^-?(\d+\.?\d*|\.\d+)$/.test(s) ? parseFloat(s) : NaN;
 }
 
@@ -191,6 +203,9 @@ function uid() {
   );
 }
 
+/** ¿Vale como id? Los ids se interpolan en onclick="…('id')": solo letras, cifras, _ y -. */
+function isId(v) { return (typeof v === 'string' || typeof v === 'number') && /^[A-Za-z0-9_-]{1,64}$/.test(String(v)); }
+
 /** Ids no seguros de datos que vienen de fuera (JSON importado, datos de un cliente):
  *  se interpolan en atributos onclick, así que solo se admite [A-Za-z0-9_-]{1,64}.
  *  Un id ausente no cuenta (el store los rellena). */
@@ -198,7 +213,7 @@ function badIds(d) {
   const bad = [], arr = x => (Array.isArray(x) ? x : []);
   const chk = o => {
     if (!o || o.id == null) return;
-    if (!/^[A-Za-z0-9_-]{1,64}$/.test(String(o.id))) bad.push(o.id);
+    if (!isId(o.id)) bad.push(o.id);
   };
   const ref = v => chk(v == null ? null : { id: v });   /* referencias: también acaban en onclick */
   for (const p of arr(d?.projects)) {
@@ -209,6 +224,8 @@ function badIds(d) {
     arr(p?.facturacion?.rectificativas).forEach(chk);
   }
   for (const k of ['clientes', 'deducibles']) arr(d?.[k]).forEach(chk);
+  /* La papelera también acaba en onclick (Recuperar / Borrar del todo), y su proyecto puede volver */
+  for (const x of arr(d?.papelera)) { chk(x); if (x?.proyecto) { chk(x.proyecto); ref(x.proyecto.clienteId); arr(x.proyecto.horas).forEach(h => { chk(h); ref(h?.subId); }); arr(x.proyecto.subproyectos).forEach(chk); } }
   for (const f of arr(d?.facturas)) { chk(f); ref(f?.proyectoId); }
   for (const g of arr(d?.gastos)) { chk(g); arr(g?.entradas).forEach(chk); }
   for (const b of arr(d?.presupuestos)) { chk(b); ref(b?.clienteId); arr(b?.lineas).forEach(l => { chk(l); ref(l?.subId); }); }

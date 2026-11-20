@@ -31,8 +31,8 @@ const App = {
 
   init() {
     if (!D.init()) D.create();
-    /* Estadísticas de uso anónimas (qué pantallas y acciones se usan; nunca datos): activas
-       por defecto mientras trackr está en desarrollo; se apagan en Configuración. */
+    /* Estadísticas de uso anónimas (qué pantallas y acciones se usan; nunca datos): apagadas
+       hasta que la persona las marca (al crear cuenta o en Configuración). */
     this.applyStats();
     if (D._broken) setTimeout(() => Toast.show(t('msg.dataBroken'), 'error', 0, [{ label: t('btn.close'), fn: () => {} }]), 500);
 
@@ -247,7 +247,7 @@ const App = {
   /** Vacía el ejemplo y deja la app lista para los datos propios (sin volver a mostrar la bienvenida) */
   exampleStart() {
     T.ev('action', 'example_start_own');
-    try { localStorage.removeItem('trackr_data'); localStorage.removeItem('trackr_example'); localStorage.setItem('trackr_welcomed', '1'); } catch (e) { /* noop */ }
+    try { localStorage.removeItem('trackr_data'); localStorage.removeItem('trackr_example'); localStorage.removeItem('trackr_timer'); localStorage.setItem('trackr_welcomed', '1'); } catch (e) { /* noop */ }
     location.reload();
   },
   exampleKeep() {
@@ -478,9 +478,10 @@ const App = {
     return html || `<p class="small" style="margin-top:.5rem">${t('imp.diff.same')}</p>`;
   },
 
-  /** Enciende o apaga el envío de estadísticas según settings.compartirUso (por defecto, sí). */
+  /** Enciende o apaga el envío de estadísticas según settings.compartirUso. Desmarcado por defecto
+   *  (opt-in): solo se envía si la persona lo ha marcado. */
   applyStats() {
-    const on = D.d?.settings?.compartirUso !== false && typeof Acc !== 'undefined' && Acc.apiBase;
+    const on = D.d?.settings?.compartirUso === true && typeof Acc !== 'undefined' && Acc.apiBase;
     T.init(on ? Acc.apiBase() + '/v1/usage' : null);
   },
   setStats(on) {
@@ -496,7 +497,7 @@ const App = {
        todo lo de este navegador: datos, copias de seguridad y la cuenta recordada. La nube no se toca. */
     if ((D.d.projects || []).length || (D.d.gastos || []).length) this.expJson(); /* descarga directa (exp() solo abre el modal) */
     /* trackr_data_broken se queda: son datos ilegibles apartados para recuperarlos */
-    ['trackr_data', 'trackr_example', 'trackr_history', 'trackr_saved_at', 'trackr_last_export', 'trackr_acct']
+    ['trackr_data', 'trackr_example', 'trackr_history', 'trackr_saved_at', 'trackr_last_export', 'trackr_acct', 'trackr_timer']
       .forEach(k => { try { localStorage.removeItem(k); } catch (e) { /* */ } });
     try { sessionStorage.removeItem('trackr_token'); } catch (e) { /* */ }
     setTimeout(() => location.reload(), 300); /* deja arrancar la descarga */

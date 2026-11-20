@@ -111,6 +111,11 @@ Object.assign(App, {
     if (!confirm(t('hijo.convertConfirm', x.nombre || '', p.nombre, fmtMoney(x.base || 0)))) return;
     const hid = D.convertirSub(pid, subId);
     if (!hid) return;
+    /* El temporizador contaba en ese subproyecto: sigue contando, ahora en el hijo */
+    const tm = this._timerGet();
+    if (tm && tm.pid === pid && tm.subId === subId) {
+      try { localStorage.setItem(this.TIMER_KEY, JSON.stringify({ pid: hid, inicio: tm.inicio })); } catch (e) { /* noop */ }
+    }
     Toast.ok(t('hijo.converted', D.p(hid).nombre));
     this.go('det', hid);
   },
@@ -122,6 +127,7 @@ Object.assign(App, {
     if (motivo) { Toast.warn(t(motivo)); return; }
     const mid = c.parentId;
     if (!confirm(t('hijo.revertConfirm', c.nombre, D.p(mid).nombre))) return;
+    if (this._timerGet()?.pid === cid) this.timerStop(true); /* sus horas se apuntan antes de que el proyecto desaparezca */
     if (!D.revertirHijo(cid)) return;
     Toast.ok(t('hijo.reverted'));
     this.go('det', mid);
@@ -325,15 +331,16 @@ Object.assign(App, {
     const p = D.p(id); if (!p) return;
     if (D.facturaVigente(id)) { Toast.warn(t('det.cannotDeleteInvoiced', `${p.facturacion.facturaNum}/${yearShort(p.facturacion.facturaFecha || todayStr())}`)); return; }
     if (!confirm(t('det.deleteProjectConfirm', p.nombre))) return;
+    if (this._timerGet()?.pid === id) this.timerStop(true); /* las horas que llevaba se apuntan y van con él a la papelera */
     D.del(id);
     this.go('dash');
-    /* Va a la papelera (30 días): se deshace desde el aviso o desde Proyectos → Papelera */
-    Toast.show(t('trash.deleted', p.nombre), 'ok', 10000, [{ label: t('trash.undo'), fn: () => this.trashRestore(id) }]);
+    /* Va a la papelera (30 días): se deshace desde el aviso o desde Proyectos → Papelera. En modo visor no hay papelera. */
+    if (!D._readOnly) Toast.show(t('trash.deleted', p.nombre), 'ok', 10000, [{ label: t('trash.undo'), fn: () => this.trashRestore(id) }]);
   },
 
   /* ── Papelera de proyectos ── */
   trashRestore(id) {
-    if (!D.restoreP(id)) return;
+    if (D._readOnly || !D.restoreP(id)) return;
     Toast.ok(t('trash.restored'));
     this.cm();
     this.go('det', id);
@@ -350,6 +357,7 @@ Object.assign(App, {
       + `<div class="ma"><button class="bt bt-p" onclick="App.cm()">${t('btn.close')}</button></div>`);
   },
   trashDrop(id) {
+    if (D._readOnly) return;
     const x = D.trash().find(t => t.id === id);
     if (!x || !confirm(t('trash.dropConfirm', x.proyecto.nombre))) return;
     D.emptyTrash(id);

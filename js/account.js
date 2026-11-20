@@ -353,6 +353,13 @@ const Acc = (() => {
       if (Array.isArray(w.entradas) && Array.isArray(o.entradas)) r.entradas = u(w.entradas, o.entradas);
       if (Array.isArray(w.facturacion?.cobros) && Array.isArray(o.facturacion?.cobros)) r.facturacion = { ...w.facturacion, cobros: u(w.facturacion.cobros, o.facturacion.cobros) };
       if (Array.isArray(w.facturacion?.rectificativas) && Array.isArray(o.facturacion?.rectificativas)) r.facturacion = { ...(r.facturacion || w.facturacion), rectificativas: u(w.facturacion.rectificativas, o.facturacion.rectificativas) };
+      // Un subproyecto que se fue (convertido en proyecto hijo en el otro dispositivo): la base del
+      // ganador aún lo contaba. Sin subproyectos B.calc ya no la rehace, así que se rehace aquí;
+      // si no, madre e hijo cobrarían lo mismo dos veces en el 303 y el 130.
+      const f0 = r.facturacion || w.facturacion;
+      if (Array.isArray(w.subproyectos) && w.subproyectos.some((x) => x && borradoTs.has(x.id)) && f0 && f0.modo === 'desde_base' && !f0.facturaNum) {
+        r.facturacion = { ...f0, baseImponible: Math.round((r.subproyectos || []).reduce((s, x) => s + (Number(x.base) || 0), 0) * 100) / 100 };
+      }
       return r;
     };
     // Una factura emitida no se pierde: si solo un lado tiene numero de factura, la facturacion
@@ -363,7 +370,10 @@ const Acc = (() => {
     const newer = (c, l) => {
       const [w, o] = (tc.get(c.id) || 0) > (tl.get(l.id) || 0) ? [c, l] : [l, c];
       const r = nested(w, o);
-      if (!facNum(w) && facNum(o) && !borradoTs.has(`fac-${o.id}-${facNum(o)}`)) r.facturacion = nested(o, w).facturacion;
+      // La lápida solo cuenta si es posterior al último toque del lado con factura: borrar una
+      // factura no enviada y volver a emitirla con el mismo número es el flujo normal.
+      const oTs = ((o === c ? tc : tl).get(o.id)) || 0;
+      if (!facNum(w) && facNum(o) && !(borradoTs.get(`fac-${o.id}-${facNum(o)}`) > oTs)) r.facturacion = nested(o, w).facturacion;
       return r;
     };
     const vivo = (x) => !(borradoTs.has(x.id) && borradoTs.get(x.id) > touched(x.id));
@@ -371,7 +381,8 @@ const Acc = (() => {
       if (local[key] || cloud[key]) out[key] = unionBy(cloud[key], local[key], (x) => x.id, newer).filter(vivo);
     }
     // Papelera de proyectos: la de los dos (D.ensure quita lo recuperado y lo caducado)
-    if (local.papelera || cloud.papelera) out.papelera = unionBy(cloud.papelera, local.papelera, (x) => x.id);
+    if (local.papelera || cloud.papelera) out.papelera = unionBy(cloud.papelera, local.papelera, (x) => x.id)
+      .filter((x) => !(x && borradoTs.get('trash-' + x.id) >= x.ts)); // vaciada a propósito en el otro dispositivo
     // Auditoria: los eventos de los dos, en orden, con el mismo tope que D._auditAs.
     if (local.audit || cloud.audit) {
       out.audit = unionBy(cloud.audit, local.audit, (e) => `${e.ts}|${e.accion}|${e.entidad}|${e.entidadId}`)
@@ -726,7 +737,7 @@ const Acc = (() => {
        Etapa A). Lo desconocido NO se comparte (privado por defecto), pero se avisa para
        que el proximo cambio de esquema pase por aqui conscientemente. */
     /* `presupuestos` queda fuera del alcance fiscal a propósito: no son facturas ni entran en los libros. */
-    const KNOWN = ['version', 'clientes', 'projects', 'gastos', 'deducibles', 'facturas', 'settings', 'audit', 'journey', 'presupuestos'];
+    const KNOWN = ['version', 'clientes', 'projects', 'gastos', 'deducibles', 'facturas', 'settings', 'audit', 'journey', 'presupuestos', 'papelera'];
     const unknown = Object.keys(d).filter(k => !KNOWN.includes(k));
     if (unknown.length) console.warn('buildShareData: campos del store fuera de la whitelist fiscal (no se comparten):', unknown);
     const s = d.settings || {};

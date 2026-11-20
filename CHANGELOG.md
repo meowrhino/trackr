@@ -5,6 +5,27 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-11-20 — Revisión general: lo que se escapó, y estadísticas desmarcadas
+
+### 🔒 Seguridad
+- **Ids con comillas o HTML** (de un JSON importado, de la nube o de la copia de un cliente en el visor de la gestoría) ejecutaban código al pintar Proyectos, sin hacer clic. Ahora, al cargar, un id que no sea letras, cifras, `_` o `-` se rehace, y las referencias rotas (cliente, madre, subproyecto, línea de presupuesto) se quitan. La papelera también pasa por ahí, y lo que se recupera de ella vuelve a pasar por la frontera de tipos. _frontend_
+
+### 🐛 Arreglado
+- **La app instalada daba una página de error** al abrir un enlace con `.html` (`/303.html` redirige a `/303`): el service worker rehacía la petición y el navegador rechazaba la respuesta. Ahora las navegaciones van tal cual y no se guarda en caché ninguna redirección. _frontend_
+- **Fusión entre dispositivos**: una factura borrada y vuelta a emitir con el mismo número ya no se pierde; un subproyecto convertido en hijo en un dispositivo ya no deja el importe contado dos veces si el otro tocó la madre; y la papelera vaciada en uno no vuelve desde el otro. _frontend_
+- **Números de presupuesto escritos a mano** («P-3», «2026/04») ya no se cambian por «0» al cargar. _frontend_
+- **Aceptar un presupuesto** ya no dice que ha aplicado importes que no aplica (líneas sueltas en un proyecto con subproyectos) ni toca un proyecto con factura anulada. _frontend_
+- **Volver a subproyecto**: un hijo gratis ya no mete dinero en la madre, y una madre gratis no lo admite. _frontend_
+- **«1,500» con la app en inglés son 1.500**, no 1,5; «1,234.50» y «1.234,50» se leen bien. _frontend_
+- **Temporizador**: borrar el proyecto, devolver un hijo a la madre o convertir el subproyecto donde cuenta ya no pierde las horas; «Borrar datos de este navegador» lo para; cambia de idioma al momento. _frontend_
+- **Modo visor de la gestoría**: sin papelera ni «Deshacer» que no guardarían nada. _frontend_
+
+### 🔧 Cambiado
+- **Las estadísticas de uso vienen desmarcadas**: solo se envían si la persona las marca al crear la cuenta o en Configuración. _frontend_
+- Test en `test/revision.mjs`.
+
+---
+
 ## 2026-11-20 — Temporizador y proyectos hijo
 
 ### ✨ Nuevo

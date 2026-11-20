@@ -23,7 +23,7 @@ Object.assign(App, {
       `<button class="fb ${this.pf === f.k ? 'on' : ''}" onclick="App.sf('${f.k}')">${f.l}</button>`
     ).join('')
       + `<span style="flex:1"></span>`
-      + (D.trash().length ? `<button class="fb" onclick="App.trashModal()">${t('trash.title')} (${D.trash().length})</button>` : '')
+      + (D.trash().length && !D._readOnly ? `<button class="fb" onclick="App.trashModal()">${t('trash.title')} (${D.trash().length})</button>` : '')
       + `<select class="fb" style="width:auto;flex:0 0 auto;padding-right:1.6rem" aria-label="${t('dash.sortBy')}" title="${t('dash.sortBy')}" onchange="App.ss(this.value)">`
       +   ['recent', 'hours', 'name'].map(k => `<option value="${k}"${this.sortMode() === k ? ' selected' : ''}>${t('dash.sort.' + k)}</option>`).join('')
       + `</select>`

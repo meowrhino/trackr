@@ -15,6 +15,7 @@ const D = {
   /** Papelera de proyectos borrados: cuántos y cuántos días se guardan. */
   TRASH_MAX: 20,
   TRASH_DAYS: 30,
+  TRASH_BYTES: 60000,
 
   /* ── Inicialización ── */
 
@@ -301,7 +302,10 @@ const D = {
     /* Papelera de proyectos: 30 días y 20 como mucho; lo recuperado (vuelve a estar en la lista) sale */
     if (Array.isArray(d.papelera)) {
       const lim = Date.now() - this.TRASH_DAYS * 864e5;
-      d.papelera = d.papelera.filter(x => x.id && x.proyecto && typeof x.proyecto === 'object' && x.ts > lim && !d.projects.some(p => p.id === x.id)).slice(-this.TRASH_MAX);
+      d.papelera = d.papelera.filter(x => isId(x.id) && x.proyecto && typeof x.proyecto === 'object' && x.proyecto.id === x.id
+        && x.ts > lim && !d.projects.some(p => p.id === x.id)).slice(-this.TRASH_MAX);
+      /* Viaja dentro del blob cifrado (tope de 256 KB): se van primero los más viejos */
+      while (d.papelera.length > 1 && JSON.stringify(d.papelera).length > this.TRASH_BYTES) d.papelera.shift();
       if (!d.papelera.length) delete d.papelera;
     }
     d.version = 4;
@@ -348,7 +352,8 @@ const D = {
     const fill = (items, scope) => {
       const seen = {};
       arr(items).forEach(x => {
-        if (!x || typeof x !== 'object' || x.id) return;
+        if (!x || typeof x !== 'object' || isId(x.id)) return;
+        delete x.id; /* uno con comillas o HTML acabaría dentro de un onclick: se rehace como si no lo tuviera */
         const body = JSON.stringify(x), n = seen[body] = (seen[body] || 0) + 1; /* dos iguales: 1.ª y 2.ª */
         x.id = 'i' + hash(scope + '|' + body + '|' + n);
       });
@@ -377,9 +382,15 @@ const D = {
        se conserva si es una clave limpia; si trae otra cosa, 'otro'. */
     const slug = (o, k, def) => { if (typeof o[k] !== 'string' || !/^[a-z0-9_]{1,40}$/.test(o[k])) o[k] = def; };
     const zona = o => { if (o.zonaFiscal != null) oneOf(o, 'zonaFiscal', Object.keys(ZONA_FISCAL), 'es'); };
+    /* Referencias a otro registro: también acaban en onclick; una que no es un id válido se quita */
+    const ref = (o, k) => { if (o && o[k] != null && !isId(o[k])) o[k] = null; };
+    /* Número de presupuesto: texto libre corto («P-3», «2026/04»…), sin lo que rompería el HTML */
+    const budNum = n => (typeof n === 'number' ? n : typeof n === 'string' ? (n.replace(/[<>"'&\\`]/g, '').trim().slice(0, 30) || null) : null);
 
     d.projects.forEach(p => {
       /* Proyecto hijo: su madre existe, no es él mismo y no es a su vez hija de nadie (un solo nivel) */
+      ref(p, 'clienteId'); ref(p, 'parentId'); ref(p, 'subOrigen');
+      if (p.parentId == null) { delete p.parentId; delete p.subOrigen; }
       if (p.parentId != null) {
         const m = d.projects.find(x => x.id === p.parentId);
         if (!m || m === p || m.parentId != null) { delete p.parentId; delete p.subOrigen; }
@@ -394,13 +405,14 @@ const D = {
         date(h, 'fecha');
         if (h.horaInicio != null && !/^\d{2}:\d{2}$/.test(h.horaInicio)) h.horaInicio = null;
         oneOf(h, 'tipo', ['trabajo', 'reunion'], 'trabajo');
+        ref(h, 'subId'); if (h.subId == null) delete h.subId;
         str(h, 'nota');
       });
       (p.subproyectos || []).forEach(x => { num(x, 'base'); str(x, 'nombre', 'descripcion'); });
       if (p.presupuesto) {
-        const n = p.presupuesto.num;
-        if (!(typeof n === 'number' || (typeof n === 'string' && /^[A-Za-z]{0,2}\d{1,9}$/.test(n)))) p.presupuesto = null;
-        else date(p.presupuesto, 'fecha', todayStr());
+        const n = budNum(p.presupuesto.num);
+        if (n == null) p.presupuesto = null;
+        else { p.presupuesto.num = n; date(p.presupuesto, 'fecha', todayStr()); }
       }
       const f = p.facturacion;
       oneOf(f, 'modo', ['desde_base', 'desde_total', 'por_hora', 'gratis'], 'gratis');
@@ -452,14 +464,16 @@ const D = {
     });
 
     d.presupuestos.forEach(b => {
-      if (typeof b.num !== 'number' && !(typeof b.num === 'string' && /^[A-Za-z]{0,2}\d{1,9}$/.test(b.num))) b.num = String(parseFacNum(b.num) || 0);
+      b.num = budNum(b.num) ?? '0';
+      ref(b, 'clienteId');
       date(b, 'fecha', todayStr()); if (b.fecha == null) b.fecha = todayStr();
       oneOf(b, 'estado', ['enviado', 'aceptado', 'rechazado'], 'enviado');
       nums(b, 'total', 'validez');
       str(b, 'descripcion');
-      b.lineas.forEach(l => { num(l, 'base'); str(l, 'concepto'); });
+      b.lineas.forEach(l => { num(l, 'base'); str(l, 'concepto'); ref(l, 'pid'); ref(l, 'subId'); if (l.subId == null) delete l.subId; });
     });
 
+    d.facturas.forEach(r => ref(r, 'proyectoId'));
     nums(s, 'defaultIva', 'defaultIrpf', 'diasVencimiento', 'calStartHour');
     s.nextFacturaNum = parseFacNum(s.nextFacturaNum) || 1;
     if (s.nextFacturaYear != null && !/^\d{4}$/.test(s.nextFacturaYear)) delete s.nextFacturaYear;
@@ -759,7 +773,7 @@ const D = {
     if (!c || !m) return 'hijo.noMadre';
     if (c.facturacion?.facturaNum || (c.facturacion?.cobros || []).length) return 'hijo.facturado'; /* ya tiene su propia factura o cobros */
     if (m.facturacion?.facturaNum) return 'hijo.madreFacturada';
-    if (!['desde_base', 'gratis'].includes(m.facturacion?.modo) || c.facturacion?.modo === 'por_hora') return 'hijo.modo';
+    if (m.facturacion?.modo !== 'desde_base' || c.facturacion?.modo === 'por_hora') return 'hijo.modo';
     return '';
   },
 
@@ -767,7 +781,8 @@ const D = {
   revertirHijo(cid) {
     if (this._readOnly || this.hijoReversible(cid)) return false;
     const c = this.p(cid), m = this.p(c.parentId);
-    const base = roundMoney((c.subproyectos || []).length ? c.subproyectos.reduce((s, y) => s + (y.base || 0), 0) : (c.facturacion.baseImponible || 0));
+    const base = c.facturacion.modo === 'gratis' ? 0 /* gratis: lo que digan sus subproyectos no se cobra */
+      : roundMoney((c.subproyectos || []).length ? c.subproyectos.reduce((s, y) => s + (y.base || 0), 0) : (c.facturacion.baseImponible || 0));
     const pre = m.nombre + ' · ';
     /* Id nuevo: el del subproyecto original lleva lápida desde que se convirtió */
     const sub = { id: uid(), nombre: c.nombre.startsWith(pre) ? c.nombre.slice(pre.length) : c.nombre, base, ...(c.notas && { descripcion: c.notas }) };
@@ -791,11 +806,14 @@ const D = {
     if (!x) return false;
     this.d.papelera = this.d.papelera.filter(t => t.id !== id);
     if (!this.p(id)) { this.d.projects.push(x.proyecto); this._audit('crear', 'proyecto', id, x.proyecto); } /* el 'crear' es posterior al 'borrar': la fusión lo da por vivo */
+    this.ensure(); /* lo que vuelve pasa por la misma frontera de tipos que todo lo demás */
     this.save();
     return true;
   },
   /** Vacía la papelera (o quita un solo proyecto): ya no se puede recuperar. */
   emptyTrash(id) {
+    /* Lápida: sin ella, la fusión con otro dispositivo la devolvería a la papelera */
+    (this.d.papelera || []).filter(t => !id || t.id === id).forEach(t => this._tomb('papelera', 'trash-' + t.id));
     this.d.papelera = id ? (this.d.papelera || []).filter(t => t.id !== id) : [];
     if (!this.d.papelera.length) delete this.d.papelera;
     this.save();
@@ -907,13 +925,16 @@ const D = {
     let n = 0;
     /* Fija la base de un proyecto (o de sus subproyectos) con unas líneas; 1 si ha cambiado algo */
     const fijar = (pid, ls) => {
-      const p = this.p(pid); if (!p || this.facturaVigente(pid) || p.facturacion?.modo === 'por_hora') return 0;
+      /* Con número de factura (vigente o anulada) no se toca: su PDF tiene que seguir siendo el mismo */
+      const p = this.p(pid); if (!p || p.facturacion?.facturaNum || p.facturacion?.modo === 'por_hora') return 0;
       const f = { ...p.facturacion }, antes = JSON.stringify([f.modo, f.baseImponible, p.subproyectos]);
       let subs = p.subproyectos;
       const conSub = ls.filter(l => l.subId && (subs || []).some(x => x.id === l.subId));
       if (conSub.length) {
         subs = subs.map(x => { const l = conSub.find(y => y.subId === x.id); return l ? { ...x, base: roundMoney(l.base || 0) } : x; });
         f.modo = 'desde_base'; f.baseImponible = roundMoney(subs.reduce((s, x) => s + (x.base || 0), 0));
+      } else if ((subs || []).length) {
+        return 0; /* líneas sin subproyecto en un proyecto con subproyectos: la base sale de ellos, no se puede fijar a mano */
       } else {
         f.modo = 'desde_base'; f.baseImponible = roundMoney(ls.reduce((s, l) => s + (l.base || 0), 0));
       }

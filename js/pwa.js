@@ -86,7 +86,7 @@
     window.addEventListener('load', () => {
       navigator.serviceWorker.ready.then((reg) => {
         const propios = performance.getEntriesByType('resource').map((r) => r.name).filter((u) => u.startsWith(location.origin + '/'));
-        const urls = [...new Set(['/', '/index.html', '/manifest.json', '/icon-192.png', '/icon-512.png', '/navicon.png', ...propios])];
+        const urls = [...new Set(['/', '/manifest.json', '/icon-192.png', '/icon-512.png', '/navicon.png', ...propios])];
         if (reg.active) reg.active.postMessage({ type: 'precache', urls });
       }).catch(() => { /* sin service worker: la app funciona igual con red */ });
     });

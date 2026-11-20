@@ -197,9 +197,9 @@ Object.assign(App, {
     } else Toast.error(t(r === 'nobackup' ? 'msg.noBackup' : 'msg.restoreFailed'));
   },
 
-  /** Estadísticas de uso anónimas: activadas por defecto mientras trackr está en desarrollo. */
+  /** Estadísticas de uso anónimas: desmarcadas por defecto (opt-in). */
   _cfgStatsSection() {
-    const on = D.d.settings.compartirUso !== false;
+    const on = D.d.settings.compartirUso === true; /* opt-in: solo si se ha marcado */
     return `<div class="cfg-section"><div class="cfg-section-title">${t('stats.title')}${itip('tip.stats')}</div>`
       + `<label style="display:flex;align-items:flex-start;gap:.5rem;cursor:pointer;text-transform:none;letter-spacing:0;font-size:.85rem;color:var(--t2)">`
       + `<input type="checkbox" ${on ? 'checked' : ''} onchange="App.setStats(this.checked)" style="width:auto;margin-top:.2rem">${t('stats.label')}</label></div>`;
@@ -239,6 +239,7 @@ Object.assign(App, {
     D.d.settings.idioma = code;
     D.save();
     this.rCfg();
+    if (this.timerRender) this.timerRender(); /* el botón del menú vive fuera de la vista */
   },
 
   setTheme(id) {

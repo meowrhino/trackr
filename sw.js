@@ -21,15 +21,17 @@ self.addEventListener('fetch', (e) => {
   if (new URL(req.url).origin !== self.location.origin) return; // el API y CDNs se dejan pasar tal cual
   e.respondWith((async () => {
     try {
-      /* no-cache: se pregunta siempre al servidor si el archivo ha cambiado (un 304 si no). Sin
-         esto, justo después de publicar, la caché HTTP podía dar un app.js nuevo con un utils.js viejo. */
-      const res = await fetch(req, { cache: 'no-cache' });
-      if (res && res.ok) { const c = await caches.open(CACHE); c.put(req, res.clone()); }
+      /* no-cache en los archivos: se pregunta siempre al servidor si han cambiado (un 304 si no).
+         Sin esto, justo después de publicar, la caché HTTP podía dar un app.js nuevo con un utils.js
+         viejo. Las navegaciones van tal cual: rehacerlas sigue las redirecciones por su cuenta
+         (/303.html → /303) y el navegador rechaza esa respuesta: página de error. */
+      const res = await fetch(req.mode === 'navigate' ? req : new Request(req, { cache: 'no-cache' }));
+      if (res && res.ok && !res.redirected && res.type === 'basic') { const c = await caches.open(CACHE); c.put(req, res.clone()); }
       return res;
     } catch (err) {
       const cached = await caches.match(req);
       if (cached) return cached;
-      if (req.mode === 'navigate') return (await caches.match('/index.html')) || (await caches.match('/')) || Response.error();
+      if (req.mode === 'navigate') return (await caches.match('/')) || (await caches.match('/index.html')) || Response.error();
       return Response.error();
     }
   })());
@@ -47,7 +49,7 @@ self.addEventListener('message', (e) => {
       try {
         if (await c.match(u)) return;
         const res = await fetch(u, { cache: 'no-cache' });
-        if (res && res.ok) await c.put(u, res);
+        if (res && res.ok && !res.redirected) await c.put(u, res); /* una redirección guardada daría error sin red */
       } catch (err) { /* sin red: la próxima vez */ }
     }));
   })());
