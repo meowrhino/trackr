@@ -74,7 +74,7 @@ Object.assign(App, {
     this.om(`<div class="mt">${t('fac.generate')}</div>`
       + `<div class="fr"><div class="fg"><label>${t('field.invoiceNum')}${itip('tip.facNum')}</label><input type="text" id="facNum" value="${esc(num)}" style="font-family:'DM Mono',monospace"></div>`
       + `<div class="fg"><label>${t('field.date')}${itip('tip.devengo')}</label><input type="date" id="facDate" value="${esc(date)}"></div>`
-      + `<div class="fg"><label>${t('fac.payDays')}</label><input type="number" id="facDias" min="0" max="365" step="1" value="${esc(dias)}" ${f.facturaNum ? 'disabled' : ''} style="font-family:'DM Mono',monospace"></div></div>`
+      + `<div class="fg"><label>${t('fac.payDays')}</label><input type="text" inputmode="decimal" id="facDias" min="0" max="365" step="1" value="${esc(dias)}" ${f.facturaNum ? 'disabled' : ''} style="font-family:'DM Mono',monospace"></div></div>`
       + `<div class="fg"><label>${t('field.subject')}</label><input type="text" id="facAsunto" value="${esc(asunto)}"></div>`
       + summary
       + warnRow
@@ -104,7 +104,7 @@ Object.assign(App, {
     const actual = roundMoney((f.baseImponible || 0) + (f.rectificativas || []).reduce((s, r) => s + (r.base || 0), 0));
     this.om(`<div class="mt">${t('rect.title', `${esc(f.facturaNum)}/${yearShort(f.facturaFecha)}`)}</div>`
       + `<p style="font-size:.82rem;color:var(--t2);line-height:1.5;margin-bottom:.8rem">${t('rect.help')}</p>`
-      + `<div class="fr"><div class="fg"><label>${t('rect.newBase', fmtMoney(actual))}</label><input type="number" id="rcBase" step="0.01" value="${actual}" oninput="App._rectPrev('${pid}')"></div>`
+      + `<div class="fr"><div class="fg"><label>${t('rect.newBase', fmtMoney(actual))}</label><input type="text" inputmode="decimal" id="rcBase" step="0.01" value="${actual}" oninput="App._rectPrev('${pid}')"></div>`
       + `<div class="fg"><label>${t('field.date')}${itip('tip.devengo')}</label><input type="date" id="rcDate" value="${todayStr()}"></div></div>`
       + `<div class="fg"><label>${t('rect.reason')}</label><input type="text" id="rcMot" placeholder="${t('rect.reasonPh')}"></div>`
       + `<div id="rcPrev" class="bb" style="margin-top:.5rem"></div>`
@@ -113,7 +113,7 @@ Object.assign(App, {
   },
   _rectPrev(pid) {
     const p = D.p(pid), el = document.getElementById('rcPrev'); if (!p || !el) return;
-    const d = B.rectDiff(p.facturacion, parseFloat(document.getElementById('rcBase').value) || 0);
+    const d = B.rectDiff(p.facturacion, parseNum(document.getElementById('rcBase').value) || 0);
     const sg = n => (n > 0 ? '+' : '') + fmtMoney(n);
     el.innerHTML = `<div class="br"><span class="la">${t('billing.taxableBase')}</span><span class="va">${sg(d.base)}</span></div>`
       + (p.facturacion.iva ? `<div class="br"><span class="la">${t('billing.plusIvaAmt', esc(p.facturacion.iva))}</span><span class="va">${sg(d.importeIva)}</span></div>` : '')
@@ -126,7 +126,7 @@ Object.assign(App, {
     const f = p.facturacion;
     const fecha = document.getElementById('rcDate').value || todayStr();
     if (fecha < f.facturaFecha) { Toast.warn(t('rect.dateBefore')); return; }
-    const d = B.rectDiff(f, parseFloat(document.getElementById('rcBase').value) || 0);
+    const d = B.rectDiff(f, parseNum(document.getElementById('rcBase').value) || 0);
     if (!d.base) { Toast.warn(t('rect.noChange')); return; }
     const r = { id: uid(), num: D.nextRectNum(fecha), fecha, motivo: document.getElementById('rcMot').value.trim(), ...d };
     const rectificativas = [...(f.rectificativas || []), r];
@@ -302,7 +302,7 @@ Object.assign(App, {
       + `<div class="fr"><div class="fg"><label>${t('bud.num')}</label><input type="text" id="budNum" value="${D.nextBudNum(hoy)}" style="font-family:'DM Mono',monospace"></div>`
       /* La serie P vuelve a 1 cada año: al cambiar de año, el número que toca */
       + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="budDate" value="${hoy}" onchange="document.getElementById('budNum').value=D.nextBudNum(this.value)"></div>`
-      + `<div class="fg"><label>${t('bud.validez')}</label><input type="number" id="budVal" min="0" step="1" value="30" style="font-family:'DM Mono',monospace"></div></div>`
+      + `<div class="fg"><label>${t('bud.validez')}</label><input type="text" inputmode="decimal" id="budVal" min="0" step="1" value="30" style="font-family:'DM Mono',monospace"></div></div>`
       + `<div class="fg"><label>${t('bud.projects')}</label>`
       +   (rows ? `<div class="cl-list">${rows}</div>` : `<div style="color:var(--t3);font-size:.85rem">${t(cid ? 'bud.noProjects' : 'bud.noClient')}</div>`)
       + `</div>`
@@ -334,7 +334,7 @@ Object.assign(App, {
       + `<div class="cl-item bud-line" data-pid="${r.pid}"${r.sub ? ` data-sub="${esc(r.sub)}"` : ''} style="gap:.5rem${r.sub ? ';padding-left:1.75rem' : ''}">`
       + `<input type="checkbox" ${r.on ? 'checked' : ''} style="width:auto">`
       + `<input type="text" class="bud-c" value="${esc(r.concepto)}" style="flex:1">`
-      + `<input type="number" class="bud-b" step="0.01" min="0" value="${r.base}" placeholder="0" style="width:7rem;font-family:'DM Mono',monospace">`
+      + `<input type="text" inputmode="decimal" class="bud-b" step="0.01" min="0" value="${r.base}" placeholder="0" style="width:7rem;font-family:'DM Mono',monospace">`
       + `</div>`).join('');
   },
 
@@ -345,7 +345,7 @@ Object.assign(App, {
       .map(el => ({
         pid: el.dataset.pid,
         concepto: el.querySelector('.bud-c').value.trim(),
-        base: roundMoney(parseFloat(el.querySelector('.bud-b').value) || 0),
+        base: roundMoney(parseNum(el.querySelector('.bud-b').value) || 0),
         ...(el.dataset.sub && { subId: el.dataset.sub })
       }));
     const v = parseInt(document.getElementById('budVal').value, 10);
@@ -359,7 +359,7 @@ Object.assign(App, {
       + `<div class="fg"><label>${t('fac.client')}</label><div style="font-size:.9rem">${esc(D.cl(b.clienteId)?.nombre || '')}</div></div>`
       + `<div class="fr"><div class="fg"><label>${t('bud.num')}</label><input type="text" id="budNum" value="${esc(b.num)}" style="font-family:'DM Mono',monospace"></div>`
       + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="budDate" value="${b.fecha}"></div>`
-      + `<div class="fg"><label>${t('bud.validez')}</label><input type="number" id="budVal" min="0" step="1" value="${b.validez ?? ''}" style="font-family:'DM Mono',monospace"></div></div>`
+      + `<div class="fg"><label>${t('bud.validez')}</label><input type="text" inputmode="decimal" id="budVal" min="0" step="1" value="${b.validez ?? ''}" style="font-family:'DM Mono',monospace"></div></div>`
       + `<div class="fg"><label>${t('field.status')}</label><select id="budSt">${['enviado', 'aceptado', 'rechazado'].map(k => `<option value="${k}" ${k === b.estado ? 'selected' : ''}>${t('bud.st.' + k)}</option>`).join('')}</select></div>`
       + `<div class="fg"><label>${t('bud.projects')}</label><div class="cl-list">${this._budRows(b.clienteId, b.lineas, () => false)}</div></div>`
       + `<div class="fg"><label>${t('bud.desc')}</label><textarea id="budDesc" placeholder="${t('bud.descPh')}">${esc(b.descripcion || '')}</textarea></div>`
@@ -432,7 +432,7 @@ Object.assign(App, {
     const title = isEdit ? t('billing.editPayment') : t('billing.addPayment');
     this.om(
       `<div class="mt">${title}</div>`
-      + `<div class="fr"><div class="fg"><label>${t('billing.paymentAmount')}</label><input type="number" id="mcA" min="0.01" step="0.01" value="${defAmount}"></div>`
+      + `<div class="fr"><div class="fg"><label>${t('billing.paymentAmount')}</label><input type="text" inputmode="decimal" id="mcA" min="0.01" step="0.01" value="${defAmount}"></div>`
       + `<div class="fg"><label>${t('field.date')}${itip('tip.cobroFecha')}</label><input type="date" id="mcD" value="${defDate}"></div></div>`
       + `<div class="fg"><label>${t('billing.method')}</label><select id="mcM">${COBRO_METODOS.map(m => `<option value="${m}" ${(existing?.metodo || 'transferencia') === m ? 'selected' : ''}>${t('billing.m.' + m)}</option>`).join('')}</select></div>`
       + (isEdit ? '' : `<div style="font-size:.78rem;color:var(--t3);margin-bottom:.75rem">${t('billing.remaining', fmtMoney(pend))}</div>`)
@@ -441,7 +441,7 @@ Object.assign(App, {
   },
 
   saveCobro(pid, cid) {
-    let cant = parseFloat(document.getElementById('mcA').value) || 0;
+    let cant = parseNum(document.getElementById('mcA').value) || 0;
     const fecha = document.getElementById('mcD').value || todayStr();
     const metodo = document.getElementById('mcM').value;
     if (cant <= 0) return;

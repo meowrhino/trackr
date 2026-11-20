@@ -12,6 +12,9 @@ const D = {
 
   /** Tope del anillo de auditoría: el array viaja dentro del blob cifrado (límite 256 KB). */
   AUDIT_MAX: 500,
+  /** Papelera de proyectos borrados: cuántos y cuántos días se guardan. */
+  TRASH_MAX: 20,
+  TRASH_DAYS: 30,
 
   /* ── Inicialización ── */
 
@@ -171,7 +174,6 @@ const D = {
       /* Garantizar campos estructurales */
       if (!p.horas) p.horas = [];
       /* Subproyectos (opcional): solo se rellenan los ids que falten; sin lista no se toca nada */
-      if (Array.isArray(p.subproyectos)) p.subproyectos.forEach(s => { if (s && !s.id) s.id = uid(); });
       if (!p.facturacion) p.facturacion = { modo: 'gratis' };
       if (!p.fechas) p.fechas = { inicio: null, finEstimada: null, finReal: null };
 
@@ -308,6 +310,12 @@ const D = {
     }
 
     this._types();
+    /* Papelera de proyectos: 30 días y 20 como mucho; lo recuperado (vuelve a estar en la lista) sale */
+    if (Array.isArray(d.papelera)) {
+      const lim = Date.now() - this.TRASH_DAYS * 864e5;
+      d.papelera = d.papelera.filter(x => x.id && x.proyecto && typeof x.proyecto === 'object' && x.ts > lim && !d.projects.some(p => p.id === x.id)).slice(-this.TRASH_MAX);
+      if (!d.papelera.length) delete d.papelera;
+    }
     d.version = 4;
   },
 
@@ -324,6 +332,7 @@ const D = {
    *  Va lo primero de ensure(): el resto ya puede recorrerlas sin mirar. */
   _shape() {
     const d = this.d;
+    this.fillIds(d); /* lo primero, con el contenido tal como llega: el id sale de él */
     const isObj = v => !!v && typeof v === 'object' && !Array.isArray(v);
     const list = (o, k, optional) => { if (optional && o[k] == null) return []; o[k] = Array.isArray(o[k]) ? o[k].filter(isObj) : []; return o[k]; };
     const obj = (o, k) => { if (o[k] != null && !isObj(o[k])) delete o[k]; };
@@ -337,6 +346,33 @@ const D = {
     });
     d.gastos.forEach(g => { list(g, 'entradas').forEach(e => list(e, 'desglose', true)); });
     d.presupuestos.forEach(b => list(b, 'lineas'));
+    list(d, 'papelera', true);
+  },
+
+  /** Pone id a todo lo que no lo tenga (datos viejos, JSON hechos a mano, los ejemplos). Sin id
+   *  una entrada no se podía editar ni borrar, y al fusionar dos dispositivos desaparecía.
+   *  El id sale del contenido (no al azar): dos dispositivos con la misma entrada sin id le dan
+   *  el mismo, así que al fusionar no se duplica. Vale para cualquier objeto de datos, no solo
+   *  D.d (la fusión lo pasa también por la copia de la nube). */
+  fillIds(d) {
+    const arr = x => (Array.isArray(x) ? x : []);
+    const hash = s => { let h = 5381, g = 52711; for (let i = 0; i < s.length; i++) { const c = s.charCodeAt(i); h = (h * 33) ^ c; g = (g * 33) ^ c; } return (h >>> 0).toString(36) + (g >>> 0).toString(36); };
+    const fill = (items, scope) => {
+      const seen = {};
+      arr(items).forEach(x => {
+        if (!x || typeof x !== 'object' || x.id) return;
+        const body = JSON.stringify(x), n = seen[body] = (seen[body] || 0) + 1; /* dos iguales: 1.ª y 2.ª */
+        x.id = 'i' + hash(scope + '|' + body + '|' + n);
+      });
+    };
+    for (const k of ['projects', 'clientes', 'gastos', 'deducibles', 'presupuestos', 'facturas']) fill(d && d[k], k);
+    arr(d && d.projects).forEach(p => {
+      if (!p || typeof p !== 'object') return;
+      fill(p.horas, p.id + '|h'); fill(p.subproyectos, p.id + '|s');
+      if (p.facturacion && typeof p.facturacion === 'object') { fill(p.facturacion.cobros, p.id + '|c'); fill(p.facturacion.rectificativas, p.id + '|r'); }
+    });
+    arr(d && d.gastos).forEach(g => { if (g && typeof g === 'object') fill(g.entradas, g.id + '|e'); });
+    return d;
   },
 
   /** Tipos: números, fechas, colores y listas cerradas. Va lo último de ensure(), con las
@@ -516,16 +552,34 @@ const D = {
        gestor (localStorage propio, historial, blob en la nube). Ver App.gstOpenClient. */
     if (this._readOnly) return;
     try {
-      localStorage.setItem('trackr_data', JSON.stringify(this.d));
+      /* Almacenamiento lleno (pasa antes en Safari, que cuenta doble las copias comprimidas):
+         se sueltan copias de seguridad viejas, de una en una, hasta que quepa. Los datos van
+         antes que sus copias: sin esto el cambio se quedaba solo en memoria. */
+      const json = JSON.stringify(this.d);
+      for (let liberadas = 0; ; liberadas++) {
+        try { localStorage.setItem('trackr_data', json); if (liberadas) this._quotaWarn(); break; }
+        catch (e) {
+          const lleno = e && (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED' || e.code === 22);
+          if (!lleno || typeof H === 'undefined' || !H.dropOldest || !H.dropOldest()) throw e;
+        }
+      }
       this.lastSaved = Date.now();
       try { localStorage.setItem('trackr_saved_at', String(this.lastSaved)); } catch (e) { /* cuota: el timestamp es prescindible */ }
       /* El refresco del indicador es UI no crítica: si falla, el guardado YA fue OK. */
       try { if (typeof App !== 'undefined' && App._renderSaved) App._renderSaved(); } catch (e) { /* noop */ }
       try { if (typeof App !== 'undefined' && App._accNoSessionNudge) App._accNoSessionNudge(); } catch (e) { /* noop */ }
     } catch (e) {
-      if (typeof Toast !== 'undefined') Toast.error('Error al guardar: ' + (e.name === 'QuotaExceededError' ? 'almacenamiento lleno' : e.message));
+      /* No se ha guardado: el aviso se queda en pantalla hasta que se cierre (antes, 5 segundos) */
+      const msg = typeof t === 'function' ? t('msg.saveFailed') : 'Error al guardar';
+      if (typeof Toast !== 'undefined') Toast.show(msg + (e.name === 'QuotaExceededError' ? '' : ' (' + e.message + ')'), 'error', 0, [{ label: 'OK', fn: () => {} }]);
       console.error('D.save() failed:', e);
     }
+  },
+  /** Aviso (una vez por sesión) de que se han borrado copias viejas para poder guardar */
+  _quotaWarn() {
+    if (this._quotaWarned) return;
+    this._quotaWarned = true;
+    if (typeof Toast !== 'undefined') Toast.show(typeof t === 'function' ? t('msg.quotaFreed') : 'Almacenamiento casi lleno', 'warn', 0, [{ label: 'OK', fn: () => {} }]);
   },
 
   /* ══════════════════════════════════════════════
@@ -544,6 +598,13 @@ const D = {
     const y = fecha ? String(fecha).slice(0, 4) : null;
     return this.d.projects.find(p => p.id !== pid && p.facturacion?.facturaNum != null && +p.facturacion.facturaNum === +num
       && (!y || String(p.facturacion.facturaFecha || '').slice(0, 4) === y));
+  },
+  /** Números de factura usados por más de un proyecto en el mismo año: ['7/26', …]. Pasa al
+   *  fusionar dos dispositivos que emitieron sin conexión, o al importar. */
+  facturasRepetidas() {
+    const n = {};
+    this.d.projects.forEach(p => { const f = p.facturacion; if (f?.facturaNum) { const k = `${f.facturaNum}/${String(f.facturaFecha || '').slice(2, 4)}`; n[k] = (n[k] || 0) + 1; } });
+    return Object.keys(n).filter(k => n[k] > 1);
   },
   /** Tras emitir (o importar) la factura `num` con esa fecha, avanza el contador si toca.
    *  Solo cuentan el año del contador (o el actual en datos viejos sin año) y los posteriores:
@@ -624,6 +685,7 @@ const D = {
     if (this.facturaBorrable(pid)) return false;
     const f = this.p(pid).facturacion, s = this.d.settings, y = f.facturaFecha.slice(0, 4);
     if ((s.nextFacturaYear || y) === y && +s.nextFacturaNum === +f.facturaNum + 1) s.nextFacturaNum = +f.facturaNum;
+    this._tomb('facturaEmitida', `fac-${pid}-${f.facturaNum}`); /* la fusión da prioridad al lado con factura: esta no debe volver */
     this.up(pid, { facturacion: { ...f, facturaNum: null, facturaFecha: null, anulada: null } });
     return true;
   },
@@ -639,10 +701,31 @@ const D = {
     if (i !== -1) { Object.assign(this.d.projects[i], u); this._audit('editar', 'proyecto', id, u); this.save(); }
   },
 
-  /** Elimina un proyecto por ID */
+  /** Elimina un proyecto por ID. Va a la papelera (con sus horas): se recupera con restoreP. */
   del(id) {
-    this.d.projects = this.d.projects.filter(p => p.id !== id);
+    const p = this.p(id);
+    this.d.projects = this.d.projects.filter(x => x.id !== id);
+    if (p && !this._readOnly) {
+      this.d.papelera = [...(this.d.papelera || []).filter(x => x.id !== id), { id, ts: Date.now(), proyecto: p }].slice(-this.TRASH_MAX);
+    }
     this._audit('borrar', 'proyecto', id);
+    this.save();
+  },
+  /** Proyectos en la papelera, del más reciente al más antiguo: [{ id, ts, proyecto }] */
+  trash() { return [...(this.d.papelera || [])].reverse(); },
+  /** Saca un proyecto de la papelera y lo devuelve a la lista. true si lo ha recuperado. */
+  restoreP(id) {
+    const x = (this.d.papelera || []).find(t => t.id === id);
+    if (!x) return false;
+    this.d.papelera = this.d.papelera.filter(t => t.id !== id);
+    if (!this.p(id)) { this.d.projects.push(x.proyecto); this._audit('crear', 'proyecto', id, x.proyecto); } /* el 'crear' es posterior al 'borrar': la fusión lo da por vivo */
+    this.save();
+    return true;
+  },
+  /** Vacía la papelera (o quita un solo proyecto): ya no se puede recuperar. */
+  emptyTrash(id) {
+    this.d.papelera = id ? (this.d.papelera || []).filter(t => t.id !== id) : [];
+    if (!this.d.papelera.length) delete this.d.papelera;
     this.save();
   },
 

@@ -81,19 +81,19 @@ footer a{color:var(--t3)}
   <div class="card">
     <h2>Acumulado desde el 1 de enero</h2>
     <div class="fr">
-      <div class="fg"><label>Ingresos (sin IVA)</label><input type="number" id="ing" min="0" step="0.01" placeholder="0,00"></div>
-      <div class="fg"><label>Gastos deducibles (sin IVA)</label><input type="number" id="gas" min="0" step="0.01" placeholder="0,00"></div>
+      <div class="fg"><label>Ingresos (sin IVA)</label><input type="text" inputmode="decimal" id="ing" min="0" step="0.01" placeholder="0,00"></div>
+      <div class="fg"><label>Gastos deducibles (sin IVA)</label><input type="text" inputmode="decimal" id="gas" min="0" step="0.01" placeholder="0,00"></div>
     </div>
     <div class="fr">
-      <div class="fg"><label>Retenciones soportadas</label><input type="number" id="ret" min="0" step="0.01" placeholder="0,00"></div>
-      <div class="fg"><label>Pagado en los 130 anteriores del año</label><input type="number" id="prev07" min="0" step="0.01" placeholder="0,00"></div>
+      <div class="fg"><label>Retenciones soportadas</label><input type="text" inputmode="decimal" id="ret" min="0" step="0.01" placeholder="0,00"></div>
+      <div class="fg"><label>Pagado en los 130 anteriores del año</label><input type="text" inputmode="decimal" id="prev07" min="0" step="0.01" placeholder="0,00"></div>
     </div>
     <label class="chk"><input type="checkbox" id="eds" checked> Estimación directa simplificada (aplica el 5 % de difícil justificación)</label>
     <details style="margin-top:.6rem">
       <summary>Minoración por rendimientos bajos y negativos anteriores</summary>
       <div class="fr">
-        <div class="fg"><label>Rendimiento neto del año pasado</label><input type="number" id="rn" step="0.01" placeholder="deja vacío si no lo sabes"></div>
-        <div class="fg"><label>Negativos de trimestres anteriores (casilla 19) sin aplicar</label><input type="number" id="neg" min="0" step="0.01" placeholder="0,00"></div>
+        <div class="fg"><label>Rendimiento neto del año pasado</label><input type="text" inputmode="decimal" id="rn" step="0.01" placeholder="deja vacío si no lo sabes"></div>
+        <div class="fg"><label>Negativos de trimestres anteriores (casilla 19) sin aplicar</label><input type="text" inputmode="decimal" id="neg" min="0" step="0.01" placeholder="0,00"></div>
       </div>
       <div class="note">La minoración (casilla 13) es de 100/75/50/25 € por trimestre si tu rendimiento neto del año anterior fue de hasta 9.000/10.000/11.000/12.000 €. En el primer año de actividad se toma 0 € → 100 €/trimestre.</div>
     </details>
@@ -138,7 +138,7 @@ footer a{color:var(--t3)}
 /* Calculadora 130 — casillas oficiales, cálculo ACUMULATIVO (art. 99.7 LIRPF).
    Sin dependencias ni persistencia; el estado se serializa a la URL. */
 const $ = id => document.getElementById(id);
-const num = id => { const v = parseFloat($(id).value); return isNaN(v) ? 0 : v; };
+const num = id => { const v = parseNum($(id).value); return isNaN(v) ? 0 : v; };
 const r2 = v => Math.round(v * 100) / 100;
 const fmt = v => v.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 const FIELDS = ['t', 'y', 'ing', 'gas', 'ret', 'prev07', 'rn', 'neg', 'eds'];
@@ -150,7 +150,7 @@ function calc() {
   const rnRaw = $('rn').value;
   const { c01, c02, dj, c03, c04, c05, c06, c07, c12, c13, c14, c15, c17, c19 } = F.casillas130({
     c01: num('ing'), gas: num('gas'), eds: $('eds').checked, c05: num('prev07'), c06: num('ret'),
-    rn: rnRaw === '' ? null : parseFloat(rnRaw), neg: num('neg')
+    rn: rnRaw === '' ? null : parseNum(rnRaw), neg: num('neg')
   });
 
   const row = (n, l, v, cls = '', style = '') =>

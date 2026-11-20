@@ -74,13 +74,26 @@ const H = {
        se sustituye en vez de añadir otra. */
     if (entry.safety && arr[0] && arr[0].safety && Date.now() - new Date(arr[0].ts).getTime() < this.SAFETY_MIN * 60000) arr.shift();
     arr.unshift(entry);                       // el nuevo se pone el primero
-    /* Sobran: se va primero la red de seguridad más vieja; la del día y las manuales, al final */
+    /* Sobran: se va primero la red de seguridad más vieja; la del día y las manuales, al final.
+       `opts.keep` (la copia que se está restaurando) no se tira nunca: con 10 copias, restaurar
+       la más antigua la borraba justo antes de leerla. */
     while (arr.length > this.MAX) {
       let i = -1;
-      for (let k = arr.length - 1; k > 0; k--) if (arr[k].safety) { i = k; break; }
-      arr.splice(i > 0 ? i : arr.length - 1, 1);
+      for (let k = arr.length - 1; k > 0; k--) if (arr[k].safety && arr[k].id !== opts.keep) { i = k; break; }
+      if (i < 0) for (let k = arr.length - 1; k > 0; k--) if (arr[k].id !== opts.keep) { i = k; break; }
+      if (i < 0) break;
+      arr.splice(i, 1);
     }
     return this._write(arr) ? entry.id : null;
+  },
+
+  /** Suelta la copia más vieja para hacer sitio (D.save con el almacenamiento lleno). Nunca la
+   *  más reciente. @returns {boolean} true si ha borrado una */
+  dropOldest() {
+    const arr = this._read();
+    if (arr.length < 2) return false;
+    arr.pop();
+    try { localStorage.setItem(this.KEY, JSON.stringify(arr)); return true; } catch { return false; }
   },
 
   /**
@@ -114,10 +127,13 @@ const H = {
   },
 
   /** Restaura un snapshot en D (reemplaza los datos actuales). @returns {boolean} */
-  restore(id) {
+  /** @param {boolean} [backup] antes de restaurar, guarda una copia del estado actual; si no se
+   *  puede guardar (almacenamiento lleno), no restaura y devuelve 'nobackup'. */
+  restore(id, backup) {
     if (D._readOnly) return false; /* modo visor: no se pisan los datos que se están mirando */
-    const data = this._data(id);
+    const data = this._data(id);   /* se lee ANTES de la copia nueva, que puede hacer sitio tirando otra */
     if (!data) return false;
+    if (backup && !this.snapshot({ keep: id })) return 'nobackup';
     D.load(data);
     return true;
   },

@@ -24,25 +24,25 @@ Object.assign(App, {
       + `<div class="fg"><label>${t('cfg.nif')}</label><input type="text" id="cfgENif" value="${esc(em.nif)}" placeholder="${t('ph.nif')}"></div>`
       + `</div><div class="cfg-save"><button class="bt bt-p" onclick="App.saveEmisor()">${t('btn.save')}</button></div></div>`
       + `<div class="cfg-section"><div class="cfg-section-title">${t('cfg.defaults')}</div><div class="cfg-grid">`
-      + `<div class="fg"><label>${t('cfg.ivaPercent')}</label><input type="number" id="cfgIva" value="${s.defaultIva}" min="0" max="100" step="1"></div>`
-      + `<div class="fg"><label>${t('cfg.irpfPercent')}</label><input type="number" id="cfgIrpf" value="${s.defaultIrpf}" min="0" max="100" step="1"></div>`
-      + `<div class="fg"><label>${t('cfg.dueDays')}</label><input type="number" id="cfgDiasVenc" value="${s.diasVencimiento ?? 30}" min="0" max="365" step="1"></div>`
+      + `<div class="fg"><label>${t('cfg.ivaPercent')}</label><input type="text" inputmode="decimal" id="cfgIva" value="${s.defaultIva}" min="0" max="100" step="1"></div>`
+      + `<div class="fg"><label>${t('cfg.irpfPercent')}</label><input type="text" inputmode="decimal" id="cfgIrpf" value="${s.defaultIrpf}" min="0" max="100" step="1"></div>`
+      + `<div class="fg"><label>${t('cfg.dueDays')}</label><input type="text" inputmode="decimal" id="cfgDiasVenc" value="${s.diasVencimiento ?? 30}" min="0" max="365" step="1"></div>`
       + `<div class="cfg-full fg"><label>${t('cfg.beneficiary')}</label><input type="text" id="cfgBenef" placeholder="${t('ph.beneficiary')}" value="${esc(em.beneficiarioPago || '')}"></div>`
       + `<div class="cfg-full fg"><label>${t('cfg.bankAccount')}</label><input type="text" id="cfgPago" placeholder="${t('ph.bankAccount')}" value="${esc(em.instruccionesPago || '')}"></div>`
       + `<div class="cfg-full fg"><label>${t('cfg.defaultSubject')}</label><input type="text" id="cfgConcepto" value="${esc(s.conceptoDefault || '')}" placeholder="${t('ph.defaultSubject')}"><label style="font-size:.82rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;margin-top:.45rem;text-transform:none;letter-spacing:0;color:var(--t2);white-space:nowrap"><input type="checkbox" id="cfgConceptoCl" style="margin:0;width:14px;height:14px;accent-color:var(--ac)" ${s.conceptoAppendCliente ? 'checked' : ''}>${t('cfg.appendClientName')}</label></div>`
       + `</div><div class="cfg-save"><button class="bt bt-p" onclick="App.saveDefaults()">${t('btn.save')}</button></div></div>`
       + `<div class="cfg-section"><div class="cfg-section-title">${t('cfg.fiscalTitle')}</div><div class="cfg-grid">`
-      + `<div class="fg"><label>${t('cfg.rendAnterior')}</label><input type="number" id="cfgFRend" value="${fis.rendAnterior ?? ''}" min="0" step="100" placeholder="—"><div style="font-size:.72rem;color:var(--t3);margin-top:.35rem">${t('cfg.rendAnteriorHelp')}</div></div>`
-      + `<div class="fg"><label>${t('cfg.saldoIva')}</label><input type="number" id="cfgFSaldo" value="${fis.saldoIvaInicial || ''}" min="0" step="0.01" placeholder="0"><div style="font-size:.72rem;color:var(--t3);margin-top:.35rem">${t('cfg.saldoIvaHelp')}</div></div>`
+      + `<div class="fg"><label>${t('cfg.rendAnterior')}</label><input type="text" inputmode="decimal" id="cfgFRend" value="${fis.rendAnterior ?? ''}" min="0" step="100" placeholder="—"><div style="font-size:.72rem;color:var(--t3);margin-top:.35rem">${t('cfg.rendAnteriorHelp')}</div></div>`
+      + `<div class="fg"><label>${t('cfg.saldoIva')}</label><input type="text" inputmode="decimal" id="cfgFSaldo" value="${fis.saldoIvaInicial || ''}" min="0" step="0.01" placeholder="0"><div style="font-size:.72rem;color:var(--t3);margin-top:.35rem">${t('cfg.saldoIvaHelp')}</div></div>`
       + `<div class="cfg-full fg"><label style="font-size:.82rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0;color:var(--t2)"><input type="checkbox" id="cfgFEds" style="margin:0;width:14px;height:14px;accent-color:var(--ac)" ${fis.eds !== false ? 'checked' : ''}>${t('cfg.eds')}${itip('tip.eds')}</label></div>`
       + `<div class="fg"><label>${t('cfg.actTipo')}</label><select id="cfgFActT">${[['A', t('cfg.actTipoA')], ['B', t('cfg.actTipoB')]].map(([k, v]) => `<option value="${k}" ${(fis.actTipo || 'A') === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
       + `<div class="fg"><label>${t('cfg.actCodigo')}</label><select id="cfgFActC">${[['05', t('cfg.act05')], ['04', t('cfg.act04')], ['03', t('cfg.act03')], ['01', t('cfg.act01')]].map(([k, v]) => `<option value="${k}" ${(fis.actCodigo || '05') === k ? 'selected' : ''}>${k} — ${v}</option>`).join('')}</select></div>`
       + `<div class="cfg-full fg"><label>${t('cfg.actIAE')}</label><input type="text" id="cfgFActE" value="${esc(fis.actIAE || '')}" placeholder="763"><div style="font-size:.72rem;color:var(--t3);margin-top:.35rem">${t('cfg.actHelp')}</div></div>`
       + `</div><div class="cfg-save"><button class="bt bt-p" onclick="App.saveFiscal()">${t('btn.save')}</button></div></div>`
       + `<div class="cfg-section"><div class="cfg-section-title">${t('cfg.goals')}</div><div class="cfg-grid">`
-      + `<div class="fg"><label>${t('cfg.hoursMonth')}</label><input type="number" id="cfgTHm" value="${tg.horasMes || ''}" min="0" step="1" placeholder="${t('ph.hoursMonth')}"></div>`
-      + `<div class="fg"><label>${t('cfg.incomeMonth')}</label><input type="number" id="cfgTIm" value="${tg.ingresosMes || ''}" min="0" step="100" placeholder="${t('ph.incomeMonth')}"></div>`
-      + `<div class="fg"><label>${t('cfg.hoursWeek')}</label><input type="number" id="cfgTHs" value="${tg.horasSemana || ''}" min="0" step="1" placeholder="${t('ph.hoursWeek')}"></div>`
+      + `<div class="fg"><label>${t('cfg.hoursMonth')}</label><input type="text" inputmode="decimal" id="cfgTHm" value="${tg.horasMes || ''}" min="0" step="1" placeholder="${t('ph.hoursMonth')}"></div>`
+      + `<div class="fg"><label>${t('cfg.incomeMonth')}</label><input type="text" inputmode="decimal" id="cfgTIm" value="${tg.ingresosMes || ''}" min="0" step="100" placeholder="${t('ph.incomeMonth')}"></div>`
+      + `<div class="fg"><label>${t('cfg.hoursWeek')}</label><input type="text" inputmode="decimal" id="cfgTHs" value="${tg.horasSemana || ''}" min="0" step="1" placeholder="${t('ph.hoursWeek')}"></div>`
       + `</div><div class="cfg-save"><button class="bt bt-p" onclick="App.saveGoals()">${t('btn.save')}</button></div></div>`
       + `<div class="cfg-section"><div class="cfg-section-title">${t('cfg.calendar')}</div><div class="cfg-grid">`
       + `<div class="fg"><label>${t('cfg.calStartHour')}</label><select id="cfgCalStart">`
@@ -189,12 +189,13 @@ Object.assign(App, {
         : 'Esto sobreescribirá tus datos actuales con esta copia. Te recomendamos descargar antes una copia del estado actual. ¿Continuar?');
     if (!confirm(msg)) return;
     if (typeof H === 'undefined') return;
-    H.snapshot(); // red de seguridad: guarda el estado ACTUAL antes de sobreescribirlo (se puede deshacer)
-    if (H.restore(id)) {
+    /* Antes guarda el estado ACTUAL (se puede deshacer); si no cabe, no restaura */
+    const r = H.restore(id, true);
+    if (r === true) {
       this._applyPrefs();
       Toast.ok(_lang === 'en' ? 'Copy restored' : (_lang === 'ca' ? 'Còpia restaurada' : 'Copia restaurada'));
       this.go(this.cv);
-    }
+    } else Toast.error(t(r === 'nobackup' ? 'msg.noBackup' : 'msg.restoreFailed'));
   },
 
   /** Sección Verifactu: identidad SIF + lista de facturas firmadas + verificar cadena */
@@ -420,8 +421,8 @@ Object.assign(App, {
     const s = D.d.settings;
     if (!s.fiscal) s.fiscal = {};
     const rend = document.getElementById('cfgFRend').value;
-    s.fiscal.rendAnterior = rend === '' ? null : (parseFloat(rend) || 0);
-    s.fiscal.saldoIvaInicial = parseFloat(document.getElementById('cfgFSaldo').value) || 0;
+    s.fiscal.rendAnterior = rend === '' ? null : (parseNum(rend) || 0);
+    s.fiscal.saldoIvaInicial = parseNum(document.getElementById('cfgFSaldo').value) || 0;
     s.fiscal.eds = document.getElementById('cfgFEds').checked;
     s.fiscal.actTipo = document.getElementById('cfgFActT').value;
     s.fiscal.actCodigo = document.getElementById('cfgFActC').value;
@@ -437,9 +438,9 @@ Object.assign(App, {
 
   saveGoals() {
     const tg = D.d.settings.targets;
-    tg.horasMes = parseFloat(document.getElementById('cfgTHm').value) || null;
-    tg.ingresosMes = parseFloat(document.getElementById('cfgTIm').value) || null;
-    tg.horasSemana = parseFloat(document.getElementById('cfgTHs').value) || null;
+    tg.horasMes = parseNum(document.getElementById('cfgTHm').value) || null;
+    tg.ingresosMes = parseNum(document.getElementById('cfgTIm').value) || null;
+    tg.horasSemana = parseNum(document.getElementById('cfgTHs').value) || null;
     D._audit('editar', 'settings', null);
     D.save();
     Toast.ok(t('cfg.saved'));
@@ -519,7 +520,8 @@ Object.assign(App, {
     this.rBud();
     const ps = D.ps().filter(p => p.facturacion?.facturaNum)
       .sort((a, b) => (b.facturacion.facturaFecha || '').localeCompare(a.facturacion.facturaFecha || '') || b.facturacion.facturaNum - a.facturacion.facturaNum);
-    document.getElementById('facC').innerHTML = ps.length
+    const dup = D.facturasRepetidas();
+    document.getElementById('facC').innerHTML = (dup.length ? `<div class="acc-warn" role="alert" style="margin-bottom:.75rem;border-color:var(--bad);color:var(--bad);font-size:.82rem">&#9888; ${t('fac.dupWarn', esc(dup.join(', ')))}</div>` : '') + (ps.length
       ? `<div class="cl-list">${ps.map(p => {
           const f = p.facturacion, reg = this._facReg(p.id);
           const anulada = !!f.anulada || (!!reg && (reg.eventos || []).some(e => e.tipo === 'anulada'));
@@ -546,7 +548,7 @@ Object.assign(App, {
               + `<span class="cl-nif" style="font-size:.78rem;color:${r.total < 0 ? 'var(--bad)' : 'var(--t1)'}">${r.total > 0 ? '+' : ''}${fmtMoney(r.total)}</span>`
               + `<div class="cl-actions"><button class="cl-btn" onclick="Fac.downloadRect('${p.id}','${r.id}')" title="${t('btn.downloadPdf')}">&#9113;</button></div></div>`).join('');
         }).join('')}</div>`
-      : `<div style="color:var(--t3);font-size:.82rem">${t('fac.none')}</div>`;
+      : `<div style="color:var(--t3);font-size:.82rem">${t('fac.none')}</div>`);
   },
 
   /** Recordatorio de cobro al portapapeles, en el idioma de la factura, para pegarlo en un email */

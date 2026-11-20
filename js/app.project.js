@@ -191,17 +191,17 @@ Object.assign(App, {
       +   `<button class="bm ${m === 'gratis' ? 'on' : ''}" onclick="App.sBM('gratis')">${t('billing.free')}</button>`
       + `</div><input type="hidden" id="mpBM" value="${m}">`
       + `<div id="bF" style="${m === 'gratis' ? 'display:none' : ''}">`
-      +   `<div id="bfPH" style="${m === 'por_hora' ? '' : 'display:none'}"><div class="fg"><label>${t('billing.eurPerHour')}</label><input type="number" id="mpPH" value="${df.precioHora}" step="0.01" min="0" placeholder="30.00" oninput="App.cPrev()"></div></div>`
+      +   `<div id="bfPH" style="${m === 'por_hora' ? '' : 'display:none'}"><div class="fg"><label>${t('billing.eurPerHour')}</label><input type="text" inputmode="decimal" id="mpPH" value="${df.precioHora}" step="0.01" min="0" placeholder="30.00" oninput="App.cPrev()"></div></div>`
       +   `<div class="fr">`
-      +     `<div class="fg" id="bfBase" style="${m === 'desde_total' || m === 'por_hora' ? 'display:none' : ''}"><label>${t('billing.baseEur')}</label><input type="number" id="mpBa" value="${df.base}" step="0.01" placeholder="0.00" oninput="App.cPrev()"></div>`
-      +     `<div class="fg" id="bfTot" style="${m === 'desde_base' || m === 'por_hora' ? 'display:none' : ''}"><label>${t('billing.totalEur')}</label><input type="number" id="mpTo" value="${df.total}" step="0.01" placeholder="0.00" oninput="App.cPrev()"></div>`
+      +     `<div class="fg" id="bfBase" style="${m === 'desde_total' || m === 'por_hora' ? 'display:none' : ''}"><label>${t('billing.baseEur')}</label><input type="text" inputmode="decimal" id="mpBa" value="${df.base}" step="0.01" placeholder="0.00" oninput="App.cPrev()"></div>`
+      +     `<div class="fg" id="bfTot" style="${m === 'desde_base' || m === 'por_hora' ? 'display:none' : ''}"><label>${t('billing.totalEur')}</label><input type="text" inputmode="decimal" id="mpTo" value="${df.total}" step="0.01" placeholder="0.00" oninput="App.cPrev()"></div>`
       +   `</div>`
       +   `<div class="fg" id="bfSubs" style="${m === 'desde_base' ? '' : 'display:none'}"><label>${t('sub.title')}${itip('tip.subs')}</label>`
       +     `<div id="mpSubs" class="cl-list">${df.subs.map(x => this._subRow(x)).join('')}</div>`
       +     `<button type="button" class="bt bt-add" style="margin:.4rem 0 0" onclick="App._subAdd()">${t('sub.add')}</button></div>`
       +   `<div class="fr">`
-      +     `<div class="fg"><label>IVA %${itip('tip.ivaPct')}</label><input type="number" id="mpIva" value="${df.iva}" min="0" max="100" step="1" oninput="App.cPrev()"></div>`
-      +     `<div class="fg"><label>IRPF %${itip('tip.irpfPct')}</label><input type="number" id="mpIrpf" value="${df.irpf}" min="0" max="100" step="1" oninput="App.cPrev()"></div>`
+      +     `<div class="fg"><label>IVA %${itip('tip.ivaPct')}</label><input type="text" inputmode="decimal" id="mpIva" value="${df.iva}" min="0" max="100" step="1" oninput="App.cPrev()"></div>`
+      +     `<div class="fg"><label>IRPF %${itip('tip.irpfPct')}</label><input type="text" inputmode="decimal" id="mpIrpf" value="${df.irpf}" min="0" max="100" step="1" oninput="App.cPrev()"></div>`
       +   `</div>`
       +   `<div class="fg" style="margin-top:.4rem"><label>${t('billing.ivaException')}${itip('tip.ivaExc')}</label><input type="text" id="mpIvaExc" value="${esc(df.ivaExc)}" placeholder="${t('ph.ivaException')}"></div>`
       +   `<div id="bPrev" class="bb" style="margin-top:.4rem"></div>`
@@ -219,7 +219,7 @@ Object.assign(App, {
   _subRow(x) {
     return `<div class="cl-item sub-row" data-id="${x.id}" style="gap:.5rem;cursor:default;flex-wrap:wrap">`
       + `<input type="text" class="sub-n" value="${esc(x.nombre || '')}" placeholder="${t('field.name')}" style="flex:1">`
-      + `<input type="number" class="sub-b" step="0.01" value="${x.base || ''}" placeholder="0.00" oninput="App.cPrev()" style="width:7rem;font-family:'DM Mono',monospace">`
+      + `<input type="text" inputmode="decimal" class="sub-b" step="0.01" value="${x.base || ''}" placeholder="0.00" oninput="App.cPrev()" style="width:7rem;font-family:'DM Mono',monospace">`
       + `<button type="button" class="hr-x" style="background:none;border:0" onclick="App._subDel(this)" title="${t('btn.delete')}">&times;</button>`
       + `<textarea class="sub-d" rows="3" placeholder="${t('sub.descPh')}" style="flex-basis:100%;min-height:0;font-size:.8rem">${esc(x.descripcion || '')}</textarea></div>`;
   },
@@ -235,7 +235,7 @@ Object.assign(App, {
     return [...document.querySelectorAll('#mpSubs .sub-row')].map(el => {
       const descripcion = el.querySelector('.sub-d').value.trim();
       return { id: el.dataset.id, nombre: el.querySelector('.sub-n').value.trim(),
-        base: roundMoney(parseFloat(el.querySelector('.sub-b').value) || 0), ...(descripcion && { descripcion }) };
+        base: roundMoney(parseNum(el.querySelector('.sub-b').value) || 0), ...(descripcion && { descripcion }) };
     }).filter(x => x.nombre || x.base || x.descripcion);
   },
 
@@ -261,15 +261,15 @@ Object.assign(App, {
     const m = document.getElementById('mpBM')?.value;
     if (!m || m === 'gratis') return;
 
-    const ivR = parseFloat(document.getElementById('mpIva')?.value) || 0;
-    const irR = parseFloat(document.getElementById('mpIrpf')?.value) || 0;
+    const ivR = parseNum(document.getElementById('mpIva')?.value) || 0;
+    const irR = parseNum(document.getElementById('mpIrpf')?.value) || 0;
 
     let base, importeIva, importeIrpf, totalF, neto, conIva;
 
     const p = this._editPid ? D.p(this._editPid) : null;
 
     if (m === 'por_hora') {
-      const ph = parseFloat(document.getElementById('mpPH')?.value) || 0;
+      const ph = parseNum(document.getElementById('mpPH')?.value) || 0;
       const th = p ? B.totalHoras(p) : 0;
       base = roundMoney(th * ph);
     } else if (m === 'desde_base') {
@@ -277,9 +277,9 @@ Object.assign(App, {
       const ba = document.getElementById('mpBa'), n = document.querySelectorAll('#mpSubs .sub-row').length;
       if (n) ba.value = roundMoney(this._subRead().reduce((s, x) => s + x.base, 0));
       ba.readOnly = !!n; ba.style.opacity = n ? '.6' : '';
-      base = parseFloat(ba.value) || 0;
+      base = parseNum(ba.value) || 0;
     } else {
-      const t2 = parseFloat(document.getElementById('mpTo')?.value) || 0;
+      const t2 = parseNum(document.getElementById('mpTo')?.value) || 0;
       conIva = !p || B.conIva({ ...p.facturacion });
       base = B.baseDesdeTotal(t2, ivR, irR, conIva);
     }
@@ -290,14 +290,14 @@ Object.assign(App, {
     totalF = tax.totalFactura;
     neto = tax.netoRecibido;
     if (m === 'desde_total') { /* mismo ajuste de céntimo que B.calc */
-      const t2 = parseFloat(document.getElementById('mpTo')?.value) || 0;
+      const t2 = parseNum(document.getElementById('mpTo')?.value) || 0;
       if (ivR > 0) importeIva = roundMoney(conIva ? t2 - base : t2 - base + importeIrpf);
       totalF = conIva ? roundMoney(base + importeIva - importeIrpf) : t2;
     }
 
     let phInfo = '';
     if (m === 'por_hora') {
-      const ph = parseFloat(document.getElementById('mpPH')?.value) || 0;
+      const ph = parseNum(document.getElementById('mpPH')?.value) || 0;
       const th = p ? B.totalHoras(p) : 0;
       phInfo = `<div class="br"><span class="la" style="font-size:.75rem;color:var(--t3)">`
         + (p ? `${th.toFixed(1)}h × ${fmtNum(ph)} €/h` : t('billing.noHoursYet'))
@@ -337,9 +337,9 @@ Object.assign(App, {
       recurrente: document.getElementById('mpRec')?.checked || false,
       fechas: { inicio: document.getElementById('mpI').value || null, finEstimada: document.getElementById('mpFE').value || null, finReal: document.getElementById('mpFR').value || null },
       facturacion: {
-        modo, baseImponible: parseFloat(document.getElementById('mpBa')?.value) || 0, total: parseFloat(document.getElementById('mpTo')?.value) || 0,
-        precioHora: parseFloat(document.getElementById('mpPH')?.value) || 0,
-        iva: parseFloat(document.getElementById('mpIva')?.value) || 0, irpf: parseFloat(document.getElementById('mpIrpf')?.value) || 0,
+        modo, baseImponible: parseNum(document.getElementById('mpBa')?.value) || 0, total: parseNum(document.getElementById('mpTo')?.value) || 0,
+        precioHora: parseNum(document.getElementById('mpPH')?.value) || 0,
+        iva: parseNum(document.getElementById('mpIva')?.value) || 0, irpf: parseNum(document.getElementById('mpIrpf')?.value) || 0,
         ivaExcepcion: document.getElementById('mpIvaExc')?.value?.trim() || '',
         asuntoFactura: document.getElementById('mpAsunto')?.value?.trim() || '',
         importeIva: 0, importeIrpf: 0, totalFactura: 0, netoRecibido: 0,

@@ -309,6 +309,9 @@ const Acc = (() => {
   }
   function mergeData(local, cloud) {
     local = local || {}; cloud = cloud || {};
+    // Lo que no tiene id (datos viejos, ejemplos) se perdia al unir por id: los dos lados reciben
+    // antes el mismo id, sacado del contenido (D.fillIds), y asi ni se pierde ni se duplica.
+    if (typeof D !== 'undefined' && D.fillIds) { D.fillIds(local); D.fillIds(cloud); }
     const out = {};
     for (const k of Object.keys(cloud)) out[k] = cloud[k];
     // La auditoria hace de reloj: por id, gana el lado que lo toco mas tarde, y un
@@ -337,11 +340,23 @@ const Acc = (() => {
       if (Array.isArray(w.facturacion?.rectificativas) && Array.isArray(o.facturacion?.rectificativas)) r.facturacion = { ...(r.facturacion || w.facturacion), rectificativas: u(w.facturacion.rectificativas, o.facturacion.rectificativas) };
       return r;
     };
-    const newer = (c, l) => ((tc.get(c.id) || 0) > (tl.get(l.id) || 0) ? nested(c, l) : nested(l, c));
+    // Una factura emitida no se pierde: si solo un lado tiene numero de factura, la facturacion
+    // sale de ese lado aunque el otro se tocara mas tarde (emitir en el portatil y apuntar una
+    // hora en el movil perdia la factura del 303, del 130 y de los libros). Salvo que se borrara
+    // a proposito (D.borrarFactura deja una lapida 'fac-<proyecto>-<numero>').
+    const facNum = (x) => (x && x.facturacion && x.facturacion.facturaNum) || null;
+    const newer = (c, l) => {
+      const [w, o] = (tc.get(c.id) || 0) > (tl.get(l.id) || 0) ? [c, l] : [l, c];
+      const r = nested(w, o);
+      if (!facNum(w) && facNum(o) && !borradoTs.has(`fac-${o.id}-${facNum(o)}`)) r.facturacion = nested(o, w).facturacion;
+      return r;
+    };
     const vivo = (x) => !(borradoTs.has(x.id) && borradoTs.get(x.id) > touched(x.id));
     for (const key of ['projects', 'clientes', 'gastos', 'deducibles', 'facturas', 'presupuestos']) {
       if (local[key] || cloud[key]) out[key] = unionBy(cloud[key], local[key], (x) => x.id, newer).filter(vivo);
     }
+    // Papelera de proyectos: la de los dos (D.ensure quita lo recuperado y lo caducado)
+    if (local.papelera || cloud.papelera) out.papelera = unionBy(cloud.papelera, local.papelera, (x) => x.id);
     // Auditoria: los eventos de los dos, en orden, con el mismo tope que D._auditAs.
     if (local.audit || cloud.audit) {
       out.audit = unionBy(cloud.audit, local.audit, (e) => `${e.ts}|${e.accion}|${e.entidad}|${e.entidadId}`)
@@ -402,6 +417,9 @@ const Acc = (() => {
             const merged = mergeData(dataObj || (typeof D !== 'undefined' ? D.d : data), cloud);
             if (typeof H !== 'undefined' && H.snapshot) H.snapshot({ safety: true }); // red de seguridad antes del merge
             _applyRemote(merged);
+            // Dos dispositivos emitieron el mismo numero en proyectos distintos: no se arregla solo
+            const dup = typeof D !== 'undefined' && D.facturasRepetidas ? D.facturasRepetidas() : [];
+            if (dup.length && typeof Toast !== 'undefined' && typeof t === 'function') Toast.show(t('fac.dupMerge', dup.join(', ')), 'error', 0, [{ label: 'OK', fn: () => {} }]);
             return await push(merged, true);
           }
         }

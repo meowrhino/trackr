@@ -185,10 +185,10 @@ Object.assign(App, {
       + `<div class="fg"><label>${t('field.project')}</label><select id="ehProj" onchange="App._ehProjChange(this.value)">${projOpts}</select>${this._projToggle('ehProj', false)}</div>`
       + `<div id="hSubW"></div>`
       + `<div class="fg"><label>${t('field.color')}</label>${this.colorSelect(p.color)}</div>`
-      + `<div class="fr"><div class="fg"><label>${t('field.hours')}</label><input type="number" id="ehA" min="0.25" step="0.25" value="${h.cantidad}"></div>`
+      + `<div class="fr"><div class="fg"><label>${t('field.hours')}</label><input type="text" inputmode="decimal" id="ehA" min="0.25" step="0.25" value="${h.cantidad}"></div>`
       +   `<div class="fg"><label>${t('field.date')}</label><input type="date" id="ehD" value="${h.fecha || ''}" ${noDate ? 'disabled' : ''}>`
       +   `<label style="margin-top:.35rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="ehNd" ${noDate ? 'checked' : ''} onchange="document.getElementById('ehD').disabled=this.checked;if(this.checked)document.getElementById('ehD').value=''" style="width:auto;accent-color:var(--t2)"> ${t('field.noDate')}</label></div></div>`
-      + `<div class="fr"><div class="fg"><label>${t('field.startTime')}</label><input type="time" id="ehHI" value="${h.horaInicio || ''}"></div><div class="fg"><label>${t('field.amount')}${itip('tip.horaMonto')}</label><input type="number" id="ehMo" min="0" step="0.01" value="${h.monto || ''}"></div></div>`
+      + `<div class="fr"><div class="fg"><label>${t('field.startTime')}</label><input type="time" id="ehHI" value="${h.horaInicio || ''}"></div><div class="fg"><label>${t('field.amount')}${itip('tip.horaMonto')}</label><input type="text" inputmode="decimal" id="ehMo" min="0" step="0.01" value="${h.monto || ''}"></div></div>`
       + `<div class="fg"><label>${t('field.note')}</label><input type="text" id="ehN" value="${esc(h.nota || '')}"></div>`
       + `<div class="ma" style="justify-content:space-between"><button class="bt bt-d" onclick="App.deleteEH('${pid}','${hid}')">${t('btn.delete')}</button><div style="display:flex;gap:.5rem"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveEH('${pid}','${hid}')">${t('btn.save')}</button></div></div>`
     );
@@ -212,12 +212,12 @@ Object.assign(App, {
     const p = D.p(pid); if (!p) return;
     const h = p.horas.find(x => x.id === hid); if (!h) return;
     h.tipo = document.querySelector('#mC .to.on')?.dataset.type || h.tipo;
-    h.cantidad = parseFloat(document.getElementById('ehA').value) || h.cantidad;
+    h.cantidad = parseNum(document.getElementById('ehA').value) || h.cantidad;
     const sinFecha = document.getElementById('ehNd')?.checked;
     h.fecha = sinFecha ? null : (document.getElementById('ehD').value || null);
     h.horaInicio = document.getElementById('ehHI').value || null;
     h.nota = document.getElementById('ehN').value.trim();
-    h.monto = parseFloat(document.getElementById('ehMo').value) || 0;
+    h.monto = parseNum(document.getElementById('ehMo').value) || 0;
     /* El selector es el del proyecto elegido: al mover la hora, el subproyecto es del nuevo */
     const sub = document.getElementById('hSub')?.value;
     if (sub) h.subId = sub; else delete h.subId;
@@ -273,16 +273,46 @@ Object.assign(App, {
   xProj(id) {
     const p = D.p(id); if (!p) return;
     if (D.facturaVigente(id)) { Toast.warn(t('det.cannotDeleteInvoiced', `${p.facturacion.facturaNum}/${yearShort(p.facturacion.facturaFecha || todayStr())}`)); return; }
-    if (confirm(t('det.deleteProjectConfirm', p.nombre))) { D.del(id); this.go('dash'); }
+    if (!confirm(t('det.deleteProjectConfirm', p.nombre))) return;
+    D.del(id);
+    this.go('dash');
+    /* Va a la papelera (30 días): se deshace desde el aviso o desde Proyectos → Papelera */
+    Toast.show(t('trash.deleted', p.nombre), 'ok', 10000, [{ label: t('trash.undo'), fn: () => this.trashRestore(id) }]);
+  },
+
+  /* ── Papelera de proyectos ── */
+  trashRestore(id) {
+    if (!D.restoreP(id)) return;
+    Toast.ok(t('trash.restored'));
+    this.cm();
+    this.go('det', id);
+  },
+  trashModal() {
+    const items = D.trash();
+    this.om(`<div class="mt">${t('trash.title')}</div>`
+      + `<p class="small" style="color:var(--t3);margin-bottom:.75rem">${t('trash.help', D.TRASH_DAYS)}</p>`
+      + (items.length ? `<div class="cl-list">${items.map(x => `<div class="cl-item" style="cursor:default;gap:.5rem">`
+          + `<span class="cl-name">${esc(x.proyecto.nombre)} <span style="color:var(--t3)">· ${fmtNum((x.proyecto.horas || []).reduce((s, h) => s + (h.cantidad || 0), 0))} h · ${fmtDateTime(x.ts)}</span></span>`
+          + `<div class="cl-actions"><button class="bt bt-s" onclick="App.trashRestore('${x.id}')">${t('trash.restore')}</button>`
+          + `<button class="bt bt-s bt-d" onclick="App.trashDrop('${x.id}')">${t('trash.drop')}</button></div></div>`).join('')}</div>`
+        : `<div style="color:var(--t3);font-size:.85rem">${t('trash.empty')}</div>`)
+      + `<div class="ma"><button class="bt bt-p" onclick="App.cm()">${t('btn.close')}</button></div>`);
+  },
+  trashDrop(id) {
+    const x = D.trash().find(t => t.id === id);
+    if (!x || !confirm(t('trash.dropConfirm', x.proyecto.nombre))) return;
+    D.emptyTrash(id);
+    this.trashModal();
+    if (this.cv === 'dash') this.rDash();
   },
 
   hModal(pid) {
     this.om(`<div class="mt">${t('det.addHours')}</div><label>Tipo</label>`
       + `<div class="ts2"><div class="to on" data-type="trabajo" onclick="App.selT(this)"><span class="ic">💻</span><span class="la">${t('det.work')}</span></div><div class="to" data-type="reunion" onclick="App.selT(this)"><span class="ic">👥</span><span class="la">${t('det.meeting')}</span></div></div>`
       + `<div id="hSubW"></div>`
-      + `<div class="fr"><div class="fg"><label>${t('field.hours')}</label><input type="number" id="mhA" min="0.25" step="0.25" value="1"></div>`
+      + `<div class="fr"><div class="fg"><label>${t('field.hours')}</label><input type="text" inputmode="decimal" id="mhA" min="0.25" step="0.25" value="1"></div>`
       + `<div class="fg"><label>${t('field.date')}</label><input type="date" id="mhD" value="${todayStr()}"><label style="margin-top:.35rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" id="mhNd" onchange="document.getElementById('mhD').disabled=this.checked;if(this.checked)document.getElementById('mhD').value=''" style="width:auto;accent-color:var(--t2)"> ${t('field.noDate')}</label></div></div>`
-      + `<div class="fr"><div class="fg"><label>${t('field.startTime')}</label><input type="time" id="mhHI" value=""></div><div class="fg"><label>${t('field.amount')}${itip('tip.horaMonto')}</label><input type="number" id="mhMo" min="0" step="0.01" placeholder="0"></div></div>`
+      + `<div class="fr"><div class="fg"><label>${t('field.startTime')}</label><input type="time" id="mhHI" value=""></div><div class="fg"><label>${t('field.amount')}${itip('tip.horaMonto')}</label><input type="text" inputmode="decimal" id="mhMo" min="0" step="0.01" placeholder="0"></div></div>`
       + `<div class="fg"><label>${t('field.note')}</label><input type="text" id="mhN" placeholder="${t('ph.whatDidYouDo')}"></div>`
       + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveHM('${pid}')">${t('btn.save')}</button></div>`);
     this._subSel(pid);
@@ -290,12 +320,12 @@ Object.assign(App, {
 
   saveHM(pid) {
     const tipo = document.querySelector('#mC .to.on')?.dataset.type || 'trabajo';
-    const cant = parseFloat(document.getElementById('mhA').value) || 0;
+    const cant = parseNum(document.getElementById('mhA').value) || 0;
     const sinF = document.getElementById('mhNd')?.checked;
     const fecha = sinF ? null : (document.getElementById('mhD').value || null);
     const horaInicio = document.getElementById('mhHI').value || null;
     const nota = document.getElementById('mhN').value.trim();
-    const monto = parseFloat(document.getElementById('mhMo').value) || 0;
+    const monto = parseNum(document.getElementById('mhMo').value) || 0;
     if (cant <= 0) return;
     const p = D.p(pid); if (!p) return;
     const subId = document.getElementById('hSub')?.value;

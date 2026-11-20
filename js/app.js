@@ -391,7 +391,8 @@ const App = {
   _impGo(d = this._impData, snap = true) {
     this._impData = null;
     try {
-      if (snap && typeof H !== 'undefined' && H.snapshot) H.snapshot();
+      /* Sin copia previa no se sustituye nada (almacenamiento lleno): importar no se puede deshacer de otra forma */
+      if (snap && typeof H !== 'undefined' && H.snapshot && !H.snapshot()) { Toast.error(t('msg.noBackup')); return; }
       D.load(d); T.ev('action', 'import');
       this._applyPrefs();
       document.getElementById('mO').classList.remove('on');
@@ -423,7 +424,13 @@ const App = {
     const field = (k) => { const l = t('imp.f.' + k); return l === esc('imp.f.' + k) ? esc(k) : l; };
     const label = (x, num) => num ? `${esc(x.id)}${x._n ? ' · ' + esc(x._n) : ''}` : esc(x.nombre || x.id);
     const diffKeys = (o, x) => [...new Set([...Object.keys(o), ...Object.keys(x)])].filter(k => k[0] !== '_' && JSON.stringify(o[k]) !== JSON.stringify(x[k]));
-    let html = '';
+    /* Facturas ya emitidas que el archivo cambia o quita: en rojo y arriba, fuera de los desplegables */
+    const facLbl = { num: t('field.invoiceNum'), fecha: t('field.date'), baseImponible: t('billing.base'), iva: 'IVA %', irpf: 'IRPF %', totalFactura: t('billing.total'), anulada: t('fac.st.void') };
+    const facVal = (k, v) => (k === 'baseImponible' || k === 'totalFactura' ? fmtMoney(v) : k === 'fecha' ? fmtDate(v) : k === 'anulada' ? t(v ? 'btn.yes' : 'btn.no') : esc(v));
+    const facCh = B.facturasCambiadas(a, b);
+    let html = !facCh.length ? '' : `<div class="acc-warn" role="alert" style="margin-top:.6rem;border-color:var(--bad);color:var(--bad);font-size:.82rem;line-height:1.45"><strong>&#9888; ${t('imp.diff.invWarn')}</strong>`
+      + `<ul style="margin:.35rem 0 0 1rem;padding:0">${facCh.map(x => `<li>${esc(x.num)} · ${esc(x.nombre)}: `
+        + (x.gone ? t('imp.diff.invGone') : x.cambios.map(c => `${facLbl[c.campo]} ${facVal(c.campo, c.antes)} → ${facVal(c.campo, c.despues)}`).join(', ')) + `</li>`).join('')}</ul></div>`;
     for (const [title, xa, xb, num] of lists) {
       const A = new Map((xa || []).map(x => [x.id, x])), Bm = new Map((xb || []).map(x => [x.id, x]));
       const add = [...Bm.values()].filter(x => !A.has(x.id));
@@ -448,6 +455,9 @@ const App = {
     }
     const dh = Math.round(((b.projects || []).reduce((s, p) => s + hrs(p), 0) - (a.projects || []).reduce((s, p) => s + hrs(p), 0)) * 100) / 100;
     if (dh) html += `<p class="small" style="margin-top:.5rem">${t('imp.diff.hours', sgn(dh))}</p>`;
+    /* Configuración: qué ajustes cambian (el IVA por defecto de 21 a 10 no salía en ningún sitio) */
+    const sk = diffKeys(a.settings || {}, b.settings || {}).filter(k => !['verifactu', 'gestorGrant', 'gestorCode'].includes(k));
+    if (sk.length) html += `<p class="small" style="margin-top:.5rem"><strong>${t('nav.config')}</strong>: <span style="color:var(--t3)">${sk.map(esc).join(', ')}</span></p>`;
     return html || `<p class="small" style="margin-top:.5rem">${t('imp.diff.same')}</p>`;
   },
 
@@ -505,7 +515,13 @@ const App = {
 };
 
 /* ── Arranque ── */
-document.addEventListener('DOMContentLoaded', () => { App.init(); if (typeof H !== 'undefined') H.maybeAutoSnapshot(); });
+document.addEventListener('DOMContentLoaded', () => {
+  App.init();
+  if (typeof H !== 'undefined') H.maybeAutoSnapshot();
+  /* Con datos dentro, pedir al navegador que no los borre por su cuenta (Safari vacía el
+     almacenamiento de una web sin instalar tras 7 días sin abrirla). */
+  try { if ((D.d.projects || []).length && navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {}); } catch (e) { /* noop */ }
+});
 
 /* ── Tooltip flotante para segmentos de barras ── */
 (function(){

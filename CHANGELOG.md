@@ -5,6 +5,23 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-11-20 — No perder datos: coma decimal, fusión, copias, papelera e importar
+
+### 🐛 Arreglado
+- **«12,50» ya no se guarda como 1.250 €** (ni «2,5» horas como 25). Los campos de importes y horas eran de tipo número y, según el idioma del navegador, se comían la coma. Ahora son de texto con teclado numérico, se leen con una función propia (`parseNum`: coma o punto) y no dejan escribir letras. También en las calculadoras /303 y /130. _frontend_
+- **Juntar dos dispositivos ya no pierde una factura**: si emites en el portátil y apuntas una hora en el móvil, la factura se queda (antes ganaba el último en tocar el proyecto). Y lo que no tenía id (datos viejos, los ejemplos) ya no desaparece al fusionar: 306 entradas de gasto pasaban a 0. Si dos dispositivos emiten el mismo número, sale un aviso que no se va solo, y otro fijo en Facturas. _frontend_
+- **Restaurar la copia más antigua funciona**: con las 10 plazas llenas, la copia previa la borraba justo antes de leerla y no restauraba nada. _frontend_
+- **Importar y restaurar se paran si no se puede guardar la copia previa** (almacenamiento lleno), en vez de seguir sin red. _frontend_
+- **Guardar con el almacenamiento lleno** (pasa antes en Safari): se sueltan copias de seguridad viejas hasta que el cambio cabe, con un aviso. Si ni así, el aviso se queda en pantalla. Con datos dentro, trackr pide al navegador que no los borre por su cuenta. _frontend_
+
+### ✨ Nuevo
+- **Papelera de proyectos**: borrar un proyecto lo manda a la papelera 30 días, con sus horas. Se deshace desde el aviso («Deshacer») o desde Proyectos → Papelera. _frontend_
+- **Importar avisa en rojo si el archivo cambia una factura ya emitida** (o la quita), con el antes y el después: «1/26: Total 2.968,00 € → 1.060,00 €». También dice qué ajustes de Configuración cambian. _frontend_
+- **Todo tiene id**: al cargar, lo que no lo tenga lo recibe (por eso las entradas de gasto de los ejemplos no se podían editar ni borrar). _frontend_
+- Test en `test/no-perder-datos.mjs`.
+
+---
+
 ## 2026-11-20 — Seguridad: nada de código en los datos, la clave de la gestoría a salvo y CSP
 
 ### 🔒 Seguridad

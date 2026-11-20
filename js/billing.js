@@ -88,6 +88,29 @@ const B={
     return !!f.totalConIva;
   },
 
+
+  /** Facturas ya emitidas en `a` (datos actuales) que `b` (lo que se va a importar) cambia o
+   *  quita: [{ num: '7/26', nombre, gone: true } | { num, nombre, cambios: [{ campo, antes, despues }] }].
+   *  Los importes se recalculan en los dos lados (el JSON puede traer una base cambiada con el
+   *  total viejo): se compara lo que la app enseñaría después de importar. */
+  facturasCambiadas(a, b) {
+    const out = [], ys = fe => String(fe || '').slice(2, 4);
+    const calc = p => { const q = JSON.parse(JSON.stringify(p)); try { if (!q.horas) q.horas = []; this.calc(q); } catch (e) { /* se compara tal cual */ } return q.facturacion || {}; };
+    const pb = new Map(((b && b.projects) || []).filter(p => p && p.id).map(p => [p.id, p]));
+    ((a && a.projects) || []).forEach(p => {
+      if (!p.facturacion || !p.facturacion.facturaNum) return;
+      const fa = calc(p), num = `${fa.facturaNum}/${ys(fa.facturaFecha)}`, o = pb.get(p.id);
+      if (!o || !o.facturacion || !o.facturacion.facturaNum) { out.push({ num, nombre: p.nombre, gone: true }); return; }
+      const fb = calc(o), cambios = [];
+      const cmp = (campo, x, y) => { if (String(x ?? '') !== String(y ?? '')) cambios.push({ campo, antes: x, despues: y }); };
+      cmp('num', fa.facturaNum, fb.facturaNum);
+      cmp('fecha', fa.facturaFecha, fb.facturaFecha);
+      for (const k of ['baseImponible', 'iva', 'irpf', 'totalFactura']) cmp(k, +fa[k] || 0, +fb[k] || 0);
+      cmp('anulada', !!fa.anulada, !!fb.anulada);
+      if (cambios.length) out.push({ num, nombre: p.nombre, cambios });
+    });
+    return out;
+  },
   /** Rectificativa por diferencias: de la base correcta a los importes (±) que corrigen
    *  la factura original y las rectificativas anteriores, con sus mismos tipos. */
   rectDiff(f, baseCorrecta) {

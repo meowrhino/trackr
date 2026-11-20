@@ -7,6 +7,8 @@
 /* ── Inputs base ── */
 input,select,textarea{font-family:'Outfit',sans-serif;font-size:.85rem;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);color:var(--t1);padding:.5rem .7rem;transition:border-color var(--tr);width:100%}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--t3)}
+/* Campo numérico con algo que no es un número (utils.js lo marca al teclear) */
+input[aria-invalid="true"]{border-color:var(--bad)}
 /* Foco visible para teclado (a11y). Solo aparece en navegacion por teclado, no al click. */
 :focus-visible{outline:2px solid var(--ac);outline-offset:2px}
 input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--ac);outline-offset:1px;border-color:var(--ac)}

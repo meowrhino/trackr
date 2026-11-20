@@ -361,6 +361,17 @@ function itip(key) {
   return `<button type="button" class="itip" data-tip="${esc(key)}" aria-label="${esc(typeof t === 'function' ? t('tip.more') : 'info')}" aria-expanded="false">i</button>`;
 }
 if (typeof document !== 'undefined') {
+  /* Campos numéricos: son type="text" inputmode="decimal" para poder escribir la coma («12,50»).
+     Con type="number", Chrome leía «12,50» como 1250 según el idioma de la interfaz. Aquí se quita
+     lo que no sea cifra, coma, punto o signo, y se marca lo que no se entiende como número. */
+  document.addEventListener('input', (e) => {
+    const el = e.target;
+    if (!el || el.tagName !== 'INPUT' || el.getAttribute('inputmode') !== 'decimal') return;
+    const v = el.value.replace(/[^\d.,\-\s]/g, '');
+    if (v !== el.value) el.value = v;
+    el.setAttribute('aria-invalid', v.trim() !== '' && Number.isNaN(parseNum(v)) ? 'true' : 'false');
+  }, true);
+
   const closeTip = () => {
     const pop = document.getElementById('tipPop'); if (pop) pop.remove();
     document.querySelectorAll('.itip[aria-expanded="true"]').forEach(b => b.setAttribute('aria-expanded', 'false'));

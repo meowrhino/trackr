@@ -81,7 +81,7 @@ assert.equal(B.totalHoras(web), 17.5, 'el total del proyecto no cambia');
 assert.equal(B.subStats(D.p('solo')).length, 0);
 
 /* ── Presupuesto nuevo: una línea por subproyecto, una por proyecto sin ellos ── */
-const filas = html => [...html.matchAll(/<div class="cl-item bud-line" data-pid="([^"]*)"(?: data-sub="([^"]*)")?[^>]*><input type="checkbox" (checked)?[^>]*><input type="text" class="bud-c" value="([^"]*)"[^>]*><input type="number" class="bud-b"[^>]* value="([^"]*)"/g)]
+const filas = html => [...html.matchAll(/<div class="cl-item bud-line" data-pid="([^"]*)"(?: data-sub="([^"]*)")?[^>]*><input type="checkbox" (checked)?[^>]*><input type="text" class="bud-c" value="([^"]*)"[^>]*><input type="text" inputmode="decimal" class="bud-b"[^>]* value="([^"]*)"/g)]
   .map(m => ({ pid: m[1], sub: m[2], on: !!m[3], concepto: m[4], base: m[5] }));
 D.d.presupuestos = [];
 let rs = filas(App._budRows('c1', [], p => p.id === 'web'));

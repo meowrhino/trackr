@@ -712,14 +712,14 @@ Object.assign(App, {
     const isE = !!dedId, d = isE ? D.ded(dedId) : null;
     this.om(`<div class="mt">${isE ? t('renta.editDeduction') : t('renta.addDeduction')}</div>`
       + `<div class="fr"><div class="fg"><label>${t('field.category')}</label><select id="dedCat">${Object.entries(DEDUCIBLE_CAT).map(([k, v]) => `<option value="${k}" ${d?.categoria === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
-      + `<div class="fg"><label>${t('field.amountEntry')}</label><input type="number" id="dedA" min="0.01" step="0.01" value="${d?.cantidad || ''}" placeholder="0,00"></div></div>`
+      + `<div class="fg"><label>${t('field.amountEntry')}</label><input type="text" inputmode="decimal" id="dedA" min="0.01" step="0.01" value="${d?.cantidad || ''}" placeholder="0,00"></div></div>`
       + `<div class="fr"><div class="fg"><label>${t('field.date')}</label><input type="date" id="dedF" value="${d?.fecha || todayStr()}"></div>`
       + `<div class="fg"><label>${t('field.note')}</label><input type="text" id="dedD" value="${esc(d?.descripcion || '')}" placeholder="${t('ph.detail')}"></div></div>`
       + `<div class="ma"><button class="bt" onclick="App.cm()">${t('btn.cancel')}</button><button class="bt bt-p" onclick="App.saveDed('${dedId || ''}')">${isE ? t('btn.save') : t('btn.add')}</button></div>`);
   },
 
   saveDed(dedId) {
-    const cant = parseFloat(document.getElementById('dedA').value) || 0;
+    const cant = parseNum(document.getElementById('dedA').value) || 0;
     if (cant <= 0) return;
     const data = {
       categoria: document.getElementById('dedCat').value,
