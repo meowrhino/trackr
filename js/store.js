@@ -379,6 +379,11 @@ const D = {
     const zona = o => { if (o.zonaFiscal != null) oneOf(o, 'zonaFiscal', Object.keys(ZONA_FISCAL), 'es'); };
 
     d.projects.forEach(p => {
+      /* Proyecto hijo: su madre existe, no es él mismo y no es a su vez hija de nadie (un solo nivel) */
+      if (p.parentId != null) {
+        const m = d.projects.find(x => x.id === p.parentId);
+        if (!m || m === p || m.parentId != null) { delete p.parentId; delete p.subOrigen; }
+      }
       str(p, 'nombre', 'notas'); if (p.nombre == null) p.nombre = '';
       oneOf(p, 'estado', Object.keys(EST), 'activo');
       color(p, 'color', 'CornflowerBlue');
@@ -695,12 +700,89 @@ const D = {
   del(id) {
     const p = this.p(id);
     this.d.projects = this.d.projects.filter(x => x.id !== id);
+    this.d.projects.forEach(c => { if (c.parentId === id) { delete c.parentId; delete c.subOrigen; } }); /* sin madre, un hijo es un proyecto más */
     if (p && !this._readOnly) {
       this.d.papelera = [...(this.d.papelera || []).filter(x => x.id !== id), { id, ts: Date.now(), proyecto: p }].slice(-this.TRASH_MAX);
     }
     this._audit('borrar', 'proyecto', id);
     this.save();
   },
+  /* ── Proyecto hijo: un subproyecto convertido en proyecto aparte (parentId = su madre) para
+     facturarlo por separado, con su propio número. Un solo nivel. Al convertir, su importe y sus
+     horas SALEN de la madre (la base de la madre baja), así que ni el 303 ni el 130 ni las horas
+     cuentan nada dos veces: madre e hijo son dos proyectos normales que se suman para enseñar
+     el total de la familia (B.familia). ── */
+
+  /** Hijos de un proyecto */
+  hijos(pid) { return this.d.projects.filter(p => p.parentId === pid); },
+
+  /** ¿Se puede convertir este subproyecto en proyecto hijo? '' si sí; si no, la clave del motivo. */
+  subConvertible(pid, subId) {
+    const p = this.p(pid);
+    if (!p || p.facturacion?.modo !== 'desde_base' || !(p.subproyectos || []).some(x => x.id === subId)) return 'hijo.noSub';
+    if (p.parentId) return 'hijo.nested';                       /* un hijo no tiene hijos */
+    if (p.facturacion.facturaNum) return 'hijo.madreFacturada'; /* su importe ya va en la factura de la madre */
+    return '';
+  },
+
+  /** Convierte un subproyecto en proyecto hijo. Devuelve el id del hijo, o null si no se puede. */
+  convertirSub(pid, subId) {
+    if (this._readOnly || this.subConvertible(pid, subId)) return null;
+    const p = this.p(pid), f = p.facturacion, x = p.subproyectos.find(s => s.id === subId);
+    const suyas = p.horas.filter(h => h.subId === subId);
+    const hijo = {
+      id: uid(), parentId: pid, subOrigen: subId,
+      nombre: `${p.nombre} · ${x.nombre || ''}`.trim(), clienteId: p.clienteId || null, color: p.color, estado: p.estado,
+      interno: !!p.interno, recurrente: false,
+      fechas: { inicio: p.fechas?.inicio || null, finEstimada: p.fechas?.finEstimada || null, finReal: null },
+      /* Ids nuevos: las horas viejas llevan lápida (abajo) para que la fusión no las devuelva a la madre */
+      horas: suyas.map(h => { const { subId: _s, ...r } = h; return { ...r, id: uid() }; }),
+      notas: x.descripcion || '',
+      ...(p.presupuesto && { presupuesto: { ...p.presupuesto } }),
+      facturacion: { modo: 'desde_base', baseImponible: roundMoney(x.base || 0), total: 0, precioHora: 0, iva: f.iva || 0, irpf: f.irpf || 0,
+        ivaExcepcion: f.ivaExcepcion || '', asuntoFactura: '', idiomaFactura: f.idiomaFactura || null,
+        cobros: [], rectificativas: [], facturaNum: null, facturaFecha: null }
+    };
+    const subs = p.subproyectos.filter(s => s.id !== subId);
+    this._tomb('subproyecto', subId);
+    suyas.forEach(h => this._tomb('hora', h.id));
+    /* Sin subproyectos la base ya no es «la suma»: se queda en lo que sumaban los que quedan (0 si era el único) */
+    this.up(pid, { subproyectos: subs, horas: p.horas.filter(h => h.subId !== subId),
+      facturacion: { ...f, baseImponible: roundMoney(subs.reduce((s, y) => s + (y.base || 0), 0)) } });
+    this.add(hijo);
+    return hijo.id;
+  },
+
+  /** ¿Puede un hijo volver a ser subproyecto de su madre? '' si sí; si no, la clave del motivo. */
+  hijoReversible(cid) {
+    const c = this.p(cid), m = c && c.parentId ? this.p(c.parentId) : null;
+    if (!c || !m) return 'hijo.noMadre';
+    if (c.facturacion?.facturaNum || (c.facturacion?.cobros || []).length) return 'hijo.facturado'; /* ya tiene su propia factura o cobros */
+    if (m.facturacion?.facturaNum) return 'hijo.madreFacturada';
+    if (!['desde_base', 'gratis'].includes(m.facturacion?.modo) || c.facturacion?.modo === 'por_hora') return 'hijo.modo';
+    return '';
+  },
+
+  /** Devuelve un hijo a su madre como subproyecto, con su importe y sus horas. true si lo ha hecho. */
+  revertirHijo(cid) {
+    if (this._readOnly || this.hijoReversible(cid)) return false;
+    const c = this.p(cid), m = this.p(c.parentId);
+    const base = roundMoney((c.subproyectos || []).length ? c.subproyectos.reduce((s, y) => s + (y.base || 0), 0) : (c.facturacion.baseImponible || 0));
+    const pre = m.nombre + ' · ';
+    /* Id nuevo: el del subproyecto original lleva lápida desde que se convirtió */
+    const sub = { id: uid(), nombre: c.nombre.startsWith(pre) ? c.nombre.slice(pre.length) : c.nombre, base, ...(c.notas && { descripcion: c.notas }) };
+    /* El presupuesto que lo nombraba (como subproyecto de la madre o como proyecto) le sigue la pista */
+    this.d.presupuestos.forEach(b => (b.lineas || []).forEach(l => {
+      if ((l.pid === m.id && c.subOrigen && l.subId === c.subOrigen) || l.pid === c.id) { l.pid = m.id; l.subId = sub.id; }
+    }));
+    const subs = [...(m.subproyectos || []), sub];
+    this.d.projects = this.d.projects.filter(p => p.id !== cid); /* no va a la papelera: nada se pierde, vuelve a la madre */
+    this._audit('borrar', 'proyecto', cid);
+    this.up(m.id, { subproyectos: subs, horas: sortHoras([...m.horas, ...c.horas.map(h => ({ ...h, subId: sub.id }))]),
+      facturacion: { ...m.facturacion, modo: 'desde_base', baseImponible: roundMoney(subs.reduce((s, y) => s + (y.base || 0), 0)) } });
+    return true;
+  },
+
   /** Proyectos en la papelera, del más reciente al más antiguo: [{ id, ts, proyecto }] */
   trash() { return [...(this.d.papelera || [])].reverse(); },
   /** Saca un proyecto de la papelera y lo devuelve a la lista. true si lo ha recuperado. */
@@ -823,8 +905,9 @@ const D = {
     const porP = {};
     (b.lineas || []).forEach(l => { if (l.pid) (porP[l.pid] = porP[l.pid] || []).push(l); });
     let n = 0;
-    Object.entries(porP).forEach(([pid, ls]) => {
-      const p = this.p(pid); if (!p || this.facturaVigente(pid) || p.facturacion?.modo === 'por_hora') return;
+    /* Fija la base de un proyecto (o de sus subproyectos) con unas líneas; 1 si ha cambiado algo */
+    const fijar = (pid, ls) => {
+      const p = this.p(pid); if (!p || this.facturaVigente(pid) || p.facturacion?.modo === 'por_hora') return 0;
       const f = { ...p.facturacion }, antes = JSON.stringify([f.modo, f.baseImponible, p.subproyectos]);
       let subs = p.subproyectos;
       const conSub = ls.filter(l => l.subId && (subs || []).some(x => x.id === l.subId));
@@ -834,9 +917,21 @@ const D = {
       } else {
         f.modo = 'desde_base'; f.baseImponible = roundMoney(ls.reduce((s, l) => s + (l.base || 0), 0));
       }
-      if (JSON.stringify([f.modo, f.baseImponible, subs]) === antes) return;
+      if (JSON.stringify([f.modo, f.baseImponible, subs]) === antes) return 0;
       this.up(pid, { facturacion: f, ...(subs && { subproyectos: subs }) });
-      n++;
+      return 1;
+    };
+    Object.entries(porP).forEach(([pid, ls]) => {
+      const p = this.p(pid); if (!p) return;
+      /* La línea de un subproyecto que después se convirtió en proyecto hijo: su importe va al hijo
+         (el presupuesto sigue apuntando a la madre) */
+      const resto = [], porHijo = {};
+      ls.forEach(l => {
+        const h = l.subId && !(p.subproyectos || []).some(x => x.id === l.subId) ? this.d.projects.find(c => c.parentId === pid && c.subOrigen === l.subId) : null;
+        if (h) (porHijo[h.id] = porHijo[h.id] || []).push({ ...l, subId: undefined }); else resto.push(l);
+      });
+      Object.entries(porHijo).forEach(([hid, hl]) => { n += fijar(hid, hl); });
+      if (resto.length) n += fijar(pid, resto);
     });
     return n;
   },

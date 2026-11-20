@@ -26,9 +26,12 @@ Object.assign(App, {
       this._detHeader(p, hex, cn, f)
       + this._detInfo(p, th, wh, mh)
       + this._detSubs(p)
+      + this._detHijos(p)
       + this._detHours(p, hex)
       + this._detBilling(p, f, eph)
-      + `<div style="display:flex;justify-content:flex-end;margin-top:1.5rem;padding-bottom:1rem"><button class="bt bt-s bt-d" onclick="App.xProj('${p.id}')">${t('btn.delete')}</button></div>`;
+      + `<div style="display:flex;justify-content:flex-end;gap:.75rem;flex-wrap:wrap;margin-top:1.5rem;padding-bottom:1rem">`
+      +   (p.parentId && !D._readOnly && !D.hijoReversible(p.id) ? `<button class="bt bt-s" onclick="App.childToSub('${p.id}')">${t('hijo.revert')}</button>` : '')
+      +   `<button class="bt bt-s bt-d" onclick="App.xProj('${p.id}')">${t('btn.delete')}</button></div>`;
   },
 
   /* ── rDet sub-renderers ── */
@@ -44,8 +47,11 @@ Object.assign(App, {
     }
 
     return `<div class="db" onclick="App.go('dash')">${t('det.backProjects')}</div>`
-      + `<div class="dh"><div><div class="dt" style="color:${hex}">${esc(p.nombre)}</div><div class="dc">${esc(cn)}${flags}</div></div>`
+      + `<div class="dh"><div><div class="dt" style="color:${hex}">${esc(p.nombre)}</div><div class="dc">${esc(cn)}${flags}</div>`
+      +   (p.parentId && D.p(p.parentId) ? `<div class="dc"><a href="#" onclick="event.preventDefault();App.go('det','${p.parentId}')" style="color:var(--t2)">&#8627; ${t('hijo.partOf', esc(D.p(p.parentId).nombre))}</a></div>` : '')
+      + `</div>`
       + `<div class="bg"><span class="bd bd-${esc(p.estado)}">${EST[p.estado] || esc(p.estado)}</span>`
+      +   this.timerBtn(p.id)
       +   `<button class="bt bt-s" onclick="App.pModal('${p.id}')">${t('btn.edit')}</button>`
       +   `${f.modo !== 'gratis' ? `<button class="bt bt-s" onclick="App.facModal('${p.id}')">${t('det.invoice')}</button>` : ''}`
       +   (p.clienteId ? `<button class="bt bt-s" onclick="App.budModal('${p.clienteId}','${p.id}')">${t('bud.btn')}</button>` : '')
@@ -67,13 +73,58 @@ Object.assign(App, {
   _detSubs(p) {
     const rows = B.subStats(p);
     if (!B.subs(p).length) return '';
+    /* «Convertir en proyecto»: para facturar ese subproyecto por separado (si la madre aún no está facturada) */
+    const conv = !D._readOnly && !p.parentId && !p.facturacion.facturaNum;
     return `<div class="ds"><div class="dst">${t('sub.title')}</div><div class="hl">${rows.map(r =>
       `<div class="hr" style="align-items:flex-start"><span style="flex:1;min-width:0;${r.id ? '' : 'color:var(--t3)'}">${r.id ? esc(r.nombre || '\u2014') : t('sub.none')}`
-      + (r.descripcion ? `<div style="color:var(--t3);font-size:.76rem;white-space:pre-wrap;margin-top:.2rem;line-height:1.45">${esc(r.descripcion)}</div>` : '') + `</span>`
+      + (r.descripcion ? `<div style="color:var(--t3);font-size:.76rem;white-space:pre-wrap;margin-top:.2rem;line-height:1.45">${esc(r.descripcion)}</div>` : '')
+      + (r.id && conv ? `<div style="margin-top:.3rem"><button class="bt bt-s" style="font-size:.72rem;white-space:nowrap" onclick="App.subToChild('${p.id}','${r.id}')">&#8599; ${t('hijo.convert')}</button></div>` : '') + `</span>`
       + `<span class="hr-a m">${r.id ? fmtMoney(r.base) : ''}</span>`
       + `<span class="hr-a m" style="min-width:55px;text-align:right">${fmtH(r.horas)}h</span>`
       + `<span class="hr-a m" style="min-width:85px;text-align:right;color:${r.eph === null ? 'var(--t3)' : B.ephColor(r.eph)}">${r.eph === null ? (r.id ? '??? ' : '') : fmtNum(r.eph) + ' '}${r.id ? '&euro;/h' : ''}</span>`
       + `</div>`).join('')}</div></div>`;
+  },
+
+  /** Proyectos hijo (subproyectos convertidos para facturarlos aparte) y la suma de toda la familia */
+  _detHijos(p) {
+    const fam = B.familia(p);
+    if (!fam) return '';
+    return `<div class="ds"><div class="dst">${t('hijo.title')}${itip('tip.hijos')}</div><div class="hl">${fam.hijos.map(h => {
+        const f = h.facturacion;
+        const st = f.facturaNum ? `${esc(f.facturaNum)}/${yearShort(f.facturaFecha || todayStr())}${f.pagado ? ' · ' + t('dash.flagPaid') : ''}` : t('hijo.noInvoice');
+        return `<div class="hr hr-click" style="border-left-color:${colorHex(h.color)}" onclick="App.go('det','${h.id}')">`
+          + `<span style="flex:1;min-width:0">${esc(h.nombre)} <span style="color:var(--t3);font-size:.76rem">· ${st}</span></span>`
+          + `<span class="hr-a m">${fmtMoney(f.baseImponible || 0)}</span>`
+          + `<span class="hr-a m" style="min-width:55px;text-align:right">${fmtH(B.totalHoras(h))}h</span></div>`;
+      }).join('')}</div>`
+      + `<div class="bb"><div class="br"><span class="la">${t('hijo.famHours')}</span><span class="va">${fmtH(fam.horas)} h</span></div>`
+      + `<div class="br"><span class="la">${t('hijo.famBase')}</span><span class="va">${fmtMoney(fam.base)}</span></div>`
+      + `<div class="br"><span class="la">${t('hijo.famInvoiced')}</span><span class="va">${fmtMoney(fam.facturado)}</span></div>`
+      + `<div class="br"><span class="la">${t('hijo.famPaid')}</span><span class="va" style="color:var(--ok)">${fmtMoney(fam.cobrado)}</span></div></div></div>`;
+  },
+
+  /** Subproyecto → proyecto hijo (se factura aparte, con su número) */
+  subToChild(pid, subId) {
+    const p = D.p(pid), x = (p?.subproyectos || []).find(s => s.id === subId); if (!x) return;
+    const motivo = D.subConvertible(pid, subId);
+    if (motivo) { Toast.warn(t(motivo)); return; }
+    if (!confirm(t('hijo.convertConfirm', x.nombre || '', p.nombre, fmtMoney(x.base || 0)))) return;
+    const hid = D.convertirSub(pid, subId);
+    if (!hid) return;
+    Toast.ok(t('hijo.converted', D.p(hid).nombre));
+    this.go('det', hid);
+  },
+
+  /** Proyecto hijo → otra vez subproyecto de su madre */
+  childToSub(cid) {
+    const c = D.p(cid); if (!c) return;
+    const motivo = D.hijoReversible(cid);
+    if (motivo) { Toast.warn(t(motivo)); return; }
+    const mid = c.parentId;
+    if (!confirm(t('hijo.revertConfirm', c.nombre, D.p(mid).nombre))) return;
+    if (!D.revertirHijo(cid)) return;
+    Toast.ok(t('hijo.reverted'));
+    this.go('det', mid);
   },
 
   /** Selector de subproyecto de los modales de horas: rellena #hSubW según el proyecto (vacío si no tiene). */

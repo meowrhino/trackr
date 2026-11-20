@@ -202,7 +202,7 @@ function badIds(d) {
   };
   const ref = v => chk(v == null ? null : { id: v });   /* referencias: también acaban en onclick */
   for (const p of arr(d?.projects)) {
-    chk(p); ref(p?.clienteId);
+    chk(p); ref(p?.clienteId); ref(p?.parentId); ref(p?.subOrigen);
     arr(p?.horas).forEach(h => { chk(h); ref(h?.subId); });
     arr(p?.subproyectos).forEach(chk);
     arr(p?.facturacion?.cobros).forEach(chk);

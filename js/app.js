@@ -229,6 +229,7 @@ const App = {
 
     if (viewEl) this._linkLabels(viewEl);
     this._exampleBanner();
+    if (this.timerRender) this.timerRender();
   },
 
   /* ── Cuenta de ejemplo: banda arriba mientras se mira, con salida clara ── */

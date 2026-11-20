@@ -5,6 +5,15 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-11-20 — Temporizador y proyectos hijo
+
+### ✨ Nuevo
+- **Temporizador**: un botón ▶ siempre a la vista en el menú (también en el móvil). Lo pulsas, eliges proyecto (o subproyecto) y cuenta; al pararlo crea la entrada de horas con su fecha y su hora de inicio, y el aviso trae «Editar» para poner la nota. En la ficha del proyecto y en el calendario hay un «▶ Empezar» de un toque. Guarda la hora en que empezó, así que **sigue contando si recargas o cierras la pestaña**. Es de ese navegador: no se sincroniza entre dispositivos (las horas apuntadas, sí). Menos de un minuto no apunta nada; más de 12 horas seguidas se apuntan igual, con un aviso que no se va solo por si se te olvidó pararlo. _frontend_
+- **Proyecto hijo**: en cada subproyecto, «Convertir en proyecto». Pasa a ser un proyecto aparte, hijo del original, con su importe y sus horas, para **facturarlo por separado con su propio número**. La base de la madre baja en ese importe, así que ni el 303, ni el 130, ni las horas cuentan nada dos veces. La ficha de la madre enseña sus hijos y la suma de todos (horas, base, facturado y cobrado); en Proyectos, los hijos salen debajo de ella. El presupuesto sigue apuntando a la madre: al aceptarlo, la línea de ese subproyecto pone el importe en el hijo. Un solo nivel; no se puede con la madre ya facturada; un hijo sin factura ni cobros puede «Volver a subproyecto». Importar y fusionar dispositivos lo tratan como un proyecto más. _frontend_
+- Tests en `test/temporizador.mjs` y `test/proyecto-hijo.mjs`.
+
+---
+
 ## 2026-11-20 — Cuentas: borrar la tuya, gestoría sin acceso a cuentas borradas y límites
 
 ### ✨ Nuevo

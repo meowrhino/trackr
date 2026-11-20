@@ -163,6 +163,34 @@ const B={
   /* Suma total de horas registradas en el proyecto */
   totalHoras(p){ return p.horas.reduce((s,h)=>s+(h.cantidad||0),0); },
 
+  /** Una madre con sus proyectos hijo: { hijos, horas, base, facturado, cobrado } sumando los
+   *  suyos y los de cada hijo (cada uno cuenta una vez: al convertir, lo del hijo salió de la
+   *  madre). facturado = total de las facturas emitidas y no anuladas. null si no tiene hijos. */
+  familia(p) {
+    const hijos = D.hijos(p.id);
+    if (!hijos.length) return null;
+    const r = { hijos, horas: 0, base: 0, facturado: 0, cobrado: 0 };
+    [p, ...hijos].forEach(x => {
+      this.calc(x);
+      const f = x.facturacion;
+      r.horas += this.totalHoras(x);
+      r.base += f.baseImponible || 0;
+      if (f.facturaNum && D.facturaVigente(x.id)) r.facturado += f.totalConRect ?? f.totalFactura ?? 0;
+      r.cobrado += this.totalCobrado(x);
+    });
+    for (const k of ['base', 'facturado', 'cobrado']) r[k] = roundMoney(r[k]);
+    return r;
+  },
+
+  /** Temporizador: del inicio y el fin (ms) a los datos de la entrada de horas, con la fecha y
+   *  la hora LOCALES en que empezó. null si no llega a un minuto (un toque sin querer). */
+  timerEntry(inicio, fin) {
+    const ms = fin - inicio;
+    if (!(inicio > 0) || !(ms >= 60000)) return null;
+    const d = new Date(inicio), dd = n => String(n).padStart(2, '0');
+    return { cantidad: Math.max(roundMoney(ms / 3600000), 0.01), fecha: localDateStr(d), horaInicio: `${dd(d.getHours())}:${dd(d.getMinutes())}` };
+  },
+
   /* Suma total cobrada */
   totalCobrado(p) {
     return roundMoney((p.facturacion.cobros || []).reduce((s, c) => s + (c.cantidad || 0), 0));

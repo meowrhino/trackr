@@ -41,3 +41,13 @@
 /* ── Tipografía de página ── */
 .pt{font-size:1.3rem;font-weight:500;margin-bottom:1.25rem;letter-spacing:-.01em}
 .ps{font-size:.82rem;color:var(--t3);margin-top:-.8rem;margin-bottom:1.25rem}
+
+/* ── Temporizador en el menú (js/app.timer.js) ── */
+.ni-timer{margin-bottom:.35rem}
+.ni-timer.run{color:var(--ac)}
+.ni-timer .timer-m{display:none;font-size:.6rem;line-height:1}
+.timer-btn.run{border-color:var(--ac);color:var(--ac)}
+.timer-row{width:100%;text-align:left;font:inherit;color:inherit;background:none;border:0;border-bottom:1px solid var(--b1);min-height:44px;align-items:center;gap:.6rem;cursor:pointer}
+.timer-row:hover{background:var(--bg3)}
+.timer-row .timer-go{color:var(--ac);margin-left:auto}
+.ni-timer .nt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}

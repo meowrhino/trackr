@@ -53,6 +53,8 @@
   <nav class="sb">
     <div class="sb-logo"><span>TRACKR</span></div>
     <div class="sb-nav">
+      <!-- Temporizador: siempre a la vista (js/app.timer.js lo pinta) -->
+      <div class="ni ni-timer" id="navTimer" onclick="App.timerTap()"><span class="ic">&#9654;</span><span class="nt">Temporizador</span></div>
       <div class="ni on" data-v="info" onclick="App.go('info')"><span class="ic">⊚</span><span class="nt">Info</span></div>
       <div class="ni" data-v="dash" onclick="App.go('dash')"><span class="ic">▣</span><span class="nt">Proyectos</span></div>
       <div class="ni" data-v="cal" onclick="App.go('cal')"><span class="ic">▨</span><span class="nt">Calendario</span></div>
@@ -187,6 +189,7 @@
 <script src="js/app.dash.js"></script>
 <script src="js/app.detail.js"></script>
 <script src="js/app.calendar.js"></script>
+<script src="js/app.timer.js"></script>
 <script src="js/app.config.js"></script>
 <script src="js/app.guide.js"></script>
 <script src="journey/journey.js"></script>

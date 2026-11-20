@@ -73,6 +73,11 @@ Object.assign(App, {
 
     /* Ordenar cada grupo según el selector (por defecto, lo trabajado más recientemente arriba) */
     Object.keys(groups).forEach(st => groups[st].sort((a, b) => this._projSort(a, b)));
+    /* Los proyectos hijo, justo debajo de su madre cuando están en el mismo grupo */
+    Object.keys(groups).forEach(st => {
+      const g = groups[st], hijos = g.filter(p => p.parentId && g.some(m => m.id === p.parentId));
+      if (hijos.length) groups[st] = g.filter(p => !hijos.includes(p)).flatMap(m => [m, ...hijos.filter(h => h.parentId === m.id)]);
+    });
 
     const c = document.getElementById('dPr');
     if (!filtered.length) {
@@ -183,7 +188,7 @@ Object.assign(App, {
       <div class="pc-h">
         <div>
           <div class="pc-n">${esc(p.nombre)}</div>
-          <div class="pc-c">${esc(cn)}</div>
+          <div class="pc-c">${p.parentId && D.p(p.parentId) ? `<span title="${t('hijo.partOf', esc(D.p(p.parentId).nombre))}">&#8627; ${esc(D.p(p.parentId).nombre)}</span>${cn ? ' · ' : ''}` : ''}${esc(cn)}</div>
         </div>
         <div class="pc-flags">${flags}</div>
       </div>

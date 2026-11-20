@@ -360,7 +360,7 @@ Object.assign(App, {
       + `<button class="bt bt-s" onclick="App.calNext()">&rarr;</button>`
       + `<button class="bt bt-s" onclick="App.calToday()">${t('cal.today')}</button>`
       + `<div class="cal-vt"><button class="cal-vb${isM ? ' on' : ''}" onclick="App.calSetView('month')">${t('cal.month')}</button><button class="cal-vb${!isM ? ' on' : ''}" onclick="App.calSetView('week')">${t('cal.week')}</button></div>`
-      + `<button class="bt bt-s cal-add-hour" onclick="App.calAddHour('','')">${t('btn.addHourCal')}</button>`
+      + `<span class="cal-add-hour" style="display:flex;gap:.5rem;flex-wrap:wrap">${this.timerBtn()}<button class="bt bt-s" onclick="App.calAddHour('','')">${t('btn.addHourCal')}</button></span>`
       + `</div>`
       + `<div class="cal-stat"><span class="cal-stat-l">${stat}</span></div>`;
   },
