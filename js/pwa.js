@@ -80,5 +80,17 @@
 
   document.addEventListener('DOMContentLoaded', renderBanner);
 
+  /* Sin conexión desde la primera visita: se le pasa al service worker la lista de archivos que
+     esta página ha cargado (ver el final de sw.js). Sin lista escrita a mano que se quede vieja. */
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.ready.then((reg) => {
+        const propios = performance.getEntriesByType('resource').map((r) => r.name).filter((u) => u.startsWith(location.origin + '/'));
+        const urls = [...new Set(['/', '/index.html', '/manifest.json', '/icon-192.png', '/icon-512.png', '/navicon.png', ...propios])];
+        if (reg.active) reg.active.postMessage({ type: 'precache', urls });
+      }).catch(() => { /* sin service worker: la app funciona igual con red */ });
+    });
+  }
+
   window.PWA = { install, dismiss, render, renderBanner, cfgSection, offerable, isStandalone };
 })();

@@ -42,7 +42,8 @@ const App = {
     /* Cerrar modal con Escape / Enter para submit */
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') this.cmSoft();
-      if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && document.getElementById('mO').classList.contains('on')) {
+      /* Enter guarda… salvo con el foco en un botón o enlace: ahí pulsa ESE (antes, Enter sobre «Cancelar» creaba el proyecto) */
+      if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && !(e.target.closest && e.target.closest('button, a, summary')) && document.getElementById('mO').classList.contains('on')) {
         e.preventDefault();
         document.getElementById('mC').querySelector('.bt-p')?.click();
       }
@@ -258,7 +259,20 @@ const App = {
    *  MODALES COMPARTIDOS
    * ══════════════════════════════════════════════ */
 
-  om(h) { this._mDirty = false; const mc = document.getElementById('mC'); mc.innerHTML = h; this._linkLabels(mc); document.getElementById('mO').classList.add('on'); },
+  om(h) {
+    this._mDirty = false;
+    const mc = document.getElementById('mC'), mo = document.getElementById('mO');
+    /* Quién tenía el foco, para devolvérselo al cerrar (solo al abrir, no al cambiar de ventana) */
+    if (!mo.classList.contains('on')) this._mFocus = document.activeElement;
+    mc.innerHTML = h;
+    this._linkLabels(mc);
+    /* Lector de pantalla: es un diálogo, y se llama como su título */
+    const tt = mc.querySelector('.mt');
+    if (tt) { tt.id = 'mT'; mc.setAttribute('aria-labelledby', 'mT'); } else mc.removeAttribute('aria-labelledby');
+    mo.classList.add('on');
+    /* El foco entra en la ventana (sin abrir el teclado del móvil: va a la ventana, no a un campo) */
+    try { mc.focus({ preventScroll: true }); } catch (e) { /* noop */ }
+  },
 
   /** A11y: asocia cada <label> de un .fg con su control (for/id) si no lo está, para lectores de pantalla. */
   _fldSeq: 0,
@@ -299,6 +313,8 @@ const App = {
       return;
     }
     document.getElementById('mO').classList.remove('on');
+    try { if (this._mFocus && document.contains(this._mFocus)) this._mFocus.focus({ preventScroll: true }); } catch (e) { /* noop */ }
+    this._mFocus = null;
     this._mDirty = false;
     this._editPid = null;
     this._accInModal = false;

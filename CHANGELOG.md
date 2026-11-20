@@ -5,6 +5,23 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-11-20 — Móvil y uso: avisos, ayuda, un solo «Guardar», teclado y sin conexión
+
+### 🐛 Arreglado
+- **En el móvil, los avisos («Instala TRACKR», «Estás viendo el ejemplo») ya no tapan la primera pantalla**: el texto se quedaba en 40 px de ancho, una palabra por renglón (251 px de alto). Ahora el botón baja a su línea. _frontend_
+- **El globo de ayuda (ⓘ) se cierra al desplazar y al tocarlo**: se quedaba flotando y caía encima de «Crear», que no se podía pulsar. _frontend_
+- **Configuración: cualquier «Guardar» lo guarda todo**. Antes cada bloque tenía el suyo y lo escrito en los demás se perdía sin avisar (el IBAN, por ejemplo). _frontend_
+- **Enter ya no pulsa el botón principal si el foco está en «Cancelar»** (creaba el proyecto). _frontend_
+- **La app instalada abre sin conexión desde la primera visita**: antes no guardaba nada hasta la segunda, así que instalarla y quedarse sin cobertura daba una pantalla en blanco. Y tras publicar una versión ya no se pueden mezclar archivos viejos y nuevos. _frontend_
+- **Números en castellano**: «8,0h» y «227,27 €/h» en vez de «8.0h» y «227.27 €/h»; las horas ya no se redondean a un decimal (1,25 h salía como 1.3). «Deadlines» es «Plazos». _frontend_
+- **Notas del proyecto**: conservan la sangría (`pre-wrap`). _frontend_
+
+### ♿ Accesibilidad
+- Las ventanas son un `role="dialog"` con su título, el foco entra al abrirlas y vuelve a donde estaba al cerrarlas; una ventana cerrada ya no se alcanza con el tabulador. _frontend_
+- **Botones táctiles de 24 px como mínimo** (antes 19×22: 73 de 74 en Facturas no llegaban) y **«Anular» / «Borrar» separado** de ⎙ y ✉. _frontend_
+
+---
+
 ## 2026-11-20 — VeriFactu, desconectado y aparcado
 
 ### 🧹 Quitado

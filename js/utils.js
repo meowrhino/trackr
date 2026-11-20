@@ -350,6 +350,11 @@ function inPeriod(date, type, year, month) {
   return y === year;
 }
 
+/** Horas para pintar, con la coma del idioma: 8 → «8,0», 1.25 → «1,25» (antes «8.0» y «1.3») */
+function fmtH(n) {
+  return (+n || 0).toLocaleString(typeof currentLocale === 'function' ? currentLocale() : 'es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 2 });
+}
+
 /** Devuelve una fecha LOCAL como string YYYY-MM-DD (no UTC) */
 function localDateStr(d = new Date()) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -386,7 +391,7 @@ if (typeof document !== 'undefined') {
   };
   document.addEventListener('click', (e) => {
     const b = e.target.closest && e.target.closest('.itip');
-    if (!b) { if (!(e.target.closest && e.target.closest('#tipPop'))) closeTip(); return; }
+    if (!b) { closeTip(); return; } /* también al tocar el propio globo: en el móvil tapaba el botón de debajo */
     e.preventDefault(); e.stopPropagation();
     const open = b.getAttribute('aria-expanded') === 'true';
     closeTip();
@@ -403,4 +408,7 @@ if (typeof document !== 'undefined') {
   }, true);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeTip(); });
   window.addEventListener('resize', closeTip);
+  /* Al desplazar (la página o la ventana): el globo se quedaba flotando en su sitio y caía encima
+     de «Crear». En captura, porque el scroll de un elemento no burbujea. */
+  document.addEventListener('scroll', closeTip, true);
 }

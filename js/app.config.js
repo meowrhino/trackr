@@ -22,7 +22,7 @@ Object.assign(App, {
       + `<div class="fg"><label>${t('cfg.address1')}</label><input type="text" id="cfgED1" value="${esc(em.direccion1)}" placeholder="${t('ph.street')}"></div>`
       + `<div class="fg"><label>${t('cfg.address2')}</label><input type="text" id="cfgED2" value="${esc(em.direccion2)}" placeholder="${t('ph.cityZip')}"></div>`
       + `<div class="fg"><label>${t('cfg.nif')}</label><input type="text" id="cfgENif" value="${esc(em.nif)}" placeholder="${t('ph.nif')}"></div>`
-      + `</div><div class="cfg-save"><button class="bt bt-p" onclick="App.saveEmisor()">${t('btn.save')}</button></div></div>`
+      + `</div><div class="cfg-save"><button class="bt bt-p" onclick="App.cfgSaveAll()">${t('btn.save')}</button></div></div>`
       + `<div class="cfg-section"><div class="cfg-section-title">${t('cfg.defaults')}</div><div class="cfg-grid">`
       + `<div class="fg"><label>${t('cfg.ivaPercent')}</label><input type="text" inputmode="decimal" id="cfgIva" value="${s.defaultIva}" min="0" max="100" step="1"></div>`
       + `<div class="fg"><label>${t('cfg.irpfPercent')}</label><input type="text" inputmode="decimal" id="cfgIrpf" value="${s.defaultIrpf}" min="0" max="100" step="1"></div>`
@@ -30,7 +30,7 @@ Object.assign(App, {
       + `<div class="cfg-full fg"><label>${t('cfg.beneficiary')}</label><input type="text" id="cfgBenef" placeholder="${t('ph.beneficiary')}" value="${esc(em.beneficiarioPago || '')}"></div>`
       + `<div class="cfg-full fg"><label>${t('cfg.bankAccount')}</label><input type="text" id="cfgPago" placeholder="${t('ph.bankAccount')}" value="${esc(em.instruccionesPago || '')}"></div>`
       + `<div class="cfg-full fg"><label>${t('cfg.defaultSubject')}</label><input type="text" id="cfgConcepto" value="${esc(s.conceptoDefault || '')}" placeholder="${t('ph.defaultSubject')}"><label style="font-size:.82rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;margin-top:.45rem;text-transform:none;letter-spacing:0;color:var(--t2);white-space:nowrap"><input type="checkbox" id="cfgConceptoCl" style="margin:0;width:14px;height:14px;accent-color:var(--ac)" ${s.conceptoAppendCliente ? 'checked' : ''}>${t('cfg.appendClientName')}</label></div>`
-      + `</div><div class="cfg-save"><button class="bt bt-p" onclick="App.saveDefaults()">${t('btn.save')}</button></div></div>`
+      + `</div><div class="cfg-save"><button class="bt bt-p" onclick="App.cfgSaveAll()">${t('btn.save')}</button></div></div>`
       + `<div class="cfg-section"><div class="cfg-section-title">${t('cfg.fiscalTitle')}</div><div class="cfg-grid">`
       + `<div class="fg"><label>${t('cfg.rendAnterior')}</label><input type="text" inputmode="decimal" id="cfgFRend" value="${fis.rendAnterior ?? ''}" min="0" step="100" placeholder="—"><div style="font-size:.72rem;color:var(--t3);margin-top:.35rem">${t('cfg.rendAnteriorHelp')}</div></div>`
       + `<div class="fg"><label>${t('cfg.saldoIva')}</label><input type="text" inputmode="decimal" id="cfgFSaldo" value="${fis.saldoIvaInicial || ''}" min="0" step="0.01" placeholder="0"><div style="font-size:.72rem;color:var(--t3);margin-top:.35rem">${t('cfg.saldoIvaHelp')}</div></div>`
@@ -38,17 +38,17 @@ Object.assign(App, {
       + `<div class="fg"><label>${t('cfg.actTipo')}</label><select id="cfgFActT">${[['A', t('cfg.actTipoA')], ['B', t('cfg.actTipoB')]].map(([k, v]) => `<option value="${k}" ${(fis.actTipo || 'A') === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`
       + `<div class="fg"><label>${t('cfg.actCodigo')}</label><select id="cfgFActC">${[['05', t('cfg.act05')], ['04', t('cfg.act04')], ['03', t('cfg.act03')], ['01', t('cfg.act01')]].map(([k, v]) => `<option value="${k}" ${(fis.actCodigo || '05') === k ? 'selected' : ''}>${k} — ${v}</option>`).join('')}</select></div>`
       + `<div class="cfg-full fg"><label>${t('cfg.actIAE')}</label><input type="text" id="cfgFActE" value="${esc(fis.actIAE || '')}" placeholder="763"><div style="font-size:.72rem;color:var(--t3);margin-top:.35rem">${t('cfg.actHelp')}</div></div>`
-      + `</div><div class="cfg-save"><button class="bt bt-p" onclick="App.saveFiscal()">${t('btn.save')}</button></div></div>`
+      + `</div><div class="cfg-save"><button class="bt bt-p" onclick="App.cfgSaveAll()">${t('btn.save')}</button></div></div>`
       + `<div class="cfg-section"><div class="cfg-section-title">${t('cfg.goals')}</div><div class="cfg-grid">`
       + `<div class="fg"><label>${t('cfg.hoursMonth')}</label><input type="text" inputmode="decimal" id="cfgTHm" value="${tg.horasMes || ''}" min="0" step="1" placeholder="${t('ph.hoursMonth')}"></div>`
       + `<div class="fg"><label>${t('cfg.incomeMonth')}</label><input type="text" inputmode="decimal" id="cfgTIm" value="${tg.ingresosMes || ''}" min="0" step="100" placeholder="${t('ph.incomeMonth')}"></div>`
       + `<div class="fg"><label>${t('cfg.hoursWeek')}</label><input type="text" inputmode="decimal" id="cfgTHs" value="${tg.horasSemana || ''}" min="0" step="1" placeholder="${t('ph.hoursWeek')}"></div>`
-      + `</div><div class="cfg-save"><button class="bt bt-p" onclick="App.saveGoals()">${t('btn.save')}</button></div></div>`
+      + `</div><div class="cfg-save"><button class="bt bt-p" onclick="App.cfgSaveAll()">${t('btn.save')}</button></div></div>`
       + `<div class="cfg-section"><div class="cfg-section-title">${t('cfg.calendar')}</div><div class="cfg-grid">`
       + `<div class="fg"><label>${t('cfg.calStartHour')}</label><select id="cfgCalStart">`
       +   [0, 6, 8, 22].map(h => `<option value="${h}" ${(s.calStartHour || 0) === h ? 'selected' : ''}>${String(h).padStart(2, '0')}:00</option>`).join('')
       + `</select><div style="font-size:.72rem;color:var(--t3);margin-top:.35rem">${t('cfg.calStartHourHelp')}</div></div>`
-      + `</div><div class="cfg-save"><button class="bt bt-p" onclick="App.saveCalSettings()">${t('btn.save')}</button></div></div>`
+      + `</div><div class="cfg-save"><button class="bt bt-p" onclick="App.cfgSaveAll()">${t('btn.save')}</button></div></div>`
       + `<div class="cfg-section"><div class="cfg-section-title">${t('cfg.theme')}</div>`
       + `<div class="theme-grid">${THEME_ORDER.map(id => {
           const th = THEMES[id];
@@ -255,8 +255,22 @@ Object.assign(App, {
     return v.ok !== false || confirm(t('msg.nifBad', nif, v.esperado ? t('msg.nifExpected', v.esperado) : ''));
   },
 
-  saveEmisor() {
-    if (!this._nifOk(document.getElementById('cfgENif').value.trim())) return;
+  /** Un solo «Guardar»: cada bloque de Configuración tenía el suyo y lo escrito en los demás se
+   *  perdía sin avisar. Ahora cualquiera de los botones guarda todos los bloques. En modo visor
+   *  (gestoría) solo el fiscal, que es lo único de Configuración que puede tocar. */
+  cfgSaveAll() {
+    const has = id => !!document.getElementById(id);
+    if (!D._readOnly && has('cfgENif') && !this._nifOk(document.getElementById('cfgENif').value.trim())) return;
+    const bloques = D._readOnly ? [['cfgFRend', 'saveFiscal']]
+      : [['cfgEN', 'saveEmisor'], ['cfgBenef', 'saveDefaults'], ['cfgFRend', 'saveFiscal'], ['cfgTHm', 'saveGoals'], ['cfgCalStart', 'saveCalSettings']];
+    const ok = Toast.ok;
+    Toast.ok = () => {}; /* un aviso, no cinco */
+    try { bloques.forEach(([id, fn]) => { if (has(id)) this[fn](true); }); } finally { Toast.ok = ok; }
+    Toast.ok(t('cfg.saved'));
+  },
+
+  saveEmisor(nifVisto) {
+    if (!nifVisto && !this._nifOk(document.getElementById('cfgENif').value.trim())) return;
     const em = D.d.settings.emisor;
     em.nombre = document.getElementById('cfgEN').value.trim();
     em.direccion1 = document.getElementById('cfgED1').value.trim();

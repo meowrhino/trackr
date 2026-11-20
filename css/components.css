@@ -17,17 +17,18 @@
 .bt-p{background:var(--ac);border-color:var(--ac);color:#fff}
 .bt-p:hover{filter:brightness(1.15)}
 .bt-d{border-color:var(--bad);color:var(--bad)}.bt-d:hover{background:rgba(204,85,85,.08)}
-.bt-s{padding:.35rem .7rem;font-size:.78rem}
+.bt-s{padding:.35rem .7rem;font-size:.78rem;min-height:24px}
 .bt-add{padding:.4rem .9rem;font-size:.78rem;border:1px dashed var(--b2);color:var(--t2);background:transparent;border-radius:var(--r);margin-bottom:.75rem}
 .bt-add:hover{border-color:var(--t2);color:var(--t1);background:var(--bg3)}
 .bg{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
 
 /* ── Banner de instalar la PWA ── */
-.pwa-banner{display:flex;align-items:center;gap:.75rem;background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:.6rem .85rem;margin-bottom:1.5rem}
+/* flex-wrap: en el móvil el botón baja a su línea (antes el texto se quedaba en 40 px de ancho, una palabra por renglón) */
+.pwa-banner{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .75rem;background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:.6rem .85rem;margin-bottom:1.5rem}
 .pwa-banner .pwa-ico{font-size:1.05rem;color:var(--ac);flex-shrink:0}
-.pwa-banner .pwa-txt{flex:1;min-width:0;font-size:.82rem;color:var(--t2);line-height:1.35}
+.pwa-banner .pwa-txt{flex:1 1 12rem;min-width:0;font-size:.82rem;color:var(--t2);line-height:1.35}
 .pwa-banner .bt{flex-shrink:0}
-.pwa-banner .pwa-x{background:none;border:none;color:var(--t3);font-size:1.15rem;line-height:1;cursor:pointer;padding:.1rem .35rem;flex-shrink:0}
+.pwa-banner .pwa-x{background:none;border:none;color:var(--t3);font-size:1.15rem;line-height:1;cursor:pointer;padding:.1rem .35rem;flex-shrink:0;min-width:24px;min-height:24px;margin-left:auto}
 .pwa-banner .pwa-x:hover{color:var(--t1)}
 
 /* ── Toggle switch ── */
@@ -99,8 +100,10 @@
 .fb.on{border-color:var(--t2);color:var(--t1)}
 
 /* ── Modal ── */
-.mo{position:fixed;inset:0;background:color-mix(in srgb,var(--bg) 75%,transparent);display:flex;align-items:center;justify-content:center;z-index:1000;padding:2rem;opacity:0;pointer-events:none;transition:opacity var(--tr)}
-.mo.on{opacity:1;pointer-events:all}
+/* visibility: una ventana cerrada (la bienvenida, la última abierta) seguía en el DOM y sus botones se alcanzaban con Tab */
+.mo{position:fixed;inset:0;background:color-mix(in srgb,var(--bg) 75%,transparent);display:flex;align-items:center;justify-content:center;z-index:1000;padding:2rem;opacity:0;pointer-events:none;visibility:hidden;transition:opacity var(--tr),visibility 0s linear var(--tr)}
+.mo.on{opacity:1;pointer-events:all;visibility:visible;transition:opacity var(--tr)}
+.md:focus{outline:none}
 .md{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:1.75rem;width:100%;max-width:520px;max-height:85vh;overflow-y:auto;box-shadow:var(--sh)}
 .mt{font-size:1.1rem;font-weight:500;margin-bottom:1.25rem}
 .ma{display:flex;justify-content:flex-end;gap:.5rem;margin-top:1.25rem}
@@ -154,7 +157,9 @@
 .al:hover{background:var(--bg3)}
 
 /* «i» de ayuda (itip en utils.js) */
-.itip{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;margin-left:.35rem;padding:0;border:1px solid var(--b2);border-radius:50%;background:none;color:var(--t3);font:italic 600 .62rem/1 Georgia,serif;cursor:pointer;vertical-align:middle;text-transform:none;letter-spacing:0}
+/* 15 px a la vista, 25 px para el dedo (::after) */
+.itip::after{content:'';position:absolute;inset:-5px}
+.itip{position:relative;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;margin-left:.35rem;padding:0;border:1px solid var(--b2);border-radius:50%;background:none;color:var(--t3);font:italic 600 .62rem/1 Georgia,serif;cursor:pointer;vertical-align:middle;text-transform:none;letter-spacing:0}
 .itip:hover,.itip[aria-expanded="true"]{color:var(--t1);border-color:var(--t2)}
 .tip-pop{position:absolute;z-index:1100;max-width:280px;padding:.6rem .75rem;border-radius:var(--r);background:var(--bg3, var(--bg2));border:1px solid var(--b2);color:var(--t1);font-size:.78rem;line-height:1.45;box-shadow:0 6px 18px color-mix(in srgb,var(--bg) 60%,transparent)}
 .tip-pop b{font-weight:600}

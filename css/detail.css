@@ -30,7 +30,8 @@
 .hr-d{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--t3);min-width:80px}
 .hr-a{font-family:'DM Mono',monospace;font-weight:500;min-width:40px}
 .hr-n{color:var(--t3);flex:1;font-size:.78rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.hr-e,.hr-x{color:var(--t3);cursor:pointer;font-size:.85rem;padding:.15rem;transition:color var(--tr);opacity:.4}
+.hr-e,.hr-x{color:var(--t3);cursor:pointer;font-size:.85rem;padding:.15rem;transition:color var(--tr);opacity:.4;min-width:24px;min-height:24px;display:inline-flex;align-items:center;justify-content:center}
+.hr-x{margin-left:.4rem}
 .hr-e:hover{color:var(--t1);opacity:1}
 .hr-x:hover{color:var(--bad);opacity:1}
 

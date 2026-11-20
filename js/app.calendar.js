@@ -117,7 +117,7 @@ Object.assign(App, {
     }
 
     document.getElementById('calC').innerHTML =
-      this._calHeader(`${MESES[month]} ${year}`, `${t('cal.monthTotal')} <span class="m">${mt.toFixed(1)}h</span>`)
+      this._calHeader(`${MESES[month]} ${year}`, `${t('cal.monthTotal')} <span class="m">${fmtH(mt)}h</span>`)
       + `<div class="cal-grid">${g}</div>`
       + mgHtml + mcHtml
       + this._calGoals('month', mt, year, month)
@@ -326,7 +326,7 @@ Object.assign(App, {
       const dayTotal = dayEntries.reduce((s, e) => s + e.cant, 0);
       mobileWeek += `<div class="cal-mday${d.today ? ' today' : ''}" onclick="App.calDetail('${d.date}')">`
         + `<div class="cal-mday-hdr"><span class="cal-mday-dow">${d.dow}</span><span class="cal-mday-num">${d.num}</span>`
-        + `${dayTotal ? `<span class="cal-mday-total m">${dayTotal.toFixed(1)}h</span>` : ''}</div>`;
+        + `${dayTotal ? `<span class="cal-mday-total m">${fmtH(dayTotal)}h</span>` : ''}</div>`;
       if (dayEntries.length || dayGastos.length) {
         mobileWeek += `<div class="cal-mday-entries">`;
         dayEntries.forEach(e => {
@@ -342,7 +342,7 @@ Object.assign(App, {
     mobileWeek += `</div>`;
 
     document.getElementById('calC').innerHTML =
-      this._calHeader(title, `${t('cal.weekTotal')} <span class="m">${wt.toFixed(1)}h</span>`)
+      this._calHeader(title, `${t('cal.weekTotal')} <span class="m">${fmtH(wt)}h</span>`)
       + `<div class="cal-week" style="--slot-h:${slotH}px"><div class="cal-week-hdr">${hdr}</div><div class="cal-week-body"><div class="cal-week-tl">${timeLbl}</div>${cols}</div></div>`
       + mobileWeek
       + ntHtml + wgHtml + wcHtml
@@ -405,7 +405,7 @@ Object.assign(App, {
           const adjTarget = target * w.nDays / 7;
           const pct = Math.min(adjTarget > 0 ? (w.h / adjTarget * 100) : 0, 100).toFixed(1);
           const widthPct = (w.nDays / daysIn * 100).toFixed(1);
-          weeklyHtml += `<div class="cal-wseg-item" style="width:${widthPct}%"><div class="cal-wseg-bar" title="${w.h.toFixed(1)}h (${w.from}–${w.to})"><div class="cal-wseg-fill" style="width:${pct}%"></div></div><span class="cal-wseg-lbl">${w.from}–${w.to}</span></div>`;
+          weeklyHtml += `<div class="cal-wseg-item" style="width:${widthPct}%"><div class="cal-wseg-bar" title="${fmtH(w.h)}h (${w.from}–${w.to})"><div class="cal-wseg-fill" style="width:${pct}%"></div></div><span class="cal-wseg-lbl">${w.from}–${w.to}</span></div>`;
         });
         weeklyHtml += `</div></div>`;
       }
@@ -428,7 +428,7 @@ Object.assign(App, {
     goals.forEach(g => {
       const pct = g.target > 0 ? (g.actual / g.target * 100) : 0;
       const barColor = pct >= 100 ? 'pbar-ok' : pct >= 50 ? 'pbar-neutral' : 'pbar-warn';
-      const valStr = g.unit === '€' ? fmtMoney(g.actual) : `${g.actual.toFixed(1)}${g.unit}`;
+      const valStr = g.unit === '€' ? fmtMoney(g.actual) : `${fmtH(g.actual)}${g.unit}`;
       const tgtStr = g.unit === '€' ? fmtMoney(g.target) : `${g.target}${g.unit}`;
       html += `<div style="margin-bottom:.6rem"><div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:.25rem"><span style="color:var(--t2)">${g.label}${g.derived ? ` <span style="color:var(--t3);font-size:.7rem">(${g.derived})</span>` : ''}</span><span class="m" style="color:var(--t1)">${valStr} / ${tgtStr}</span></div><div class="pbar"><div class="pbar-fill ${barColor}" style="width:${Math.min(pct, 100).toFixed(1)}%"></div></div></div>`;
     });
@@ -440,7 +440,7 @@ Object.assign(App, {
     const list = Object.entries(pStats).map(([id, v]) => ({ id, ...v })).sort((a, b) => b.h - a.h);
     if (!list.length) return '';
     return `<div class="cal-ps"><div class="cal-ps-title">${t('cal.projectsInPeriod')}</div><div class="cal-ps-list">${
-      list.map(p => `<div class="cal-ps-item cal-ps-click" onclick="App.go('det','${p.id}')"><span class="cal-ps-dot" style="background:${p.pc}"></span><span class="cal-ps-name">${esc(p.pn)}</span><span class="cal-ps-h m">${p.h.toFixed(1)}h</span></div>`).join('')
+      list.map(p => `<div class="cal-ps-item cal-ps-click" onclick="App.go('det','${p.id}')"><span class="cal-ps-dot" style="background:${p.pc}"></span><span class="cal-ps-name">${esc(p.pn)}</span><span class="cal-ps-h m">${fmtH(p.h)}h</span></div>`).join('')
     }</div></div>`;
   },
 
@@ -607,7 +607,7 @@ Object.assign(App, {
         ).join('')}</div>`;
     }
 
-    this.om(`<div class="mt">${fmtDate(ds)}</div><div style="margin-bottom:.75rem;font-size:.82rem;color:var(--t3)">Total: <span class="m">${tot.toFixed(1)}h</span></div>${body}<div class="ma"><button class="bt bt-p" onclick="App.cm();App.calAddHour('${ds}','')">${t('btn.addHourCal')}</button><button class="bt" onclick="App.cm()">${t('btn.close')}</button></div>`);
+    this.om(`<div class="mt">${fmtDate(ds)}</div><div style="margin-bottom:.75rem;font-size:.82rem;color:var(--t3)">Total: <span class="m">${fmtH(tot)}h</span></div>${body}<div class="ma"><button class="bt bt-p" onclick="App.cm();App.calAddHour('${ds}','')">${t('btn.addHourCal')}</button><button class="bt" onclick="App.cm()">${t('btn.close')}</button></div>`);
   },
 
   // Estados que se ocultan del desplegable por defecto (lista larga y poco editada).

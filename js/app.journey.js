@@ -99,7 +99,7 @@ Object.assign(App, {
     if (typeof B !== 'undefined' && B.calc) B.calc(p);
     const th = (typeof B !== 'undefined' && B.totalHoras) ? B.totalHoras(p) : 0;
     const f = p.facturacion || {};
-    const parts = [th.toFixed(1) + ' h'];
+    const parts = [fmtH(th) + ' h'];
     if (f.modo && f.modo !== 'gratis' && f.totalFactura > 0) parts.push(fmtMoney(f.totalFactura));
     if (p.presupuesto) parts.push(t('bud.btn') + ' ' + p.presupuesto.num + '/' + yearShort(p.presupuesto.fecha));
     const fechas = this.cardDatesText(p);

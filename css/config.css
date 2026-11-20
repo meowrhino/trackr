@@ -77,7 +77,15 @@
   opacity: .5;
   background: none;
   border: none;
+  /* objetivo táctil de 24 px (WCAG 2.5.8): antes 19×22 */
+  min-width: 24px;
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
+/* Borrar o anular, apartado de los demás: un dedo gordo no anula una factura queriendo bajar el PDF */
+.cl-actions .cl-btn-del { margin-left: .6rem; }
 .cl-btn:hover { color: var(--t1); opacity: 1; }
 .cl-btn-del:hover { color: var(--bad); opacity: 1; }
 

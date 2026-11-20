@@ -262,7 +262,7 @@ const LANGS = {
     'info.recentActivity': 'Actividad reciente',
     'info.today': 'Hoy',
     'info.yesterday': 'Ayer',
-    'info.deadlines': 'Deadlines',
+    'info.deadlines': 'Plazos',
     'info.taxNext': 'Modelos 303 y 130 del {0}: {1}',
     'info.taxDays': 'quedan {0} días (hasta el {1})',
     'info.taxToday': 'hoy es el último día',

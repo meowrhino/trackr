@@ -58,9 +58,9 @@ Object.assign(App, {
       + `<div><div class="dfl">${t('field.start')}</div><div class="dfv">${fmtDate(p.fechas.inicio)}</div></div>`
       + `<div><div class="dfl">${t('field.estEnd')}</div><div class="dfv">${fmtDate(p.fechas.finEstimada)}</div></div>`
       + `<div><div class="dfl">${t('field.actualEnd')}</div><div class="dfv">${fmtDate(p.fechas.finReal)}</div></div>`
-      + `<div><div class="dfl">${t('field.hours')}</div><div class="dfv">${th.toFixed(1)}h <span style="color:var(--t3);font-size:.72rem">💻${wh.toFixed(1)} 👥${mh.toFixed(1)}</span></div></div>`
+      + `<div><div class="dfl">${t('field.hours')}</div><div class="dfv">${fmtH(th)}h <span style="color:var(--t3);font-size:.72rem">💻${fmtH(wh)} 👥${fmtH(mh)}</span></div></div>`
       + (p.presupuesto ? `<div><div class="dfl">${t('bud.btn')}</div><div class="dfv">${esc(p.presupuesto.num)}/${yearShort(p.presupuesto.fecha)} · ${fmtDate(p.presupuesto.fecha)}</div></div>` : '')
-      + `</div>${p.notas ? `<div style="margin-top:.75rem"><div class="dfl">${t('field.notes')}</div><div style="color:var(--t3);font-size:.85rem;white-space:pre-line">${esc(p.notas)}</div></div>` : ''}</div>`;
+      + `</div>${p.notas ? `<div style="margin-top:.75rem"><div class="dfl">${t('field.notes')}</div><div style="color:var(--t3);font-size:.85rem;white-space:pre-wrap">${esc(p.notas)}</div></div>` : ''}</div>`;
   },
 
   /** Subproyectos: importe, horas y €/h de cada uno; al final, las horas sin asignar. */
@@ -69,10 +69,10 @@ Object.assign(App, {
     if (!B.subs(p).length) return '';
     return `<div class="ds"><div class="dst">${t('sub.title')}</div><div class="hl">${rows.map(r =>
       `<div class="hr" style="align-items:flex-start"><span style="flex:1;min-width:0;${r.id ? '' : 'color:var(--t3)'}">${r.id ? esc(r.nombre || '\u2014') : t('sub.none')}`
-      + (r.descripcion ? `<div style="color:var(--t3);font-size:.76rem;white-space:pre-line;margin-top:.2rem;line-height:1.45">${esc(r.descripcion)}</div>` : '') + `</span>`
+      + (r.descripcion ? `<div style="color:var(--t3);font-size:.76rem;white-space:pre-wrap;margin-top:.2rem;line-height:1.45">${esc(r.descripcion)}</div>` : '') + `</span>`
       + `<span class="hr-a m">${r.id ? fmtMoney(r.base) : ''}</span>`
-      + `<span class="hr-a m" style="min-width:55px;text-align:right">${r.horas.toFixed(1)}h</span>`
-      + `<span class="hr-a m" style="min-width:85px;text-align:right;color:${r.eph === null ? 'var(--t3)' : B.ephColor(r.eph)}">${r.eph === null ? (r.id ? '??? ' : '') : r.eph.toFixed(2) + ' '}${r.id ? '&euro;/h' : ''}</span>`
+      + `<span class="hr-a m" style="min-width:55px;text-align:right">${fmtH(r.horas)}h</span>`
+      + `<span class="hr-a m" style="min-width:85px;text-align:right;color:${r.eph === null ? 'var(--t3)' : B.ephColor(r.eph)}">${r.eph === null ? (r.id ? '??? ' : '') : fmtNum(r.eph) + ' '}${r.id ? '&euro;/h' : ''}</span>`
       + `</div>`).join('')}</div></div>`;
   },
 
@@ -123,7 +123,7 @@ Object.assign(App, {
         + (f.irpf ? `<div class="br"><span class="la">${t('billing.minusIrpfAmt', esc(f.irpf))}</span><span class="va">${fmtMoney(f.importeIrpf || 0)}</span></div>` : '')
         + `<div class="br tot"><span class="la">${t('billing.invoiceTotal')}</span><span class="va">${fmtMoney(f.totalFactura || 0)}</span></div>`
         + `<div class="br"><span class="la">${t('billing.netToReceive')}${itip('tip.neto')}</span><span class="va" style="color:var(--ok)">${fmtMoney(f.netoRecibido || 0)}</span></div>`
-        + (eph !== null ? `<div class="br"><span class="la">${t('billing.profitability')}${itip('tip.eph')}</span><span class="va" style="color:${B.ephColor(eph)}">${eph.toFixed(2)} &euro;/h</span></div>` : '')
+        + (eph !== null ? `<div class="br"><span class="la">${t('billing.profitability')}${itip('tip.eph')}</span><span class="va" style="color:${B.ephColor(eph)}">${fmtNum(eph)} &euro;/h</span></div>` : '')
         + `</div>`;
 
     /* ── Cobros parciales ── */

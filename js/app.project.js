@@ -326,7 +326,7 @@ Object.assign(App, {
       const ph = parseNum(document.getElementById('mpPH')?.value) || 0;
       const th = p ? B.totalHoras(p) : 0;
       phInfo = `<div class="br"><span class="la" style="font-size:.75rem;color:var(--t3)">`
-        + (p ? `${th.toFixed(1)}h × ${fmtNum(ph)} €/h` : t('billing.noHoursYet'))
+        + (p ? `${fmtH(th)}h × ${fmtNum(ph)} €/h` : t('billing.noHoursYet'))
         + `</span></div>`;
     }
 

@@ -136,11 +136,11 @@ Object.assign(App, {
       +   `<div class="info-stat-lbl">${tp('info.activeProjects', activos.length)}</div>`
       + `</div>`
       + `<div class="info-stat-card" style="--stat-accent:var(--b2)" onclick="App.calView='week';App.go('cal')">`
-      +   `<div class="info-stat-val">${horasSemana.toFixed(1)}<small>h</small></div>`
+      +   `<div class="info-stat-val">${fmtH(horasSemana)}<small>h</small></div>`
       +   `<div class="info-stat-lbl">${t('info.thisWeek')}</div>`
       + `</div>`
       + `<div class="info-stat-card" style="--stat-accent:var(--b2)" onclick="App.calView='month';App.go('cal')">`
-      +   `<div class="info-stat-val">${horasMes.toFixed(1)}<small>h</small></div>`
+      +   `<div class="info-stat-val">${fmtH(horasMes)}<small>h</small></div>`
       +   `<div class="info-stat-lbl">${t('info.thisMonth')}</div>`
       + `</div>`
       + `<div class="info-stat-card" style="--stat-accent:${horasMes > 0 && netoMes < 0 ? 'var(--bad)' : 'var(--ok)'}" onclick="App.go('gas')">`

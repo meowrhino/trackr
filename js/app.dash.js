@@ -188,12 +188,12 @@ Object.assign(App, {
         <div class="pc-flags">${flags}</div>
       </div>
       <div class="pc-s">
-        <span><span class="m">${th.toFixed(1)}h</span></span>
+        <span><span class="m">${fmtH(th)}h</span></span>
         ${f.modo !== 'gratis'
           ? `<span><span class="m">${fmtMoney(f.totalFactura || 0)}</span></span>`
           : `<span style="color:var(--t3)">${t('dash.free')}</span>`}
         ${f.modo === 'gratis' ? ''
-          : eph !== null ? `<span style="color:${B.ephColor(eph)}">${eph.toFixed(2)} &euro;/h</span>`
+          : eph !== null ? `<span style="color:${B.ephColor(eph)}">${fmtNum(eph)} &euro;/h</span>`
           : `<span style="color:var(--t3)" title="${t('billing.noHoursYet')}">??? &euro;/h</span>`}
         ${this.cardDates(p)}
       </div>
