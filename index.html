@@ -3,6 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- CSP: si algún día entra código ajeno en la página, no puede mandar datos a otro dominio (connect, img,
+     form) ni cargar scripts de fuera. 'unsafe-inline' hace falta por los onclick="" y los style="" de
+     toda la app; 'unsafe-eval'/'wasm-unsafe-eval', por el WebAssembly de Argon2 (Safari < 16 lo bloquea
+     sin el primero). frame-ancestors solo vale como cabecera: va en _headers. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://trackr-api.manuellatourf.workers.dev http://localhost:8787 http://localhost:8788; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <title>TRACKR · Gestión y facturación para autónomos · Gratis y privado</title>
 <meta name="description" content="TRACKR: app gratuita de facturación para autónomos. Controla proyectos, horas, gastos y modelo 303 y 130. Funciona sin cuenta en tu navegador; con sincronización cifrada de conocimiento cero, opcional, entre dispositivos.">
 <meta name="keywords" content="autónomos, facturación, modelo 303, modelo 130, gratis, sin registro, gestión proyectos">

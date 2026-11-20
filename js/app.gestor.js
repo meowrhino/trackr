@@ -62,12 +62,11 @@
 
     _cfgGestorCartera() {
       const code = D.d.settings.gestorCode || '…';
-      const kp = D.d.settings.gestorKeypair || {};
       return `<div class="cfg-section" style="margin-top:2.5rem"><div class="cfg-section-title">${t('gestTitle')}</div>`
         + `<p style="color:var(--t3);font-size:.82rem;margin-bottom:.75rem">${t('gestDesc')}</p>`
         + `<div class="acc-card"><div class="acc-row"><span>${t('yourCode')}: <code class="mono" id="gstOwnCode" style="font-size:.95rem">${esc2(code)}</code></span>`
         + `<button class="bt" style="font-size:.72rem;padding:.2rem .6rem" onclick="App.gstCopyCode()">${t('copy')}</button></div>`
-        + `<div style="color:var(--t3);font-size:.72rem;margin-top:.3rem">${t('fingerprint')}: <code class="mono">${esc2(fpShort(kp.fingerprint))}</code></div></div>`
+        + `<div style="color:var(--t3);font-size:.72rem;margin-top:.3rem">${t('fingerprint')}: <code class="mono">${esc2(fpShort(Acc.gestorFingerprint()))}</code></div></div>`
         + `<div style="margin-top:1.1rem"><div class="cfg-section-title" style="font-size:.85rem;margin-bottom:.5rem">${t('clients')}</div>`
         + `<button class="bt" onclick="App.gstLoadClients()">${t('refresh')}</button>`
         + `<div id="gstClients" style="margin-top:.6rem"></div></div>`

@@ -286,6 +286,7 @@ Object.assign(App, {
    *  si cambia el importe, lo correcto es rectificar. */
   anularLocal(pid) {
     const p = D.p(pid); if (!p?.facturacion?.facturaNum) return;
+    if (D._readOnly) { Toast.warn(t('gops.cantEdit')); return; }
     const f = p.facturacion, num = `${f.facturaNum}/${yearShort(f.facturaFecha || todayStr())}`;
     if (!confirm(t('fac.voidConfirm', num))) return;
     D.up(pid, { facturacion: { ...f, anulada: { fecha: todayStr() } } });
@@ -298,6 +299,7 @@ Object.assign(App, {
   /** Borra del todo una factura no enviada (la última del año, sin VeriFactu): ver D.facturaBorrable. */
   borrarFactura(pid) {
     const p = D.p(pid); if (!p?.facturacion?.facturaNum) return;
+    if (D._readOnly) { Toast.warn(t('gops.cantEdit')); return; }
     const num = this._facNumStr(p), motivo = D.facturaBorrable(pid);
     if (motivo) { Toast.warn(t(motivo, num)); return; }
     if (!confirm(t('fac.deleteConfirm', num))) return;

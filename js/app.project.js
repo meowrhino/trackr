@@ -10,8 +10,8 @@
 Object.assign(App, {
   colorSelect(currentName) {
     const curHex = colorHex(currentName);
-    let html = `<div class="cs-wrap"><div class="cs-hd"><div id="mpColorDot" class="cs-dot" style="background:${curHex}"></div><span id="mpColorLbl" class="cs-lbl">${currentName}</span></div>`;
-    html += `<input type="hidden" id="mpColor" value="${currentName}"><div class="cs-grid" onmouseleave="App._csReset()">`;
+    let html = `<div class="cs-wrap"><div class="cs-hd"><div id="mpColorDot" class="cs-dot" style="background:${curHex}"></div><span id="mpColorLbl" class="cs-lbl">${esc(currentName)}</span></div>`;
+    html += `<input type="hidden" id="mpColor" value="${esc(currentName)}"><div class="cs-grid" onmouseleave="App._csReset()">`;
     for (const [group, colors] of Object.entries(W3C_COLORS)) { colors.forEach(([name, hex]) => { html += `<div class="cs-sw${name === currentName ? ' on' : ''}" style="background:${hex}" data-name="${name}" data-hex="${hex}" title="${name}" onmouseenter="App._csHover(this)" onclick="App._csPick(this)"></div>`; }); }
     return html + `</div></div>`;
   },

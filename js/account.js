@@ -35,6 +35,8 @@ const Acc = (() => {
   function getToken() { try { return sessionStorage.getItem(TKEY); } catch (e) { return null; } }
   function wipe() {
     try { sessionStorage.removeItem(TKEY); } catch (e) { /* */ }
+    _gkp = null; _gkpCloudSeen = false;
+    try { localStorage.removeItem(GKEY); } catch (e) { /* */ }
     S = fresh(); // la meta en localStorage se queda: recuerda en que version estaba esta copia local
   }
 
@@ -111,6 +113,49 @@ const Acc = (() => {
   function status() { return { state: S.state, email: S.email, active: S.active, isAdmin: S.isAdmin, role: S.role, version: S.version }; }
   function isUnlocked() { return S.state === 'in' && !!S.dek; }
 
+  /* ── Clave privada de la gestoría: fuera de los datos ──
+     Antes vivía en D.d.settings.gestorKeypair: en claro en localStorage, en cada copia de
+     seguridad y en cada «Exportar JSON»; con ella se descifran todos los clientes de esa
+     gestoría. Ahora D.d no la lleva nunca: está en memoria (aquí, sin acceso desde fuera) y,
+     cifrada con la DEK, en localStorage. En la nube sigue viajando dentro del blob de la
+     cuenta (cifrado): se añade justo al cifrar para subir y se quita justo al descifrar. */
+  const GKEY = 'trackr_gkp';
+  let _gkp = null, _gkpCloudSeen = false;
+  async function keepKp(kp) {
+    _gkp = kp;
+    try { localStorage.setItem(GKEY, (await CA.encryptForUpload(S.dek, { gestorKeypair: kp }, S.email, 0)).blob); } catch (e) { /* sin sitio: queda en memoria y en la nube */ }
+  }
+  // Saca el par de unos datos recién descifrados (o de datos locales de antes de este cambio).
+  async function takeKp(data) {
+    const kp = data && data.settings && data.settings.gestorKeypair;
+    if (!kp) return data;
+    delete data.settings.gestorKeypair;
+    if (!_gkp) await keepKp(kp);
+    return data;
+  }
+  // Deja el par en memoria si esta cuenta lo tiene: datos locales viejos → copia local cifrada → nube.
+  async function ensureKp() {
+    if (S.role !== 'gestor' || !isUnlocked()) return _gkp;
+    if (typeof D !== 'undefined' && !D._readOnly && D.d && D.d.settings && D.d.settings.gestorKeypair) {
+      await takeKp(D.d);
+      D.save();
+      if (typeof H !== 'undefined' && H.stripSetting) H.stripSetting('gestorKeypair');
+    }
+    if (_gkp) return _gkp;
+    try {
+      const raw = localStorage.getItem(GKEY);
+      if (raw) _gkp = (await CA.decryptDownload(S.dek, raw, S.email, 0)).gestorKeypair || null;
+    } catch (e) { /* de otra cuenta o ilegible: se busca en la nube */ }
+    if (_gkp || _gkpCloudSeen) return _gkp;
+    const g = await api('/v1/blob', { method: 'GET', auth: true });
+    if (g.status === 200 && g.data && g.data.blob) {
+      try { await takeKp(await CA.decryptDownload(S.dek, g.data.blob, S.email, g.data.version)); _gkpCloudSeen = true; } catch (e) { /* */ }
+    } else if (g.status === 404) _gkpCloudSeen = true; // aún no hay blob: no hay nada que perder
+    return _gkp;
+  }
+  // Huella de la clave pública (para enseñarla); la privada no sale de este módulo.
+  function gestorFingerprint() { return (_gkp && _gkp.fingerprint) || ''; }
+
   /* ── SIGNUP ── */
   async function signup(emailRaw, password, dataObj, role) {
     if (!CA.available()) throw new Error('crypto_unavailable');
@@ -123,11 +168,15 @@ const Acc = (() => {
       dataObj.settings.gestorKeypair = await CA.genShareKeypair();
     }
     const su = await CA.buildSignup(emailRaw, password, dataObj);
+    // El blob inicial ya la lleva dentro (cifrada); en los datos locales no se queda.
+    const kp = role === 'gestor' ? dataObj.settings.gestorKeypair : null;
+    if (kp) delete dataObj.settings.gestorKeypair;
     su.payload.role = role;
     const r = await api('/v1/signup', { method: 'POST', body: su.payload });
     if (r.status === 201) {
       S = { state: 'in', token: r.data.token, email: su.email, dek: su.dek, credEpoch: su.credEpoch, kdf: { mem: 65536, time: 3, par: 1 }, version: r.data.currentVersion || 1, active: !!r.data.active, isAdmin: !!r.data.isAdmin, role, userId: r.data.userId };
       setToken(r.data.token); markSynced(); // el blob inicial ES la copia local
+      if (kp) await keepKp(kp);
       return { ok: true, recoveryCode: su.recoveryCode, active: S.active, isAdmin: S.isAdmin };
     }
     if (r.status === 202) return { ok: true, pending: true, recoveryCode: su.recoveryCode }; // cuenta creada (active=0) o email ya existente (anti-enum)
@@ -225,7 +274,7 @@ const Acc = (() => {
     if (g.status === 503) return { ok: false, error: 'kv_unavailable_retry' };
     if (g.status !== 200) return { ok: false, error: g.data?.error || 'get_failed' };
     let data;
-    try { data = await CA.decryptDownload(S.dek, g.data.blob, S.email, g.data.version); }
+    try { data = await takeKp(await CA.decryptDownload(S.dek, g.data.blob, S.email, g.data.version)); _gkpCloudSeen = true; }
     catch (e) { return { ok: false, error: 'decrypt_failed' }; }
     S.version = g.data.version;
     _applyRemote(data);
@@ -330,10 +379,15 @@ const Acc = (() => {
     try {
       const data = dataObj || (typeof D !== 'undefined' ? D.d : null);
       if (!data) return { ok: false, error: 'no_data' };
+      // Gestoría: el blob de la nube lleva su clave privada. Sin tenerla en la mano no se sube
+      // (subir sin ella la borraría de la nube y dejaría de poder abrir a sus clientes).
+      const kp = await ensureKp();
+      if (S.role === 'gestor' && !kp && !_gkpCloudSeen && S.version) return { ok: false, error: 'network' };
       const savedAt = typeof D !== 'undefined' ? D.lastSaved : null; // lo que se edite durante el PUT sigue sucio
       const ph = await plainHash(data);
       if (!_retry && ph === _lastPlainHash && S.version) { S.syncedAt = savedAt || Date.now(); saveMeta(); return { ok: true, version: S.version, unchanged: true }; }
-      const { blob, blobHash } = await CA.encryptForUpload(S.dek, data, S.email, S.version + 1);
+      const up = kp ? { ...data, settings: { ...data.settings, gestorKeypair: kp } } : data;
+      const { blob, blobHash } = await CA.encryptForUpload(S.dek, up, S.email, S.version + 1);
       const r = await api('/v1/blob', { method: 'PUT', auth: true, keepalive: true, body: { blob, blobHash, baseVersion: S.version } });
       if (r.status === 200) { S.version = r.data.version; S.syncedAt = savedAt || Date.now(); _lastPlainHash = ph; saveMeta(); return { ok: true, version: r.data.version }; }
       if (r.status === 409 && !_retry) {
@@ -341,7 +395,7 @@ const Acc = (() => {
         const g = await api('/v1/blob', { method: 'GET', auth: true });
         if (g.status === 200 && g.data) {
           let cloud = null;
-          try { cloud = await CA.decryptDownload(S.dek, g.data.blob, S.email, g.data.version); } catch (e) { /* */ }
+          try { cloud = await takeKp(await CA.decryptDownload(S.dek, g.data.blob, S.email, g.data.version)); _gkpCloudSeen = true; } catch (e) { /* */ }
           if (cloud) {
             S.version = g.data.version;
             // D.d actual, no el `data` del inicio: otra pestana pudo guardar mientras volaba el PUT
@@ -469,7 +523,7 @@ const Acc = (() => {
     const g = await api('/v1/blob?version=' + encodeURIComponent(v), { auth: true });
     if (g.status !== 200) return { ok: false, error: failOf(g, 'get_failed') };
     let data;
-    try { data = await CA.decryptDownload(S.dek, g.data.blob, S.email, g.data.version); }
+    try { data = await takeKp(await CA.decryptDownload(S.dek, g.data.blob, S.email, g.data.version)); }
     catch (e) { return { ok: false, error: 'decrypt_failed' }; }
     _applyRemote(data);
     S.version = current;
@@ -479,10 +533,10 @@ const Acc = (() => {
   /* ── Gestores (comparticion E2E, PROTOCOL §15) ── */
 
   // Publica la clave publica del gestor si aun no lo esta (idempotente) y devuelve su codigo.
-  // Se llama al entrar una cuenta gestor activa. El par vive en D.d.settings.gestorKeypair.
+  // Se llama al entrar una cuenta gestor activa. El par vive solo en este módulo (ver ensureKp).
   async function gestorEnsureKey() {
     if (!isUnlocked() || !S.active || S.role !== 'gestor') return { ok: false, error: 'not_ready' };
-    const kp = typeof D !== 'undefined' ? D.d?.settings?.gestorKeypair : null;
+    const kp = await ensureKp();
     if (!kp || !kp.publicKey) return { ok: false, error: 'no_keypair' };
     const r = await api('/v1/gestor/keys', { method: 'POST', auth: true, body: { publicKey: kp.publicKey } });
     if (r.status === 201 || r.status === 200) return { ok: true, code: r.data.code, fingerprint: r.data.fingerprint };
@@ -541,7 +595,7 @@ const Acc = (() => {
   // la necesita GOps para cifrar las ops si la persona le dejo editar (Etapa B).
   async function gestorOpenClient(grantId) {
     if (!isUnlocked() || S.role !== 'gestor') return { ok: false, error: 'not_ready' };
-    const kp = D.d?.settings?.gestorKeypair;
+    const kp = await ensureKp();
     if (!kp) return { ok: false, error: 'no_keypair' };
     const r = await api('/v1/gestor/clients/' + encodeURIComponent(grantId) + '/blob', { method: 'GET', auth: true });
     if (r.status === 404) return { ok: false, error: r.data?.error || 'no_blob' };
@@ -607,6 +661,9 @@ const Acc = (() => {
         applied++;
       });
       g.lastOpSeq = maxSeq;
+      // Lo aplicado viene de otra cuenta: pasa por la misma frontera de tipos que un import
+      // (un importe como texto, "1200", daba un total de 1.200.072 €).
+      if (applied) D.ensure();
       D.save();  // dispara el auto-sync: lo aplicado sube en el proximo push
       await _ackOps(g, maxSeq); // confirmar (el server las borra); si falla, el ack de recuperacion lo reintenta
       if (applied && _onOps) { try { _onOps({ applied, gestorEmail: g.gestorEmail }); } catch (e) { /* */ } }
@@ -763,7 +820,7 @@ const Acc = (() => {
     gestorEnsureKey, gestorResolve, grantCreate, grantRevoke, gestorClients, gestorOpenClient, pushShadow, _buildShareData: buildShareData,
     grantSetCanEdit, opsPush, pullOps, setOpsListener, reconcileGrant, pushVerifactu,
     adminListUsers, adminSetActive, adminSetPaid, adminDelete, adminGetConfig, adminSetConfig, _mergeData: mergeData, adoptMeta,
-    status, isUnlocked, detectLocked, setAutoSync, setSyncListener, notifyChange, setApiBase: (u) => { API_BASE = u; }, apiBase: () => API_BASE, adminUsage,
+    status, isUnlocked, detectLocked, setAutoSync, setSyncListener, notifyChange, setApiBase: (u) => { API_BASE = u; }, apiBase: () => API_BASE, adminUsage, gestorFingerprint,
     get email() { return S.email; }, get version() { return S.version; }, get state() { return S.state; },
   };
 })();

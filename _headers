@@ -1,0 +1,8 @@
+# Cabeceras de todo el sitio (Cloudflare Workers, assets estáticos). La CSP completa de la app
+# va en un <meta> de index.html; aquí, lo que solo funciona como cabecera.
+/*
+  X-Frame-Options: DENY
+  Content-Security-Policy: frame-ancestors 'none'
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()

@@ -138,6 +138,16 @@ function gastoCoste(e) {
   return bi > 0 ? bi : (e.total || e.cantidad || 0) + (e.irpf || 0);
 }
 
+/** Lee un número tecleado o importado. Admite coma decimal («12,50») y punto de miles con coma
+ *  («1.250,50»); un punto solo es decimal («12.5»). Vacío o no numérico → NaN. */
+function parseNum(v) {
+  if (typeof v === 'number') return v;
+  if (typeof v !== 'string') return NaN;
+  let s = v.trim().replace(/\s/g, '');
+  if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
+  return /^-?(\d+\.?\d*|\.\d+)$/.test(s) ? parseFloat(s) : NaN;
+}
+
 /** Número de factura tecleado → entero ≥ 1. Con algo más que cifras («2026/033», «33/26») → null:
  *  antes un parseInt se quedaba con el «2026» y la factura salía como 2026/26. */
 function parseFacNum(s) {

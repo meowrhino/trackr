@@ -72,9 +72,9 @@ Object.assign(App, {
       + `<div class="br tot"><span class="la">${t('billing.total')}</span><span class="va">${fmtMoney(f.totalFactura || 0)}</span></div></div>`;
 
     this.om(`<div class="mt">${t('fac.generate')}</div>`
-      + `<div class="fr"><div class="fg"><label>${t('field.invoiceNum')}${itip('tip.facNum')}</label><input type="text" id="facNum" value="${String(num)}" style="font-family:'DM Mono',monospace"></div>`
-      + `<div class="fg"><label>${t('field.date')}${itip('tip.devengo')}</label><input type="date" id="facDate" value="${date}"></div>`
-      + `<div class="fg"><label>${t('fac.payDays')}</label><input type="number" id="facDias" min="0" max="365" step="1" value="${dias}" ${f.facturaNum ? 'disabled' : ''} style="font-family:'DM Mono',monospace"></div></div>`
+      + `<div class="fr"><div class="fg"><label>${t('field.invoiceNum')}${itip('tip.facNum')}</label><input type="text" id="facNum" value="${esc(num)}" style="font-family:'DM Mono',monospace"></div>`
+      + `<div class="fg"><label>${t('field.date')}${itip('tip.devengo')}</label><input type="date" id="facDate" value="${esc(date)}"></div>`
+      + `<div class="fg"><label>${t('fac.payDays')}</label><input type="number" id="facDias" min="0" max="365" step="1" value="${esc(dias)}" ${f.facturaNum ? 'disabled' : ''} style="font-family:'DM Mono',monospace"></div></div>`
       + `<div class="fg"><label>${t('field.subject')}</label><input type="text" id="facAsunto" value="${esc(asunto)}"></div>`
       + summary
       + warnRow
@@ -122,6 +122,7 @@ Object.assign(App, {
   },
   saveRect(pid) {
     const p = D.p(pid); if (!p) return;
+    if (D._readOnly) { Toast.warn(t('gops.cantEdit')); return; } /* las facturas son de la persona */
     const f = p.facturacion;
     const fecha = document.getElementById('rcDate').value || todayStr();
     if (fecha < f.facturaFecha) { Toast.warn(t('rect.dateBefore')); return; }
@@ -149,6 +150,7 @@ Object.assign(App, {
     if (!p) return;
     /* Ya emitida (no debería llegar aquí: facModal no abre la ventana): solo el PDF, sin tocar nada */
     if (p.facturacion.facturaNum && D.facturaVigente(pid)) { this.cm(); this.facPdf(pid); return; }
+    if (D._readOnly) { Toast.warn(t('gops.cantEdit')); return; } /* modo visor: las facturas las emite la persona */
     /* «2026/033», «33/26»…: solo cifras. Vacío = el que toca. */
     if (numTxt && num == null) { Toast.error(t('fac.numBad', numTxt, D.nextFacturaNum(fecha), yearShort(fecha))); return; }
     /* Anulada: su número no se reutiliza y una factura nueva desde aquí quedaría fuera de impuestos */

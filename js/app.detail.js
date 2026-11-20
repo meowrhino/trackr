@@ -45,7 +45,7 @@ Object.assign(App, {
 
     return `<div class="db" onclick="App.go('dash')">${t('det.backProjects')}</div>`
       + `<div class="dh"><div><div class="dt" style="color:${hex}">${esc(p.nombre)}</div><div class="dc">${esc(cn)}${flags}</div></div>`
-      + `<div class="bg"><span class="bd bd-${p.estado}">${EST[p.estado] || p.estado}</span>`
+      + `<div class="bg"><span class="bd bd-${esc(p.estado)}">${EST[p.estado] || esc(p.estado)}</span>`
       +   `<button class="bt bt-s" onclick="App.pModal('${p.id}')">${t('btn.edit')}</button>`
       +   `${f.modo !== 'gratis' ? `<button class="bt bt-s" onclick="App.facModal('${p.id}')">${t('det.invoice')}</button>` : ''}`
       +   (p.clienteId ? `<button class="bt bt-s" onclick="App.budModal('${p.clienteId}','${p.id}')">${t('bud.btn')}</button>` : '')

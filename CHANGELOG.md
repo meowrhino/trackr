@@ -5,6 +5,17 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-11-20 — Seguridad: nada de código en los datos, la clave de la gestoría a salvo y CSP
+
+### 🔒 Seguridad
+- **Un JSON importado, la copia de un cliente o un cambio de la gestoría ya no pueden colar código**. Antes, una categoría de gasto o un estado de proyecto con HTML dentro lo ejecutaba al abrir Dineros o la ficha. Ahora, al cargar, cada campo se queda con su tipo (número, fecha, color, lista cerrada) en un solo sitio (`D.ensure`), también después de aplicar los cambios de la gestoría; lo que no vale pasa a su valor por defecto. De paso, una lista rota o un cliente sin nombre ya no rompen la app. _frontend_
+- **La clave privada de la gestoría sale de los datos**: estaba en claro en el navegador, en cada copia de seguridad y en cada «Exportar JSON», y con ella se descifran todos los clientes de esa gestoría. Ahora vive en memoria y, cifrada, en el navegador; en la nube sigue dentro del blob cifrado. Las cuentas de gestoría que ya existen se arreglan solas al entrar (también sus copias guardadas). Cerrar sesión la borra de ese navegador. _frontend_
+- **La gestoría no puede cambiar una factura emitida** (base, IVA, IRPF, número, fecha, anularla ni rectificarla), ni emitir una en nombre de la persona. Sí puede apuntar cobros y editar el resto. En modo visor tampoco se guardan ni se restauran copias de seguridad (se mezclaban los datos del cliente con los de la gestoría). _frontend_
+- **CSP y cabeceras**: la página solo puede hablar con su servidor y con la API de trackr, no carga nada de fuera y no se puede meter en un iframe (`_headers`, en Cloudflare). _frontend_
+- Tests en `test/tipos-ensure.mjs` y `test/gestor-clave.mjs`.
+
+---
+
 ## 2026-11-20 — Números de factura que no se descolocan, y aviso si el NIF está mal
 
 ### 🐛 Arreglado

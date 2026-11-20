@@ -41,7 +41,7 @@ Object.assign(App, {
     if (!deds.length) return '';
     let html = `<div class="din-ded-list" style="margin-top:.5rem">`;
     deds.forEach(d => {
-      const catLabel = DEDUCIBLE_CAT[d.categoria] || d.categoria || 'Otro';
+      const catLabel = DEDUCIBLE_CAT[d.categoria] || esc(d.categoria || 'Otro');
       html += `<div class="din-ded-item">`
         + `<span class="din-ded-cat">${catLabel}</span>`
         + `<span class="gas-e-date">${fmtDate(d.fecha)}</span>`
@@ -251,7 +251,7 @@ Object.assign(App, {
       gastos.forEach(g => {
         const entries = (g.entradas || []).filter(e => e.fecha && inPeriod(e.fecha, type, y, m));
         const total = entries.reduce((s, e) => s + gastoCoste(e), 0);
-        const catLabel = GASTO_CAT[g.categoria] || g.categoria || 'Otro';
+        const catLabel = GASTO_CAT[g.categoria] || esc(g.categoria || 'Otro');
         const gHex = colorHex(g.color || 'Salmon');
         const isPuntual = !g.recurrente || g.recurrente === 'no';
         /* Ocultar puntuales sin entradas en este periodo */

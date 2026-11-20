@@ -39,6 +39,24 @@ const GOps = (() => {
     settings:  { fiscalOnly: true },
   };
   const FISCAL_KEYS = ['eds', 'rendAnterior', 'saldoIvaInicial'];
+
+  /* Facturación de un proyecto: lo que el gestor no cambia. Emitir, renumerar, anular o
+     rectificar una factura es de la persona (FAC_SIEMPRE). Con una factura emitida y vigente,
+     tampoco lo que decide sus importes (FAC_EMITIDA): cambiarían el 303 y el 130 de un
+     trimestre quizá ya presentado. Los importes calculados (cuota, total…) no se miran: los
+     rehace B.calc a partir de estos. Le quedan los cobros, el asunto y el resto del proyecto. */
+  const FAC_SIEMPRE = ['facturaNum', 'facturaFecha', 'anulada', 'rectificativas'];
+  const FAC_EMITIDA = ['modo', 'baseImponible', 'total', 'precioHora', 'iva', 'irpf', 'ivaExcepcion', 'diasPago', 'totalConIva', 'idiomaFactura'];
+  function facturaGuard(cur, payload) {
+    if (!payload || !('facturacion' in payload)) return null;
+    const a = (cur && cur.facturacion) || {}, b = payload.facturacion || {};
+    /* Vacío es vacío: null, '', 0, false y [] cuentan igual (un guardado añade campos a cero) */
+    const norm = (v) => (v == null || v === '' || v === 0 || v === false || (Array.isArray(v) && !v.length) ? null : v);
+    const same = (k) => JSON.stringify(norm(a[k])) === JSON.stringify(norm(b[k]));
+    const emitida = !!(cur && a.facturaNum && D.facturaVigente(cur.id));
+    const bad = [...FAC_SIEMPRE, ...(emitida ? FAC_EMITIDA : [])].find((k) => !same(k));
+    return bad ? `facturacion.${bad}: ${emitida ? 'la factura ya esta emitida' : 'las facturas las emite la persona'}` : null;
+  }
   const ACCIONES = ['crear', 'editar', 'borrar'];
 
   /* Un inverso muy gordo (borrar un proyecto con años de horas) inflaría el blob de la
@@ -231,6 +249,10 @@ const GOps = (() => {
     if (!Array.isArray(D.d[spec.list])) D.d[spec.list] = [];
     const list = D.d[spec.list];
     const i = list.findIndex(x => x && x.id === id);
+    if (!trusted && op.entidad === 'proyecto') {
+      const why = facturaGuard(i === -1 ? null : list[i], c.payload);
+      if (why) return { ok: false, why };
+    }
 
     if (op.accion === 'crear') {
       // Si ya existe, la op es un reenvío: mergear en vez de duplicar la entidad.

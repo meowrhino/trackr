@@ -58,6 +58,8 @@ const H = {
    */
   snapshot(opts = {}) {
     if (typeof LZString === 'undefined' || !D || !D.d) return null;
+    /* Modo visor: D.d son los datos de un cliente de la gestoría. No se guardan en este navegador. */
+    if (D._readOnly) return null;
     const compressed = LZString.compressToUTF16(JSON.stringify(D.d));
     const entry = {
       id: 'sv_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
@@ -113,6 +115,7 @@ const H = {
 
   /** Restaura un snapshot en D (reemplaza los datos actuales). @returns {boolean} */
   restore(id) {
+    if (D._readOnly) return false; /* modo visor: no se pisan los datos que se están mirando */
     const data = this._data(id);
     if (!data) return false;
     D.load(data);
@@ -127,6 +130,21 @@ const H = {
     const ts = (s.ts || '').slice(0, 16).replace(/[:T]/g, '-');
     downloadFile(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }), `trackr_${ts}.json`);
     return true;
+  },
+
+  /** Quita una clave de `settings` de todas las copias guardadas (la clave privada de la
+   *  gestoría vivía ahí en claro). Devuelve cuántas copias ha limpiado. */
+  stripSetting(key) {
+    if (typeof LZString === 'undefined') return 0;
+    const arr = this._read(); let n = 0;
+    arr.forEach(s => {
+      try {
+        const d = JSON.parse(LZString.decompressFromUTF16(s.data));
+        if (d && d.settings && key in d.settings) { delete d.settings[key]; s.data = LZString.compressToUTF16(JSON.stringify(d)); n++; }
+      } catch { /* copia ilegible: se deja */ }
+    });
+    if (n) this._write(arr);
+    return n;
   },
 
   /** Borra un snapshot del historial. */

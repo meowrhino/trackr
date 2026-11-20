@@ -70,6 +70,7 @@ const D = {
    */
   ensure() {
     const d = this.d;
+    this._shape();
 
     /* Arrays raíz */
     if (!d.clientes) d.clientes = [];
@@ -306,7 +307,137 @@ const D = {
       });
     }
 
+    this._types();
     d.version = 4;
+  },
+
+  /* ══════════════════════════════════════════════
+   *  FRONTERA DE DATOS: forma y tipos
+   *  Lo que llega de un JSON importado, de la nube, de la copia de un cliente o de un cambio de
+   *  la gestoría puede traer cualquier cosa. La app trata muchos campos como número, fecha,
+   *  color o lista cerrada y los pinta tal cual (innerHTML, value="…"): un «estado» o una
+   *  «categoría» con HTML dentro ejecutaba código al abrir la vista. Aquí cada campo se queda
+   *  con su tipo; el texto libre (nombres, notas…) se escapa al pintar con esc().
+   * ══════════════════════════════════════════════ */
+
+  /** Forma: las listas son listas de objetos (lo demás se tira) y los objetos, objetos.
+   *  Va lo primero de ensure(): el resto ya puede recorrerlas sin mirar. */
+  _shape() {
+    const d = this.d;
+    const isObj = v => !!v && typeof v === 'object' && !Array.isArray(v);
+    const list = (o, k, optional) => { if (optional && o[k] == null) return []; o[k] = Array.isArray(o[k]) ? o[k].filter(isObj) : []; return o[k]; };
+    const obj = (o, k) => { if (o[k] != null && !isObj(o[k])) delete o[k]; };
+    for (const k of ['clientes', 'gastos', 'projects', 'deducibles', 'facturas', 'presupuestos', 'audit']) list(d, k);
+    obj(d, 'settings');
+    if (d.settings) for (const k of ['emisor', 'targets', 'fiscal', 'verifactu']) obj(d.settings, k);
+    d.projects.forEach(p => {
+      list(p, 'horas'); list(p, 'subproyectos', true);
+      obj(p, 'facturacion'); obj(p, 'fechas'); obj(p, 'presupuesto');
+      if (p.facturacion) { list(p.facturacion, 'cobros', true); list(p.facturacion, 'rectificativas', true); }
+    });
+    d.gastos.forEach(g => { list(g, 'entradas').forEach(e => list(e, 'desglose', true)); });
+    d.presupuestos.forEach(b => list(b, 'lineas'));
+  },
+
+  /** Tipos: números, fechas, colores y listas cerradas. Va lo último de ensure(), con las
+   *  migraciones ya hechas. Un valor que no vale se cambia por su valor por defecto. */
+  _types() {
+    const d = this.d, s = d.settings;
+    const num = (o, k, def = 0) => { if (o[k] == null) return; const n = parseNum(o[k]); o[k] = Number.isFinite(n) ? n : def; };
+    const nums = (o, ...ks) => ks.forEach(k => num(o, k));
+    const date = (o, k, def = null) => { if (o[k] != null && !/^\d{4}-\d{2}-\d{2}$/.test(o[k])) o[k] = def; };
+    const oneOf = (o, k, vals, def) => { if (!vals.includes(o[k])) o[k] = def; };
+    const color = (o, k, def) => { if (typeof o[k] !== 'string' || !/^([A-Za-z]{1,30}|#[0-9A-Fa-f]{3,8})$/.test(o[k])) o[k] = def; };
+    const str = (o, ...ks) => ks.forEach(k => { if (o[k] != null && typeof o[k] !== 'string') o[k] = typeof o[k] === 'object' ? '' : String(o[k]); });
+    /* Clave de categoría que no está en la lista (las hay en datos viejos y en los ejemplos):
+       se conserva si es una clave limpia; si trae otra cosa, 'otro'. */
+    const slug = (o, k, def) => { if (typeof o[k] !== 'string' || !/^[a-z0-9_]{1,40}$/.test(o[k])) o[k] = def; };
+    const zona = o => { if (o.zonaFiscal != null) oneOf(o, 'zonaFiscal', Object.keys(ZONA_FISCAL), 'es'); };
+
+    d.projects.forEach(p => {
+      str(p, 'nombre', 'notas'); if (p.nombre == null) p.nombre = '';
+      oneOf(p, 'estado', Object.keys(EST), 'activo');
+      color(p, 'color', 'CornflowerBlue');
+      p.interno = !!p.interno; p.recurrente = !!p.recurrente;
+      ['inicio', 'finEstimada', 'finReal'].forEach(k => date(p.fechas, k));
+      p.horas.forEach(h => {
+        nums(h, 'cantidad', 'monto'); if (h.cantidad == null) h.cantidad = 0;
+        date(h, 'fecha');
+        if (h.horaInicio != null && !/^\d{2}:\d{2}$/.test(h.horaInicio)) h.horaInicio = null;
+        oneOf(h, 'tipo', ['trabajo', 'reunion'], 'trabajo');
+        str(h, 'nota');
+      });
+      (p.subproyectos || []).forEach(x => { num(x, 'base'); str(x, 'nombre', 'descripcion'); });
+      if (p.presupuesto) {
+        const n = p.presupuesto.num;
+        if (!(typeof n === 'number' || (typeof n === 'string' && /^[A-Za-z]{0,2}\d{1,9}$/.test(n)))) p.presupuesto = null;
+        else date(p.presupuesto, 'fecha', todayStr());
+      }
+      const f = p.facturacion;
+      oneOf(f, 'modo', ['desde_base', 'desde_total', 'por_hora', 'gratis'], 'gratis');
+      nums(f, 'baseImponible', 'total', 'precioHora', 'iva', 'irpf', 'importeIva', 'importeIrpf', 'totalFactura', 'netoRecibido', 'gastos');
+      if (f.diasPago != null) { num(f, 'diasPago', NaN); if (!(f.diasPago >= 0)) delete f.diasPago; }
+      if (f.facturaNum != null) f.facturaNum = parseFacNum(f.facturaNum);
+      date(f, 'facturaFecha'); date(f, 'fechaPago');
+      str(f, 'ivaExcepcion', 'asuntoFactura');
+      if (f.idiomaFactura != null && !/^[a-z]{2}$/.test(f.idiomaFactura)) f.idiomaFactura = null;
+      if (f.anulada) { f.anulada = typeof f.anulada === 'object' && !Array.isArray(f.anulada) ? f.anulada : {}; date(f.anulada, 'fecha'); }
+      (f.cobros || []).forEach(c => {
+        num(c, 'cantidad'); if (c.cantidad == null) c.cantidad = 0;
+        date(c, 'fecha');
+        if (c.metodo != null && !/^[a-z]{1,20}$/.test(c.metodo)) delete c.metodo;
+      });
+      (f.rectificativas || []).forEach(r => { nums(r, 'base', 'importeIva', 'importeIrpf', 'total', 'netoRecibido'); date(r, 'fecha', todayStr()); str(r, 'num', 'motivo'); });
+    });
+
+    d.clientes.forEach(c => {
+      str(c, 'nombre', 'nombreCompleto', 'nif', 'direccion1', 'direccion2', 'notas'); if (c.nombre == null) c.nombre = '';
+      color(c, 'color', 'CornflowerBlue');
+      zona(c);
+    });
+
+    d.gastos.forEach(g => {
+      str(g, 'nombre', 'notas', 'nifProveedor'); if (g.nombre == null) g.nombre = '';
+      slug(g, 'categoria', 'otro');
+      if (g.recurrente) oneOf(g, 'recurrente', Object.keys(RECURRENCIA), 'no');
+      color(g, 'color', 'Salmon');
+      g.desgravable = !!g.desgravable;
+      nums(g, 'tipoIva', 'tipoIrpf', 'importeBase');
+      if (g.diaRecurrente != null) { num(g, 'diaRecurrente', NaN); g.diaRecurrente = g.diaRecurrente >= 1 && g.diaRecurrente <= 31 ? Math.floor(g.diaRecurrente) : null; }
+      if (g.finHasta != null && !/^\d{4}-\d{2}(-\d{2})?$/.test(g.finHasta)) g.finHasta = null;
+      zona(g);
+      g.entradas.forEach(e => {
+        nums(e, 'base', 'iva', 'irpf', 'total', 'cantidad', 'tipoIva', 'tipoIrpf');
+        date(e, 'fecha');
+        str(e, 'nota', 'numFactura');
+        (e.desglose || []).forEach(l => nums(l, 'tipoIva', 'base', 'iva'));
+      });
+    });
+
+    d.deducibles.forEach(x => {
+      slug(x, 'categoria', 'otro');
+      num(x, 'cantidad'); date(x, 'fecha');
+      str(x, 'nombre', 'descripcion', 'nota');
+    });
+
+    d.presupuestos.forEach(b => {
+      if (typeof b.num !== 'number' && !(typeof b.num === 'string' && /^[A-Za-z]{0,2}\d{1,9}$/.test(b.num))) b.num = String(parseFacNum(b.num) || 0);
+      date(b, 'fecha', todayStr()); if (b.fecha == null) b.fecha = todayStr();
+      oneOf(b, 'estado', ['enviado', 'aceptado', 'rechazado'], 'enviado');
+      nums(b, 'total', 'validez');
+      str(b, 'descripcion');
+      b.lineas.forEach(l => { num(l, 'base'); str(l, 'concepto'); });
+    });
+
+    nums(s, 'defaultIva', 'defaultIrpf', 'diasVencimiento', 'calStartHour');
+    s.nextFacturaNum = parseFacNum(s.nextFacturaNum) || 1;
+    if (s.nextFacturaYear != null && !/^\d{4}$/.test(s.nextFacturaYear)) delete s.nextFacturaYear;
+    oneOf(s, 'idioma', ['es', 'en', 'ca'], 'es');
+    if (typeof s.tema !== 'string' || !/^[\w-]{1,30}$/.test(s.tema)) s.tema = 'oscuro';
+    str(s.emisor, 'nombre', 'nif', 'direccion1', 'direccion2', 'instruccionesPago', 'beneficiarioPago');
+    str(s, 'conceptoDefault');
+    nums(s.targets, 'horasMes', 'ingresosMes', 'horasSemana');
+    nums(s.fiscal, 'rendAnterior', 'saldoIvaInicial');
   },
 
   /* ══════════════════════════════════════════════
