@@ -25,6 +25,13 @@ Object.assign(App, {
       if (!confirm(t('fac.voidedDeleteConfirm', this._facNumStr(p)))) return;
       D.borrarFactura(pid);
     }
+    /* Ya emitida: su número y su fecha no se tocan. El botón solo vuelve a bajar el mismo PDF
+       (antes la ventana dejaba cambiarlos: la 7/26 de mayo pasaba a ser la 99/26 de noviembre). */
+    if (p.facturacion?.facturaNum && D.facturaVigente(pid)) {
+      this.facPdf(pid);
+      Toast.ok(t('fac.redownloaded', this._facNumStr(p)));
+      return;
+    }
     B.calc(p);
     const f = p.facturacion, s = D.d.settings;
     const cl = p.clienteId ? D.cl(p.clienteId) : null;
@@ -46,8 +53,10 @@ Object.assign(App, {
       : `<div class="br"><span class="la">${t('fac.client')}</span><span class="va" style="display:flex;align-items:center;justify-content:flex-end;gap:.2rem"><span style="color:var(--t3)">${t('fac.noClient')}</span>${addBtn}</span></div>`;
 
     const missing = [];
+    if (nifCheck(s.emisor.nif).ok === false) missing.push(t('fac.badNifEmisor'));
     if (cl) {
       if (!cl.nif) missing.push(t('fac.missingNif'));
+      else if ((cl.zonaFiscal || 'es') === 'es' && nifCheck(cl.nif).ok === false) missing.push(t('fac.badNif'));
       if (!cl.direccion1 && !cl.direccion2) missing.push(t('fac.missingAddress'));
     }
     const warnRow = missing.length
@@ -133,10 +142,15 @@ Object.assign(App, {
        EXACTAMENTE la misma (Fac.download también cae a todayStr() si va vacía). */
     const fecha = document.getElementById('facDate').value || todayStr();
     const asunto = document.getElementById('facAsunto').value.trim();
-    const num = parseInt(document.getElementById('facNum').value) || null;
+    const numTxt = document.getElementById('facNum').value.trim();
+    const num = parseFacNum(numTxt);
     const diasPago = parseInt(document.getElementById('facDias').value, 10);
     const p = D.p(pid);
     if (!p) return;
+    /* Ya emitida (no debería llegar aquí: facModal no abre la ventana): solo el PDF, sin tocar nada */
+    if (p.facturacion.facturaNum && D.facturaVigente(pid)) { this.cm(); this.facPdf(pid); return; }
+    /* «2026/033», «33/26»…: solo cifras. Vacío = el que toca. */
+    if (numTxt && num == null) { Toast.error(t('fac.numBad', numTxt, D.nextFacturaNum(fecha), yearShort(fecha))); return; }
     /* Anulada: su número no se reutiliza y una factura nueva desde aquí quedaría fuera de impuestos */
     if (p.facturacion.anulada) { Toast.warn(t('fac.isVoided')); return; }
     /* Una factura de prueba a 0 € o sin emisor numera el proyecto y lo bloquea: avisar antes. */
@@ -145,6 +159,13 @@ Object.assign(App, {
     const numEf = num || p.facturacion.facturaNum || D.nextFacturaNum(fecha);
     const otro = D.facturaNumTaken(numEf, pid, fecha);
     if (otro) { Toast.error(t('fac.numTaken', numEf, otro.nombre)); return; }
+    /* Huecos y orden de fecha: se avisa y se deja seguir (quien migra a mitad de año empieza en la 33) */
+    for (const a of D.facturaAvisos(numEf, fecha, pid)) {
+      const ys = yearShort(fecha);
+      const msg = a.tipo === 'hueco' ? t('fac.gapConfirm', a.toca, numEf, a.hasta)
+        : t(a.tipo === 'fechaAntes' ? 'fac.dateBeforeConfirm' : 'fac.dateAfterConfirm', `${a.num}/${ys}`, fmtDate(a.fecha), fmtDate(fecha));
+      if (!confirm(msg)) return;
+    }
 
     /* Guardar asunto en el proyecto si difiere del default; borrar si vacío o igual al default */
     const def = defaultAsunto(Object.assign({}, p, { facturacion: Object.assign({}, p.facturacion, { asuntoFactura: '' }) }));

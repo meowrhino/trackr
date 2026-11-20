@@ -5,6 +5,19 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-11-20 — Números de factura que no se descolocan, y aviso si el NIF está mal
+
+### 🐛 Arreglado
+- **«2026/033» ya no acaba como factura «2026/26»**: el número son solo cifras (el «/26» lo pone trackr). Si escribes otra cosa, avisa, dice qué número te toca y no emite nada. Antes se quedaba con el «2026» y el contador saltaba a 2027. _frontend_
+- **Volver a pulsar «Factura» en una factura ya emitida no la cambia**: solo vuelve a bajar el mismo PDF. Antes la ventana dejaba cambiar el número y la fecha (la 7/26 de mayo podía pasar a ser la 99/26 de noviembre). _frontend_
+
+### ✨ Nuevo
+- **Aviso de huecos y de fechas fuera de orden** antes de emitir: si te saltas números o la fecha es anterior a la de la factura de antes (o posterior a la de después), pregunta antes de seguir. Deja continuar, porque quien empieza a mitad de año arranca en la 33. _frontend_
+- **Se comprueba la letra del NIF, NIE o CIF** del emisor y de los clientes de España: si no cuadra, dice cuál sería y pregunta antes de guardar. La ventana de la factura también avisa. _frontend_
+- Test en `test/facturas-numeracion.mjs`.
+
+---
+
 ## 2026-11-19 — Borrar una factura no enviada; los cobros parciales ya no crecen
 
 ### ✨ Nuevo

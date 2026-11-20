@@ -138,6 +138,34 @@ function gastoCoste(e) {
   return bi > 0 ? bi : (e.total || e.cantidad || 0) + (e.irpf || 0);
 }
 
+/** Número de factura tecleado → entero ≥ 1. Con algo más que cifras («2026/033», «33/26») → null:
+ *  antes un parseInt se quedaba con el «2026» y la factura salía como 2026/26. */
+function parseFacNum(s) {
+  s = String(s ?? '').trim();
+  return /^\d{1,9}$/.test(s) && +s > 0 ? +s : null;
+}
+
+/** Carácter de control de un NIF español (DNI, NIE o CIF). ok: true/false, o null si no tiene
+ *  ninguno de esos formatos (NIF-IVA extranjero, vacío…): ahí no se opina. */
+function nifCheck(raw) {
+  const s = String(raw ?? '').replace(/[\s.-]/g, '').toUpperCase();
+  let m;
+  if ((m = /^(\d{8})([A-Z])$/.exec(s)) || (m = /^([XYZ]\d{7})([A-Z])$/.exec(s))) {
+    const n = +m[1].replace('X', '0').replace('Y', '1').replace('Z', '2');
+    const esperado = 'TRWAGMYFPDXBNJZSQVHLCKE'[n % 23];
+    return { ok: m[2] === esperado, esperado };
+  }
+  if ((m = /^([ABCDEFGHJNPQRSUVW])(\d{7})([0-9A-J])$/.exec(s))) {
+    let sum = 0;
+    [...m[2]].forEach((c, i) => { let d = +c; if (i % 2 === 0) { d *= 2; if (d > 9) d -= 9; } sum += d; });
+    const c = (10 - sum % 10) % 10, dig = String(c), letra = 'JABCDEFGHI'[c];
+    /* Según la letra inicial el control es letra (P, Q, R, S, N, W), cifra (A, B, E, H) o cualquiera de las dos */
+    const soloLetra = 'PQRSNW'.includes(m[1]), soloCifra = 'ABEH'.includes(m[1]);
+    return { ok: soloLetra ? m[3] === letra : soloCifra ? m[3] === dig : (m[3] === dig || m[3] === letra), esperado: soloLetra ? letra : dig };
+  }
+  return { ok: null };
+}
+
 /** Genera un ID único tipo xxxx-xxxx-xxxx */
 function uid() {
   return 'xxxx-xxxx-xxxx'.replace(/x/g, () =>

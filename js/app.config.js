@@ -367,7 +367,14 @@ Object.assign(App, {
     this.rCfg();
   },
 
+  /** NIF con el carácter de control mal: se avisa (diciendo cuál sería) y se deja guardar si insiste. */
+  _nifOk(nif) {
+    const v = nifCheck(nif);
+    return v.ok !== false || confirm(t('msg.nifBad', nif, v.esperado ? t('msg.nifExpected', v.esperado) : ''));
+  },
+
   saveEmisor() {
+    if (!this._nifOk(document.getElementById('cfgENif').value.trim())) return;
     const em = D.d.settings.emisor;
     em.nombre = document.getElementById('cfgEN').value.trim();
     em.direccion1 = document.getElementById('cfgED1').value.trim();
@@ -585,6 +592,8 @@ Object.assign(App, {
     if (!nombre) { Toast.warn(t('msg.nameRequired')); return; }
     const color = document.getElementById('mpColor')?.value || 'CornflowerBlue';
     const nombreCompleto = document.getElementById('clNC').value.trim();
+    /* Solo clientes de España: el NIF-IVA de otro país tiene otro formato */
+    if (document.getElementById('clZona').value === 'es' && !this._nifOk(document.getElementById('clNif').value.trim())) return;
     const data = { nombre, nombreCompleto, direccion1: document.getElementById('clD1').value.trim(), direccion2: document.getElementById('clD2').value.trim(), nif: document.getElementById('clNif').value.trim(), zonaFiscal: document.getElementById('clZona').value, color, notas: document.getElementById('clNo').value.trim() };
     let savedId;
     if (cid) { D.upCl(cid, data); savedId = cid; }

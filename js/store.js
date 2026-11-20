@@ -423,6 +423,24 @@ const D = {
     if (fy > cy || (fy === cy && +num >= (+s.nextFacturaNum || 1))) { s.nextFacturaNum = +num + 1; s.nextFacturaYear = fy; return true; }
     return false;
   },
+  /** Avisos antes de emitir la factura `num` con esa fecha (no la impiden: se confirman):
+   *  { tipo: 'hueco', toca, hasta } si se salta números, y { tipo: 'fechaAntes' | 'fechaDespues', num, fecha }
+   *  si deja de ir en orden de fecha respecto a la factura anterior o a la siguiente de su año. */
+  facturaAvisos(num, fecha, pid) {
+    const out = [], y = String(fecha || todayStr()).slice(0, 4);
+    const toca = this.nextFacturaNum(fecha);
+    if (+num > toca) out.push({ tipo: 'hueco', toca, hasta: +num - 1 });
+    let ant = null, sig = null;
+    this.d.projects.forEach(p => {
+      const f = p.facturacion; if (p.id === pid || !f?.facturaNum || String(f.facturaFecha || '').slice(0, 4) !== y) return;
+      const n = +f.facturaNum;
+      if (n < +num && (!ant || n > +ant.facturaNum)) ant = f;
+      if (n > +num && (!sig || n < +sig.facturaNum)) sig = f;
+    });
+    if (ant && ant.facturaFecha > fecha) out.push({ tipo: 'fechaAntes', num: +ant.facturaNum, fecha: ant.facturaFecha });
+    if (sig && sig.facturaFecha < fecha) out.push({ tipo: 'fechaDespues', num: +sig.facturaNum, fecha: sig.facturaFecha });
+    return out;
+  },
   /** Siguiente número de rectificativa (serie R, por año): 'R1', 'R2'… */
   nextRectNum(fecha) {
     const y = String(fecha || todayStr()).slice(0, 4);
