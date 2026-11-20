@@ -21,6 +21,7 @@ function setup({ cloud, local, role = 'gestor', blobDown = false }) {
     if (path === '/v1/login') return res(200, { token: 't', credEpoch: 1, currentVersion: srvVersion, active: true, role });
     if (path === '/v1/blob/meta') return res(200, { currentVersion: srvVersion, updatedAt: 1700000000 });
     if (path === '/v1/blob' && m === 'GET') return down ? res(503, {}) : res(200, { blob: blobs[srvVersion], version: srvVersion });
+    if (path === '/v1/account' && m === 'DELETE') return body.currentAuthKey === 'a' ? res(204, null) : res(401, { error: 'invalid_credentials' });
     if (path === '/v1/blob' && m === 'PUT') {
       if (body.baseVersion !== srvVersion) return res(409, { currentVersion: srvVersion });
       blobs[++srvVersion] = body.blob; puts.push(JSON.parse(body.blob));
@@ -30,7 +31,7 @@ function setup({ cloud, local, role = 'gestor', blobDown = false }) {
   };
   const CA = {
     available: () => true, canonEmail: (e) => e,
-    deriveForLogin: async () => ({ authKey: 'a', wrapKeyPwd: 'w' }), unwrapLogin: async () => 'dek',
+    deriveForLogin: async (pw) => ({ authKey: pw === 'pw' ? 'a' : 'x', wrapKeyPwd: 'w' }), unwrapLogin: async () => 'dek',
     decryptDownload: async (dek, blob) => JSON.parse(blob),
     encryptForUpload: async (dek, data) => ({ blob: JSON.stringify(data), blobHash: 'h' }),
     _: { b64u: (u8) => Buffer.from(u8).toString('base64url') },
@@ -113,4 +114,18 @@ const datos = (kp) => ({ version: 4, projects: [], clientes: [], gastos: [], set
   assert.equal((await e.Acc.push()).ok, true);
   assert.equal(e.puts.at(-1).settings.gestorKeypair, undefined);
   console.log('ok - cuenta persona');
+}
+
+// Borrar la propia cuenta: con la contraseña; cierra la sesión y no toca los datos del navegador
+{
+  const e = setup({ cloud: datos(), local: datos(), role: 'persona' });
+  await e.Acc.login('p@b.c', 'pw');
+  e.D.d.clientes.push({ id: 'c1' });
+  assert.equal((await e.Acc.deleteAccount('otra')).error, 'invalid_credentials', 'sin la contraseña no se borra');
+  assert.equal(e.Acc.status().state, 'in');
+  assert.equal((await e.Acc.deleteAccount('pw')).ok, true);
+  assert.equal(e.Acc.status().state, 'out', 'sesión cerrada');
+  assert.equal(e.store.trackr_acct, undefined, 'este navegador ya no recuerda la cuenta');
+  assert.equal(e.D.d.clientes.length, 1, 'los datos locales siguen');
+  console.log('ok - borrar mi cuenta');
 }

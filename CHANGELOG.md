@@ -5,6 +5,24 @@ Convención de hashes: `frontend@xxxxxxx` / `backend@xxxxxxx`.
 
 ---
 
+## 2026-11-20 — Cuentas: borrar la tuya, gestoría sin acceso a cuentas borradas y límites
+
+### ✨ Nuevo
+- **«Borrar mi cuenta»** en Configuración → Cuenta: la borras tú, con tu contraseña, sin tener que escribir a nadie. Se cierra al momento y se elimina del todo a los 30 días. Los datos del navegador no se tocan. _frontend + backend (`DELETE /v1/account`)_
+
+### 🔒 Seguridad (backend)
+- **Al borrar una cuenta, su gestoría deja de poder ver su copia y de enviarle cambios en ese mismo instante** (antes seguía leyéndola 30 días). Vale también para las cuentas borradas antes de este arreglo.
+- **Inicio de sesión**: además del límite por conexión, hay un límite de intentos por cuenta (120 por hora), para frenar a quien pruebe contraseñas desde muchos sitios a la vez. Las direcciones IPv6 se agrupan por /64.
+- **Estadísticas de uso anónimas**: el servidor solo acepta la lista fija de 27 acciones que manda la app y escribe una sola línea por visita y día (antes, hasta 51 por llamada: con unas 10 IPs se agotaba la cuota diaria de la base de datos y dejaba de funcionar el login para todos). El texto de la app dice ahora «por día y por visita».
+- Tests en `trackr-api/test/regresion.mjs` (Worker real sobre SQLite real).
+
+### Al desplegar el backend (a mano, en este orden)
+1. `npx wrangler d1 execute trackr-db --remote --file scripts/migrate-usage-fila.sql` (una sola vez, justo antes del deploy)
+2. `npm run deploy`
+3. `npx wrangler d1 execute trackr-db --remote --file scripts/drop-verifactu.sql` (borra la cola de VeriFactu; no se puede deshacer)
+
+---
+
 ## 2026-11-20 — Móvil y uso: avisos, ayuda, un solo «Guardar», teclado y sin conexión
 
 ### 🐛 Arreglado

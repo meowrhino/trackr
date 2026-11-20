@@ -238,6 +238,21 @@ const Acc = (() => {
     return { ok: true };
   }
 
+  /* ── BORRAR LA CUENTA (la propia persona, probando su contraseña) ──
+     El servidor la cierra al momento (sesiones y vínculos con gestorías) y la elimina del todo
+     a los 30 días. Los datos de este navegador no se tocan: siguen siendo de quien los tiene. */
+  async function deleteAccount(password) {
+    if (!isUnlocked()) return { ok: false, error: 'locked' };
+    const pre = await api('/v1/prelogin', { method: 'POST', body: { email: S.email } });
+    if (pre.status !== 200 || !pre.data) return { ok: false, error: failOf(pre, 'server_error') };
+    const { authKey } = await CA.deriveForLogin(password, pre.data.kdfSalt, { mem: pre.data.kdfMem, time: pre.data.kdfTime, par: pre.data.kdfPar });
+    const r = await api('/v1/account', { method: 'DELETE', auth: true, body: { currentAuthKey: authKey } });
+    if (r.status !== 204) return { ok: false, error: failOf(r, 'delete_failed') };
+    wipe();
+    try { localStorage.removeItem(MKEY); } catch (e) { /* */ } // ya no hay cuenta que recordar en este navegador
+    return { ok: true };
+  }
+
   /* ── RECUPERACION (2 fases) ── */
   async function recover(emailRaw, recoveryCode, newPassword) {
     if (!CA.available()) throw new Error('crypto_unavailable');
@@ -796,7 +811,7 @@ const Acc = (() => {
     gestorEnsureKey, gestorResolve, grantCreate, grantRevoke, gestorClients, gestorOpenClient, pushShadow, _buildShareData: buildShareData,
     grantSetCanEdit, opsPush, pullOps, setOpsListener, reconcileGrant,
     adminListUsers, adminSetActive, adminSetPaid, adminDelete, adminGetConfig, adminSetConfig, _mergeData: mergeData, adoptMeta,
-    status, isUnlocked, detectLocked, setAutoSync, setSyncListener, notifyChange, setApiBase: (u) => { API_BASE = u; }, apiBase: () => API_BASE, adminUsage, gestorFingerprint,
+    status, isUnlocked, detectLocked, deleteAccount, setAutoSync, setSyncListener, notifyChange, setApiBase: (u) => { API_BASE = u; }, apiBase: () => API_BASE, adminUsage, gestorFingerprint,
     get email() { return S.email; }, get version() { return S.version; }, get state() { return S.state; },
   };
 })();

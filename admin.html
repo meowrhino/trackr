@@ -184,7 +184,7 @@ async function entrar() {
 /* Uso: sesiones por día (barras de texto) y las acciones más usadas */
 async function cargarUso() {
   const u = await Acc.adminUsage(30);
-  if (!u) { $('uso').innerHTML = '<div class="msg">Sin datos (¿falta aplicar scripts/migrate-usage.sql?).</div>'; return; }
+  if (!u) { $('uso').innerHTML = '<div class="msg">Sin datos (¿falta aplicar scripts/migrate-usage-fila.sql?).</div>'; return; }
   const tot = u.sessions.reduce((s, x) => s + x.sessions, 0);
   const max = Math.max(1, ...u.sessions.map(x => x.sessions));
   const dias = u.sessions.map(x => `<div style="display:flex;gap:.5rem;font-size:.78rem"><span style="width:6.5rem;color:var(--t3)">${esc(x.day)}</span><span style="background:var(--t2);height:.7rem;align-self:center;width:${Math.round(x.sessions / max * 60)}%"></span><span>${x.sessions}</span></div>`).join('');

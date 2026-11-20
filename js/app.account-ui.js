@@ -87,6 +87,7 @@
           + (st.active ? `<button class="bt bt-s" onclick="App.accSyncNow()">${t('syncNow')}</button><button class="bt bt-s" onclick="App.accVersions()">${t('verBtn')}</button>` : '')
           + `<button class="bt bt-s" onclick="App.accChangePwModal()">${t('changePw')}</button>`
           + `<button class="bt bt-s" onclick="App.accLogout()">${t('logout')}</button>`
+          + (st.isAdmin ? '' : `<button class="bt bt-s" style="border-color:var(--bad);color:var(--bad);margin-left:auto" onclick="App.accDeleteModal()">${t('delAccount')}</button>`)
           + `</div>`
           + (st.isAdmin ? this._accAdminBlock() : '');
       } else {
@@ -429,6 +430,30 @@
         + `<div class="fg"><label>${t('password2')}</label><input id="accNew2" name="new-password2" type="password" autocomplete="new-password"></div>`
         + `<div class="ma"><button type="button" class="bt" onclick="App.cm()">${t('cancel')}</button><button type="submit" class="bt bt-p">${t('save')}</button></div>`
         + `</form>`);
+    },
+
+    /* Borrar la cuenta: la decide su dueño, con su contraseña (derecho de supresión, sin escribir a nadie) */
+    accDeleteModal() {
+      const email = (Acc.status && Acc.status() && Acc.status().email) ? Acc.status().email : '';
+      this.om(`<div class="mt">${t('delAccount')}</div>`
+        + `<p style="font-size:.86rem;color:var(--t2);line-height:1.5;margin-bottom:.9rem">${t('delAccountHelp')}</p>`
+        + `<form style="display:contents" onsubmit="App.accDeleteGo();return false">`
+        + (email ? `<input type="email" name="email" autocomplete="username" value="${esc2(email)}" readonly tabindex="-1" aria-hidden="true" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">` : '')
+        + `<div class="fg"><label>${t('currentPassword')}</label><input id="accDelPw" name="current-password" type="password" autocomplete="current-password"></div>`
+        + `<div class="ma"><button type="button" class="bt" onclick="App.cm()">${t('cancel')}</button><button type="submit" class="bt bt-d">${t('delAccount')}</button></div>`
+        + `</form>`);
+    },
+    async accDeleteGo() {
+      const pw = val('accDelPw');
+      if (!pw) return;
+      if (!confirm(t('delAccountConfirm'))) return;
+      try {
+        const r = await Acc.deleteAccount(pw);
+        if (!r.ok) return Toast.error(r.error === 'invalid_credentials' ? t('currentPassword') + ' ✗' : errMsg(r.error));
+        Toast.show(t('delAccountDone'), 'ok', 0, [{ label: 'OK', fn: () => {} }]);
+        this._mDirty = false; this.cm();
+        this.refreshAccountNav(); this.go(this.cv);
+      } catch (e) { Toast.error(String(e.message || e)); }
     },
 
     async accChangePwSave() {
